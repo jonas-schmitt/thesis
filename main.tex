@@ -88,7 +88,7 @@
 \firstname{Jonas}
 \lastname{Schmitt}
 \degree{M.Sc.}
-\origin{Nürnberg}
+\origin{Forchheim}
 
 % publication identifiers
 \yearofpublication{Year of Publication}
@@ -138,7 +138,7 @@
    
     %%% WRITE YOUR PREFACE DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR PREFACE %%%
-    \input{contents/my_preface.tex}
+    %\input{contents/my_preface.tex}
     
   \end{preface}
 
@@ -162,19 +162,18 @@
 
   % inserts introduction heading (hat \label{ch:intro},
   % reference via \autoref{ch:intro} or \ref{ch:intro})
-  \begin{introduction}
+\chapter{Introduction}
     
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR INTRODUCTION %%%
-    \input{contents/my_introduction.tex}
-    
-  \end{introduction}
+    %\input{contents/my_introduction.tex}
 
+\chapter{Background}
   %%% WRITE YOUR THESIS DIRECTLY HERE OR %%%%%%
   %%% INPUT EXTERNAL FILES WITH YOUR THESIS %%%
-  \input{contents/my_first_chapter.tex}
-  \input{contents/my_second_chapter.tex}
-  \input{contents/my_third_chapter.tex}
+  \input{contents/discretization.tex}
+  %\input{contents/my_second_chapter.tex}
+  %\input{contents/my_third_chapter.tex}
 
 % start the appendix (arabic page numbering [continued],
 % uppercase alphabetic sectioning numbering, header)
@@ -182,7 +181,7 @@
   
   %%% WRITE YOUR APPENDIX DIRECTLY HERE OR %%%%%%%%
   %%% INPUT AN EXTERNAL FILE WITH YOUR APPENDIX %%%
-  \input{contents/my_appendix.tex}
+  %\input{contents/my_appendix.tex}
     
 % start the backmatter (arabic page numbering [continued],
 % no sectioning numbering, header)
