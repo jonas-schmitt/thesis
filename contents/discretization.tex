@@ -3,21 +3,40 @@ Many problems in science and engineering can be modeled as partial differential 
 A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
 Consider, for instance, the equation
 \begin{equation}
-	\alpha \nabla^2 u - \frac{\partial }{\partial t} u,
+	\alpha \nabla^2 u = f,
 	\label{eq:heat-equation}
 \end{equation}
-where $u = u(\vec{x}, t)$ is a function in space and time.
-Equation~\eqref{eq:heat-equation} describes the time-dependent distribution of heat inside a medium whose thermal conductivity is determined by the coefficient $\alpha$.
-While depending on the initial conditions and those governing at the boundaries of the domain, an analytical solution for this equation might exist, an alternative approach is replace the partial derivatives $\nabla^2$ and $\frac{\partial }{\partial t}$ by simpler approximations defined at certain discrete points of the original domain.
-One possibility to obtain such an approximation is to compute the Taylor series expansion around each of such points, which leads to the so-called \emph{finite difference method} (FDM).
+where $u = u(\vec{x})$ and $f = f(\vec{x})$ are both functions with respect to the vector of space variables $\vec{x}$.
+Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source.
+While depending on the initial conditions and those governing at the boundaries of the domain an analytic solution for this equation might exist, an alternative approach is replace the partial derivative $\nabla^2$ by a simpler approximation defined at certain discrete points of the original domain.
+One possibility to obtain such an approximation is to compute the Taylor series expansion around each of these points, which leads to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
-To derive the finite difference method, we consider the one-dimensional case of Equation~\ref{eq:heat-equation}, where $u(x,t)$ represents a function that is differentiable in time and space.
-Expanding $u$ around $t$ using the respective Taylor series yields
+To obtain an approximation for the derivatives of a one-dimensional function $u(x)$, we can expand $u$ in the neighborhood of $x$ using the respective Taylor series with a step size $h$, which yields
 \begin{equation}
-	u(x, t - h_t) = u(x, t) - h_t \frac{\partial}{\partial t} u(x,t) + \mathcal{O}(h_t^2)
+	u(x + h) = u(x) - h \dv{x} u(x) + \mathcal{O}(h^2)
 \end{equation}
-Assuming $h_t$ is sufficiently small, the first-order approximation 
+Assuming $h$ is sufficiently small, the first-order approximation 
 \begin{equation}
-	\frac{\partial}{\partial t} u(x, t) \approx \frac{u(x, t) -  u(x, t - h_t)}{h_t}
+	\dv{x} u(x) \approx \frac{u(x + h) -  u(x)}{h}
 \end{equation}
 is obtained.
+Furthermore, we can derive an approximation for the second-order partial derivative $\dv[2]{x}$ by considering
+\begin{equation}
+	u(x + h) = u(x) + h \dv{x} u(x) + \frac{h^2}{2} \dv[2]{x} u(x) + \mathcal{O}(h^3)
+	\label{eq:taylor-forward}
+\end{equation}
+and 
+\begin{equation}
+	u(x - h) = u(x) - h \dv{x} u(x) + \frac{h^2}{2} \dv[2]{x} u(x) + \mathcal{O}(h^3).
+	\label{eq:taylor-backward}
+\end{equation}
+Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward} then yields the second-order finite difference approximation
+\begin{equation}
+	 \dv[2]{x} u(x,t) = \frac{u(x + h) + u(x - h) - 2u(x)}{h^2} + \mathcal{O}(h^3).
+\end{equation}
+Using the same technique similar approximation terms can be obtained for higher-order derivatives. %TODO Referenz einfügen
+\subsection{Boundary Conditions}
+
+
+
+
