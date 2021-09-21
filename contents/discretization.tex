@@ -1,2 +1,23 @@
 \section{Discretization of Partial Differential Equations}
-Numerous problems in science and engineering can be modeled as partial differential equations (PDEs). %TODO insert references
+Many problems in science and engineering can be modeled as partial differential equations (PDEs). %TODO insert references
+A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
+Consider, for instance, the equation
+\begin{equation}
+	\alpha \nabla^2 u - \frac{\partial }{\partial t} u,
+	\label{eq:heat-equation}
+\end{equation}
+where $u = u(\vec{x}, t)$ is a function in space and time.
+Equation~\eqref{eq:heat-equation} describes the time-dependent distribution of heat inside a medium whose thermal conductivity is determined by the coefficient $\alpha$.
+While depending on the initial conditions and those governing at the boundaries of the domain, an analytical solution for this equation might exist, an alternative approach is replace the partial derivatives $\nabla^2$ and $\frac{\partial }{\partial t}$ by simpler approximations defined at certain discrete points of the original domain.
+One possibility to obtain such an approximation is to compute the Taylor series expansion around each of such points, which leads to the so-called \emph{finite difference method} (FDM).
+\subsection{Finite Difference Method}
+To derive the finite difference method, we consider the one-dimensional case of Equation~\ref{eq:heat-equation}, where $u(x,t)$ represents a function that is differentiable in time and space.
+Expanding $u$ around $t$ using the respective Taylor series yields
+\begin{equation}
+	u(x, t - h_t) = u(x, t) - h_t \frac{\partial}{\partial t} u(x,t) + \mathcal{O}(h_t^2)
+\end{equation}
+Assuming $h_t$ is sufficiently small, the first-order approximation 
+\begin{equation}
+	\frac{\partial}{\partial t} u(x, t) \approx \frac{u(x, t) -  u(x, t - h_t)}{h_t}
+\end{equation}
+is obtained.
