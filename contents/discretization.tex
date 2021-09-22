@@ -3,15 +3,27 @@ Many problems in science and engineering can be modeled as partial differential 
 A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
 Consider, for instance, the equation
 \begin{equation}
-	\alpha \nabla^2 u = f,
+	\alpha \nabla^2 u = f \quad \text{in} \; \Omega 
 	\label{eq:heat-equation}
 \end{equation}
-where $u = u(\vec{x})$ and $f = f(\vec{x})$ are both functions with respect to the vector of space variables $\vec{x}$.
-Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source.
-While depending on the initial conditions and those governing at the boundaries of the domain an analytic solution for this equation might exist, an alternative approach is replace the partial derivative $\nabla^2$ by a simpler approximation defined at certain discrete points of the original domain.
+where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^n$.
+Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source $f$.
+Since Equation~\eqref{eq:heat-equation} is only satisfied in the interior of the domain $\Omega$, we, additionally need to define a set of conditions at its boundaries.
+These so-called \emph{boundary conditions} (BCs) can be usually classified in four different types:
+\begin{description}
+	\item[Dirichlet] $u(\bm{x}) = g(\bm{x})$
+	\item[Neumann] $\frac{\partial}{\partial \vec{n}} u(\bm{x}) = 0$
+	\item[Robin] $a u(\bm{x}) + b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = g(\bm{x})$
+	\item[Cauchy] $a u(\bm{x}) = g(\bm{x}), \; b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = h(\bm{x})$
+\end{description}
+Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to outwards-directed normal vector of the boundary.
+Note that the difference between Robin and Cauchy BCs is that in the former case one condition is formulated as a weighted average of $u$ and its derivative in normal direction, while for the latter two conditions must be met individually.
+While depending on the boundary conditions analytic solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs its computation is unfeasible.
+An alternative approach is replace all partial derivative contained in an equation by a simpler approximation defined at certain discrete points of the original domain.
 One possibility to obtain such an approximation is to compute the Taylor series expansion around each of these points, which leads to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
-To obtain an approximation for the derivatives of a one-dimensional function $u(x)$, we can expand $u$ in the neighborhood of $x$ using the respective Taylor series with a step size $h$, which yields
+For the sake of simplicity, we consider the one-dimensional function $u(x)$.
+To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
 \begin{equation}
 	u(x + h) = u(x) - h \dv{x} u(x) + \mathcal{O}(h^2)
 \end{equation}
@@ -32,10 +44,9 @@ and
 \end{equation}
 Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward} then yields the second-order finite difference approximation
 \begin{equation}
-	 \dv[2]{x} u(x) = \frac{u(x + h) + u(x - h) - 2u(x)}{h^2} + \mathcal{O}(h^3).
+	 \dv[2]{x} u(x) \approx \frac{u(x + h) + u(x - h) - 2u(x)}{h^2}.
 \end{equation}
 Using the same technique similar approximation terms can be obtained for higher-order derivatives. %TODO Referenz einfügen
-\subsection{Boundary Conditions}
 
 
 
