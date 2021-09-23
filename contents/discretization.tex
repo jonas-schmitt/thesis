@@ -65,21 +65,21 @@ For an in-depth introduction to these methods, the reader is referred to one of 
 To illustrate the previous two sections we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
 \begin{equation}
 	\begin{split}
-		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \text{in} \; \left( 0, 1 \right)^2 \\
-		u(x,y) & = 0 \quad \text{on} \; \left( 0, 1 \right)^2 
+		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1)^2 \\
+		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) & = 0 \quad \forall x, y \in (0, 1)^2
 	\end{split}
 	\label{eq:2D-poisson-model}
 \end{equation}
-Note that this equation corresponds to a two-dimensional steady-state heat equation with constant $\alpha = 1$.
+Note that this equation corresponds to the two-dimensional steady-state heat equation with constant $\alpha = 1$ on the unit square $\Omega = \left( 0, 1 \right)^2$.
 We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
 \begin{equation}
 	\begin{split}
-		\frac{1}{h^2} (u_{i-1, j} + u_{i+1, j} + u_{i, j-1} + u_{i, j+1} - 4 u_{i,j} ) & = f_{i, j} \quad \text{in} \; \left( 0, 1 \right)^2 \\
-		u_{i, j} & = 0 \quad \text{on} \; \left( 0, 1 \right)^2 
+		\frac{1}{h^2} (u_{i-1, j} + u_{i+1, j} + u_{i, j-1} + u_{i, j+1} - 4 u_{i,j} ) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\}^2 \\
+		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} & = 0 \quad \forall i, j \in \{1, 2, \dots n\}^2
 	\end{split} 
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
-with $u_{i,j} = u(ih, jh)$ and $f_{i,j} = f(ih, jh)$ for $i = 1, 2, \dots, n$ and $j = 1, 2, \dots, n$, where $n = 1/h - 1$.
+with $u_{i,j} = u(ih, jh)$, $f_{i,j} = f(ih, jh)$ and $n = 1/h - 1$.
 By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be transformed to a system of linear equation of type $\bm{A} \bm{u} = \bm{f}$. 
 
 
