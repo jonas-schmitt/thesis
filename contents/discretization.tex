@@ -18,9 +18,19 @@ These so-called \emph{boundary conditions} (BCs) can be usually classified in fo
 \end{description}
 Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to outwards-directed normal vector of the boundary.
 Note that the difference between Robin and Cauchy BCs is that in the former case one condition is formulated as a weighted average of $u$ and its derivative in normal direction, while for the latter two conditions must be met individually.
-While depending on the boundary conditions analytic solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs its computation is unfeasible.
-An alternative approach is replace all partial derivative contained in an equation by a simpler approximation defined at certain discrete points of the original domain.
-One possibility to obtain such an approximation is to compute the Taylor series expansion around each of these points, which leads to the so-called \emph{finite difference method} (FDM).
+While depending on the boundary conditions an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs such a solution has not been discovered or its computation is unfeasible.
+A remedy is the application of so-called numerical methods, that are based on approximating the solution of a given PDE on a discrete set of grid points. 
+\subsection{Grid Creation}
+Before computing a numerical approximation of the solution of a given PDE, we need to define a set of discrete points within the domain $\Omega$ at which we aim to obtain the solution.
+Usually, these points are defined on a grid or mesh with certain structure.
+In general, a distinction is made between structured (or regular) and unstructured grids.
+A structured grid is characterized by the uniform neighborhood of its grid points, which means that the number of neighbors is typically the same for each grid point.
+In contrast, each point within an unstructured grid can have a varying number of neighbors.
+Due to their regularity, computations are usually easier to implement and more efficient on structured grids, which are however difficult to create on complicated and irregular domains.
+On the other hand, unstructured grids offer a higher degree of flexibility and are, therefore, also well-suited for the previously mentioned cases. %TODO include references
+Since this thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids.
+In the following, we therefore exclusively focus on this grid type.
+One possibility to approximate a given PDE on a structured set of grid points is to compute the Taylor series expansion around each of them points, which leads to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
@@ -46,7 +56,10 @@ Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward}
 \begin{equation}
 	 \dv[2]{x} u(x) \approx \frac{u(x + h) + u(x - h) - 2u(x)}{h^2}.
 \end{equation}
-Using the same technique similar approximation terms can be obtained for higher-order derivatives. %TODO Referenz einfügen
+Using the same technique similar approximation terms can be obtained for higher-dimensional functions and higher-order derivatives. %TODO Referenz einfügen
+While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together more complicated approaches such as the finite volume (FVM) and finite element method (FEM) together with the use of semi- or unstructured grids.
+For an in-depth introduction to these methods, the reader is referred to one of these references:
+%TODO insert references about FVM and FEM
 
 
 
