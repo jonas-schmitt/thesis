@@ -26,10 +26,11 @@ Usually, these points are defined on a grid or mesh with certain structure.
 In general, a distinction is made between structured (or regular) and unstructured grids.
 A structured grid is characterized by the uniform neighborhood of its grid points, which means that the number of neighbors is typically the same for each grid point.
 In contrast, each point within an unstructured grid can have a varying number of neighbors.
-Due to their regularity, computations are usually easier to implement and more efficient on structured grids, which are however difficult to create on complicated and irregular domains.
+Computations are usually easier to implement and more efficient on structured grids, due to their regularity.
+However, structured grids are often difficult to create on complicated and irregular domains.
 On the other hand, unstructured grids offer a higher degree of flexibility and are, therefore, also well-suited for the previously mentioned cases. %TODO include references
-Since this thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids.
-In the following, we therefore exclusively focus on this grid type.
+This thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids. 
+In the following, we, therefore, focus on this particular grid type.
 One possibility to approximate a given PDE on a structured set of grid points is to compute the Taylor series expansion around each of them points, which leads to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
@@ -58,8 +59,30 @@ Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward}
 \end{equation}
 Using the same technique similar approximation terms can be obtained for higher-dimensional functions and higher-order derivatives. %TODO Referenz einfügen
 While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together more complicated approaches such as the finite volume (FVM) and finite element method (FEM) together with the use of semi- or unstructured grids.
-For an in-depth introduction to these methods, the reader is referred to one of these references:
+For an in-depth introduction to these methods, the reader is referred to one of the following references:
 %TODO insert references about FVM and FEM
+\subsection{Model Problem}
+To illustrate the previous two sections we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
+\begin{equation}
+	\begin{split}
+		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \text{in} \; \left( 0, 1 \right)^2 \\
+		u(x,y) & = 0 \quad \text{on} \; \left( 0, 1 \right)^2 
+	\end{split}
+	\label{eq:2D-poisson-model}
+\end{equation}
+Note that this equation corresponds to a two-dimensional steady-state heat equation with constant $\alpha = 1$.
+We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
+\begin{equation}
+	\begin{split}
+		\frac{1}{h^2} (u_{i-1, j} + u_{i+1, j} + u_{i, j-1} + u_{i, j+1} - 4 u_{i,j} ) & = f_{i, j} \quad \text{in} \; \left( 0, 1 \right)^2 \\
+		u_{i, j} & = 0 \quad \text{on} \; \left( 0, 1 \right)^2 
+	\end{split} 
+	\label{eq:2D-poisson-model-discrete}
+\end{equation}
+with $u_{i,j} = u(ih, jh)$ and $f_{i,j} = f(ih, jh)$ for $i = 1, 2, \dots, n$ and $j = 1, 2, \dots, n$, where $n = 1/h - 1$.
+By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be transformed to a system of linear equation of type $\bm{A} \bm{u} = \bm{f}$. 
+
+
 
 
 
