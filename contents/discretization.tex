@@ -80,7 +80,20 @@ We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
 with $u_{i,j} = u(ih, jh)$, $f_{i,j} = f(ih, jh)$ and $n = 1/h - 1$.
-By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be transformed to a system of linear equation of type $\bm{A} \bm{u} = \bm{f}$. 
+By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be transformed to a system of linear equation of type $A \bm{u} = \bm{f}$. 
+For instance, setting $h = 0.25$, results in $n = 3$ and, hence, a total number of nine grid points.
+%TODO draw grid
+Assuming a natural ordering of grid points, we can represent the resulting system of linear equations as follows
+\begin{equation}
+\underbrace{\begin{pmatrix}
+\begin{array}{ccc|ccc|ccc}~4&-1&~0&-1&~0&~0&~0&~0&~0\\-1&~4&-1&~0&-1&~0&~0&~0&~0\\~0&-1&~4&~0&~0&-1&~0&~0&~0\\\hline -1&~0&~0&~4&-1&~0&-1&~0&~0\\~0&-1&~0&-1&~4&-1&~0&-1&~0\\~0&~0&-1&~0&-1&~4&~0&~0&-1\\\hline ~0&~0&~0&-1&~0&~0&~4&-1&~0\\~0&~0&~0&~0&-1&~0&-1&~4&-1\\~0&~0&~0&~0&~0&-1&~0&-1&~4\end{array}
+	\end{pmatrix}}_{\textstyle A}
+\underbrace{\begin{pmatrix}
+	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
+\end{pmatrix}}_{\textstyle u} = \underbrace{\begin{pmatrix}
+f_{11} \\ f_{12} \\ f_{13} \\ f_{21} \\ f_{22} \\ f_{23} \\ f_{31} \\ f_{32} \\ f_{33}
+\end{pmatrix}}_{\textstyle f}
+\end{equation}
 
 
 
