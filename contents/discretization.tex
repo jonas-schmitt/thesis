@@ -88,13 +88,15 @@ Assuming a natural ordering of grid points, we can represent the resulting syste
 \underbrace{\begin{pmatrix}
 \begin{array}{ccc|ccc|ccc}~4&-1&~0&-1&~0&~0&~0&~0&~0\\-1&~4&-1&~0&-1&~0&~0&~0&~0\\~0&-1&~4&~0&~0&-1&~0&~0&~0\\\hline -1&~0&~0&~4&-1&~0&-1&~0&~0\\~0&-1&~0&-1&~4&-1&~0&-1&~0\\~0&~0&-1&~0&-1&~4&~0&~0&-1\\\hline ~0&~0&~0&-1&~0&~0&~4&-1&~0\\~0&~0&~0&~0&-1&~0&-1&~4&-1\\~0&~0&~0&~0&~0&-1&~0&-1&~4\end{array}
 	\end{pmatrix}}_{\textstyle A}
-\underbrace{\begin{pmatrix}
+\underbrace{
+	\begin{pmatrix}
 	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
-\end{pmatrix}}_{\textstyle u} = \underbrace{\begin{pmatrix}
-f_{11} \\ f_{12} \\ f_{13} \\ f_{21} \\ f_{22} \\ f_{23} \\ f_{31} \\ f_{32} \\ f_{33}
-\end{pmatrix}}_{\textstyle f}
+\end{pmatrix}}_{\textstyle{\bm{u}}} = \underbrace{\begin{pmatrix}
+-h^2 f_{11} + u_{10} + u_{01} \\-h^2 f_{12} + u_{02} \\-h^2 f_{13} + u_{03} + u_{14} \\-h^2 f_{21} + u_{20} \\ -h^2 f_{22} \\ -h^2 f_{23} + u_{24} \\ -h^2 f_{31} + u_{30} + u_{41}  \\ -h^2 f_{32} + u_{42} \\ -h^2 f_{33} + u_{34} + u_{43}
+\end{pmatrix}}_{ \textstyle{\bm {f}} }.
 \end{equation}
-
+Since we assume Dirichlet boundary conditions with a constant value of zero, the right-hand side $\bm f$ can be reduced to
+$\bm f = h^2 \left(f_{11}, f_{12}, f_{13}, f_{21}, f_{22},  f_{23}, f_{31}, f_{32}, f_{33} \right)^T$
 
 
 
