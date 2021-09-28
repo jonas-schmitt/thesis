@@ -3,7 +3,7 @@ Many problems in science and engineering can be modeled as partial differential 
 A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
 Consider, for instance, the equation
 \begin{equation}
-	\alpha \nabla^2 u = f \quad \text{in} \; \Omega 
+	-\alpha \nabla^2 u = f \quad \text{in} \; \Omega 
 	\label{eq:heat-equation}
 \end{equation}
 where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^n$.
@@ -65,7 +65,7 @@ For an in-depth introduction to these methods, the reader is referred to one of 
 To illustrate the previous two sections we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
 \begin{equation}
 	\begin{split}
-		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1)^2 \\
+		-\frac{\partial^2}{\partial x^2} u(x,y) - \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1)^2 \\
 		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) & = 0 \quad \forall x, y \in (0, 1)^2
 	\end{split}
 	\label{eq:2D-poisson-model}
@@ -74,7 +74,7 @@ Note that this equation corresponds to the two-dimensional steady-state heat equ
 We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
 \begin{equation}
 	\begin{split}
-		\frac{1}{h^2} (u_{i-1, j} + u_{i+1, j} + u_{i, j-1} + u_{i, j+1} - 4 u_{i,j} ) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\}^2 \\
+		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\}^2 \\
 		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} & = 0 \quad \forall i, j \in \{1, 2, \dots n\}^2
 	\end{split} 
 	\label{eq:2D-poisson-model-discrete}
@@ -85,19 +85,54 @@ For instance, setting $h = 0.25$, results in $n = 3$ and, hence, a total number 
 %TODO draw grid
 Assuming a natural ordering of grid points, we can represent the resulting system of linear equations as follows
 \begin{equation}
-\underbrace{\begin{pmatrix}
+\frac{1}{h^2} \underbrace{ \begin{pmatrix}
 \begin{array}{ccc|ccc|ccc}~4&-1&~0&-1&~0&~0&~0&~0&~0\\-1&~4&-1&~0&-1&~0&~0&~0&~0\\~0&-1&~4&~0&~0&-1&~0&~0&~0\\\hline -1&~0&~0&~4&-1&~0&-1&~0&~0\\~0&-1&~0&-1&~4&-1&~0&-1&~0\\~0&~0&-1&~0&-1&~4&~0&~0&-1\\\hline ~0&~0&~0&-1&~0&~0&~4&-1&~0\\~0&~0&~0&~0&-1&~0&-1&~4&-1\\~0&~0&~0&~0&~0&-1&~0&-1&~4\end{array}
 	\end{pmatrix}}_{\textstyle A}
 \underbrace{
 	\begin{pmatrix}
 	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
-\end{pmatrix}}_{\textstyle{\bm{u}}} = \underbrace{\begin{pmatrix}
--h^2 f_{11} + u_{10} + u_{01} \\-h^2 f_{12} + u_{02} \\-h^2 f_{13} + u_{03} + u_{14} \\-h^2 f_{21} + u_{20} \\ -h^2 f_{22} \\ -h^2 f_{23} + u_{24} \\ -h^2 f_{31} + u_{30} + u_{41}  \\ -h^2 f_{32} + u_{42} \\ -h^2 f_{33} + u_{34} + u_{43}
-\end{pmatrix}}_{ \textstyle{\bm {f}} }.
+\end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f
 \end{equation}
-Since we assume Dirichlet boundary conditions with a constant value of zero, the right-hand side $\bm f$ can be reduced to
-$\bm f = h^2 \left(f_{11}, f_{12}, f_{13}, f_{21}, f_{22},  f_{23}, f_{31}, f_{32}, f_{33} \right)^T$
-
+with a right-hand side $\bm f$, which can be further reduced with respect to the given boundary conditions that assume a constant value of zero at all boundary points:
+\begin{equation}
+\bm f = \begin{pmatrix}
+		f_{11} + \frac{1}{h^2} (u_{10} + u_{01}) \\f_{12} + \frac{1}{h^2} u_{02} \\ f_{13} + \frac{1}{h^2} (u_{03} + u_{14})  \\ f_{21} + \frac{1}{h^2} u_{20} \\ f_{22} \\ f_{23} + \frac{1}{h^2} u_{24} \\ f_{31} + \frac{1}{h^2} (u_{30} + u_{41}) \\ f_{32} + \frac{1}{h^2} u_{42} \\ f_{33} + \frac{1}{h^2} (u_{34} + u_{43})
+\end{pmatrix} = \begin{pmatrix}
+f_{11} \\
+f_{12} \\ 
+f_{13} \\ 
+f_{21} \\ 
+f_{22} \\
+f_{23} \\
+f_{31} \\ 
+f_{32} \\
+f_{33}
+\end{pmatrix}.
+\label{eq:2D-poisson-assembled-rhs}
+\end{equation}
+Note that $A$ represents a sparse matrix, which means that only a minority of its entries are nonzero.
+Moreover, since we already represent the solution of Equation~\ref{eq:2D-poisson-model-discrete} on a regular grid, storing the resulting linear system in a matrix-vector format is inefficient.
+If we assume that each operation required for solving a system of linear equations can be formulated in form of a matrix-vector or vector-vector operation, it is unnecessary to store the corresponding matrix explicitly.
+Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
+On regular grids, each of such pattern can be represented as a so-called stencil code.
+\subsection{Stencil Codes}
+In general, a stencil code can be considered a set of mappings from an n-dimensional index to a complex-valued number.
+More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $m$ tuples of the following form:
+\begin{equation}
+	S^{(m, n)} = \{(\bm{a_k}, b_k) \}_{k=1}^m \; \text{with} \; \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}.
+\end{equation}
+Furthermore, we can define the application of a stencil to a certain point $u_{\bm x}$ with $\bm x \in \mathbb{Z}^n$ on a regular grid as follows
+\begin{equation}
+	S^{(m, n)} \cdot u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad \text{with}\; \bm{x}, \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}
+\end{equation}
+For example consider the five-point stencil
+\begin{equation}
+	S_{\text{Laplace}}^{(5,2)} = (((0,0), 4), ((1,0), -1), ((-1,0), -1), ((0,1), -1), ((0,-1), -1))
+\end{equation}
+Applying $S_{\text{Laplace}}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional grid yields 
+\begin{equation}
+	S_{\text{Laplace}}^{(5,2)} \cdot u_{i,j} = 4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}.
+\end{equation}
 
 
 
