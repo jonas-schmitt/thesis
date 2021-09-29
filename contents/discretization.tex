@@ -116,23 +116,36 @@ If we assume that each operation required for solving a system of linear equatio
 Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
 On regular grids, each of such pattern can be represented as a so-called stencil code.
 \subsection{Stencil Codes}
-In general, a stencil code can be considered a set of mappings from an n-dimensional index to a complex-valued number.
+In general, a stencil code can be considered a set of mappings from an n-dimensional index vector to a complex-valued number.
 More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $m$ tuples of the following form:
+
 \begin{equation}
-	S^{(m, n)} = \{(\bm{a_k}, b_k) \}_{k=1}^m \; \text{with} \; \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}.
+	\begin{split}
+			& S^{(m, n)} = \left\{\left(\bm{a_k}, b_k\right) \right\}_{k=1}^m = \left\{\left(\bm{a_1}, b_1\right),  \left(\bm{a_2}, b_2\right), \dots \left(\bm{a_m}, b_m\right)\right\} 
+	\\ & \text{with} \; \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}.
+	\end{split}
 \end{equation}
-Furthermore, we can define the application of a stencil to a certain point $u_{\bm x}$ with $\bm x \in \mathbb{Z}^n$ on a regular grid as follows
+
+Furthermore, we define the application of a stencil $S^{(m, n)}$ to a certain point $u_{\bm x}$ with $\bm x \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^n$ is the set of grid indices, each considered as an n-dimensional vector:
 \begin{equation}
-	S^{(m, n)} \cdot u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad \text{with}\; \bm{x}, \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}
+	\begin{split}
+		& S^{(m, n)} \circ u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
+		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & \left(\bm{a_i}, b_i\right) \in S^{(m,n)} \; \forall \; i = 1, 2, \dots m
+	\end{split}
 \end{equation}
-For example consider the five-point stencil
+As an example we consider the following five-point stencil:
 \begin{equation}
-	S_{\text{Laplace}}^{(5,2)} = (((0,0), 4), ((1,0), -1), ((-1,0), -1), ((0,1), -1), ((0,-1), -1))
+	\begin{split}
+		\Delta_h^{(5,2)} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
+	\end{split}
 \end{equation}
-Applying $S_{\text{Laplace}}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional grid yields 
+Applying $\Delta_{h}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
 \begin{equation}
-	S_{\text{Laplace}}^{(5,2)} \cdot u_{i,j} = 4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}.
+	\Delta_h^{(5,2)} \circ u_{i,j} = \frac{1}{h^2}(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}),
 \end{equation}
+which corresponds precisely to the left part of Equation~\ref{eq:2D-poisson-model-discrete}.
+
+
 
 
 
