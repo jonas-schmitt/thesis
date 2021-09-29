@@ -92,6 +92,7 @@ Assuming a natural ordering of grid points, we can represent the resulting syste
 	\begin{pmatrix}
 	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
 \end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f
+\label{eq:2D-poisson-assembled-matrix}
 \end{equation}
 with a right-hand side $\bm f$, which can be further reduced with respect to the given boundary conditions that assume a constant value of zero at all boundary points:
 \begin{equation}
@@ -116,7 +117,7 @@ If we assume that each operation required for solving a system of linear equatio
 Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
 On regular grids, each of such pattern can be represented as a so-called stencil code.
 \subsection{Stencil Codes}
-In general, a stencil code can be considered a set of mappings from an n-dimensional index vector to a complex-valued number.
+In general, a stencil code can be considered as a set of mappings from an n-dimensional index vector to a complex-valued number.
 More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
@@ -143,7 +144,19 @@ Applying $\Delta_{h}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional re
 \begin{equation}
 	\Delta_h^{(5,2)} \circ u_{i,j} = \frac{1}{h^2}(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}),
 \end{equation}
-which corresponds precisely to the left part of Equation~\ref{eq:2D-poisson-model-discrete}.
+which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
+From this example it becomes evident that applying a given stencil to set of points $u_{\bm x}$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
+Therefore, in case it is possible to define each computational step for solving a given discretized PDE on a regular grid by means of a stencil application, we only need to obtain the respective stencil entries instead of assembling or even storing a complete matrix.
+Furthermore, many operators defined for matrices can be easily transferred into the domain of stencil codes.
+% Scalar multiplication
+\begin{equation}
+	\alpha S^{(m, n)} = \left\{\left(\bm{a_k}, \alpha b_k\right) \right\}_{k=1}^m
+\end{equation}
+% Diagonal
+\begin{equation}
+		\text{diag}(S^{(m, n)}) = \left\{\left(\bm{0}, b\right) \right\} \text{if} \; (\bm 0, b) \in S^{(m, n)}
+\end{equation}
+
 
 
 
