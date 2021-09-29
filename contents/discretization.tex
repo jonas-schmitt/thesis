@@ -123,7 +123,7 @@ More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $
 \begin{equation}
 	\begin{split}
 			& S^{(m, n)} = \left\{\left(\bm{a_k}, b_k\right) \right\}_{k=1}^m = \left\{\left(\bm{a_1}, b_1\right),  \left(\bm{a_2}, b_2\right), \dots \left(\bm{a_m}, b_m\right)\right\} 
-	\\ & \text{with} \; \bm{a_k} \in \mathbb{Z}^n, b_k \in \mathbb{C}.
+	\\ & \bm{a_k} \in \mathbb{Z}^n \wedge \bm{a_i} \neq \bm{a_j} \; \forall \, i, j \in \left\{1, 2, \dots m \right\} \; \text{with} \; i \neq j , b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
 
@@ -131,7 +131,7 @@ Furthermore, we define the application of a stencil $S^{(m, n)}$ to a certain po
 \begin{equation}
 	\begin{split}
 		& S^{(m, n)} \circ u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
-		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & \left(\bm{a_i}, b_i\right) \in S^{(m,n)} \; \forall \; i = 1, 2, \dots m
+		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & \left(\bm{a_i}, b_i\right) \in S^{(m,n)} \; \forall \, i \in \left\{ 1, 2, \dots m \right\} 
 	\end{split}
 \end{equation}
 As an example we consider the following five-point stencil:
@@ -154,9 +154,14 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 \end{equation}
 % Diagonal
 \begin{equation}
-		\text{diag}(S^{(m, n)}) = \left\{\left(\bm{0}, b\right) \right\} \text{if} \; (\bm 0, b) \in S^{(m, n)}
+		\text{diag}\left(S^{(m, n)}\right) = \begin{cases}
+			\left\{\left(\bm{0}, b\right) \right\} & \text{if} \; (\bm 0, b) \in S^{(m, n)} \\
+			\emptyset & \text{else}
+		\end{cases}
 \end{equation}
-
+\begin{equation}
+	S^{(m, n)} + \tilde{S}^{(\tilde{m}, \tilde{n})} = \left\{\left(\bm{a_k}, b_k + \tilde{b} \right) \right\} \; \forall 
+\end{equation}
 
 
 
