@@ -70,7 +70,7 @@ To illustrate the previous two sections we consider the following model problem,
 	\end{split}
 	\label{eq:2D-poisson-model}
 \end{equation}
-Note that this equation corresponds to the two-dimensional steady-state heat equation with constant $\alpha = 1$ on the unit square $\Omega = \left( 0, 1 \right)^2$.
+Note that this equation corresponds to the two-dimensional steady-state heat equation with constant $\alpha = 1$ on the unit square $\Omega = ( 0, 1 )^2$.
 We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
 \begin{equation}
 	\begin{split}
@@ -122,8 +122,8 @@ More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $
 
 \begin{equation}
 	\begin{split}
-			& S^{(m, n)} = \left\{\left(\bm{a_k}, b_k\right) \right\}_{k=1}^m = \left\{\left(\bm{a_1}, b_1\right),  \left(\bm{a_2}, b_2\right), \dots \left(\bm{a_m}, b_m\right)\right\} 
-	\\ & \forall \, i, j, k \in \left\{1, 2, \dots m \right\}: \,
+			& S^{(m, n)} = \{(\bm{a_k}, b_k) \}_{k=1}^m = \{(\bm{a_1}, b_1),  (\bm{a_2}, b_2), \dots (\bm{a_m}, b_m)\} 
+	\\ & \forall \, i, j, k \in \{1, 2, \dots m \}: \,
 	\bm{a_k} \in \mathbb{Z}^n \wedge \bm{a_i} \neq \bm{a_j} \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
@@ -132,7 +132,7 @@ Furthermore, we define the application of a stencil $S^{(m, n)}$ to a certain po
 \begin{equation}
 	\begin{split}
 		& S^{(m, n)} \circ u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
-		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & \left(\bm{a_i}, b_i\right) \in S^{(m,n)} \; \forall \, i \in \left\{ 1, 2, \dots m \right\} 
+		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & (\bm{a_i}, b_i) \in S^{(m,n)} \; \forall \, i \in \{ 1, 2, \dots m \} 
 	\end{split}
 \end{equation}
 As an example we consider the following five-point stencil:
@@ -143,7 +143,7 @@ As an example we consider the following five-point stencil:
 \end{equation}
 Applying $\Delta_{h}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
 \begin{equation}
-	\Delta_h^{(5,2)} \circ u_{i,j} = \frac{1}{h^2}(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}),
+	\Delta_h^{(5,2)} \circ u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
 From this example it becomes evident that applying a given stencil to set of points $u_{\bm x}$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
@@ -151,12 +151,12 @@ Therefore, in case it is possible to define each computational step for solving 
 Furthermore, many operators defined for matrices can be easily transferred into the domain of stencil codes.
 % Scalar multiplication
 \begin{equation}
-	\alpha S^{(m, n)} = \left\{\left(\bm{a_k}, \alpha b_k\right) \right\}_{k=1}^m
+	\alpha S^{(m, n)} = \{(\bm{a_k}, \alpha b_k) \}_{k=1}^m
 \end{equation}
 % Diagonal
 \begin{equation}
-		\text{diag}\left(S\right) = \begin{cases}
-			\left\{\left(\bm{0}, b\right) \right\} & \text{if} \; (\bm 0, b) \in S \\
+		\text{diag}(S) = \begin{cases}
+			\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\
 			\emptyset & \text{else}
 		\end{cases}
 \end{equation}
@@ -164,16 +164,17 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 \begin{equation}
 	S_1 \pm S_2 = 
 	\begin{cases}
-		\left\{\left(\bm{a}, b\pm c \right) \right\} \cup \left(\tilde{S}_1 \pm \tilde{S}_2\right) & \text{if} \; S_1 = 	\left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
-		S_2 = \left\{\left(\bm{a}, c \right) \right\} \cup \tilde{S}_2 \\
+		\{(\bm{a}, b\pm c ) \} \cup (\tilde{S}_1 \pm \tilde{S}_2) & \text{if} \; S_1 = 	\{(\bm{a}, b ) \} \cup \tilde{S}_1 \wedge
+		S_2 = \{(\bm{a}, c ) \} \cup \tilde{S}_2 \\
 		
-		\left\{\left(\bm{a}, b \right) \right\} \cup \left(\tilde{S}_1 \pm S_2\right) & \text{if} \; S_1 = 	\left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
-		\left\{\left(\bm{a}, c \right) \right\} \notin S_2 \;
+		\{(\bm{a}, b ) \} \cup (\tilde{S}_1 \pm S_2) & \text{if} \; S_1 = 	\{(\bm{a}, b ) \} \cup \tilde{S}_1 \wedge
+		\{(\bm{a}, c ) \} \notin S_2 \;
 		\forall c \in \mathbb{C}
 		\\
-		\left\{\left(\bm{a}, c \right) \right\} \cup \left(S_1 \pm \tilde{S}_2\right) & \text{if} \; S_2 = 	\left\{\left(\bm{a}, c \right) \right\} \cup \tilde{S}_2 \wedge
-		\left\{\left(\bm{a}, b \right) \right\} \notin S_1 \; \forall b \in \mathbb{C}
-		\\
+% TODO case probably unnecessary
+%		\{(\bm{a}, c ) \} \cup (S_1 \pm \tilde{S}_2) & \text{if} \; S_2 = 	\{(\bm{a}, c ) \} \cup \tilde{S}_2 \wedge
+%		\{(\bm{a}, b ) \} \notin S_1 \; \forall b \in \mathbb{C}
+%		\\
 		S_1 & \text{if} \; S_2 = \emptyset
 		\\
 		S_2 & \text{else} 
@@ -181,20 +182,12 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 	\end{cases}
 \end{equation}
 
-%TODO define stencil merge
-% Stencil merge
-\begin{equation}
-	\sum S_1 = \begin{cases}
-		Inhalt...
-	\end{cases}
-\end{equation}
-
 % Stencil multiplication
 \begin{equation}
 	S_1 \cdot S_2 = 
 	\begin{cases}
-		\sum (\left\{\left(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} \right) \right\} \cup \left( \left\{\left(\bm{a}, b \right) \right\} \cdot \tilde{S}_2\right) \cup \left(\tilde{S}_1 \cdot S_2\right)) & \text{if} \; S_1 = \left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
-		S_2 = \left\{\left(\bm{\hat{a}}, \hat{b} \right) \right\} \cup \tilde{S}_2 \\
+		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} +  \{(\bm{a}, b ) \} \cdot \tilde{S}_2 + \tilde{S}_1 \cdot S_2 & \text{if} \; S_1 = \{(\bm{a}, b ) \} \cup \tilde{S}_1 \wedge
+		S_2 = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{S}_2 \\
 		\emptyset & \text{if} \; S_1 = \emptyset \vee S_2 = \emptyset
 	\end{cases}
 \end{equation}
