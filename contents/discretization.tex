@@ -123,7 +123,8 @@ More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $
 \begin{equation}
 	\begin{split}
 			& S^{(m, n)} = \left\{\left(\bm{a_k}, b_k\right) \right\}_{k=1}^m = \left\{\left(\bm{a_1}, b_1\right),  \left(\bm{a_2}, b_2\right), \dots \left(\bm{a_m}, b_m\right)\right\} 
-	\\ & \bm{a_k} \in \mathbb{Z}^n \wedge \bm{a_i} \neq \bm{a_j} \; \forall \, i, j \in \left\{1, 2, \dots m \right\} \; \text{with} \; i \neq j , b_k \in \mathbb{C}.
+	\\ & \forall \, i, j, k \in \left\{1, 2, \dots m \right\}: \,
+	\bm{a_k} \in \mathbb{Z}^n \wedge \bm{a_i} \neq \bm{a_j} \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
 
@@ -154,13 +155,48 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 \end{equation}
 % Diagonal
 \begin{equation}
-		\text{diag}\left(S^{(m, n)}\right) = \begin{cases}
-			\left\{\left(\bm{0}, b\right) \right\} & \text{if} \; (\bm 0, b) \in S^{(m, n)} \\
+		\text{diag}\left(S\right) = \begin{cases}
+			\left\{\left(\bm{0}, b\right) \right\} & \text{if} \; (\bm 0, b) \in S \\
 			\emptyset & \text{else}
 		\end{cases}
 \end{equation}
+% Stencil addition and subtraction
 \begin{equation}
-	S^{(m, n)} + \tilde{S}^{(\tilde{m}, \tilde{n})} = \left\{\left(\bm{a_k}, b_k + \tilde{b} \right) \right\} \; \forall 
+	S_1 \pm S_2 = 
+	\begin{cases}
+		\left\{\left(\bm{a}, b\pm c \right) \right\} \cup \left(\tilde{S}_1 \pm \tilde{S}_2\right) & \text{if} \; S_1 = 	\left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
+		S_2 = \left\{\left(\bm{a}, c \right) \right\} \cup \tilde{S}_2 \\
+		
+		\left\{\left(\bm{a}, b \right) \right\} \cup \left(\tilde{S}_1 \pm S_2\right) & \text{if} \; S_1 = 	\left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
+		\left\{\left(\bm{a}, c \right) \right\} \notin S_2 \;
+		\forall c \in \mathbb{C}
+		\\
+		\left\{\left(\bm{a}, c \right) \right\} \cup \left(S_1 \pm \tilde{S}_2\right) & \text{if} \; S_2 = 	\left\{\left(\bm{a}, c \right) \right\} \cup \tilde{S}_2 \wedge
+		\left\{\left(\bm{a}, b \right) \right\} \notin S_1 \; \forall b \in \mathbb{C}
+		\\
+		S_1 & \text{if} \; S_2 = \emptyset
+		\\
+		S_2 & \text{else} 
+		\\
+	\end{cases}
+\end{equation}
+
+%TODO define stencil merge
+% Stencil merge
+\begin{equation}
+	\sum S_1 = \begin{cases}
+		Inhalt...
+	\end{cases}
+\end{equation}
+
+% Stencil multiplication
+\begin{equation}
+	S_1 \cdot S_2 = 
+	\begin{cases}
+		\sum (\left\{\left(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} \right) \right\} \cup \left( \left\{\left(\bm{a}, b \right) \right\} \cdot \tilde{S}_2\right) \cup \left(\tilde{S}_1 \cdot S_2\right)) & \text{if} \; S_1 = \left\{\left(\bm{a}, b \right) \right\} \cup \tilde{S}_1 \wedge
+		S_2 = \left\{\left(\bm{\hat{a}}, \hat{b} \right) \right\} \cup \tilde{S}_2 \\
+		\emptyset & \text{if} \; S_1 = \emptyset \vee S_2 = \emptyset
+	\end{cases}
 \end{equation}
 
 
