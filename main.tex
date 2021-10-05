@@ -43,11 +43,13 @@
     % both (= true, all, default)
     % onlyhorizontal (= novertical)
     % onlyvertical (= nohorizontal)
-  bibliography = split,
+  %TODO fix faupress bibliography
+  bibliography = false,
     % none (= false)
     % split (= true, default)
     % combined
-  bibliographypart = all,
+  %TODO fix faupress bibliography
+  bibliographypart = false,
     % none (= false)
     % all (= true, default)
     % onlymain
@@ -176,8 +178,7 @@
   %%% WRITE YOUR THESIS DIRECTLY HERE OR %%%%%%
   %%% INPUT EXTERNAL FILES WITH YOUR THESIS %%%
   \input{contents/discretization.tex}
-  %\input{contents/my_second_chapter.tex}
-  %\input{contents/my_third_chapter.tex}
+  \input{contents/iterative_solvers.tex}
 
 % start the appendix (arabic page numbering [continued],
 % uppercase alphabetic sectioning numbering, header)
@@ -190,9 +191,11 @@
 % start the backmatter (arabic page numbering [continued],
 % no sectioning numbering, header)
 \backmatter
-
+  \bibliographystyle{abbrv}
+  %TODO fix faupress bibliography
   % typeset the bibliography, settings can be
   % tweaked via the class option bibliography
-  \faupressprintbibliography
+  % \faupressprintbibliography
+  \bibliography{bibliography}
 
 \end{document}
