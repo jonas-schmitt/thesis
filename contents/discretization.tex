@@ -6,7 +6,7 @@ Consider, for instance, the equation
 	-\alpha \nabla^2 u = f \quad \text{in} \; \Omega 
 	\label{eq:heat-equation}
 \end{equation}
-where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^n$.
+where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^d$.
 Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source $f$.
 Since Equation~\eqref{eq:heat-equation} is only satisfied in the interior of the domain $\Omega$, we, additionally need to define a set of conditions at its boundaries.
 These so-called \emph{boundary conditions} (BCs) can be usually classified in four different types:
@@ -62,11 +62,11 @@ While finite differences offer a simple and straightforward way to approximate a
 For an in-depth introduction to these methods, the reader is referred to one of the following references:
 %TODO insert references about FVM and FEM
 \subsection{Model Problem}
-To illustrate the previous two sections we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
+To illustrate the previous two sections, we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
 \begin{equation}
 	\begin{split}
-		-\frac{\partial^2}{\partial x^2} u(x,y) - \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1)^2 \\
-		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) & = 0 \quad \forall x, y \in (0, 1)^2
+		-\frac{\partial^2}{\partial x^2} u(x,y) - \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1) \\
+		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) & = 0 \quad \forall x, y \in (0, 1)
 	\end{split}
 	\label{eq:2D-poisson-model}
 \end{equation}
@@ -74,8 +74,8 @@ Note that this equation corresponds to the two-dimensional steady-state heat equ
 We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
 \begin{equation}
 	\begin{split}
-		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\}^2 \\
-		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} & = 0 \quad \forall i, j \in \{1, 2, \dots n\}^2
+		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\} \\
+		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} & = 0 \quad \forall i, j \in \{1, 2, \dots n\}
 	\end{split} 
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
@@ -118,22 +118,22 @@ Instead, we only have to store the computational pattern that corresponds to a m
 On regular grids, each of such pattern can be represented as a so-called stencil code.
 \subsection{Stencil Codes}
 In general, a stencil code can be considered as a set of mappings from an n-dimensional index vector to a complex-valued number.
-More formally we can define the general stencil $S^{(m,n)}$ as a finite set of $m$ tuples of the following form:
+More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
 	\begin{split}
-			& S^{(m, n)} = \{(\bm{a_k}, b_k) \}_{k=1}^m = \{(\bm{a_1}, b_1),  (\bm{a_2}, b_2), \dots (\bm{a_m}, b_m)\} 
+			& S^{(m, d)} = \{(\bm{a_k}, b_k) \}_{k=1}^m = \{(\bm{a_1}, b_1),  (\bm{a_2}, b_2), \dots (\bm{a_m}, b_m)\} 
 	\\ & \forall \, i, j, k \in \{1, 2, \dots m \}: \,
-	\bm{a_k} \in \mathbb{Z}^n \wedge \bm{a_i} \neq \bm{a_j} \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
+	\bm{a_k} \in \mathbb{Z}^d \wedge \bm{a_i} \neq \bm{a_j} \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
 Here, the left entry $\bm{a_k}$ of each tuple $(\bm{a_k}, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
 
-Furthermore, we define the application of a stencil $S^{(m, n)}$ to a certain point $u_{\bm x}$ with $\bm x \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^n$ is the set of grid indices, each considered as an n-dimensional vector:
+Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain point $u_{\bm x}$ with $\bm x \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^d$ is the set of grid indices, each considered as an n-dimensional vector:
 \begin{equation}
 	\begin{split}
-		& S^{(m, n)} \cdot u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
-		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^n, \\ & (\bm{a_i}, b_i) \in S^{(m,n)} \; \forall \, i \in \{ 1, 2, \dots m \} 
+		& S^{(m, d)} \cdot u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
+		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a_i}, b_i) \in S^{(m,d)} \; \forall \, i \in \{ 1, 2, \dots m \} 
 	\end{split}
 \end{equation}
 As an example we consider the following five-point stencil:
@@ -141,6 +141,7 @@ As an example we consider the following five-point stencil:
 	\begin{split}
 		\Delta_h^{(5,2)} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
 	\end{split}
+	\label{eq:five-point-stencil}
 \end{equation}
 Applying $\Delta_{h}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
 \begin{equation}
@@ -153,7 +154,7 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
-	\alpha S^{(m, n)} = \{(\bm{a_k}, \alpha b_k) \}_{k=1}^m
+	\alpha S^{(m, d)} = \{(\bm{a_k}, \alpha b_k) \}_{k=1}^m
 \end{equation}
 
 Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils.
@@ -200,5 +201,78 @@ We then multiply the entry $\{(\bm{a}, b ) \}$ chosen from $S_1$ with the remain
 Finally, the process is continued recursively by computing the product of the remainder $\tilde{S}_1 = S_1 \setminus \{(\bm{a}, b ) \}$, with the original stencil $S_2$.
 Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to sum up the corresponding weights and combine them in a single tuple.
 For this purpose, we employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}, to sum up all tuples with matching offset obtained within each recursive subcomputation.
+%TODO introduce array stencil notation for 1D and 2D
+\subsection{Systems of Partial Differential Equations}
+While so far we have only considered problems formulated in form of a single partial differential equation, many phenomena can only be modeled in form of a system of PDEs.
+One of the most simple systems of PDEs is the so-called biharmonic equation
+\begin{equation}
+	\begin{split}
+		\nabla^2 u & = v  \\
+		\nabla^2 v & = f.
+	\end{split}
+\label{eq:biharmonic-system}
+\end{equation}
+As a remark, note that this system is mathematically equivalent to the scalar equation 
+\begin{equation}
+	\nabla^4 u = f.
+\end{equation}
+We can reformulate Equation~\eqref{eq:biharmonic-system} to obtain
+\begin{equation}
+	\underbrace{
+	\begin{pmatrix}
+		\nabla^2 & -1 \\
+		0 & \nabla^2
+	\end{pmatrix}}_{A}
+\underbrace{ 
+	\begin{pmatrix}
+		u \\ v
+	\end{pmatrix}
+}_{\bm{u}}
+=
+\underbrace{
+\begin{pmatrix}
+	0 \\ f
+\end{pmatrix}
+}_{\bm{f}}.
+\label{eq:biharmonic-system-matrix-formulation}
+\end{equation}
+While in contrast to our previous examples Equation~\eqref{eq:biharmonic-system-matrix-formulation} includes partial derivatives of multiple variables, we can employ the same techniques to discretize each individual operator and obtain a corresponding system of linear equations. 
+Consider the two-dimensional biharmonic system
+\begin{equation}
+	\begin{split}
+		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) - v(x, y) & = 0 \\
+		\frac{\partial^2}{\partial x^2} v(x,y) + \frac{\partial^2}{\partial y^2} v(x,y) & = f(x, y) \\ \forall x, y \in (0, 1)^2
+	\end{split}
+	\label{eq:2D-biharmonic-system}
+\end{equation}
+Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences with a uniform step size $h$ and rewriting the resulting equations in stencil form yields
+\begin{equation}
+		\begin{pmatrix}
+			\Delta_h^{(5,2)} & -1 \\
+			0 & \Delta_h^{(5,2)}
+	\end{pmatrix}
+		\begin{pmatrix}
+			u_{i,j} \\ v_{i,j}
+		\end{pmatrix}
+	=
+		\begin{pmatrix}
+			0 \\ f_{i,j}
+		\end{pmatrix} \\
+\forall i,j \in \{1, 2, \dots n\},
+	\label{eq:2D-biharmonic-system-stencil}
+\end{equation}
+where $\Delta_h^{(5,2)}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
+Equation~\eqref{eq:2D-biharmonic-system-stencil} then represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
+If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations is obtained whose solution corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
+Before we conclude this section, it is important to mention that we have not yet discussed how each degree of freedom, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
+While it is tempting to always place each degree of freedom at the same position within a grid, in many applications this leads to undesirable numerical properties.%TODO insert reference
+As a consequence, often more complex grid placing strategies are used in practice, for instance so-called staggered grids, which we, for the sake of brevity, do not discuss here.
+For a detailed treatment of these techniques, the reader is referred to %TODO insert suitable reference
+.
+Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
+These boundary conditions can be of the same type as described above.
+Again, for a more detailed treatment of boundary conditions for systems of PDEs, the reader is referred to %TODO insert suitable reference
+.
+ 
 
 
