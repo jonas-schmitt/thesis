@@ -16,6 +16,12 @@ Furthermore, assuming that we can compute an acceptable approximation using only
 In the following, we first introduce stationary iterative methods, as the Jacobi, Gauss-Seidel and SOR method, and then give an outlook to more advanced methods, like Krylov Subspace Methods.
 Finally, as multigrid methods represent the fundamental basis for this work, we discuss these methods in greater detail.   
 \subsection{Stationary Iterative Methods} 
+We begin our introduction of stationary iterative method by considering the general system of linear equations
+\begin{equation}
+	A \bm{u} = \bm{f},
+\end{equation}
+where $A$ is the coefficient matrix, $\bm u$ the vector of unknowns and $\bm f$ the right-hand side.
+At this point we do not specify whether $A$ represents a dense/sparse matrix or a stencil, as long as all the operations employed within the subsequent methods are well-defined for a mathematical object of this type.
 
 % Diagonal
 
