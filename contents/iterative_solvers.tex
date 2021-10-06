@@ -1,5 +1,24 @@
-\section{Iterative Solvers}
+\section{Iterative Methods}
+In general, the methods for solving systems of linear equations can be assigned to two categories: Direct and iterative methods.
+Direct methods are characterized by the fact that they are able to compute the exact solution of a linear system in a finite number of steps.
+In contrast, iterative methods are based on computing a series of approximations for the solution of the linear system.
+Even though this series often converges to the exact solution, there is usually no guarantee that the approximations will ever reach the accuracy of a solution computed by a direct method.
+Unfortunately, for many problems applying direct methods infeasible, due to their high computational complexity and memory storage requirements.
+For instance, Gaussian elimination, in general, requires $\mathcal O(n^3)$ operations for solving a system of linear equations with $n$ unknowns.
+Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, it based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
+In contrast, many iterative methods are exclusively based on the computation of matrix-vector products and, hence, do not require to manipulate the input matrix directly.
+As we have shown in Section~\ref{subsec:stencil-codes}, the discretization of many partial differential equations enables the representation of matrix-vector products as the application of a stencil code, whereas each stencil is directly derived from the discretization of a continuous differential operator.
+If we assume that each stencil includes only a finite number of entries and that we need to store at most one stencil per grid point, we can reduce the storage requirements to $\mathcal{O}(n)$, where $n$ is the total number of grid points.
+In case the same stencil applies to the whole domain, we even only need to store a single stencil, whose memory requirements are negligible compared to those for storing each grid point.
+Furthermore, due to the approximation of real numbers by floating-point numbers on a computer, even the solution of a direct method is prone to numerical errors.
+As a consequence, in practice, the exactness of direct methods is often undermined by these effects and, hence, the approximations computed by an iterative method can achieve the same degree of numerical accuracy.%TODO include ref
+Furthermore, assuming that we can compute an acceptable approximation using only a finite number of $m$ matrix-vector multiplications, the application of an iterative method reduces the computational complexity for solving a system of linear equations to $O(mn)$.
+In the following, we first introduce stationary iterative methods, as the Jacobi, Gauss-Seidel and SOR method, and then give an outlook to more advanced methods, like Krylov Subspace Methods.
+Finally, as multigrid methods represent the fundamental basis for this work, we discuss these methods in greater detail.   
+\subsection{Stationary Iterative Methods} 
+
 % Diagonal
+
 \begin{equation}
 	\text{diag}(S) = \begin{cases}
 		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\

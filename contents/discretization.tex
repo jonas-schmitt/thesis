@@ -117,6 +117,7 @@ If we assume that each operation required for solving a system of linear equatio
 Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
 On regular grids, each of such pattern can be represented as a so-called stencil code.
 \subsection{Stencil Codes}
+\label{subsec:stencil-codes}
 In general, a stencil code can be considered as a set of mappings from an n-dimensional index vector to a complex-valued number.
 More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $m$ tuples of the following form:
 
@@ -264,8 +265,8 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 where $\Delta_h^{(5,2)}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
 Equation~\eqref{eq:2D-biharmonic-system-stencil} then represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
 If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations is obtained whose solution corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
-Before we conclude this section, it is important to mention that we have not yet discussed how each degree of freedom, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
-While it is tempting to always place each degree of freedom at the same position within a grid, in many applications this leads to undesirable numerical properties.%TODO insert reference
+Before we conclude this section, it is important to mention that we have not yet discussed how each variable, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
+While it is tempting to always place each variable at the same position within a grid, in many applications this leads to undesirable numerical properties.%TODO insert reference
 As a consequence, often more complex grid placing strategies are used in practice, for instance so-called staggered grids, which we, for the sake of brevity, do not discuss here.
 For a detailed treatment of these techniques, the reader is referred to %TODO insert suitable reference
 .
