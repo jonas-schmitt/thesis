@@ -37,7 +37,8 @@ Replacing $\bm x$ by $\bm{x}^{(i+1)}$ in the left and by $\bm{x}^{(i)}$ in the r
 	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \bm b - A \bm{x}^{(i)}.
 	\label{eq:richardson-iteration}
 \end{equation}
-Equation~\eqref{eq:richardson-iteration} is usually called Richardson iteration can be considered as the most basic form of an iterative method for solving a system of linear equations.
+Equation~\eqref{eq:richardson-iteration} is usually called Richardson iteration and can be considered as the most basic form of an iterative method for solving a system of linear equations.
+Here, the term $\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)}$ represents the \emph{residual} or \emph{defect} in iteration $i$ of the method.
 Next, we consider 
 \begin{equation}
 	M^{-1} A \bm{x} = M^{-1} \bm{b},
@@ -51,7 +52,7 @@ By, again, considering the fixed point of Equation~\eqref{eq:general-preconditio
 	\bm{x}^{(i+1)} = \bm{x}^{(i)} + M^{-1}(\bm b - A \bm{x}^{(i)}),
 	\label{eq:general-stationary-iterative-method}
 \end{equation}
-which represents the general form of a stationary iterative method.
+which represents the general form of a stationary iterative method. 
 For instance, if we replace $M$ with the unit matrix $I$, we obtain a Richardson iteration.
 Furthermore, setting $M = A$ allows us to obtain the solution in one step since then
 \begin{equation}
@@ -66,17 +67,68 @@ The result of this iteration $x^{(i+1)}$ is hence independent of the choice of $
 Since the computation of the inverse of a general matrix $A$, in general, is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is impracticle.
 However, with it we can already provide an intuition about the choice of $M$.
 The closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method will usually be.
-In contrast, the choice of a matrix $M$ that is easy to invert, where the Richardson iteration represents a extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute, but potentially suffers from slow convergence.   
+In contrast, the choice of a matrix $M$ that is easy to invert, where the Richardson iteration represents a extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute, but potentially suffers from slow convergence.
+Before we introduce some basic iterative methods that fall into this framework, note that we can reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
+\begin{equation}
+	M (\bm{x}^{(i+1)} - \bm{x}^{(i)}) = \bm{b} - A \bm{x}^{(i)}. 
+\end{equation}
+Moreover, by defining $\bm{c}^{(i+1)}$ as the correction term
+\begin{equation}
+	\bm{c}^{(i+1)} = \bm{x}^{(i+1)} - \bm{x}^{(i)},
+\end{equation}
+we obtain a new system of linear equations
+\begin{equation}
+	M \bm{c}^{(i+1)} = \bm{b} - A \bm{x}^{(i)}. 
+	\label{eq:general-stationary-iterative-method-system-formulation}
+\end{equation}
+The solution of this system $\bm{c}^{(i+1)}$ then provides us with the approximate solution in step $i+1$ through the relation
+\begin{equation}
+	\bm{x}^{(i+1)} =  \bm{x}^{(i)} + \bm{c}^{(i+1)}.
+\end{equation}
+To obtain a new approximate solution in every iteration, we can, therefore, solve the system of linear equations denoted by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}, instead of computing the inverse of $M$.
 
+Since, as we have already mentioned, it is desirable to choose $M \approx A$, we define the splitting
+\begin{equation}
+	A = D - L - U,
+\end{equation} 
+where $D$ is the lower diagonal, $-L$ the lower triangular and $-U$ the upper triangular part of $A$, respectively.
+Both the Jacobi as well as the Gauss-Seidel method are defined based on this splitting.
+First of all, setting $M = D$, yields the Jacobi method
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + D^{-1}(\bm b - A \bm{x}^{(i)}).
+	\label{eq:jacobi-method}
+\end{equation}
+Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all its diagonal entries.
+Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)}$ with the diagonal matrix $D^{-1}$.
 
-
- 
-% Diagonal
-
+To define the Jacobi method in the domain of stencil codes with respect to our derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$, which can be defined as
 \begin{equation}
 	\text{diag}(S) = \begin{cases}
 		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\
-		\emptyset & \text{else}
+		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag}
 \end{equation}
+Based on this definition, we can also specify the inverse diagonal of a given stencil $S$ as
+\begin{equation}
+	\text{inv}(S) = \begin{cases}
+		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S \\
+		\emptyset & \text{else}.
+	\end{cases}
+	\label{eq:stencil-diag-inv}
+\end{equation}
+
+\begin{equation}
+	\text{lower}(S) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; (\bm a, b) \cup \tilde{S} \; \text{and} \; \bm a < \bm 0 \\
+		\text{lower}(\tilde{S}) & \text{if} \; (\bm a, b) \cup \tilde{S} \; \text{and} \; \bm a \geq \bm 0 \\
+		\emptyset & \text{else}.
+	\end{cases}
+	\label{eq:stencil-lower}
+\end{equation}
+
+\begin{equation}
+	\text{upper}(S) = S - \text{lower}(S) - \text{diag}(S)
+\end{equation}
+
+
