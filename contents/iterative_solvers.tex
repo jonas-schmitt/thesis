@@ -18,11 +18,59 @@ Finally, as multigrid methods represent the fundamental basis for this work, we 
 \subsection{Stationary Iterative Methods} 
 We begin our introduction of stationary iterative method by considering the general system of linear equations
 \begin{equation}
-	A \bm{u} = \bm{f},
+	A \bm{x} = \bm{b},
+	\label{eq:general-system-of-linear-equations}
 \end{equation}
-where $A$ is the coefficient matrix, $\bm u$ the vector of unknowns and $\bm f$ the right-hand side.
+where $A$ is the coefficient matrix, $\bm x$ the vector of unknowns and $\bm b$ the right-hand side.
 At this point we do not specify whether $A$ represents a dense/sparse matrix or a stencil, as long as all the operations employed within the subsequent methods are well-defined for a mathematical object of this type.
+We can now rewrite Equation~\eqref{eq:general-system-of-linear-equations} to obtain
+\begin{equation}
+	\bm{x} = \bm{x} + \bm b - A \bm{x}.
+	\label{eq:general-fixed-point}
+\end{equation}
+Which can be considered a fixed point of the form
+\begin{equation}
+	\bm x = f(\bm x).
+\end{equation} 
+Replacing $\bm x$ by $\bm{x}^{(i+1)}$ in the left and by $\bm{x}^{(i)}$ in the right part of Equation~\eqref{eq:general-fixed-point} yields the fixed-point iteration
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \bm b - A \bm{x}^{(i)}.
+	\label{eq:richardson-iteration}
+\end{equation}
+Equation~\eqref{eq:richardson-iteration} is usually called Richardson iteration can be considered as the most basic form of an iterative method for solving a system of linear equations.
+Next, we consider 
+\begin{equation}
+	M^{-1} A \bm{x} = M^{-1} \bm{b},
+	\label{eq:general-preconditioned-system-of-linear-equations}
+\end{equation}
+which represents a modified version of Equation~\eqref{eq:general-system-of-linear-equations}, that is obtained by multiplying each side of the equation by the inverse of a matrix $M$.
+By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and therefore has the same solution.
+However, it can be also considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as preconditioner.
+By, again, considering the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} we obtain the iteration
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + M^{-1}(\bm b - A \bm{x}^{(i)}),
+	\label{eq:general-stationary-iterative-method}
+\end{equation}
+which represents the general form of a stationary iterative method.
+For instance, if we replace $M$ with the unit matrix $I$, we obtain a Richardson iteration.
+Furthermore, setting $M = A$ allows us to obtain the solution in one step since then
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + A^{-1}(\bm b - A \bm{x}^{(i)}),
+	\label{eq:one-step-iteration}
+\end{equation}
+which leads to
+\begin{equation}
+	\bm{x}^{(i+1)} = A^{-1}\bm b.
+\end{equation}
+The result of this iteration $x^{(i+1)}$ is hence independent of the choice of $x^{(i)}$ and if we insert $A^{-1}\bm b$ Equation~\eqref{eq:general-system-of-linear-equations} it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
+Since the computation of the inverse of a general matrix $A$, in general, is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is impracticle.
+However, with it we can already provide an intuition about the choice of $M$.
+The closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method will usually be.
+In contrast, the choice of a matrix $M$ that is easy to invert, where the Richardson iteration represents a extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute, but potentially suffers from slow convergence.   
 
+
+
+ 
 % Diagonal
 
 \begin{equation}
