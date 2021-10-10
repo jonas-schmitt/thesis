@@ -111,17 +111,26 @@ To define the Jacobi method in the domain of stencil codes with respect to our d
 \end{equation}
 Based on this definition, we can also specify the inverse diagonal of a given stencil $S$ as
 \begin{equation}
-	\text{inv}(S) = \begin{cases}
+	\text{diag-inv}(S) = \begin{cases}
 		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag-inv}
 \end{equation}
+Hence, in case  the coefficient matrix is given as a stencil code $S$, we can define $D^{-1} = \text{diag-inv}(S)$.
+Next, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
+\begin{equation}
+	(D - L) \bm{c}^{(i+1)} = \bm{b} - A \bm{x}^{(i)}, 
+	\label{eq:gauss-seidel-method}
+\end{equation}
+where, again, $\bm{c}^{(i+1)}$ is the correction term $\bm{c}^{(i+1)} = \bm{x}^{(i+1)} - \bm{x}^{(i)}$.
+Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily compute its inverse, but instead must solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
+However, because $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back substitution. 
 
 \begin{equation}
 	\text{lower}(S) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; (\bm a, b) \cup \tilde{S} \; \text{and} \; \bm a < \bm 0 \\
-		\text{lower}(\tilde{S}) & \text{if} \; (\bm a, b) \cup \tilde{S} \; \text{and} \; \bm a \geq \bm 0 \\
+		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-lower}
