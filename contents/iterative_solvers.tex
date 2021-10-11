@@ -100,8 +100,9 @@ First of all, setting $M = D$, yields the Jacobi method
 \end{equation}
 Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all its diagonal entries.
 Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)}$ with the diagonal matrix $D^{-1}$.
-
-To define the Jacobi method in the domain of stencil codes with respect to our derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$, which can be defined as
+To define the Jacobi method in the domain of stencil codes with respect to our derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$.
+As an offset of zero in each dimension always refers to the grid point on which the stencil is applied and therefore to the diagonal entry in each line of the corresponding matrix.
+We can therefore define the diagonal of $S$ as
 \begin{equation}
 	\text{diag}(S) = \begin{cases}
 		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\
@@ -109,7 +110,7 @@ To define the Jacobi method in the domain of stencil codes with respect to our d
 	\end{cases}
 	\label{eq:stencil-diag}
 \end{equation}
-Based on this definition, we can also specify the inverse diagonal of a given stencil $S$ as
+Based on this definition, we can also specify the inverse diagonal of a stencil as
 \begin{equation}
 	\text{diag-inv}(S) = \begin{cases}
 		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S \\
@@ -117,16 +118,18 @@ Based on this definition, we can also specify the inverse diagonal of a given st
 	\end{cases}
 	\label{eq:stencil-diag-inv}
 \end{equation}
-Hence, in case  the coefficient matrix is given as a stencil code $S$, we can define $D^{-1} = \text{diag-inv}(S)$.
+
 Next, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
 \begin{equation}
 	(D - L) \bm{c}^{(i+1)} = \bm{b} - A \bm{x}^{(i)}, 
 	\label{eq:gauss-seidel-method}
 \end{equation}
 where, again, $\bm{c}^{(i+1)}$ is the correction term $\bm{c}^{(i+1)} = \bm{x}^{(i+1)} - \bm{x}^{(i)}$.
-Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily compute its inverse, but instead must solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
-However, because $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back substitution. 
-
+Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily obtain its inverse, but instead solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
+As $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back substitution. 
+To apply the Gauss-Seidel method within the domain of stencil codes, we also need to define a function that extracts the lower triangle of a given stencil.
+As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by only including all entry with an offset lower than zero.
+The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 \begin{equation}
 	\text{lower}(S) = \begin{cases}
 		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
@@ -136,8 +139,48 @@ However, because $D - L$ is a lower triangular matrix, the solution of this syst
 	\label{eq:stencil-lower}
 \end{equation}
 
+Similarly, we can also provide a definition for obtaining the upper triangle of a given stencil, which is formulated in Equation~\eqref{eq:stencil-upper}.
 \begin{equation}
-	\text{upper}(S) = S - \text{lower}(S) - \text{diag}(S)
+	\text{upper}(S) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\emptyset & \text{else}.
+	\end{cases}
+	\label{eq:stencil-upper}
 \end{equation}
+While there are many more iterative methods that can be formulated in the form of Equation~\eqref{eq:general-stationary-iterative-method}, the goal of this section is to introduce only those concepts necessary for a basic understanding of these method's functioning.
+Therefore, we postpone the treatment of other and more advanced variants of the methods presented here to later chapters of this thesis. 
+
+\subsection{Convergence}
+In contrast to direct methods, which compute the solution of a given system of linear equations in a fixed number of computational steps, iterative methods compute a series of approximations.
+The method is then said to convergence when the difference between the actual solution and subsequent approximations approaches zero.
+To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained through a specific iterative method.
+First of all, we can define the error in iteration $i$ as
+\begin{equation}
+	\bm{e}^{(i)} = \bm{x}^{(i)} - \bm{x}^{*},
+\end{equation}
+where $\bm{x}^{(i)}$ is the $i$th approximation and $\bm{x}^{*}$ the correct solution of the system.
+While the error gives as an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations and therefore are not able to compute this metric.
+As a remedy, we can instead consider the residual
+\begin{equation}
+	\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)},
+\end{equation}
+which can be always computed irrespective of whether the solution of the system is known.
+Note that the residual will be always zero in case the error is zero.
+We then reconsider that the iterative methods introduced in the last section can be all considered a fixed-point iteration of the form
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + M^{-1}(\bm b - A \bm{x}^{(i)}),
+\end{equation}
+and assume that $\bm{e}^{(i)} = \bm{0}$.
+Hence, we have $\bm{x}^{(i)} = \bm{x}^{*}$ and the above equation is reduced to
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{*}.
+\end{equation}
+The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method of the form of Equation~\eqref{eq:general-stationary-iterative-method}.
+
+\begin{equation}
+	\bm{x}^{(i+1)} = (I - M^{-1} A) \bm{x}^{(i)} + M^{-1}\bm b.
+\end{equation}
+
 
 
