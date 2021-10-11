@@ -156,15 +156,15 @@ In contrast to direct methods, which compute the solution of a given system of l
 The method is then said to convergence when the difference between the actual solution and subsequent approximations approaches zero.
 To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained through a specific iterative method.
 First of all, we can define the error in iteration $i$ as
-\begin{equation}
+\begin{equation*}
 	\bm{e}^{(i)} = \bm{x}^{(i)} - \bm{x}^{*},
-\end{equation}
+\end{equation*}
 where $\bm{x}^{(i)}$ is the $i$th approximation and $\bm{x}^{*}$ the correct solution of the system.
 While the error gives as an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations and therefore are not able to compute this metric.
 As a remedy, we can instead consider the residual
-\begin{equation}
+\begin{equation*}
 	\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)},
-\end{equation}
+\end{equation*}
 which can be always computed irrespective of whether the solution of the system is known.
 Note that the residual will be always zero in case the error is zero.
 We then reconsider that the iterative methods introduced in the last section can be all considered a fixed-point iteration of the form
@@ -176,11 +176,53 @@ Hence, we have $\bm{x}^{(i)} = \bm{x}^{*}$ and the above equation is reduced to
 \begin{equation}
 	\bm{x}^{(i+1)} = \bm{x}^{*}.
 \end{equation}
-The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method of the form of Equation~\eqref{eq:general-stationary-iterative-method}.
-
+The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method.
+However, note that this represents a necessary and not a sufficient condition. 
+We, therefore, consider an arbitrary fixed-point of Equation~\eqref{eq:general-stationary-iterative-method}
+\begin{equation*}
+	\bm{x} = \bm{x} + M^{-1}(\bm b - A \bm{x}).
+\end{equation*}
+Transforming this equation again into a system of linear equations yields
+\begin{equation*}
+	M^{-1} A \bm{x} = M^{-1}\bm b,
+\end{equation*}
+which means that each fixed-point $\bm{x}$ represents a solution of the preconditioned linear system~\eqref{eq:general-preconditioned-system-of-linear-equations} and, hence, also of the original system~\eqref{eq:general-system-of-linear-equations}.
+If we assume that $A$ is a square, nonsingular matrix, the solution of each system of linear equations with $A$ as its coefficient matrix is unique and, therefore, it must be true that $\bm{x} = \bm{x}^{*}$.
+After we have ensured that in case a stationary iterative method has converged to a fixed-point $\bm{x}$, it is equal to the correct solution of the linear system the method aims to solve.
+However, the question remains to be answered under which conditions a sequence of the form of Equation~\eqref{eq:general-stationary-iterative-method} converges to a fixed point and how many iteration must be performed to achieve this goal.
+For this purpose, we, again, reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
 \begin{equation}
-	\bm{x}^{(i+1)} = (I - M^{-1} A) \bm{x}^{(i)} + M^{-1}\bm b.
+	\bm{x}^{(i+1)} = (I - M^{-1} A) \bm{x}^{(i)} + M^{-1}\bm b,
 \end{equation}
-
+as an alternative formulation.
+Within this equation can now set $\bm{x}^{i} = \bm{x}^{0}$ 
+\begin{equation}
+	\bm{x}^{(1)} = (I - M^{-1} A) \bm{x}^{(0)} + M^{-1}\bm b,
+\end{equation}
+and expand this sequence to the two-iteration series
+\begin{equation}
+	\bm{x}^{(2)} = (I - M^{-1} A)^2 \bm{x}^{(0)} + (2I - M^{-1} A)M^{-1} \bm{b}.
+\end{equation}
+By continuing this recursively for an arbitrary number of $k$ times, we see that the resulting equation will always be of the form
+\begin{equation}
+	\bm{x}^{(k)} = (I - M^{-1} A)^k \bm{x}^{(0)} + N^{(k)}\bm{b},
+	\label{eq:stationary-iterative-method-series}
+\end{equation}
+which means that we can always separate the term $N^{(k)}\bm{b}$ from the rest of the equation.
+Note that here the superscript $G^k$ means that we have the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(i)}$.
+Since we have obtained Equation~\eqref{eq:stationary-iterative-method-series} from our original formulation it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
+\begin{equation}
+	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
+\end{equation}
+Here, $G = I - M^{-1} A$ is the so-called \emph{iteration matrix} of the given stationary iterative method.
+Before we can formulate a major theorem about the convergence of this sequence, we first have to introduce the spectral radius 
+\begin{equation}
+	\rho (A)=\max \left\{|\lambda _{1}|,\dotsc ,|\lambda _{n}|\right\},
+\end{equation}
+where $A$ is a matrix of rank $n$ with the eigenvalues $\lambda_{1}, \dots, \lambda_{n}$.
+\begin{theorem}
+$\lim_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$.
+\end{theorem}
+%TODO prove theorem
 
 
