@@ -213,16 +213,40 @@ Note that here the superscript $G^k$ means that we have the $k$th power of $G$, 
 Since we have obtained Equation~\eqref{eq:stationary-iterative-method-series} from our original formulation it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
 \begin{equation}
 	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
+	\label{eq:iteration-matrix-sequence}
 \end{equation}
 Here, $G = I - M^{-1} A$ is the so-called \emph{iteration matrix} of the given stationary iterative method.
-Before we can formulate a major theorem about the convergence of this sequence, we first have to introduce the spectral radius 
+Before we reason about convergence of this sequence, we introduce the spectral radius 
 \begin{equation}
-	\rho (A)=\max \left\{|\lambda _{1}|,\dotsc ,|\lambda _{n}|\right\},
+	\rho (A)=\max \limits_{1 \leq k \leq n} |\lambda _{k}|,
 \end{equation}
 where $A$ is a matrix of rank $n$ with the eigenvalues $\lambda_{1}, \dots, \lambda_{n}$.
+Based on this definition we can then state the following theorem:
 \begin{theorem}
-$\lim_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$.
+$\lim \limits_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$.
+\label{theorem:general-convergence-result}
 \end{theorem}
-%TODO prove theorem
+%TODO potentially prove theorem
+
+While Theorem~\ref{theorem:general-convergence-result} provides an answer whether the sequence~\eqref{eq:iteration-matrix-sequence} converges to zero, we still do not have any knowledge about the speed of this process.
+For this purpose, we introduce the general \emph{convergence factor} $\rho$ of a sequence of the form of Equation~\eqref{eq:iteration-matrix-sequence} as
+\begin{equation}
+	\rho = \lim \limits_{k \to  \infty} \left( \max \limits_{x^{(0)} \in \mathbb{R}^{n}} \frac{\norm{\bm{x}^{(k)} - \bm{x}^{*}}}{\norm{\bm{x}^{(0)} - \bm{x}^{*}}} \right)^{\frac{1}{k}}.
+\end{equation} 
+Furthermore, the \emph{convergence rate} $\tau$ is defined as the natural logarithm of the inverse of the convergence factor
+\begin{equation}
+	\tau = -\ln \rho
+\end{equation}
+\begin{theorem}
+	$\rho = \rho(G)$.
+	\label{theorem:convergence-factor}
+\end{theorem}
+%TODO potentially prove theorem
+\begin{proof}
+	For a proof of both Theorem~\ref{theorem:general-convergence-result} and~\ref{theorem:convergence-factor} the reader is referred to ~\cite{varga1962iterative,saad2003iterative}.
+\end{proof}
+As a result of Theorem~\ref{theorem:convergence-factor} we can state that the spectral radius $\rho(G)$ gives a lower limit for the speed of convergence of every stationary iterative method with an iteration matrix $G = I - M^{-1} A$ that is independent of the choice of the initial vector $\bm{x}^{(0)}$. 
+
+
 
 
