@@ -1,4 +1,4 @@
-\section{Iterative Methods}
+\section{Basic Iterative Methods}
 In general, the methods for solving systems of linear equations can be assigned to two categories: Direct and iterative methods.
 Direct methods are characterized by the fact that they are able to compute the exact solution of a linear system in a finite number of steps.
 In contrast, iterative methods are based on computing a series of approximations for the solution of the linear system.
@@ -13,10 +13,10 @@ In case the same stencil applies to the whole domain, we even only need to store
 Furthermore, due to the approximation of real numbers by floating-point numbers on a computer, even the solution of a direct method is prone to numerical errors.
 As a consequence, in practice, the exactness of direct methods is often undermined by these effects and, hence, the approximations computed by an iterative method can achieve the same degree of numerical accuracy.%TODO include ref
 Furthermore, assuming that we can compute an acceptable approximation using only a finite number of $m$ matrix-vector multiplications, the application of an iterative method reduces the computational complexity for solving a system of linear equations to $O(mn)$.
-In the following, we first introduce stationary iterative methods, as the Jacobi, Gauss-Seidel and SOR method, and then give an outlook to more advanced methods, like Krylov Subspace Methods.
-Finally, as multigrid methods represent the fundamental basis for this work, we discuss these methods in greater detail.   
-\subsection{Stationary Iterative Methods} 
-We begin our introduction of stationary iterative method by considering the general system of linear equations
+In the following, we first introduce basic iterative methods, as the Jacobi and Gauss-Seidel method, and then derive fundamental statements about their convergence. 
+%Finally, as multigrid methods represent the fundamental basis for this work, we discuss these methods in greater detail.   
+\subsection{Jacobi and Gauss-Seidel} 
+We begin our introduction of basic iterative methods by considering the general system of linear equations
 \begin{equation}
 	A \bm{x} = \bm{b},
 	\label{eq:general-system-of-linear-equations}
@@ -243,10 +243,11 @@ Furthermore, the \emph{convergence rate} $\tau$ is defined as the natural logari
 \end{theorem}
 %TODO potentially prove theorem
 \begin{proof}
-	For a proof of both Theorem~\ref{theorem:general-convergence-result} and~\ref{theorem:convergence-factor} the reader is referred to ~\cite{varga1962iterative,saad2003iterative}.
+	For a proof of Theorem~\ref{theorem:general-convergence-result} and~\ref{theorem:convergence-factor} the reader is referred to ~\cite{varga1962iterative,saad2003iterative}.
 \end{proof}
-As a result of Theorem~\ref{theorem:convergence-factor} we can state that the spectral radius $\rho(G)$ gives a lower limit for the speed of convergence of every stationary iterative method with an iteration matrix $G = I - M^{-1} A$ that is independent of the choice of the initial vector $\bm{x}^{(0)}$. 
-
-
+As a result of Theorem~\ref{theorem:convergence-factor} we can state that the spectral radius $\rho(G)$ gives a lower limit for the speed of convergence of every stationary iterative method with an iteration matrix $G = I - M^{-1} A$ that is independent of the choice of the initial vector $\bm{x}^{(0)}$.
+Since stationary iterative methods are all based on the simple formulation in Equation~\eqref{eq:general-stationary-iterative-method}, they are both easy to implement and analyze.
+The application of these methods alone, however, leads to slow convergence in solving many PDE-based problems~\cite{briggs2000multigrid}.
+While many other iterative methods for solving the systems of linear equations arising from the discretization of PDEs have been formulated~\cite{saad2003iterative}, the main focus of this thesis is on multigrid method, which will be discussed in the following section.
 
 

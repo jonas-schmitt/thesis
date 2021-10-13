@@ -1,0 +1,8 @@
+Unfortunately, determining the spectral radius requires the computation of the eigenvalues of a matrix $G$, which, in general, is of complexity $\mathcal{O}(n^3)$ for $G \in \mathbb{R}^{n \times n}$~\cite{demmel2007fast}.
+In cases where the system of linear equations is obtained from the discretization of PDEs on a regular grid with uniform spacing and thus where the matrix $G$ is available in form of one or multiple stencil codes, it is possible to employ local Fourier analysis (LFA)~\cite{wienands2004practical}.
+LFA considers a reformulation of the given problem on an infinite grid, which is transferred to the frequency domain to investigate the symbol of the underlying operator.
+Based on the latter, an estimation of the spectral radius can then be computed in significantly less time.
+
+
+
+
