@@ -118,6 +118,14 @@ Based on this definition, we can also specify the inverse diagonal of a stencil 
 	\end{cases}
 	\label{eq:stencil-diag-inv}
 \end{equation}
+Because the Jacobi method, as defined in Equation~\eqref{eq:jacobi-method}, does often suffer from slow convergence, it is common to introduce a \emph{relaxation factor} or \emph{weight} $\omega$, which leads to the so-called weighted Jacobi method
+\begin{equation}
+	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \omega D^{-1}(\bm b - A \bm{x}^{(i)}),
+	\label{eq:weighted-jacobi-method}
+\end{equation}
+where $\omega$ is chosen from the interval $\left(0, 2\right)$.
+Here, a value of $\omega$ smaller than one is usually called underrelaxation, while for a value greater than one the term overrelaxation is used.
+Note that $\omega = 1$ leads to the original Jacobi method without any relaxation.
 
 Next, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
 \begin{equation}
