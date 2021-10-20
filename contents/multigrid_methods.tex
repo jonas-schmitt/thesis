@@ -52,9 +52,9 @@ As it becomes apparent from investigating the middle and right columns of the fi
 In contrast, the third row, which represents a highly-oscillating component, the application of 100 steps of the Jacobi method already reduces the initial error to less than one-fifth of its original value.
 The same behavior can also be observed for the Gauss-Seidel method, whereby, compared to the Jacobi method, high-frequency error components are reduced even faster.
 
-We can further illustrate the error reduction properties of basic iterative methods by investigating Figure~\ref{fig:combined-error} which shows the combination of two error components with equal magnitude, one of them with low, the other one with high frequency.
-Again, the left plot shows the initial while the right one contains the reduced error after 100 iterations of Jacobi.
-As it can be seen here, the attained improvement can be almost fully attributed to the reduction of the highly-oscillating component.
+We can further illustrate the error reduction properties of basic iterative methods by investigating Figure~\ref{fig:combined-error} which shows the combination of two error components with equal magnitude, one of them with low the other one with high frequency.
+Again, the left plot shows the initial while the middle and right ones contain the reduced error after 100 iterations of Jacobi and Gauss-Seidel, respectively.
+As it can be seen here, the attained improvement with both methods can be almost fully attributed to the reduction of the highly-oscillating component.
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 	\centering
@@ -75,8 +75,11 @@ As it can be seen here, the attained improvement can be almost fully attributed 
 	\caption{Combination of two error components discretized on a grid with step size $h = 2^{-9}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
 \label{fig:combined-error}
 \end{figure}
+Because the remaining error is more smooth than initially, basic iterative methods are often denoted as \emph{smoothers} and their effectiveness is measured in terms of their capability to reduce the high-frequency components of a given error. 
 
 Now observe what happens if we represent the same low-frequency error component shown in the first row of Figure~\ref{fig:different-error-components} on a grid with larger step size $h = 2^{-6}$, hence a smaller number of grid points.
+Because the number of (inner) grid points $n$ is inversely proportional to the step size with $n = 1/h - 1$, usually the term \emph{coarser} grid is used.
+The resulting error reduction, again after 100 iterations of each of both iterative methods, is shown in Figure~\ref{fig:low-frequency-error-component-coarse}. 
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 	\centering
@@ -98,3 +101,9 @@ Now observe what happens if we represent the same low-frequency error component 
 	\caption{Low-frequency error component discretized on a coarse grid with step size $h = 2^{-6}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
 	\label{fig:low-frequency-error-component-coarse}
 \end{figure}
+As it can be seen, the amount of low-frequency error reduction is significantly higher for both methods than on the \emph{finer} grid with a step size of $h = 2^{-9}$.
+While basic iterative methods, like the Jacobi and Gauss-Seidel method are only capable of reducing the high-frequency components of a given error, we can, hence, employ the same methods to effectively reduce the remaining low-frequency components when they can be represented on a coarser grid.
+\emph{Multigrid} methods build up on this idea by automating the process of recursively obtaining a coarser representation of a given problem, which can then be effectively reduced by employing only a few \emph{smoothing} iterations.
+These methods, therefore, operate on a so-called hierarchy of grids, where on each subsequent discretization level certain error components are reduced, which is then used to correct the remaining error on the next-finer grid.
+In the following, we first introduce the basic components of a multigrid method, such as the smoothing, restriction, prolongation and coarse grid correction operations.
+Based on this definition, we then develop a formal language for the representation of arbitrarily composed multigrid solvers.
