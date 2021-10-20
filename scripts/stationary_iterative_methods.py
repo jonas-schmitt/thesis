@@ -63,7 +63,7 @@ def generate_plots(iterate, h, A, x, b, steps=100, omega=1.0, name="jacobi"):
     plot_error(e, h, f"final_error_{name}.pdf")
 
 
-h = 1/2**10
+h = 1/2**6
 n = int(1/h - 1)
 omega = 1
 steps = 100
@@ -76,14 +76,14 @@ for i in range(2, 7):
     tmp1 = np.linspace(0 + h * end, end - h * end, n)
     x1 = (np.sin(tmp1))
     x = x1
-    generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name=f"jacobi_{k}pi")
-    generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"gauss_seidel_{k}pi")
+    generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name=f"jacobi_{k}pi_coarse")
+    generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"gauss_seidel_{k}pi_coarse")
 
 k = 4
 tmp1 = np.linspace(0, k*np.pi, n)
 x1 = 0.5 * (np.sin(tmp1))
-tmp2 = np.linspace(0, 32 * k * np.pi, n)
+tmp2 = np.linspace(0, 16 * k * np.pi, n)
 x2 = 0.5 * (np.sin(tmp2))
 x = x1+x2
-generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_combined")
-generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_combined")
+generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_combined_coarse")
+generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_combined_coarse")
