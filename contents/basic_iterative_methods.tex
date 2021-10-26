@@ -32,13 +32,13 @@ Which can be considered a fixed point of the form
 \begin{equation}
 	\bm x = f(\bm x).
 \end{equation} 
-Replacing $\bm x$ by $\bm{x}^{(i+1)}$ in the left and by $\bm{x}^{(i)}$ in the right part of Equation~\eqref{eq:general-fixed-point} yields the fixed-point iteration
+Replacing $\bm x$ by $\bm{x}^{(k+1)}$ in the left and by $\bm{x}^{(k)}$ in the right part of Equation~\eqref{eq:general-fixed-point} yields the fixed-point iteration
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \bm b - A \bm{x}^{(i)}.
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + \bm b - A \bm{x}^{(k)}.
 	\label{eq:richardson-iteration}
 \end{equation}
 Equation~\eqref{eq:richardson-iteration} is usually called Richardson iteration and can be considered as the most basic form of an iterative method for solving a system of linear equations.
-Here, the term $\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)}$ represents the \emph{residual} or \emph{defect} in iteration $i$ of the method.
+Here, the term $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ represents the \emph{residual} or \emph{defect} in iteration $k$ of the method.
 Next, we consider 
 \begin{equation}
 	M^{-1} A \bm{x} = M^{-1} \bm{b},
@@ -49,41 +49,41 @@ By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system
 However, it can be also considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as preconditioner.
 By, again, considering the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} we obtain the iteration
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + M^{-1}(\bm b - A \bm{x}^{(i)}),
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:general-stationary-iterative-method}
 \end{equation}
 which represents the general form of a stationary iterative method. 
 For instance, if we replace $M$ with the unit matrix $I$, we obtain a Richardson iteration.
 Furthermore, setting $M = A$ allows us to obtain the solution in one step since then
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + A^{-1}(\bm b - A \bm{x}^{(i)}),
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + A^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:one-step-iteration}
 \end{equation}
 which leads to
 \begin{equation}
-	\bm{x}^{(i+1)} = A^{-1}\bm b.
+	\bm{x}^{(k+1)} = A^{-1}\bm b.
 \end{equation}
-The result of this iteration $x^{(i+1)}$ is hence independent of the choice of $x^{(i)}$ and if we insert $A^{-1}\bm b$ Equation~\eqref{eq:general-system-of-linear-equations} it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
+The result of this iteration $x^{(k+1)}$ is hence independent of the choice of $x^{(k)}$ and if we insert $A^{-1}\bm b$ Equation~\eqref{eq:general-system-of-linear-equations} it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
 Since the computation of the inverse of a general matrix $A$, in general, is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is impracticle.
 However, with it we can already provide an intuition about the choice of $M$.
 The closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method will usually be.
 In contrast, the choice of a matrix $M$ that is easy to invert, where the Richardson iteration represents a extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute, but potentially suffers from slow convergence.
 Before we introduce some basic iterative methods that fall into this framework, note that we can reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
 \begin{equation}
-	M (\bm{x}^{(i+1)} - \bm{x}^{(i)}) = \bm{b} - A \bm{x}^{(i)}. 
+	M (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)}. 
 \end{equation}
-Moreover, by defining $\bm{c}^{(i+1)}$ as the correction term
+Moreover, by defining $\bm{c}^{(k+1)}$ as the correction term
 \begin{equation}
-	\bm{c}^{(i+1)} = \bm{x}^{(i+1)} - \bm{x}^{(i)},
+	\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)},
 \end{equation}
 we obtain a new system of linear equations
 \begin{equation}
-	M \bm{c}^{(i+1)} = \bm{b} - A \bm{x}^{(i)}. 
+	M \bm{c}^{(k+1)} = \bm{b} - A \bm{x}^{(k)}. 
 	\label{eq:general-stationary-iterative-method-system-formulation}
 \end{equation}
-The solution of this system $\bm{c}^{(i+1)}$ then provides us with the approximate solution in step $i+1$ through the relation
+The solution of this system $\bm{c}^{(k+1)}$ then provides us with the approximate solution in step $i+1$ through the relation
 \begin{equation}
-	\bm{x}^{(i+1)} =  \bm{x}^{(i)} + \bm{c}^{(i+1)}.
+	\bm{x}^{(k+1)} =  \bm{x}^{(k)} + \bm{c}^{(k+1)}.
 \end{equation}
 To obtain a new approximate solution in every iteration, we can, therefore, solve the system of linear equations denoted by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}, instead of computing the inverse of $M$.
 
@@ -95,11 +95,11 @@ where $D$ is the lower diagonal, $-L$ the lower triangular and $-U$ the upper tr
 Both the Jacobi as well as the Gauss-Seidel method are defined based on this splitting.
 First of all, setting $M = D$, yields the Jacobi method
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + D^{-1}(\bm b - A \bm{x}^{(i)}).
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + D^{-1}(\bm b - A \bm{x}^{(k)}).
 	\label{eq:jacobi-method}
 \end{equation}
 Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all its diagonal entries.
-Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)}$ with the diagonal matrix $D^{-1}$.
+Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ with the diagonal matrix $D^{-1}$.
 To define the Jacobi method in the domain of stencil codes with respect to our derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$.
 As an offset of zero in each dimension always refers to the grid point on which the stencil is applied and therefore to the diagonal entry in each line of the corresponding matrix.
 We can therefore define the diagonal of $S$ as
@@ -120,7 +120,7 @@ Based on this definition, we can also specify the inverse diagonal of a stencil 
 \end{equation}
 Because the Jacobi method, as defined in Equation~\eqref{eq:jacobi-method}, does often suffer from slow convergence, it is common to introduce a \emph{relaxation factor} or \emph{weight} $\omega$, which leads to the so-called weighted Jacobi method
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \omega D^{-1}(\bm b - A \bm{x}^{(i)}),
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + \omega D^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:weighted-jacobi-method}
 \end{equation}
 where $\omega$ is chosen from the interval $\left(0, 2\right)$.
@@ -129,10 +129,10 @@ Note that $\omega = 1$ leads to the original Jacobi method without any relaxatio
 
 Next, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
 \begin{equation}
-	(D - L) \bm{c}^{(i+1)} = \bm{b} - A \bm{x}^{(i)}, 
+	(D - L) \bm{c}^{(k+1)} = \bm{b} - A \bm{x}^{(k)}, 
 	\label{eq:gauss-seidel-method}
 \end{equation}
-where, again, $\bm{c}^{(i+1)}$ is the correction term $\bm{c}^{(i+1)} = \bm{x}^{(i+1)} - \bm{x}^{(i)}$.
+where, again, $\bm{c}^{(k+1)}$ is the correction term $\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)}$.
 Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily obtain its inverse, but instead solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
 As $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back substitution. 
 To apply the Gauss-Seidel method within the domain of stencil codes, we also need to define a function that extracts the lower triangle of a given stencil.
@@ -163,26 +163,26 @@ Therefore, we postpone the treatment of other and more advanced variants of the 
 In contrast to direct methods, which compute the solution of a given system of linear equations in a fixed number of computational steps, iterative methods compute a series of approximations.
 The method is then said to convergence when the difference between the actual solution and subsequent approximations approaches zero.
 To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained through a specific iterative method.
-First of all, we can define the error in iteration $i$ as
+First of all, we can define the error in iteration $k$ as
 \begin{equation*}
-	\bm{e}^{(i)} = \bm{x}^{(i)} - \bm{x}^{*},
+	\bm{e}^{(k)} = \bm{x}^{(k)} - \bm{x}^{*},
 \end{equation*}
-where $\bm{x}^{(i)}$ is the $i$th approximation and $\bm{x}^{*}$ the correct solution of the system.
+where $\bm{x}^{(k)}$ is the $k$th approximation and $\bm{x}^{*}$ the correct solution of the system.
 While the error gives as an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations and therefore are not able to compute this metric.
 As a remedy, we can instead consider the residual
 \begin{equation*}
-	\bm{r}^{(i)} = \bm{b} - A \bm{x}^{(i)},
+	\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)},
 \end{equation*}
 which can be always computed irrespective of whether the solution of the system is known.
 Note that the residual will be always zero in case the error is zero.
 We then reconsider that the iterative methods introduced in the last section can be all considered a fixed-point iteration of the form
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + M^{-1}(\bm b - A \bm{x}^{(i)}),
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}),
 \end{equation}
-and assume that $\bm{e}^{(i)} = \bm{0}$.
-Hence, we have $\bm{x}^{(i)} = \bm{x}^{*}$ and the above equation is reduced to
+and assume that $\bm{e}^{(k)} = \bm{0}$.
+Hence, we have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{*}.
+	\bm{x}^{(k+1)} = \bm{x}^{*}.
 \end{equation}
 The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method.
 However, note that this represents a necessary and not a sufficient condition. 
@@ -200,7 +200,7 @@ After we have ensured that in case a stationary iterative method has converged t
 However, the question remains to be answered under which conditions a sequence of the form of Equation~\eqref{eq:general-stationary-iterative-method} converges to a fixed point and how many iteration must be performed to achieve this goal.
 For this purpose, we, again, reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
 \begin{equation}
-	\bm{x}^{(i+1)} = (I - M^{-1} A) \bm{x}^{(i)} + M^{-1}\bm b,
+	\bm{x}^{(k+1)} = (I - M^{-1} A) \bm{x}^{(k)} + M^{-1}\bm b,
 \end{equation}
 as an alternative formulation.
 Within this equation can now set $\bm{x}^{i} = \bm{x}^{0}$ 
@@ -217,7 +217,7 @@ By continuing this recursively for an arbitrary number of $k$ times, we see that
 	\label{eq:stationary-iterative-method-series}
 \end{equation}
 which means that we can always separate the term $N^{(k)}\bm{b}$ from the rest of the equation.
-Note that here the superscript $G^k$ means that we have the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(i)}$.
+Note that here the superscript $G^k$ means that we have the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(k)}$.
 Since we have obtained Equation~\eqref{eq:stationary-iterative-method-series} from our original formulation it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
 \begin{equation}
 	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
