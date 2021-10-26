@@ -150,7 +150,9 @@ x_{i}^{(k+1)}={\frac {1}{a_{ii}}}\left(b_{i}-\sum _{j\neq i}a_{ij}x_{j}^{(k)}\ri
 In contrast to Equation~\eqref{eq:gauss-seidel-element-wise} the computation of each subsequent element of the vector $\bm{x}^{(k+1)}$ does not depend on any of its previous ones.
 Consequently, the computation of a new approximate solution $\bm{x}^{(k+1)}$ using the Jacobi method can be performed in parallel for each individual element of the vector.
 
-To enable a parallel Gauss-Seidel-like computation of the approximate solution $\bm{x}^{(k+1)}$ the red-black Gauss-Seidel method has been proposed.  
+To enable a parallel computation of the approximate solution $\bm{x}^{(k+1)}$ that is similar to the Gauss-Seidel method but does not rely on a sequential computation, the red-black Gauss-Seidel method has been proposed.
+It is obtained by partitioning the elements of the vector $\bm{x}^{(k+1)}$ into two sets, where the first one represents the set of grid points with an even index, whereas the other one contains those with an odd index.
+%TODO describe why RB-GS is only applicable in certain cases 
 
 
 
