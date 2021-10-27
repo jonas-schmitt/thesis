@@ -123,12 +123,12 @@ More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $
 
 \begin{equation}
 	\begin{split}
-			& S^{(m, d)} = \{(\bm{a_k}, b_k) \}_{k=1}^m = \{(\bm{a_1}, b_1),  (\bm{a_2}, b_2), \dots (\bm{a_m}, b_m)\} 
+			& S^{(m, d)} = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\} 
 	\\ & \forall \, i, j, k \in \{1, 2, \dots m \}: \,
-	\bm{a_k} \in \mathbb{Z}^d \wedge \bm{a_i} \neq \bm{a_j} \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
+	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
-Here, the left entry $\bm{a_k}$ of each tuple $(\bm{a_k}, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
+Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
 For one- and two-dimensional problems, it is often more convenient to use the alternative notation 
 \begin{equation*}
 	S^{(m, 1)} = \begin{bmatrix}
@@ -145,14 +145,14 @@ and
 		& \vdots & \vdots & \vdots &
 	\end{bmatrix}
 \end{equation*}
-where for all $s_{\bm{a_i}}$  with $i \in \{1, \dots, m\}$ there exists a tuple $(\bm{a_i}, b_i) \in S^{(m, d)}$ such that $b_i = s_{\bm{a_i}}$.
+where for all $s_{\bm{a}_i}$  with $i \in \{1, \dots, m\}$ there exists a tuple $(\bm{a}_i, b_i) \in S^{(m, d)}$ such that $b_i = s_{\bm{a}_i}$.
 
 
-Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain point $u_{\bm x}$ with $\bm x \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^d$ is the set of grid indices, each considered as an n-dimensional vector:
+Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain point $u_{\bm i}$ with $\bm i \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^d$ is the set of grid indices, each considered as an n-dimensional vector:
 \begin{equation}
 	\begin{split}
-		& S^{(m, d)} \cdot u_{\bm x} = \sum_{k=1}^m b_k u_{\bm x + \bm{a_k}} \quad 
-		\text{with} \; \bm{x} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a_i}, b_i) \in S^{(m,d)} \; \forall \, i \in \{ 1, 2, \dots m \} 
+		& S^{(m, d)} \cdot u_{\bm i} = \sum_{k=1}^m b_k u_{\bm i + \bm{a}_k} \quad 
+		\text{with} \; \bm{i} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a}_i, b_i) \in S^{(m,d)} \; \forall \, i \in \{ 1, 2, \dots m \} 
 	\end{split}
 \end{equation}
 As an example we consider the following five-point stencil:
@@ -173,7 +173,7 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
-	\alpha S^{(m, d)} = \{(\bm{a_k}, \alpha b_k) \}_{k=1}^m
+	\alpha S^{(m, d)} = \{(\bm{a}_k, \alpha b_k) \}_{k=1}^m
 \end{equation}
 
 Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils.

@@ -16,6 +16,7 @@ which is discretized using the three-point stencil
 	\Delta_h^{(3, 1)} = \frac{1}{h^2}\begin{bmatrix}
 		-1 & 2 & -1
 	\end{bmatrix}.
+		\label{eq:1D-laplace-stencil}
 \end{equation} 
 Figure~\ref{fig:different-error-components} shows the impact of applying the Jacobi´and Gauss-Seidel method on different periodic error components.
 \begin{figure}
@@ -126,7 +127,7 @@ Since $U = A - (D - L)$, we can rewrite this equation to obtain
 \begin{equation*}
 	(D - L) \bm{x}^{(k+1)} = \bm{b} - U \bm{x}^{(k)}.
 \end{equation*}  
-which can then be solved using forward substitution such that
+which can then be solved using forward substitution by applying
 \begin{equation}
 	x_{i}^{(k+1)}={\frac {1}{a_{ii}}}\left(b_{i}-\sum _{j=1}^{i-1}a_{ij}x_{j}^{(k+1)}-\sum _{j=i+1}^{n}a_{ij}x_{j}^{(k)}\right),
 	\label{eq:gauss-seidel-element-wise}
@@ -150,8 +151,48 @@ x_{i}^{(k+1)}={\frac {1}{a_{ii}}}\left(b_{i}-\sum _{j\neq i}a_{ij}x_{j}^{(k)}\ri
 In contrast to Equation~\eqref{eq:gauss-seidel-element-wise} the computation of each subsequent element of the vector $\bm{x}^{(k+1)}$ does not depend on any of its previous ones.
 Consequently, the computation of a new approximate solution $\bm{x}^{(k+1)}$ using the Jacobi method can be performed in parallel for each individual element of the vector.
 
-To enable a parallel computation of the approximate solution $\bm{x}^{(k+1)}$ that is similar to the Gauss-Seidel method but does not rely on a sequential computation, the red-black Gauss-Seidel method has been proposed.
-It is obtained by partitioning the elements of the vector $\bm{x}^{(k+1)}$ into two sets, where the first one represents the set of grid points with an even index, whereas the other one contains those with an odd index.
+One possibility to enable a parallel computation of the approximate solution $\bm{x}^{(k+1)}$ that is similar to the Gauss-Seidel method but does not rely on a sequential computation, is to partition the grid points into multiple subsets.
+The computation of each subset is then performed in a Jacobi-like fashion, however, in case the values of grid points from other subsets are needed, the updated values are used.
+A common variant of this approach is the red-black Gauss-Seidel method.
+Here, the grid points are assigned to two distinct sets, where the first represents the red and the second one the black points.
+We can define the red-black Gauss-Seidel method in the following way:
+\begin{equation}
+	\begin{split}
+		\bm{x}^{(k+1/2)} & = \bm{x}^{(k)} + P_r D^{-1} (\bm{b} - A \bm{x}^{k}) \\
+		\bm{x}^{(k+1)} & = \bm{x}^{(k+1/2)} + P_b D^{-1} (\bm{b} - A \bm{x}^{k+1/2})
+	\end{split}
+\end{equation}
+The entries of the matrices $P_R$ and $P_B$ are then defined as
+\begin{equation}
+	P_{R,ij} = \begin{cases}
+	1 & \text{if} \; i = j \; \text{and} \; i,j \in R \\
+	0 & \text{otherwise},  
+	\end{cases}
+\end{equation}
+\begin{equation}
+	P_{B,ij} = \begin{cases}
+		1 & \text{if} \; i = j \; \text{and} \; i,j \in B \\
+		0 & \text{otherwise}  
+	\end{cases}
+\end{equation}
+Here, $R$ and $B$ are the sets of grid indices that correspond to the red and black points, respectively.
+Now consider again the three-point stencil defined in Equation~\eqref{eq:1D-laplace-stencil}.
+If we define the Gauss-Seidel method with respect to this stencil we obtain
+\begin{equation*}
+	x_{i}^{(k+1)}=\frac {1}{2}\left(b_{i} + x_{i-1}^{(k+1)} + x_{i+1}^{(k)}\right).
+\end{equation*}
+Here the update of each individual grid point is exclusively based on its neighbors, whereas the left neighbor $x_{i-1}^{(k+1)}$ has been already updated in the previous step of the method.
+We can achieve a similar behavior by assigning neighboring grid points to different partitions, for instance in case of a red-black partitioning by defining
+\begin{equation}
+		R = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{even} \}, \;
+		B = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{odd} \}.
+\end{equation}
+The resulting method can often achieve better smoothing properties as the Jacobi method, without sacrificing much of its parallelism, as the computations on each partition can be performed in parallel. 
+
+
+ 
+%The fundamental requirement of this approach then is that the structure of the matrix $A$ enables a creation of distinct grid point subsets, such that the access
+%It is obtained by partitioning the elements of the vector $\bm{x}^{(k+1)}$ into two sets, where the first one represents the set of grid points with an even index, whereas the other one contains those with an odd index.
 %TODO describe why RB-GS is only applicable in certain cases 
 
 
