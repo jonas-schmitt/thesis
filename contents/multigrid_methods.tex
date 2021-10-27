@@ -189,7 +189,6 @@ We can achieve a similar behavior by assigning neighboring grid points to differ
 \end{equation}
 The resulting method can often achieve better smoothing properties as the Jacobi method, without sacrificing much of its parallelism, as the computations on each partition can be performed in parallel. 
 
-
  
 %The fundamental requirement of this approach then is that the structure of the matrix $A$ enables a creation of distinct grid point subsets, such that the access
 %It is obtained by partitioning the elements of the vector $\bm{x}^{(k+1)}$ into two sets, where the first one represents the set of grid points with an even index, whereas the other one contains those with an odd index.

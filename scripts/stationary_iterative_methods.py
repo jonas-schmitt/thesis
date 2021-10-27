@@ -27,6 +27,19 @@ def jacobi(A: sparse.csr_matrix, x: np.array, b: np.array, omega=1.0):
     x_new = x + omega * sparse.diags(d_inv) * r
     return x_new
 
+
+def red_black_gauss_seidel(A: sparse.csr_matrix, x: np.array, b: np.array, omega=1.0):
+    r = b - A * x
+    d = A.diagonal()
+    d_inv = 1.0/d
+
+    P_r = np.array([1 - i % 2 for i in range(1, d.shape[0]+1)])
+    P_b = np.array([i % 2 for i in range(1, d.shape[0]+1)])
+    x_new = x + omega * sparse.diags(P_r) * sparse.diags(d_inv) * r
+    r_new = b - A * x_new
+    return x_new + omega * sparse.diags(P_b) * sparse.diags(d_inv) * r_new
+
+
 def gauss_seidel(A: sparse.csr_matrix, x: np.array, b: np.array, omega=1.0):
     r = b - A * x
     A_ = A.toarray()
@@ -36,6 +49,7 @@ def gauss_seidel(A: sparse.csr_matrix, x: np.array, b: np.array, omega=1.0):
     B = D - U
     e = np.linalg.solve(B, omega * r)
     return x + e
+
 
 
 def plot_error(e, h, filename):
@@ -63,7 +77,7 @@ def generate_plots(iterate, h, A, x, b, steps=100, omega=1.0, name="jacobi"):
     plot_error(e, h, f"final_error_{name}.pdf")
 
 
-h = 1/2**6
+h = 1/2**9
 n = int(1/h - 1)
 omega = 1
 steps = 100
@@ -76,8 +90,9 @@ for i in range(2, 7):
     tmp1 = np.linspace(0 + h * end, end - h * end, n)
     x1 = (np.sin(tmp1))
     x = x1
-    generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name=f"jacobi_{k}pi_coarse")
-    generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"gauss_seidel_{k}pi_coarse")
+    generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name=f"jacobi_{k}pi")
+    generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"gauss_seidel_{k}pi")
+    generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"red_black_gauss_seidel_{k}pi")
 
 k = 4
 tmp1 = np.linspace(0, k*np.pi, n)
@@ -85,5 +100,6 @@ x1 = 0.5 * (np.sin(tmp1))
 tmp2 = np.linspace(0, 16 * k * np.pi, n)
 x2 = 0.5 * (np.sin(tmp2))
 x = x1+x2
-generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_combined_coarse")
-generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_combined_coarse")
+generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_combined")
+generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_combined")
+generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="red_black_gauss_seidel_combined")
