@@ -83,7 +83,6 @@ omega = 1
 steps = 100
 A = generate_1D_matrix(n)
 b = np.zeros(n)
-
 for i in range(2, 7):
     k = 2**i
     end = k * np.pi
@@ -93,13 +92,14 @@ for i in range(2, 7):
     generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name=f"jacobi_{k}pi")
     generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"gauss_seidel_{k}pi")
     generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, omega=omega, name=f"red_black_gauss_seidel_{k}pi")
-
 k = 4
 tmp1 = np.linspace(0, k*np.pi, n)
-x1 = 0.5 * (np.sin(tmp1))
-tmp2 = np.linspace(0, 16 * k * np.pi, n)
-x2 = 0.5 * (np.sin(tmp2))
-x = x1+x2
-generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_combined")
-generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_combined")
-generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="red_black_gauss_seidel_combined")
+x1 = 0.25 * (np.sin(tmp1))
+tmp3 = np.linspace(0, 8 * k * np.pi, n)
+x3 = 0.25 * (np.sin(tmp3))
+tmp4 = np.linspace(0, 16 * k * np.pi, n)
+x4 = 0.5 * (np.sin(tmp4))
+x = x1+x3+x4
+generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega, name="jacobi_dominant_high_frequency")
+generate_plots(gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="gauss_seidel_dominant_high_frequency")
+generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, omega=omega, name="red_black_gauss_seidel_dominant_high_frequency")
