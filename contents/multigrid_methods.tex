@@ -109,6 +109,7 @@ These methods, therefore, operate on a so-called hierarchy of grids, where on ea
 In the following, we first introduce the basic components of a multigrid method, such as the smoothing, restriction, prolongation and coarse grid correction operations.
 Based on this definition, we then develop a formal language for the representation of multigrid solvers.
 \subsection{Smoothing}
+\label{subsec:smoothing}
 One of the central elements of multigrid methods is the utilization of a smoothing procedure, that is able to quickly reduce the oscillatory components of a given error.
 We have already shown that the Jacobi and Gauss-Seidel method behave in such a way for the considered one-dimensional model problem.
 To further improve the smoothing property of a basic iterative methods, it is often beneficial to introduce an additional relaxation factor $\omega$ which yields the iteration 
@@ -181,41 +182,80 @@ If we define the Gauss-Seidel method with respect to this stencil we obtain
 \begin{equation*}
 	x_{i}^{(k+1)}=\frac {1}{2}\left(b_{i} + x_{i-1}^{(k+1)} + x_{i+1}^{(k)}\right).
 \end{equation*}
-Here the update of each individual grid point is exclusively based on its neighbors, whereas the left neighbor $x_{i-1}^{(k+1)}$ has been already updated in the previous step of the method.
+Here the update of each individual grid point is exclusively based on its neighbors, whereas the left neighbor $x_{i-1}^{(k+1)}$ has already been updated in the previous step of the method.
 We can achieve a similar behavior by assigning neighboring grid points to different partitions, for instance in case of a red-black partitioning by defining
 \begin{equation}
 		R = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{even} \}, \;
 		B = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{odd} \}.
 \end{equation}
-The resulting method can often achieve better smoothing properties as the Jacobi method, without sacrificing much of its parallelism, as the computations on each partition can be performed in parallel.
-As an example the effect of one hundred steps of both Gauss-Seidel variants on a combination of different error components is shown in Figure~\ref{fig:combined-error-dominant-high-frequency}.
-\begin{figure}
-	\begin{subfigure}[b]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_jacobi_dominant_high_frequency.pdf}
-		\caption{Initial error}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_dominant_high_frequency.pdf}
-		\caption{Error after applying GS}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{figures/final_error_red_black_gauss_seidel_dominant_high_frequency.pdf}
-		\caption{Error after applying RB-GS}
-	\end{subfigure}
-	\caption{Combination of three error components with dominant high-frequency term discretized on a grid with step size $h = 2^{-9}$ before and after applying 100 steps of either the Gauss-Seidel (GS) or red-black Gauss-Seidel (RB-GS) method.}
-	\label{fig:combined-error-dominant-high-frequency}
-\end{figure}
+In many cases, the resulting method has better smoothing properties than the Jacobi method without sacrificing much of its parallelism, since the computations on each partition can be performed in parallel~\cite{trottenberg2000multigrid}.
+\subsection{Advanced Multigrid Techniques}
+\subsubsection{Block Smoothing}
+In Section~\ref{subsec:smoothing}, we have only discussed smoothers that operate in a pointwise manner.
+For instance, in the Jacobi method, Equation~\eqref{eq:jacobi-element-wise} is computed for each individual grid point.
+The idea of block smoothing is to reorder the original system in such a way, that the same operations can be defined on blocks of grid points.
+As a consequence each scalar operation in the original pointwise method is then replaced by a matrix or vector operation, whose dimensionality corresponds to the chosen block size.
 
-
- 
-%The fundamental requirement of this approach then is that the structure of the matrix $A$ enables a creation of distinct grid point subsets, such that the access
-%It is obtained by partitioning the elements of the vector $\bm{x}^{(k+1)}$ into two sets, where the first one represents the set of grid points with an even index, whereas the other one contains those with an odd index.
-%TODO describe why RB-GS is only applicable in certain cases 
-
+For example, we can rearrange our original system in the following way:
+\begin{equation}
+\underbrace{
+\begin{pmatrix}A_{11}&A_{12}&\cdots &A_{1m}\\A_{21}&A_{22}&\cdots &A_{2m}\\\vdots &\vdots &\ddots &\vdots \\A_{m1}&A_{m2}&\cdots &A_{mm}\end{pmatrix}}_{A}
+ = 
+\underbrace{
+\begin{pmatrix}
+\bm{x}_1 \\ \bm{x}_2 \\ \vdots \\ \bm{x_m} 
+\end{pmatrix}}_{\bm{x}} =
+\underbrace{
+\begin{pmatrix}
+	\bm{b}_1 \\ \bm{b}_2 \\ \vdots \\ \bm{b_m} 
+\end{pmatrix}}_{\bm{b}}
+\end{equation}
+with $m = n / n_b$ if $n_b$ is the size of each block.
+A block Jacobi method can then be defined as
+\begin{equation}
+	\bm{x}_{i}^{(k+1)}=A_{ii}^{-1}\left(\bm{b}_{i}-\sum _{j\neq i}A_{ij}\bm{x}_{j}^{(k)}\right),
+	\label{eq:jacobi-block-wise}
+\end{equation}
+For example we can define a block consisting of two elements for the one-dimensional Laplace equation and obtain the respective block Jacobi for each inner block with index $i_b = n_b (i - 1)$ 
+\begin{equation}
+	\begin{pmatrix}
+		2 & -1 \\
+		-1 & 2
+	\end{pmatrix}
+	\begin{pmatrix}
+		x_{i_b}^{(k+1)} \\ x_{i_b+1}^{(k+1)} 
+	\end{pmatrix}
+= 	- \left( \begin{pmatrix}
+	0 & 0 \\
+	-1 & 0
+\end{pmatrix} 	
+\begin{pmatrix}
+x_{i_b+2}^{(k)} \\ x_{i_b + 3}^{(k)}
+\end{pmatrix} +
+\begin{pmatrix}
+	0 & -1 \\
+	0 & 0
+\end{pmatrix} 	
+\begin{pmatrix}
+	x_{i_b-2}^{(k)} \\ x_{i_b-1}^{(k)} 
+\end{pmatrix}\right)
+\end{equation}
+This method can be defined in a similar way using our previously introduced stencil notation
+\begin{equation}
+	\begin{pmatrix}
+		\begin{bmatrix}  0 & 2 & -1 \end{bmatrix} \bullet x_{i_b}^{(k+1)} \\ \begin{bmatrix} -1 & 2 & 0 \end{bmatrix} \bullet x_{i_b+1}^{(k+1)} 
+	\end{pmatrix}
+	= 	-\left(
+	\begin{pmatrix}
+		\emptyset \bullet x_{i_b+2}^{(k)} \\ \begin{bmatrix} -1 & 0 & 0 \end{bmatrix} \bullet x_{i_b + 3}^{(k)}
+	\end{pmatrix} +
+	\begin{pmatrix}
+		\begin{bmatrix} 0 & 0 & -1 \end{bmatrix} \bullet x_{i_b-2}^{(k)} \\ \emptyset \bullet x_{i_b-1}^{(k)} 
+	\end{pmatrix}\right)
+\end{equation}
+%TODO define stencil blocks
+\subsection{Systems of PDEs}
+%TODO write section
+  
 
 
