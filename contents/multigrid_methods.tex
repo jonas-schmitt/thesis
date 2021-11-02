@@ -196,7 +196,7 @@ For instance, in the Jacobi method, Equation~\eqref{eq:jacobi-element-wise} is c
 The idea of block smoothing is to reorder the original system in such a way, that the same operations can be defined on blocks of grid points.
 As a consequence each scalar operation in the original pointwise method is then replaced by a matrix or vector operation, whose dimensionality corresponds to the chosen block size.
 
-For example, we can rearrange our original system in the following way:
+For example, we can rearrange our original system of the form of Equation~\eqref{eq:general-system-of-linear-equations} in the following way:
 \begin{equation}
 \underbrace{
 \begin{pmatrix}A_{11}&A_{12}&\cdots &A_{1m}\\A_{21}&A_{22}&\cdots &A_{2m}\\\vdots &\vdots &\ddots &\vdots \\A_{m1}&A_{m2}&\cdots &A_{mm}\end{pmatrix}}_{A}
@@ -216,43 +216,61 @@ A block Jacobi method can then be defined as
 	\bm{x}_{i}^{(k+1)}=A_{ii}^{-1}\left(\bm{b}_{i}-\sum _{j\neq i}A_{ij}\bm{x}_{j}^{(k)}\right),
 	\label{eq:jacobi-block-wise}
 \end{equation}
-For example we can define a block consisting of two elements for the one-dimensional Laplace equation and obtain the respective block Jacobi for each inner block with index $i_b = n_b (i - 1)$ 
+For example we can define a block consisting of two elements for the one-dimensional Laplace equation and obtain the respective block Jacobi for each inner block with index $i$ by computing
 \begin{equation}
 	\begin{pmatrix}
 		2 & -1 \\
 		-1 & 2
 	\end{pmatrix}
 	\begin{pmatrix}
-		x_{i_b}^{(k+1)} \\ x_{i_b+1}^{(k+1)} 
+		x_{j}^{(k+1)} \\ x_{j+1}^{(k+1)} 
 	\end{pmatrix}
-= 	- \left( \begin{pmatrix}
+= 	-  \begin{pmatrix}
 	0 & 0 \\
 	-1 & 0
 \end{pmatrix} 	
 \begin{pmatrix}
-x_{i_b+2}^{(k)} \\ x_{i_b + 3}^{(k)}
-\end{pmatrix} +
+x_{j+2}^{(k)} \\ x_{j+3}^{(k)}
+\end{pmatrix} -
 \begin{pmatrix}
 	0 & -1 \\
 	0 & 0
 \end{pmatrix} 	
 \begin{pmatrix}
-	x_{i_b-2}^{(k)} \\ x_{i_b-1}^{(k)} 
-\end{pmatrix}\right)
+	x_{j-2}^{(k)} \\ x_{j-1}^{(k)} 
+\end{pmatrix},
 \end{equation}
+where $j = n_b (i - 1) + 1$.
 This method can be defined in a similar way using our previously introduced stencil notation
 \begin{equation}
 	\begin{pmatrix}
-		\begin{bmatrix}  0 & 2 & -1 \end{bmatrix} \bullet x_{i_b}^{(k+1)} \\ \begin{bmatrix} -1 & 2 & 0 \end{bmatrix} \bullet x_{i_b+1}^{(k+1)} 
+		\{(0, 2), (1, -1)\} \bullet x_{j}^{(k+1)} \\ \{(-1, -1), (0, 2)\} \bullet x_{j+1}^{(k+1)} 
 	\end{pmatrix}
-	= 	-\left(
+	= 	-
 	\begin{pmatrix}
-		\emptyset \bullet x_{i_b+2}^{(k)} \\ \begin{bmatrix} -1 & 0 & 0 \end{bmatrix} \bullet x_{i_b + 3}^{(k)}
-	\end{pmatrix} +
+		\emptyset \bullet x_{j+2}^{(k)} \\ \{(-1, -1)\} \bullet x_{j + 3}^{(k)}
+	\end{pmatrix} -
 	\begin{pmatrix}
-		\begin{bmatrix} 0 & 0 & -1 \end{bmatrix} \bullet x_{i_b-2}^{(k)} \\ \emptyset \bullet x_{i_b-1}^{(k)} 
-	\end{pmatrix}\right)
+		\{(1,-1)\} \bullet x_{j-2}^{(k)} \\ \emptyset \bullet x_{j-1}^{(k)} 
+	\end{pmatrix}.
 \end{equation}
+In both cases we obtain a system of two linear equation of the form
+\begin{equation}
+	\begin{pmatrix}
+		2 x_{j}^{(k+1)} - x_{j+1}^{(k+1)} \\ 2 x_{j+1}^{(k+1)} - x_{j}^{(k+1)} 
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		x_{j - 1}^{(k)} \\ x_{j + 2}^{(k)}
+	\end{pmatrix}.
+\end{equation}
+that in each step of the method must be solved for each block, for instance, using a direct solver such as Gaussian elimination.
+As in the pointwise Jacobi method, the system of each block can be solved independently and, therefore, operations on different blocks can be performed in parallel. 
+Considering the fact that direct solvers in general require $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \frac{n}{n_b}) = \mathcal{O}(n_b^2 n)$.
+Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and, therefore, solve the original system using Gaussian elimination.
+In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which, for a constant stencil, can be computed with a constant number of operations per grid point.
+While we here only provide a brief introductions to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
+Furthermore, it is also possible to define overlapping block smoothers, %TODO elaborate
 %TODO define stencil blocks
 \subsection{Systems of PDEs}
 %TODO write section

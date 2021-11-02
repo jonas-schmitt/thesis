@@ -18,11 +18,18 @@ In the following, we first introduce basic iterative methods, as the Jacobi and 
 \subsection{Jacobi and Gauss-Seidel} 
 We begin our introduction of basic iterative methods by considering the general system of linear equations
 \begin{equation}
-	A \bm{x} = \bm{b},
+	\underbrace{
+	\begin{pmatrix}a_{11}&a_{12}&\cdots &a_{1n}\\a_{21}&a_{22}&\cdots &a_{2n}\\\vdots &\vdots &\ddots &\vdots \\a_{n1}&a_{n2}&\cdots &a_{nn}\end{pmatrix}}_{A}
+\underbrace{\begin{pmatrix}
+		x_1 \\ x_2 \\ \vdots \\ x_n
+\end{pmatrix}}_{\bm{x}} = 
+\underbrace{\begin{pmatrix}
+		b_1 \\ b_2 \\ \vdots \\ b_n
+\end{pmatrix}}_{\bm{b}}
 	\label{eq:general-system-of-linear-equations}
 \end{equation}
-where $A$ is the coefficient matrix, $\bm x$ the vector of unknowns and $\bm b$ the right-hand side.
-At this point we do not specify whether $A$ represents a dense/sparse matrix or a stencil, as long as all the operations employed within the subsequent methods are well-defined for a mathematical object of this type.
+where $A \in \mathbb{C}^{n \times n}$ is the coefficient matrix, $\bm x \in \mathbb{C}^n$ the vector of unknowns and $\bm b \in \mathbb{C}^n$ the right-hand side.
+At this point we do not specify whether $A$ is represented as a dense/sparse matrix or a stencil, as long as all the operations employed within the subsequent methods are well-defined for a mathematical object of this type.
 We can now rewrite Equation~\eqref{eq:general-system-of-linear-equations} to obtain
 \begin{equation}
 	\bm{x} = \bm{x} + \bm b - A \bm{x}.
