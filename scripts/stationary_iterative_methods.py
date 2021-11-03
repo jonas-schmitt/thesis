@@ -58,7 +58,7 @@ def plot_error(e, h, filename):
     sns.set(style="whitegrid")
     sns.set_context("paper")
     sns.despine()
-    sns.relplot(x=x, y=y, kind='line', color="black", dashes=False, legend=False)
+    sns.relplot(x=x, y=y, kind='line', color="black", dashes=False, marker="o", legend=False)
     plt.tight_layout()
     plt.xlim(0, 1)
     plt.ylim(-1.1, 1.1)
@@ -68,29 +68,34 @@ def plot_error(e, h, filename):
 def generate_plots(iterate, h, A, x, b, steps=100, omega=1.0, name="jacobi"):
     e = x - b
     plot_error(e, h, f"initial_error_{name}.pdf")
+    """
     for i in range(1, steps + 1):
         # x_new = jacobi(A, x, b, omega)
         x_new = iterate(A, x, b, omega)
         x = x_new
     e = x - b
     plot_error(e, h, f"final_error_{name}.pdf")
+    """
 
 
-h = 1/2**9
-n = int(1/h - 1)
 omega_jacobi = 1.0
 steps = 100
-A = generate_1D_matrix(n)
-b = np.zeros(n)
-for i in range(2, 7):
-    k = 2**i
-    end = k * np.pi
-    tmp1 = np.linspace(0 + h * end, end - h * end, n)
-    x1 = (np.sin(tmp1))
-    x = x1
-    generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega_jacobi, name=f"jacobi_{k}pi")
-    generate_plots(gauss_seidel, h, A, x, b, steps=steps, name=f"gauss_seidel_{k}pi")
-    generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, name=f"red_black_gauss_seidel_{k}pi")
+for j in range(9, 4, -1):
+    h = 1 / 2 ** j
+    n = int(1 / h - 1)
+    A = generate_1D_matrix(n)
+    b = np.zeros(n)
+    for i in range(1, 7):
+        k = 2**i
+        end = k * np.pi
+        tmp1 = np.linspace(0 + h * end, end - h * end, n)
+        x1 = (np.sin(tmp1))
+        x = x1
+        generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega_jacobi, name=f"{k}pi_level{j}")
+        # generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega_jacobi, name=f"jacobi_{k}pi")
+        # generate_plots(gauss_seidel, h, A, x, b, steps=steps, name=f"gauss_seidel_{k}pi")
+        # generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, name=f"red_black_gauss_seidel_{k}pi")
+"""
 end1 = 4 * np.pi
 tmp1 = np.linspace(0 + h * end1, end1 - h * end1, n)
 x1 = 0.5 * (np.sin(tmp1))
@@ -101,3 +106,4 @@ x = x1 + x2
 generate_plots(jacobi, h, A, x, b, steps=steps, omega=omega_jacobi, name="jacobi_combined")
 generate_plots(gauss_seidel, h, A, x, b, steps=steps, name="gauss_seidel_combined")
 generate_plots(red_black_gauss_seidel, h, A, x, b, steps=steps, name="red_black_gauss_seidel_combined")
+"""
