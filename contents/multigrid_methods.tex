@@ -346,7 +346,7 @@ Assuming that the error $\bm{e}_{2h}$ on the coarse grid consists exclusively of
 \end{equation} 
 Now the question remains to be answered how we can compute the error $\bm{e}_{2h}$ on the coarse grid.
 As we have shown Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
-Therefore, we can apply our previously defined inter-grid transfer operators to define the coarse error equation
+Therefore, we can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2h$
 \begin{equation}
 	\underbrace{I_{h}^{2h} A_h I_{2h}^h}_{A_{2h}} \bm{e}_{2h} = I_{h}^{2h} \left(\bm{b}_h - A \bm{x}^{(0)}_h\right).
 	\label{eq:coarse-grid-error-equation}
@@ -355,6 +355,44 @@ Note that we have again made use of the fact that $\bm{e}_{h} \approx I_{2h}^{h}
 Note that in Equation~\eqref{eq:coarse-grid-error-equation} the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$. 
 This process is usually called \emph{Galerkin coarsening}.
 However, in cases where the operator $A_h$ can be directly discretized on a coarser grid with step size $2h$, it is often also possible to use the resulting operator $A_{2h}$ instead.
+We can therefore derive a two-level-method which is summarized in Algorithm~\ref{alg:two-grid-method}.
+\begin{algorithm}
+	\caption{Two-Grid Method}
+	\label{alg:two-grid-method}
+	\begin{algorithmic}
+		\State{Relax on $A_h \bm{x}_h = \bm{b}_h$ to obtain an approximation $\tilde{\bm{x}}_h$}
+		\State{Compute the residual $\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
+		\State{\hskip1em Obtain $A_{2h}$ through Galerkin coarsening or rediscretization}
+		\State{\hskip1em Restrict the residual $\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
+		\State{\hskip1em Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
+		\State{Perform the correction $\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \bm{x}_{2h}$}
+	\end{algorithmic}
+\end{algorithm}
+Note that even though we are actually solving Equation~\eqref{eq:coarse-grid-error-equation} on the coarse grid, we have now redefined it as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
+Based on this notation, we can then similarly define a two-level method starting from a grid with step size $2h$.
+We can, hence, define a recursive version of~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level.
+However, we have not covered the question which initial guess should be used for the error equation on each coarser level.
+For this purpose, note that one step of smoothing on Equation~\eqref{eq:coarse-grid-error-equation} with an initial guess of zero corresponds to
+\begin{equation}
+	\bm{e}_{2h}^{(1)} = M_{2h}^{-1} I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
+	\label{eq:initial-coarse-grid-relaxation}
+\end{equation}
+Since the error $\bm{e}_{2h}^{(k+1)}$ in step $k+1$ is defined as
+\begin{equation*}
+	\bm{e}_{2h}^{(k+1)} = \bm{x}_{2h}^{(k+1)} - \bm{x}_{2h}^{(k)},
+\end{equation*}
+and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose an initial guess of $\bm{x}_{2h}^{(0)} = I_{2h}^{h} \bm{x}_{h}^{(0)}$ and, hence, obtain the iteration
+\begin{equation}
+	\bm{x}_{2h}^{(1)} = I_{h}^{2h} \bm{x}_{h}^{(0)} + M_{2h}^{-1} ( I_{h}^{2h} \bm{b}_h - \underbrace{I_{h}^{2h} A_h I_{2h}^{h}}_{A_{2h}} I_{h}^{2h} \bm{x}_{h}^{(0)} ).
+\end{equation}
+Consequently, performing one step of relaxation with a zero initial guess on the coarse-grid error equation corresponds to one step of relaxation on the equation
+\begin{equation}
+	I_{h}^{2h} A_h I_{2h}^h \bm{x}_{2h} = I_{h}^{2h} \bm{b}_h,
+\end{equation}
+with an initial guess of $\bm{x}_{2h}^{(0)} = I_{h}^{2h} \bm{x}_{h}^{(0)}$.
+Because smoothing aims to remove the remaining oscillatory components of the error obtained from the fine grid, performing a relaxation of the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
+%TODO formulate V-cycle
+
 %\subsection{Systems of PDEs}
 %TODO write section
   
