@@ -366,12 +366,12 @@ We can therefore derive a two-level-method which is summarized in Algorithm~\ref
 		\State{\hskip1em Restrict the residual $\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
 		\State{\hskip1em Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
 		\State{Perform the correction $\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \bm{x}_{2h}$}
+		\State{Relax again $A_h \bm{x}_h = \bm{b}_h$ with an initial guess of $\tilde{\bm{x}}_h$}
 	\end{algorithmic}
 \end{algorithm}
 Note that even though we are actually solving Equation~\eqref{eq:coarse-grid-error-equation} on the coarse grid, we have now redefined it as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
-Based on this notation, we can then similarly define a two-level method starting from a grid with step size $2h$.
-We can, hence, define a recursive version of~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level.
-However, we have not covered the question which initial guess should be used for the error equation on each coarser level.
+Based on this notation, we could similarly define a two-level method starting from a grid with step size $2h$.
+However, we have not covered the question which initial guess should then be used for the error equation on the coarser level.
 For this purpose, note that one step of smoothing on Equation~\eqref{eq:coarse-grid-error-equation} with an initial guess of zero corresponds to
 \begin{equation}
 	\bm{e}_{2h}^{(1)} = M_{2h}^{-1} I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
@@ -391,8 +391,170 @@ Consequently, performing one step of relaxation with a zero initial guess on the
 \end{equation}
 with an initial guess of $\bm{x}_{2h}^{(0)} = I_{h}^{2h} \bm{x}_{h}^{(0)}$.
 Because smoothing aims to remove the remaining oscillatory components of the error obtained from the fine grid, performing a relaxation of the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
-%TODO formulate V-cycle
 
+By putting this all together we can formulate a recursive version of Algorithm~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level, which can be seen in Algorithm~\ref{alg:multigrid-cycle}.
+Note that the function \textsc{$\mu$-cycle} has a number of additional parameters compared to our original two-grid method.
+First, of all $l$ represents the number of recursive coarsening steps until the respective system of linear equations is solved directly.
+Furthermore, since in certain cases a single recursive application of this function is not sufficient to obtain a reasonably accurate approximation on the coarse grid, the procedure can be repeated for a certain number of times, which is controlled by the parameter $\gamma$.
+\begin{algorithm}
+	\caption{Multigrid Cycle}
+	\label{alg:multigrid-cycle}
+	\begin{algorithmic}
+		\Function{$\mu$-cycle}{$\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $l$, $\gamma$, $\nu_1$, $\nu_2$, $\omega$}
+		\For{$i = 1, \dots, \nu_1$}
+		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
+		\EndFor
+		\State{$\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
+		\State{$\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
+		\If{$l = 0$}
+		\State{ Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
+		\Else
+		\State{$\tilde{\bm{x}}_{2h} = \bm{0}_{2h}$}
+		\For{$i = 1, \dots, \gamma$}
+		\State{$\tilde{\bm{x}}_{2h} =  \mu\textsc{-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, l-1, \gamma, \nu_1, \nu_2)$}
+		\EndFor
+		\EndIf
+		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \tilde{\bm{x}}_{2h}$}
+		\For{$i = 1, \dots, \nu_2$}
+		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
+		\EndFor
+		\State \Return{$\tilde{\bm{x}}_h$}
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing steps before and after the coarse grid correction is performed, respectively.
+Note that when performing multiple sweeps of relaxation or coarse grid correction, the initial guess is, as usual, replaced by the approximation obtained in the previous step.
+While in principle the parameters of Algorithm~\ref{alg:multigrid-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value corresponds to a distinct computational pattern.
+For instance, choosing $\gamma = 1$ means that only a single recursive descent is performed on each discretization level.
+Figure shows a graphic representation of the resulting computational pattern.
+
+\begin{figure}
+	\begin{subfigure}{0.33\textwidth}
+					\begin{tikzpicture}
+			\node   (h) at (-0.75, 4){$h$};
+			\node   (2h) at (-0.75, 3){$2h$};
+			\node   (4h) at (-0.75, 2){$4h$};
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,,fill=black,scale=0.8] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,4) [draw, circle, scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			;
+		\end{tikzpicture}
+		\caption{$\gamma = 1$}
+	\end{subfigure}
+	\begin{subfigure}{0.33\textwidth}
+					\begin{tikzpicture}
+					\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+					\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+					\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
+					\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+					\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
+					\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
+					\node	(g) at (3,4) [draw, circle, scale=0.8] {};
+					
+					\draw 
+					(a) edge[->] (b) 
+					(b) edge[->] (c)
+					(c) edge[->] (d)
+					(d) edge[->] (e)   
+					(e) edge[->] (f)
+					(f) edge[->] (g)
+					;
+				\end{tikzpicture}
+		\caption{$\gamma = 2$}
+	\end{subfigure}
+	\begin{subfigure}{0.33\textwidth}
+	\begin{tikzpicture}
+		\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+		\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+		\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
+		\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+		\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
+		\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
+		\node	(g) at (3,2) [draw, circle, fill=black,scale=0.8] {};
+		\node	(h) at (3.5,3) [draw, circle, scale=0.8] {};	
+		\node	(i) at (4,4) [draw, circle, scale=0.8] {};	
+		\draw 
+		(a) edge[->] (b) 
+		(b) edge[->] (c)
+		(c) edge[->] (d)
+		(d) edge[->] (e)   
+		(e) edge[->] (f)
+		(f) edge[->] (g)
+		(g) edge[->] (h)
+		(h) edge[->] (i)
+		;
+	\end{tikzpicture}
+	\caption{$\gamma = 3$}
+	\end{subfigure}
+	\caption{}
+	\label{fig:three-grid-cycles}
+\end{figure}
+
+\begin{figure}
+	\begin{subfigure}{0.49\textwidth}
+		\begin{tikzpicture}
+			\node   (h) at (-0.75, 4){$h$};
+			\node   (2h) at (-0.75, 3){$2h$};
+			\node   (4h) at (-0.75, 2){$4h$};
+			\node   (8h) at (-0.75, 1){$8h$};
+			\node   (16h) at (-0.75, 0){$16h$};
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
+			\node	(d) at (1.5,1) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,0) [draw, circle,fill=black, scale=0.8] {};
+			\node	(f) at (2.5,1) [draw, circle,scale=0.8] {};
+			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
+			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
+			\node	(i) at (4,4) [draw, circle,scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			(g) edge[->] (h)
+			(h) edge[->] (i)
+			;
+		\end{tikzpicture}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\begin{tikzpicture}
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
+			\node	(d) at (1.5,1) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,0) [draw, circle,fill=black, scale=0.8] {};
+			\node	(f) at (2.5,1) [draw, circle,scale=0.8] {};
+			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
+			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
+			\node	(i) at (4,4) [draw, circle,scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			(g) edge[->] (h)
+			(h) edge[->] (i)
+			;
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{}
+\label{fig:four-grid-cycles}
+\end{figure}
 %\subsection{Systems of PDEs}
 %TODO write section
   
