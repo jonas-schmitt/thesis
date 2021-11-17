@@ -400,7 +400,7 @@ Furthermore, since in certain cases a single recursive application of this funct
 	\caption{Multigrid Cycle}
 	\label{alg:multigrid-cycle}
 	\begin{algorithmic}
-		\Function{$\mu$-cycle}{$\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $l$, $\gamma$, $\nu_1$, $\nu_2$, $\omega$}
+		\Function{mg-cycle}{$\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $l$, $\gamma$, $\nu_1$, $\nu_2$, $\omega$}
 		\For{$i = 1, \dots, \nu_1$}
 		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
 		\EndFor
@@ -411,7 +411,7 @@ Furthermore, since in certain cases a single recursive application of this funct
 		\Else
 		\State{$\tilde{\bm{x}}_{2h} = \bm{0}_{2h}$}
 		\For{$i = 1, \dots, \gamma$}
-		\State{$\tilde{\bm{x}}_{2h} =  \mu\textsc{-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, l-1, \gamma, \nu_1, \nu_2)$}
+		\State{$\tilde{\bm{x}}_{2h} =  \textsc{mg-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, l-1, \gamma, \nu_1, \nu_2)$}
 		\EndFor
 		\EndIf
 		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \tilde{\bm{x}}_{2h}$}
@@ -586,8 +586,6 @@ While Algorithm~\ref{alg:multigrid-cycle} enables the construction of different 
 For instance, in Algorithm~\ref{alg:multigrid-cycle} assumes that the same value of $\gamma$ is chosen on each level, which restricts possible computational pattern to those depicted in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
 One way to surpass this limitation is to combine different cycle types in a single method.
 For instance employing a combination of W- and V-cycles on each level results in a so-called F-cycle, whose computational pattern is shown in Figure~\ref{fig:f-cycle}.
-Note that for $l = 2$ this cycle is equivalent to a W-cycle.
-On discretization hierarchies with a larger depth, an F-cycle represents a compromise between the V- and W-cycle.
 \begin{figure}
 	\begin{subfigure}{0.4\textwidth}
 
@@ -653,7 +651,20 @@ On discretization hierarchies with a larger depth, an F-cycle represents a compr
 	\caption{Computational pattern of the F-cycle with a different numbers of coarsening steps.}
 	\label{fig:f-cycle}
 \end{figure}
+Except for the case of $l = 2$, where F-cycle and W-cycle are equivalent, it represents a compromise between applying a pure V- or W-cycle.
+While the combination of different cycle types, as within the F-cycle, represents an additional degree of freedom, the resulting methods can be still formulated within the rules of Algorithm~\ref{alg:multigrid-cycle} and, hence, are fully described by the aforementioned parameters.
+In the classical formulation of a multigrid method as in~\cite{brandt1977multi,hackbusch2013multi,trottenberg2000multigrid,briggs2000multigrid} these parameters are considered global and, hence, represent a fixed choice throughout the method.
+Therefore, within this framework, the same smoothing procedure and cycle type is assumed on every discretization level of the method.
+While for many applications this approach leads to efficient multigrid methods~\cite{trottenberg2000multigrid} there are still a number of cases, where the full potential of multigrid methods could not yet be exploited, see for instance~\cite{ernst2012difficult,benzi2005numerical}.
+While to date there exists a rich amount of research on the optimization of multigrid cycles based on its classical formulation, the variation of its components on an individual level has not been considered yet.
+Such an approach would grant us the flexibility to generate multigrid cycles that consist of arbitrary restriction and coarse-grid correction steps, each with a different combination of smoothers and relaxation factors.
+In Algorithm~\ref{alg:multigrid-cycle} the space of possible computational patterns is restricted to a finite number of choices. However, we can overcome this constraint by expressing each multigrid cycle in form of a finite stream of instructions, where the order of instructions is restricted by the rules of linear algebra and multigrid theory.
+To specify these rules in a mathematically formal way, we can make use of programming language theory, such that the formulation of a multigrid method is treated as a program construction task.
+Therefore, in the next section we give a brief overview about programming language theory and introduce the concept of formal grammars.
+We then combine this formalism together with our knowledge about multigrid methods to derive a novel representation of multigrid solvers that enables us to construct these methods in the form of a program design and optimization task.
 
+
+%TODO computational complexity
 %\subsection{Systems of PDEs}
 %TODO write section
   
