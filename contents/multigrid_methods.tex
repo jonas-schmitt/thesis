@@ -426,14 +426,19 @@ Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing step
 Note that when performing multiple sweeps of relaxation or coarse grid correction, the initial guess is, as usual, replaced by the approximation obtained in the previous step.
 While in principle the parameters of Algorithm~\ref{alg:multigrid-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value corresponds to a distinct computational pattern.
 For instance, choosing $\gamma = 1$ means that only a single recursive descent is performed on each discretization level.
-Figure shows a graphic representation of the resulting computational pattern.
-
+Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} show the computational patterns resulting from different values of $\gamma$ on a hierarchy of three and four grids, respectively.
 \begin{figure}
-	\begin{subfigure}{0.33\textwidth}
-					\begin{tikzpicture}
+	\captionsetup{justification=centering}
+	\begin{subfigure}{0.1\textwidth}
+		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
+		\end{tikzpicture}
+		\caption*{}
+	\end{subfigure}
+	\begin{subfigure}{0.22\textwidth}
+		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
 			\node	(c) at (1,2) [draw, circle,,fill=black,scale=0.8] {};
@@ -447,98 +452,106 @@ Figure shows a graphic representation of the resulting computational pattern.
 			(d) edge[->] (e)   
 			;
 		\end{tikzpicture}
-		\caption{$\gamma = 1$}
+		\caption*{$\gamma = 1$}
 	\end{subfigure}
-	\begin{subfigure}{0.33\textwidth}
-					\begin{tikzpicture}
-					\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-					\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-					\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
-					\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-					\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
-					\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
-					\node	(g) at (3,4) [draw, circle, scale=0.8] {};
-					
-					\draw 
-					(a) edge[->] (b) 
-					(b) edge[->] (c)
-					(c) edge[->] (d)
-					(d) edge[->] (e)   
-					(e) edge[->] (f)
-					(f) edge[->] (g)
-					;
-				\end{tikzpicture}
-		\caption{$\gamma = 2$}
+	\begin{subfigure}{0.32\textwidth}
+		\begin{tikzpicture}
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
+			\node	(g) at (3,4) [draw, circle, scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			;
+		\end{tikzpicture}
+		\caption*{$\gamma = 2$}
 	\end{subfigure}
-	\begin{subfigure}{0.33\textwidth}
-	\begin{tikzpicture}
-		\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-		\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-		\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
-		\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-		\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
-		\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
-		\node	(g) at (3,2) [draw, circle, fill=black,scale=0.8] {};
-		\node	(h) at (3.5,3) [draw, circle, scale=0.8] {};	
-		\node	(i) at (4,4) [draw, circle, scale=0.8] {};	
-		\draw 
-		(a) edge[->] (b) 
-		(b) edge[->] (c)
-		(c) edge[->] (d)
-		(d) edge[->] (e)   
-		(e) edge[->] (f)
-		(f) edge[->] (g)
-		(g) edge[->] (h)
-		(h) edge[->] (i)
-		;
-	\end{tikzpicture}
-	\caption{$\gamma = 3$}
+	\begin{subfigure}{0.32\textwidth}
+		\begin{tikzpicture}
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
+			\node	(g) at (3,2) [draw, circle, fill=black,scale=0.8] {};
+			\node	(h) at (3.5,3) [draw, circle, scale=0.8] {};	
+			\node	(i) at (4,4) [draw, circle, scale=0.8] {};	
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			(g) edge[->] (h)
+			(h) edge[->] (i)
+			;
+		\end{tikzpicture}
+		\caption*{$\gamma = 3$}
 	\end{subfigure}
-	\caption{}
+	\caption{Three-grid cycles ($l = 2$).}
 	\label{fig:three-grid-cycles}
 \end{figure}
 
 \begin{figure}
-	\begin{subfigure}{0.49\textwidth}
+	\captionsetup{justification=centering}
+	\begin{subfigure}{0.1\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
-			\node	(d) at (1.5,1) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,0) [draw, circle,fill=black, scale=0.8] {};
-			\node	(f) at (2.5,1) [draw, circle,scale=0.8] {};
-			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
-			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
-			\node	(i) at (4,4) [draw, circle,scale=0.8] {};
-			
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] (f)
-			(f) edge[->] (g)
-			(g) edge[->] (h)
-			(h) edge[->] (i)
-			;
 		\end{tikzpicture}
+		\caption*{}
 	\end{subfigure}
-	\begin{subfigure}{0.49\textwidth}
+	\begin{subfigure}{0.3\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
 			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
-			\node	(d) at (1.5,1) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,0) [draw, circle,fill=black, scale=0.8] {};
-			\node	(f) at (2.5,1) [draw, circle,scale=0.8] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
+			\node	(f) at (2.5,3) [draw, circle,scale=0.8] {};
+			\node	(g) at (3,4) [draw, circle,scale=0.8] {};
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			
+			;
+		\end{tikzpicture}
+		\caption*{$\gamma = 1$}
+	\end{subfigure}
+	\begin{subfigure}{0.6\textwidth}
+		\begin{tikzpicture}
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
+			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=0.8] {};
 			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
 			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
-			\node	(i) at (4,4) [draw, circle,scale=0.8] {};
+			\node	(i) at (4,2) [draw, circle,scale=0.8] {};
+			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=0.8] {};
+			\node	(k) at (5,2) [draw, circle, scale=0.8] {};
+			\node	(l) at (5.5,1) [draw, circle,fill=black,scale=0.8] {};
+			\node	(m) at (6,2) [draw, circle,scale=0.8] {};
+			\node	(n) at (6.5,3) [draw, circle, scale=0.8] {};
+			\node	(o) at (7,4) [draw, circle, scale=0.8] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -549,12 +562,98 @@ Figure shows a graphic representation of the resulting computational pattern.
 			(f) edge[->] (g)
 			(g) edge[->] (h)
 			(h) edge[->] (i)
+			(i) edge[->] (j)
+			(j) edge[->] (k)
+			(k) edge[->] (l)
+			(l) edge[->] (m)
+			(m) edge[->] (n)
+			(n) edge[->] (o)
+			;
+		\end{tikzpicture}
+		\caption*{$\gamma = 2$}
+	\end{subfigure}
+	\caption{Four-grid cycles ($l = 3$).}
+	\label{fig:four-grid-cycles}
+\end{figure}
+Here each white node corresponds to one or multiple step of smoothing on the respective level, while a black node represents the direct solution of the resulting error equation on the coarsest level.
+Since, as it can be seen in Figure~\ref{fig:three-grid-cycles}, the choice of $\gamma = 1$ results in a V-like computational pattern, the corresponding multigrid method is usually called a V-cycle.
+Similarly, the computational pattern of a method with $\gamma = 2$ on a three-grid hierarchy looks like a W, and, hence, the name W-cycle is chosen.
+As it can be seen in Figure~\ref{fig:four-grid-cycles} the amount of computation of a W-cycle drastically increases with the number of coarsening steps.
+In general the choice of a V-cycle always results in the least amount of computations.
+However, in many cases a single coarse grid correction step is not sufficient to reduce the oscillatory components of the initial error on the finest grid and more computationally expensive methods, such as W-cycles are required~\cite{trottenberg2000multigrid}.
+Due to the resulting drastic increase in the number of computations, larger values of $\gamma$ are usually impractical for multigrid methods with more than two coarsening steps~\cite{trottenberg2000multigrid}.
+While Algorithm~\ref{alg:multigrid-cycle} enables the construction of different multigrid methods with the choice of different values for the parameters $l$, $\gamma$, $\nu_1$, $\nu_2$ and $\omega$, the structural composition of the resulting methods is limited.
+For instance, in Algorithm~\ref{alg:multigrid-cycle} assumes that the same value of $\gamma$ is chosen on each level, which restricts possible computational pattern to those depicted in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
+One way to surpass this limitation is to combine different cycle types in a single method.
+For instance employing a combination of W- and V-cycles on each level results in a so-called F-cycle, whose computational pattern is shown in Figure~\ref{fig:f-cycle}.
+Note that for $l = 2$ this cycle is equivalent to a W-cycle.
+On discretization hierarchies with a larger depth, an F-cycle represents a compromise between the V- and W-cycle.
+\begin{figure}
+	\begin{subfigure}{0.4\textwidth}
+
+		\begin{tikzpicture}
+			\node   (h) at (-0.75, 4){$h$};
+			\node   (2h) at (-0.75, 3){$2h$};
+			\node   (4h) at (-0.75, 2){$4h$};
+			\node   (8h) at (-0.75, 1){};
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
+			\node	(g) at (3,4) [draw, circle, scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
 			;
 		\end{tikzpicture}
 	\end{subfigure}
-	\caption{}
-\label{fig:four-grid-cycles}
+	\begin{subfigure}{0.6\textwidth}
+		\begin{tikzpicture}
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
+			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
+			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
+			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=0.8] {};
+			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
+			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
+			\node	(i) at (4,2) [draw, circle,scale=0.8] {};
+			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=0.8] {};
+			\node	(k) at (5,2) [draw, circle, scale=0.8] {};
+			\node	(l) at (5.5,3) [draw, circle,scale=0.8] {};
+			\node	(m) at (6,4) [draw, circle,scale=0.8] {};
+			
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] (f)
+			(f) edge[->] (g)
+			(g) edge[->] (h)
+			(h) edge[->] (i)
+			(i) edge[->] (j)
+			(j) edge[->] (k)
+			(k) edge[->] (l)
+			(l) edge[->] (m)
+			;
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Computational pattern of the F-cycle with a different numbers of coarsening steps.}
+	\label{fig:f-cycle}
 \end{figure}
+
 %\subsection{Systems of PDEs}
 %TODO write section
   
