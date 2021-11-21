@@ -397,7 +397,39 @@ Here, the restriction operator $I_{2h}^{h}$ must be able to compute an approxima
 In both cases, we are, first and foremost, interested in preserving the low-frequency components, as the remaining ones will be quickly reduced by smoothing.
 In general, the definition of such operators depends on the chosen method of discretization. 
 Since, as mentioned in Section~\ref{sec:discretization}, this work focuses on the discretizations of PDEs on regular grids, we do not consider inter-grid operators defined on other grid types, such as unstructured grids.
-For a detailed treatment of these cases, the reader is referred to~\cite{trottenberg2000multigrid}.%TODO mehr Referenzen einfügen
+For a detailed treatment of these cases, the reader is referred to~\cite{trottenberg2000multigrid,ruge1987algebraic,stuben2001introduction}.%TODO mehr Referenzen einfügen
+First, to define the restriction operator, we can make the observation, that on a regular grid, the set coarse grid points is always contained in the set of fine grid points.
+The easiest way to define such an operator is to simply take the values present at the respective points of the fine grid over to the coarse grid, which leads to the so-called \emph{injection} restriction operator.
+While this approach can lead to a functioning multigrid method in case the residual is sufficiently smooth, it neglects the information contained within all fine grid points that do not coincide with a coarse grid point.
+In most cases, it is beneficial to incorporate this information into the coarse grid, by computing a weighted average over all neighboring fine grid points.
+This idea leads to the so-called full- and half-weighting restriction operators.
+Using our previously defined stencil notation, the one-dimensional full-weighting restriction operator is given by
+\begin{equation}
+	R_{FW}^{(3,1)} = \frac{1}{8}\{((0,0), 2), ((0,-1), 1), ((0,-1), 1)\}
+\end{equation} 
+or equivalently
+\begin{equation}
+	R_{fw}^{(3,1)} =  \frac{1}{8} \begin{bmatrix}
+			1 & 2 & 1
+		\end{bmatrix}.
+	\label{eq:full-weighting-restriction}
+\end{equation} 
+If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
+\begin{equation}
+	R_{FW}^{(6,2)} = \frac{1}{4} \begin{bmatrix}
+		1 \\ 2 \\ 1
+	\end{bmatrix} \otimes \frac{1}{4} \begin{bmatrix}
+		1 & 2 & 1
+	\end{bmatrix} =
+\frac{1}{16} 
+\begin{bmatrix}
+	1 & 2 & 1 \\
+	2 & 4 & 2 \\
+	1 & 2 & 1
+\end{bmatrix}.
+\end{equation} 
+
+
 
 \subsection{The Multigrid Cycle}
 By putting this all together we can formulate a recursive version of Algorithm~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level, which can be seen in Algorithm~\ref{alg:multigrid-cycle}.
