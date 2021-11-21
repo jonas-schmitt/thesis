@@ -130,13 +130,13 @@ More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $
 \end{equation}
 Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
 For one- and two-dimensional problems, it is often more convenient to use the alternative notation 
-\begin{equation*}
+\begin{equation}
 	S^{(m, 1)} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
 	\end{bmatrix}
-\end{equation*}
+\end{equation}
 and
-\begin{equation*}
+\begin{equation}
 	S^{(m, 2)} = \begin{bmatrix}
 		& \vdots & \vdots & \vdots & \\
 		\cdots & s_{1,-1} & s_{1,0} & s_{1,1} & \cdots \\
@@ -144,9 +144,18 @@ and
 		\cdots & s_{-1,-1} & s_{-1,0} & s_{-1,1} & \cdots \\
 		& \vdots & \vdots & \vdots &
 	\end{bmatrix}
-\end{equation*}
+\end{equation}
 where for all $s_{\bm{a}_i}$  with $i \in \{1, \dots, m\}$ there exists a tuple $(\bm{a}_i, b_i) \in S^{(m, d)}$ such that $b_i = s_{\bm{a}_i}$.
-
+We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two dimensional stencil, such that
+\begin{equation}
+	S^{(m,3)} = 
+	\begin{bmatrix}
+		\cdots & S_{z-1}^{(m_{z-1},2)} & S_{z}^{(m_{z},2)} & S_{z+1}^{(m_{z+1},2)} & \cdots 
+	\end{bmatrix},
+\label{eq:3D-stencil-matrix-notation}
+\end{equation}
+where $m = \sum_{i} m_{z+i}$.
+%TODO specify range of i
 
 Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain point $u_{\bm i}$ with $\bm i \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^d$ is the set of grid indices, each considered as an n-dimensional vector:
 \begin{equation}
@@ -155,6 +164,11 @@ Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain po
 		\text{with} \; \bm{i} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a}_i, b_i) \in S^{(m,d)} \; \forall \, i \in \{ 1, 2, \dots m \} 
 	\end{split}
 \end{equation}
+For the special case of $d = 3$, we can also provide an alternative definition based on the notation provided in Equation~\eqref{eq:3D-stencil-matrix-notation}.
+\begin{equation}
+	S^{(m, 3)} \bullet u_{x,y,z} = \sum_{i} S_{z}^{(m_{z+i},2)} \bullet u_{x,y,z+i}
+\end{equation}
+%TODO specify range of i
 As an example we consider the following five-point stencil:
 \begin{equation}
 	\begin{split}
