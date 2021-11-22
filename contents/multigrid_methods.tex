@@ -242,18 +242,20 @@ x_{j+2}^{(k)} \\ x_{j+3}^{(k)}
 where $j = n_b (i - 1) + 1$.
 This method can be defined in a similar way using our previously introduced stencil notation
 \begin{equation}
-	\begin{pmatrix}
-		\{(0, 2), (1, -1)\} \bullet x_{j}^{(k+1)} \\ \{(-1, -1), (0, 2)\} \bullet x_{j+1}^{(k+1)} 
+\begin{split}
+	& \begin{pmatrix}
+		\left[0 \quad 2 \quad -1 \right] \bullet x_{j}^{(k+1)} \\ \left[ -1 \quad 2 \quad 0 \right] \bullet x_{j+1}^{(k+1)} 
 	\end{pmatrix}
-	= 	-
+	= \\ - & 
 	\begin{pmatrix}
-		\emptyset \bullet x_{j+2}^{(k)} \\ \{(-1, -1)\} \bullet x_{j + 3}^{(k)}
+		\left[ 0 \right] \bullet x_{j+2}^{(k)} \\ \left[-1 \quad 0 \quad 0 \right] \bullet x_{j + 3}^{(k)}
 	\end{pmatrix} -
 	\begin{pmatrix}
-		\{(1,-1)\} \bullet x_{j-2}^{(k)} \\ \emptyset \bullet x_{j-1}^{(k)} 
+		\left[0 \quad 0 \quad -1 \right] \bullet x_{j-2}^{(k)} \\ \left[ 0 \right] \bullet x_{j-1}^{(k)} 
 	\end{pmatrix}.
+\end{split}
 \end{equation}
-In both cases we obtain a system of two linear equation of the form
+In both cases we obtain a system of two linear equations of the form
 \begin{equation}
 	\begin{pmatrix}
 		2 x_{j}^{(k+1)} - x_{j+1}^{(k+1)} \\ 2 x_{j+1}^{(k+1)} - x_{j}^{(k+1)} 
@@ -405,16 +407,16 @@ In most cases, it is beneficial to incorporate this information into the coarse 
 This idea leads to the so-called full- and half-weighting restriction operators.
 Using our previously defined stencil notation, the one-dimensional full-weighting restriction operator is given by
 \begin{equation}
-	R_{FW}^{(3,1)} = \frac{1}{8}\{((0,0), 2), ((0,-1), 1), ((0,-1), 1)\}
+	R_{FW}^{(3,1)} = \frac{1}{8}\{((-1), 1), ((0), 2), ((1), 1)\}
 \end{equation} 
-or equivalently
+or equivalently using the matrix notation
 \begin{equation}
-	R_{fw}^{(3,1)} =  \frac{1}{8} \begin{bmatrix}
+	R_{FW}^{(3,1)} =  \frac{1}{8} \begin{bmatrix}
 			1 & 2 & 1
 		\end{bmatrix}.
 	\label{eq:full-weighting-restriction}
 \end{equation} 
-If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
+If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
 	R_{FW}^{(6,2)} = \frac{1}{4} \begin{bmatrix}
 		1 \\ 2 \\ 1
@@ -426,10 +428,79 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 	1 & 2 & 1 \\
 	2 & 4 & 2 \\
 	1 & 2 & 1
-\end{bmatrix}.
+\end{bmatrix},
 \end{equation} 
-
-
+\begin{equation}
+\begin{split}
+	R_{FW}^{(27,3)} = & \frac{1}{4} \begin{bmatrix}
+		1 & 2 & 1
+	\end{bmatrix} \otimes 
+	\frac{1}{16} 
+	\begin{bmatrix}
+		1 & 2 & 1 \\
+		2 & 4 & 2 \\
+		1 & 2 & 1
+	\end{bmatrix} \\
+= & \frac{1}{64} \begin{bmatrix}
+\begin{bmatrix}
+	1 & 2 & 1 \\
+	2 & 4 & 2 \\
+	1 & 2 & 1
+\end{bmatrix} &	\begin{bmatrix}
+2 & 4 & 2 \\
+4 & 8 & 4 \\
+2 & 4 & 2
+\end{bmatrix} &
+\begin{bmatrix}
+	1 & 2 & 1 \\
+	2 & 4 & 2 \\
+	1 & 2 & 1
+\end{bmatrix}
+\end{bmatrix}
+\end{split}.
+\end{equation}
+A second restriction operator based on the idea of averaging neighboring fine grid point is the half-weighting restriction operator, whose two- and three-dimensional versions are defined as
+\begin{equation}
+	R_{HW}^{(5,2)} = \frac{1}{8}
+	\begin{bmatrix}
+		 & 1 &  \\
+		1 & 4 & 1 \\
+		 & 1 & 
+	\end{bmatrix},
+\end{equation} 
+\begin{equation}
+\begin{split}
+	R_{HW}^{(15,3)} = & 
+\frac{1}{4} \begin{bmatrix}
+	1 & 2 & 1
+\end{bmatrix}
+\otimes 
+\frac{1}{8}
+	\begin{bmatrix}
+	& 1 &  \\
+	1 & 4 & 1 \\
+	& 1 & 
+\end{bmatrix} \\
+= &
+\frac{1}{32} \begin{bmatrix}
+	\begin{bmatrix}
+		& 1 &  \\
+		1 & 4 & 1 \\
+		& 1 & 
+	\end{bmatrix}
+ &		\begin{bmatrix}
+ 	& 2 &  \\
+ 	2 & 6 & 2 \\
+ 	& 2 & 
+ \end{bmatrix} &
+	\begin{bmatrix}
+	& 1 &  \\
+	1 & 4 & 1 \\
+	& 1 & 
+\end{bmatrix}
+\end{bmatrix}
+\end{split}
+\end{equation} 
 
 \subsection{The Multigrid Cycle}
 By putting this all together we can formulate a recursive version of Algorithm~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level, which can be seen in Algorithm~\ref{alg:multigrid-cycle}.

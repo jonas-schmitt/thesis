@@ -163,13 +163,21 @@ Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain po
 		& S^{(m, d)} \bullet u_{\bm i} = \sum_{k=1}^m b_k u_{\bm i + \bm{a}_k} \quad 
 		\text{with} \; \bm{i} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a}_i, b_i) \in S^{(m,d)} \; \forall \, i \in \{ 1, 2, \dots m \} 
 	\end{split}
+\label{eq:stencil-application}
 \end{equation}
-For the special case of $d = 3$, we can also provide an alternative definition based on the notation provided in Equation~\eqref{eq:3D-stencil-matrix-notation}.
+For $d = 3$, we can formulate the application of a three-dimensional stencil $S^{(m,3)}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
 \begin{equation}
-	S^{(m, 3)} \bullet u_{x,y,z} = \sum_{i} S_{z}^{(m_{z+i},2)} \bullet u_{x,y,z+i}
+	S^{(m, 3)} \bullet u_{x,y,z} = 	
+\begin{bmatrix}
+	\cdots & S_{z-1}^{(m_{z-1},2)} & S_{z}^{(m_{z},2)} & S_{z+1}^{(m_{z+1},2)} & \cdots 
+\end{bmatrix} \bullet
+\begin{bmatrix}
+	\vdots \\ u_{x,y,z-1} \\ u_{x,y,z} \\ u_{x,y,z+1} \\ \vdots 
+\end{bmatrix},
 \end{equation}
-%TODO specify range of i
-As an example we consider the following five-point stencil:
+where each element-wise multiplication is interpreted as an application of the operator defined in Equation~\eqref{eq:stencil-application}.
+
+As a two-dimensional example we consider the following five-point stencil:
 \begin{equation}
 	\begin{split}
 		\Delta_h^{(5,2)} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
