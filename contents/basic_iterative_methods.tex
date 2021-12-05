@@ -146,9 +146,9 @@ To apply the Gauss-Seidel method within the domain of stencil codes, we also nee
 As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by only including all entry with an offset lower than zero.
 The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 \begin{equation}
-	\text{lower}(S) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
-		\text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+	\text{lower}(S_h) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-lower}
@@ -156,9 +156,9 @@ The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 
 Similarly, we can also provide a definition for obtaining the upper triangle of a given stencil, which is formulated in Equation~\eqref{eq:stencil-upper}.
 \begin{equation}
-	\text{upper}(S) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
-		\text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \; \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+	\text{upper}(S_h) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-upper}

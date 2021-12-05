@@ -296,15 +296,15 @@ The solution $\bm{e}$ of this system, which depends on the initial solution $\bm
 \end{equation}
 Consequently, each approximate solution computed for Equation~\eqref{eq:linear-system-error-equation} can be used to obtain an approximation for the solution of the original system of linear equations.
 Before we can define operations on a hierarchy of discretizations, we need to introduce the following notation:
-The subscript $h$ indicates that an operator $A_h$ or the solution $\bm{x}_h$ is discretized on a (uniform) grid with step size $h$.  
-Now, assume there exist the prolongation and restriction operators, $I_h^{2h}$ and $I_{2h}^h$, that enable us to obtain an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
+The subscripts $A_h$ and $\bm{x}_h$ indicate that an operator or variable is discretized on a regular grid with step size $\bm{h}$.  
+Now, assume there exists the prolongation and restriction operators, $I_h^{2h}$ and $I_{2h}^h$, that enable us to obtain an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
 \begin{equation}
 	\bm{x}_{2h} \approx I_h^{2h} \bm{x}_{h}, \;
 	\bm{x}_{h} \approx I_{2h}^{h} \bm{x}_{2h}. 
 \end{equation}
 In general, this approximation can obviously never be exact.
 However, we have already observed that a certain error only consists of smooth components, we can approximate the same components on a coarser grid without a significant loss of accuracy.
-This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, where two error components with different frequency are discretized on a hierarchy of grids with decreasing steps size.
+This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, where two error components with different frequency are discretized on a one-dimensional hierarchy of grids with decreasing steps size.
 Here, the first error component, which possesses a higher frequency, can not be accurately represented on the coarsest grid with step size $h = 2^{-5}$.
 In contrast, the characteristics of the second error component, which is relatively smooth, is still clearly visible on the same grid. 
 \begin{figure}
@@ -348,9 +348,9 @@ Assuming that the error $\bm{e}_{2h}$ on the coarse grid consists exclusively of
 \end{equation} 
 Now the question remains to be answered how we can compute the error $\bm{e}_{2h}$ on the coarse grid.
 As we have shown Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
-Therefore, we can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2h$
+Therefore, we can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2\bm{h}$
 \begin{equation}
-	\underbrace{I_{h}^{2h} A_h I_{2h}^h}_{A_{2h}} \bm{e}_{2h} = I_{h}^{2h} \left(\bm{b}_h - A \bm{x}^{(0)}_h\right).
+	\underbrace{I_{h}^{2h} A_h I_{2h}^h}_{A_{2h}} \bm{e}_{2h} = I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
 	\label{eq:coarse-grid-error-equation}
 \end{equation}
 Note that we have again made use of the fact that $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$ is a reasonably accurate approximation in case $\bm{e}_{2h}$ is smooth.
@@ -395,6 +395,7 @@ with an initial guess of $\bm{x}_{2h}^{(0)} = I_{h}^{2h} \bm{x}_{h}^{(0)}$.
 Because smoothing aims to remove the remaining oscillatory components of the error obtained from the fine grid, performing a relaxation of the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
 
 \subsection{Restriction and Prolongation}
+%TODO fix stencil notation in this section
 Before we can define an actual multigrid method, which recursively applies the techniques introduced here to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{2h}^{h}$ and $I_{h}^{2h}$.
 Here, the restriction operator $I_{2h}^{h}$ must be able to compute an approximation of the current residual on a coarser grid, while the goal of the prolongation operator $I_{h}^{2h}$ is to transfer a approximation for the solution of the error equation back to a finer grid.
 In both cases, we are, first and foremost, interested in preserving the low-frequency components, as the remaining ones will be quickly reduced by smoothing.
@@ -408,22 +409,22 @@ In most cases, it is beneficial to incorporate this information into the coarse 
 This idea leads to the so-called \emph{full-weighting} and \emph{half-weighting} restriction operators.
 Using our previously defined stencil notation, the one-dimensional full-weighting restriction operator is given by
 \begin{equation}
-	R_{FW}^{(3,1)} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_h^{2h}
+	FW_{h_x}^{(3)} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_h^{2h}
 \end{equation} 
 or equivalently using the matrix notation
 \begin{equation}
-	R_{FW}^{(3,1)} =  \frac{1}{4} \begin{bmatrix}
+	FW_{h_x}^{(3)} =  \frac{1}{4} \begin{bmatrix}
 			1 & 2 & 1
 		\end{bmatrix}_h^{2h}.
 	\label{eq:full-weighting-restriction}
 \end{equation} 
 If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
-	R_{FW}^{(9,2)} = \frac{1}{4} \begin{bmatrix}
+	FW^{(9)}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
 		1 \\ 2 \\ 1
-	\end{bmatrix}_h^{2h} \otimes \frac{1}{4} \begin{bmatrix}
+	\end{bmatrix}_{h_y}^{2h_y} \otimes \frac{1}{4} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_h^{2h} =
+	\end{bmatrix}_{h_x}^{2h_x} =
 \frac{1}{16} 
 \begin{bmatrix}
 	1 & 2 & 1 \\
@@ -433,7 +434,7 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 \end{equation} 
 \begin{equation}
 \begin{split}
-	R_{FW}^{(27,3)} = & \frac{1}{4} \begin{bmatrix}
+	FW^{(27)}_{h_x, h_y, h_z} = & \frac{1}{4} \begin{bmatrix}
 		1 & 2 & 1
 	\end{bmatrix}_h^{2h} \otimes 
 	\frac{1}{16} 

@@ -118,12 +118,31 @@ Instead, we only have to store the computational pattern that corresponds to a m
 On regular grids, each of such pattern can be represented as a so-called stencil code.
 \subsection{Stencil Codes}
 \label{subsec:stencil-codes}
-In general, a stencil code can be considered as a set of mappings from an n-dimensional index vector to a complex-valued number.
-More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $m$ tuples of the following form:
+In the previous section, we have already introduced to notion of a so-called regular grid, which can be defined more formally as
+\begin{equation}
+	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \cdot \bm{h}, \bm{i} \in \mathbb{N}^d \right\}, d \in \mathbb{N}
+\end{equation},
+where $d$ is the dimensionality of the problem.
+A grid function or variable $u$ is then a mapping of the form
+\begin{equation}
+	\begin{split}
+		& u : G_{h}\to \mathbb{C} \\
+		& \bm{x} \to u(\bm{x})
+	\end{split}
+\end{equation}
+As in the previous section one often makes use of the simplified notation
+\begin{equation}
+	\begin{split}
+		 & u_i = u(i h) \\
+		& u_{i,j} = u(i h_x, j h_y) \\
+		& u_{i,j,k} = u(i h_x, j h_y, k h_z).
+	\end{split}
+\end{equation}
+More formally we can define the general stencil $S_h$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
 	\begin{split}
-			& S^{(m, d)} = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\} 
+			& S_h = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\}, m \in \mathbb{N}
 	\\ & \forall \, i, j, k \in \{1, 2, \dots m \}: \,
 	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
@@ -131,62 +150,62 @@ More formally we can define the general stencil $S^{(m,d)}$ as a finite set of $
 Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
 For one- and two-dimensional problems, it is often more convenient to use the alternative notation 
 \begin{equation}
-	S^{(m, 1)} = \begin{bmatrix}
+	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
 	\end{bmatrix}
 \end{equation}
 and
 \begin{equation}
-	S^{(m, 2)} = \begin{bmatrix}
+	S_{h_x, h_y} = \begin{bmatrix}
 		& \vdots & \vdots & \vdots & \\
 		\cdots & s_{1,-1} & s_{1,0} & s_{1,1} & \cdots \\
 		\cdots & s_{0,-1} & s_{0,0} & s_{0,1} & \cdots \\
 		\cdots & s_{-1,-1} & s_{-1,0} & s_{-1,1} & \cdots \\
 		& \vdots & \vdots & \vdots &
-	\end{bmatrix}
+	\end{bmatrix}.
 \end{equation}
-where for all $s_{\bm{a}_i}$  with $i \in \{1, \dots, m\}$ there exists a tuple $(\bm{a}_i, b_i) \in S^{(m, d)}$ such that $b_i = s_{\bm{a}_i}$.
 We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two dimensional stencil, such that
 \begin{equation}
-	S^{(m,3)} = 
+	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
-		\cdots & S_{z-1}^{(m_{z-1},2)} & S_{z}^{(m_{z},2)} & S_{z+1}^{(m_{z+1},2)} & \cdots 
-	\end{bmatrix},
+		\cdots & S_{h_x, h_y}^{(k-1)} & S_{h_x, h_y}^{(k)} & S_{h_x, h_y}^{(k+1)} & \cdots 
+	\end{bmatrix}.
 \label{eq:3D-stencil-matrix-notation}
 \end{equation}
-where $m = \sum_{i} m_{z+i}$.
 %TODO specify range of i
 
-Furthermore, we define the application of a stencil $S^{(m, d)}$ to a certain point $u_{\bm i}$ with $\bm i \in \mathcal G$, where $\mathcal G \supset \mathbb{N}^d$ is the set of grid indices, each considered as an n-dimensional vector:
+Furthermore, we define the application of a stencil $S_h$ to a certain point $u(\bm x)$ with $\bm x \in G_h$:
 \begin{equation}
 	\begin{split}
-		& S^{(m, d)} \bullet u_{\bm i} = \sum_{k=1}^m b_k u_{\bm i + \bm{a}_k} \quad 
-		\text{with} \; \bm{i} \in \mathcal G \supset \mathbb{N}^d, \\ & (\bm{a}_k, b_k) \in S^{(m,d)} \; \forall \, k \in \{ 1, 2, \dots m \} 
+		& S_h \bullet u(\bm{x}) = \sum_{k=1}^m b_k u({\bm x + \bm{a}_k} \cdot \bm{h}) \quad 
+		\text{with} \; \bm{x} \in G_h, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in S_h \; \forall \, k \in \{ 1, 2, \dots, m \}
 	\end{split}
 \label{eq:stencil-application}
 \end{equation}
-For $d = 3$, we can formulate the application of a three-dimensional stencil $S^{(m,3)}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
+For $d = 3$, we can formulate the application of a three-dimensional stencil $S_{h_x, h_y, h_z}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
 \begin{equation}
-	S^{(m, 3)} \bullet u_{x,y,z} = 	
-\begin{bmatrix}
-	\cdots & S_{z-1}^{(m_{z-1},2)} & S_{z}^{(m_{z},2)} & S_{z+1}^{(m_{z+1},2)} & \cdots 
-\end{bmatrix} \bullet
-\begin{bmatrix}
-	\vdots \\ u_{x,y,z-1} \\ u_{x,y,z} \\ u_{x,y,z+1} \\ \vdots 
-\end{bmatrix},
+	\begin{split}
+	& S_{h_x, h_y, h_z} \bullet u_{i,j,k} = 	
+	\begin{bmatrix}
+	\cdots & S_{h}^{(k-1)} & S_{h}^{(k)} & S_{h}^{(k+1)} & \cdots 
+	\end{bmatrix} \bullet
+	\begin{bmatrix}
+	\vdots \\ u_{i,j,k-1} \\ u_{i,j,k} \\ u_{i,j,k+1} \\ \vdots 
+	\end{bmatrix} \\
+	& = \dots \, + S_{h}^{(k-1)} \bullet u_{i,j,k-1} + S_{h}^{(k)} \bullet u_{i,j,k} + S_{h}^{(k+1)} \bullet u_{i,j,k+1} + \, \dots .
+	\end{split}
 \end{equation}
-where each element-wise multiplication is interpreted as an application of the operator defined in Equation~\eqref{eq:stencil-application}.
 
 As a two-dimensional example we consider the following five-point stencil:
 \begin{equation}
 	\begin{split}
-		\Delta_h^{(5,2)} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
+		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
 	\end{split}
 	\label{eq:five-point-stencil}
 \end{equation}
-Applying $\Delta_{h}^{(5,2)}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
+Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
 \begin{equation}
-	\Delta_h^{(5,2)} \bullet u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
+	\Delta_{h,h} \bullet u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
 From this example it becomes evident that applying a given stencil to set of points $u_{\bm x}$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
@@ -195,51 +214,50 @@ Furthermore, many operators defined for matrices can be easily transferred into 
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
-	\alpha S^{(m, d)} = \{(\bm{a}_k, \alpha b_k) \}_{k=1}^m
+	\alpha S_h = \{(\bm{a}_k, \alpha b_k) \}_{k=1}^m, m \in \mathbb{N}
 \end{equation}
 
-Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils.
+Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
 Equation~\eqref{eq:stencil-addsub} contains a recursive definition of stencil addition and subtraction.
-Here, we simply add the weights of each entry with the same offset contained in both $S_1$ and $S_2$.
+Here, we simply add the weights of each entry with the same offset contained in both $A_h$ and $B_h$.
 In case an offset is not contained in both stencils the respective tuple is included unmodified.  
 % Stencil addition and subtraction
 \begin{equation}
-	S_1 \pm S_2 = 
+	A_h \pm B_h = 
 	\begin{cases}
-		\{(\bm{a}, b\pm c ) \} \cup (\tilde{S}_1 \pm \tilde{S}_2) & \text{if} \; S_1 = 	\{(\bm{a}, b ) \} \cup \tilde{S}_1 \\
-		& \text{and} \; S_2 = \{(\bm{a}, c ) \} \cup \tilde{S}_2 \\
+		\{(\bm{a}, b\pm c ) \} \cup (\tilde{A}_h \pm \tilde{B}_h) & \text{if} \; A_h = 	\{(\bm{a}, b ) \} \cup \tilde{A}_h \\
+		& \text{and} \; B_h = \{(\bm{a}, c ) \} \cup \tilde{B}_h \\
 		
-		\{(\bm{a}, b ) \} \cup (\tilde{S}_1 \pm S_2) & \text{if} \; S_1 = 	\{(\bm{a}, b ) \} \cup \tilde{S}_1 \\
-		& \text{and} \; \{(\bm{a}, c ) \} \notin S_2 \;
-		\forall c \in \mathbb{C}
+		\{(\bm{a}, b ) \} \cup (\tilde{A}_h \pm B_h) & \text{if} \; A_h = 	\{(\bm{a}, b ) \} \cup \tilde{A}_h \\
+		& \text{and} \; \nexists  c \in \mathbb{C} : \{(\bm{a}, c ) \} \in B_h 
 		\\
 % TODO case probably unnecessary
-%		\{(\bm{a}, c ) \} \cup (S_1 \pm \tilde{S}_2) & \text{if} \; S_2 = 	\{(\bm{a}, c ) \} \cup \tilde{S}_2 \wedge
-%		\{(\bm{a}, b ) \} \notin S_1 \; \forall b \in \mathbb{C}
+%		\{(\bm{a}, c ) \} \cup (A_h \pm \tilde{B}_h) & \text{if} \; B_h = 	\{(\bm{a}, c ) \} \cup \tilde{B}_h \wedge
+%		\{(\bm{a}, b ) \} \notin A_h \; \forall b \in \mathbb{C}
 %		\\
-		S_1 & \text{if} \; S_2 = \emptyset
+		A_h & \text{if} \; B_h = \emptyset
 		\\
-		S_2 & \text{else} 
+		B_h & \text{else} 
 		\\
 	\end{cases}
 \label{eq:stencil-addsub}
 \end{equation}
-Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definition of the multiplication of two stencils $S_1$ and $S_2$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
+Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definition of the multiplication of two stencils $A_h$ and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
 % Stencil multiplication
 \begin{equation}
-	S_1 \cdot S_2 = 
+	A_h \cdot B_h = 
 	\begin{cases}
-		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} +  \{(\bm{a}, b ) \} \cdot \tilde{S}_2 + \tilde{S}_1 \cdot S_2 & \text{if} \; S_1 = \{(\bm{a}, b ) \} \cup \tilde{S}_1 \\
+		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} +  \{(\bm{a}, b ) \} \cdot \tilde{B}_h + \tilde{A}_h \cdot B_h & \text{if} \; A_h = \{(\bm{a}, b ) \} \cup \tilde{A}_h \\
 		&
-		\text{and} \; S_2 = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{S}_2 \\
-		\emptyset & \text{if} \; S_1 = \emptyset \vee S_2 = \emptyset
+		\text{and} \; B_h = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B}_h \\
+		\emptyset & \text{if} \; A_h = \emptyset \vee B_h = \emptyset
 	\end{cases}
 \label{eq:stencil-mult}
 \end{equation}
-Here, to compute the stencil product $S_1 \cdot S_2$, for each pair of entries $\{(\bm{a}, b ) \} \in S_1$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in S_2$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
-To define this computation recursively, we first pick random entries $\{(\bm{a}, b ) \} \in S_1$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in S_2$ and combine them as described above.
-We then multiply the entry $\{(\bm{a}, b ) \}$ chosen from $S_1$ with the remainder stencil $\tilde{S}_2 = S_2 \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $S_2$.
-Finally, the process is continued recursively by computing the product of the remainder $\tilde{S}_1 = S_1 \setminus \{(\bm{a}, b ) \}$, with the original stencil $S_2$.
+Here, to compute the stencil product $A_h \cdot B_h$, for each pair of entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
+To define this computation recursively, we first pick random entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combine them as described above.
+We then multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A_h$ with the remainder stencil $\tilde{B}_h = B_h \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B_h$.
+Finally, the process is continued recursively by computing the product of the remainder $\tilde{A}_h = A_h \setminus \{(\bm{a}, b ) \}$, with the original stencil $B_h$.
 Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to sum up the corresponding weights and combine them in a single tuple.
 For this purpose, we employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}, to sum up all tuples with matching offset obtained within each recursive subcomputation.
 %TODO introduce array stencil notation for 1D and 2D
@@ -289,8 +307,8 @@ Consider the two-dimensional biharmonic system
 Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences with a uniform step size $h$ and rewriting the resulting equations in stencil form yields
 \begin{equation}
 		\begin{pmatrix}
-			\Delta_h^{(5,2)} & -1 \\
-			0 & \Delta_h^{(5,2)}
+			\Delta_h^{(5)} & -1 \\
+			0 & \Delta_h^{(5)}
 	\end{pmatrix}
 		\begin{pmatrix}
 			u_{i,j} \\ v_{i,j}
@@ -302,7 +320,7 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 \forall i,j \in \{1, 2, \dots n\},
 	\label{eq:2D-biharmonic-system-stencil}
 \end{equation}
-where $\Delta_h^{(5,2)}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
+where $\Delta_h^{(5)}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
 Equation~\eqref{eq:2D-biharmonic-system-stencil} then represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
 If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations is obtained whose solution corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
 Before we conclude this section, it is important to mention that we have not yet discussed how each variable, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
