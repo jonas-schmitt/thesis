@@ -1,0 +1,39 @@
+\section{Formal Languages and Grammars}
+In the previous section, we have introduced the theoretical background necessary to understand the fundamentals of multigrid methods.
+The goal of this thesis is to develop a formal language that can express multigrid solvers of variable structure.
+In general the \emph{alphabet} of a formal language is a non-empty set of symbols $\Sigma$.
+Based on $\Sigma$ \emph{strings} can be created, which represent finite sequences of symbols.
+For instance the alphabet $\Sigma = \left\{a, b\right\}$ contains only the symbols $a$ and $b$, as such $aabbb$ and $abaab$ are both strings on the alphabet $\Sigma$.
+The length of a string, denoted by $|\cdot|$, is equal to the number of symbols contained in it. 
+A concatenation of two strings 
+\begin{equation}
+	\begin{split}
+		v & = a_1 a_2 \cdots a_n \\
+		w & = b_1 b_2 \cdots b_m
+	\end{split}
+\end{equation}
+is performed by appending the second string to the right of the first string such that
+\begin{equation}
+	vw = a_1 a_2 \cdots a_n b_1 b_2 \cdots b_m,
+\end{equation}
+The length of the concatenated string is then obviously equal to the sum of the length of the individual string, which means
+\begin{equation}
+|vw| = |v| + |w|.
+\end{equation}
+Finally, we define the empty string $\lambda$ as
+\begin{equation}
+	\begin{split}
+		& |\lambda| = 0 \\
+		& v \lambda = \lambda v = v,
+	\end{split}
+\end{equation}
+where $v$ is a string on an arbitrary alphabet.
+Assume $\Sigma$ is an alphabet, then $\Sigma^*$ is the set of strings obtained by concatenating zero or an arbitrary number of symbols from $\Sigma$.
+Consequently, $\Sigma^*$ always contains the empty string $\lambda$.
+To exclude $\lambda$ from the set, we define $\Sigma^+ = \Sigma^* \setminus \lambda$.
+Since the number of strings that can be created from an alphabet through concatenation is infinite, both $\Sigma^+$ and $\Sigma^*$ represent infinite sets.
+In general, a \emph{language} is then defined as a subset of $\Sigma^*$ (or $\Sigma^+$)
+\begin{equation}
+	L \supset \Sigma^*,
+\end{equation}
+where $\Sigma$ is an alphabet.

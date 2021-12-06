@@ -244,14 +244,14 @@ This method can be defined in a similar way using our previously introduced sten
 \begin{equation}
 \begin{split}
 	& \begin{pmatrix}
-		\left[0 \quad 2 \quad -1 \right] \bullet x_{j}^{(k+1)} \\ \left[ -1 \quad 2 \quad 0 \right] \bullet x_{j+1}^{(k+1)} 
+		\left[0 \quad 2 \quad -1 \right]_{h} \cdot x_{j}^{(k+1)} \\ \left[ -1 \quad 2 \quad 0 \right]_{h} \cdot x_{j+1}^{(k+1)} 
 	\end{pmatrix}
 	= \\ - & 
 	\begin{pmatrix}
-		\left[ 0 \right] \bullet x_{j+2}^{(k)} \\ \left[-1 \quad 0 \quad 0 \right] \bullet x_{j + 3}^{(k)}
+		\left[ 0 \right]_{h} \cdot x_{j+2}^{(k)} \\ \left[-1 \quad 0 \quad 0 \right]_{h} \cdot x_{j + 3}^{(k)}
 	\end{pmatrix} -
 	\begin{pmatrix}
-		\left[0 \quad 0 \quad -1 \right] \bullet x_{j-2}^{(k)} \\ \left[ 0 \right] \bullet x_{j-1}^{(k)} 
+		\left[0 \quad 0 \quad -1 \right]_{h} \cdot x_{j-2}^{(k)} \\ \left[ 0 \right]_{h} \cdot x_{j-1}^{(k)} 
 	\end{pmatrix}.
 \end{split}
 \end{equation}
@@ -278,7 +278,7 @@ The core idea behind multigrid methods is to reduce the oscillatory components o
 As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using similar relaxation techniques that are effective to reduce oscillatory components on the finer grid.
 Before defining this procedure, observe that our original system
 \begin{equation}
-	A_h \bm{x}_h = \bm{b_h}
+	A_h \bm{x}_h = \bm{b}_h
 \end{equation}
 is equivalent to the error equation
 \begin{equation}
