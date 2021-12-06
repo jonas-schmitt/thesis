@@ -120,30 +120,30 @@ On regular grids, each of such pattern can be represented as a so-called stencil
 \label{subsec:stencil-codes}
 In the previous section, we have already introduced to notion of a so-called regular grid, which can be defined more formally as
 \begin{equation}
-	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \cdot \bm{h}, \bm{i} \in \mathbb{N}^d \right\}, d \in \mathbb{N}
-\end{equation},
-where $d$ is the dimensionality of the problem.
+	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \circ \bm{h}, \bm{i} \in \mathbb{N}^d \right\}, d \in \mathbb{N},
+\end{equation}
+where $d$ is the dimensionality of the problem and $\circ$ represents the Hadamard-product between two vectors.
 A grid function or variable $u$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
-		& u : G_{h}\to \mathbb{C} \\
-		& \bm{x} \to u(\bm{x})
+		& u_h : G_{h}\to \mathbb{C} \\
+		& \bm{x} \to u_h(\bm{x})
 	\end{split}
 \end{equation}
 As in the previous section one often makes use of the simplified notation
 \begin{equation}
 	\begin{split}
-		 & u_i = u(i h) \\
-		& u_{i,j} = u(i h_x, j h_y) \\
-		& u_{i,j,k} = u(i h_x, j h_y, k h_z).
+		 & u_i = u_{h_x}(i h_x) \\
+		& u_{i,j} = u_{h_x, h_y}(i h_x, j h_y) \\
+		& u_{i,j,k} = u_{h_x, h_y, h_z}(i h_x, j h_y, k h_z).
 	\end{split}
 \end{equation}
 More formally we can define the general stencil $S_h$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
 	\begin{split}
-			& S_h = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\}, m \in \mathbb{N}
-	\\ & \forall \, i, j, k \in \{1, 2, \dots m \}: \,
+			& S_h = \{(\bm{a}_k, b_k) \}_{k=1, h}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\}_h, m \in \mathbb{N}
+	\\ & \forall \, i, j, k \in \{1, 2, \dots, m \}: \,
 	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \end{equation}
@@ -152,7 +152,7 @@ For one- and two-dimensional problems, it is often more convenient to use the al
 \begin{equation}
 	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
-	\end{bmatrix}
+	\end{bmatrix}_{h_x}
 \end{equation}
 and
 \begin{equation}
@@ -162,22 +162,22 @@ and
 		\cdots & s_{0,-1} & s_{0,0} & s_{0,1} & \cdots \\
 		\cdots & s_{-1,-1} & s_{-1,0} & s_{-1,1} & \cdots \\
 		& \vdots & \vdots & \vdots &
-	\end{bmatrix}.
+	\end{bmatrix}_{h_x, h_y}.
 \end{equation}
 We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two dimensional stencil, such that
 \begin{equation}
 	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
 		\cdots & S_{h_x, h_y}^{(k-1)} & S_{h_x, h_y}^{(k)} & S_{h_x, h_y}^{(k+1)} & \cdots 
-	\end{bmatrix}.
+	\end{bmatrix}_{h_x, h_y, h_z}.
 \label{eq:3D-stencil-matrix-notation}
 \end{equation}
 %TODO specify range of i
 
-Furthermore, we define the application of a stencil $S_h$ to a certain point $u(\bm x)$ with $\bm x \in G_h$:
+Furthermore, we define the application of a stencil $S_h$ to a grid function $u_h(\bm x)$ with $\bm x \in G_h$:
 \begin{equation}
 	\begin{split}
-		& S_h \bullet u(\bm{x}) = \sum_{k=1}^m b_k u({\bm x + \bm{a}_k} \cdot \bm{h}) \quad 
+		& S_h \cdot u_h(\bm{x}) = \sum_{k=1}^m b_k u_h({\bm x + \bm{a}_k} \circ \bm{h}) \quad 
 		\text{with} \; \bm{x} \in G_h, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in S_h \; \forall \, k \in \{ 1, 2, \dots, m \}
 	\end{split}
 \label{eq:stencil-application}
@@ -185,36 +185,36 @@ Furthermore, we define the application of a stencil $S_h$ to a certain point $u(
 For $d = 3$, we can formulate the application of a three-dimensional stencil $S_{h_x, h_y, h_z}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
 \begin{equation}
 	\begin{split}
-	& S_{h_x, h_y, h_z} \bullet u_{i,j,k} = 	
+	& S_{h_x, h_y, h_z} \cdot u_{i,j,k} = 	
 	\begin{bmatrix}
 	\cdots & S_{h}^{(k-1)} & S_{h}^{(k)} & S_{h}^{(k+1)} & \cdots 
-	\end{bmatrix} \bullet
+	\end{bmatrix}_{h_x, h_y, h_z} \cdot
 	\begin{bmatrix}
 	\vdots \\ u_{i,j,k-1} \\ u_{i,j,k} \\ u_{i,j,k+1} \\ \vdots 
 	\end{bmatrix} \\
-	& = \dots \, + S_{h}^{(k-1)} \bullet u_{i,j,k-1} + S_{h}^{(k)} \bullet u_{i,j,k} + S_{h}^{(k+1)} \bullet u_{i,j,k+1} + \, \dots .
+	& = \dots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \dots .
 	\end{split}
 \end{equation}
 
-As a two-dimensional example we consider the following five-point stencil:
+As a two-dimensional example we consider the following five-point stencil defined on a two-dimensional regular grid with uniform step size $h_x = h_y = h$:
 \begin{equation}
 	\begin{split}
-		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
+		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}_{h,h}.
 	\end{split}
 	\label{eq:five-point-stencil}
 \end{equation}
-Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ on a two-dimensional regular grid yields 
+Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields 
 \begin{equation}
-	\Delta_{h,h} \bullet u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
+	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
-From this example it becomes evident that applying a given stencil to set of points $u_{\bm x}$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
+From this example it becomes evident that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
 Therefore, in case it is possible to define each computational step for solving a given discretized PDE on a regular grid by means of a stencil application, we only need to obtain the respective stencil entries instead of assembling or even storing a complete matrix.
 Furthermore, many operators defined for matrices can be easily transferred into the domain of stencil codes.
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
-	\alpha S_h = \{(\bm{a}_k, \alpha b_k) \}_{k=1}^m, m \in \mathbb{N}
+	\alpha S_h = \{(\bm{a}_k, \alpha b_k) \}_{k=1, h}^m, m \in \mathbb{N}
 \end{equation}
 
 Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
@@ -304,11 +304,11 @@ Consider the two-dimensional biharmonic system
 	\end{split}
 	\label{eq:2D-biharmonic-system}
 \end{equation}
-Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences with a uniform step size $h$ and rewriting the resulting equations in stencil form yields
+Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences with a uniform step size $h_x = h_y = h$ and rewriting the resulting equations in stencil form yields
 \begin{equation}
 		\begin{pmatrix}
-			\Delta_h^{(5)} & -1 \\
-			0 & \Delta_h^{(5)}
+			\Delta_{h, h} & -1 \\
+			0 & \Delta_{h, h}
 	\end{pmatrix}
 		\begin{pmatrix}
 			u_{i,j} \\ v_{i,j}

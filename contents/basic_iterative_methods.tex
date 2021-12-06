@@ -111,17 +111,17 @@ To define the Jacobi method in the domain of stencil codes with respect to our d
 As an offset of zero in each dimension always refers to the grid point on which the stencil is applied and therefore to the diagonal entry in each line of the corresponding matrix.
 We can therefore define the diagonal of $S$ as
 \begin{equation}
-	\text{diag}(S) = \begin{cases}
-		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\
-		\emptyset & \text{else}.
+	\text{diag}(S_h) = \begin{cases}
+		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S_h \\
+		\{(\bm{0}, 0) \} & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag}
 \end{equation}
 Based on this definition, we can also specify the inverse diagonal of a stencil as
 \begin{equation}
-	\text{diag-inv}(S) = \begin{cases}
-		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S \\
-		\emptyset & \text{else}.
+	\text{diag-inv}(S_h) = \begin{cases}
+		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S_h \\
+		\{(\bm{0}, 0) \} & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag-inv}
 \end{equation}

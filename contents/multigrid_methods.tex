@@ -13,7 +13,7 @@ For this purpose, we consider the one-dimensional Laplace equation
 \end{equation}
 which is discretized using the three-point stencil
 \begin{equation}
-	\Delta_h^{(3, 1)} = \frac{1}{h^2}\begin{bmatrix}
+	\Delta_h = \frac{1}{h^2}\begin{bmatrix}
 		-1 & 2 & -1
 	\end{bmatrix}.
 		\label{eq:1D-laplace-stencil}
@@ -278,25 +278,25 @@ The core idea behind multigrid methods is to reduce the oscillatory components o
 As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using similar relaxation techniques that are effective to reduce oscillatory components on the finer grid.
 Before defining this procedure, observe that our original system
 \begin{equation}
-	A \bm x = \bm b
+	A_h \bm{x}_h = \bm{b_h}
 \end{equation}
 is equivalent to the error equation
 \begin{equation}
-	A \left(\bm{x} - \bm {x}^{(0)}\right) = \bm{b} - A \bm{x}^{(0)}
+	A_h \left(\bm{x}_h - \bm {x}^{(0)_h}\right) = \bm{b}_h - A_h \bm{x}^{(0)}_h
 \end{equation}
-with an arbitrary initial guess $\bm{x}^{(0)}$.
-We can further introduce the error $\bm{e} = \bm{x} - \bm {x}^{(0)}$ to obtain the equation
+with an arbitrary initial guess $\bm{x}^{(0)}_h$.
+The subscripts $A_h$ and $\bm{x}_h$ indicate a discretization with step size $\bm{h}$.
+Therefore, each entry of the vector $\bm{x}_h$ represents a grid function value $u_h(\bm{i} \cdot \bm{h})$ at the respective position within the grid.
+We can further introduce the error $\bm{e}_h = \bm{x}_h - \bm {x}^{(0)}_h$ to obtain the equation
 \begin{equation}
 	A \bm{e} = \bm{b} - A \bm{x}^{(0)}.
 	\label{eq:linear-system-error-equation}
 \end{equation}
-The solution $\bm{e}$ of this system, which depends on the initial solution $\bm{x}^{(0)}$, can then be employed to obtain the solution of the original system by computing
+The solution $\bm{e}_h$ of this system, which depends on the initial solution $\bm{x}^{(0)}_h$, can then be employed to obtain the solution of the original system by computing
 \begin{equation}
-	\bm{x} = \bm{x}^{(0)} + \bm{e}.
+	\bm{x}_h = \bm{x}^{(0)}_h + \bm{e}_h.
 \end{equation}
 Consequently, each approximate solution computed for Equation~\eqref{eq:linear-system-error-equation} can be used to obtain an approximation for the solution of the original system of linear equations.
-Before we can define operations on a hierarchy of discretizations, we need to introduce the following notation:
-The subscripts $A_h$ and $\bm{x}_h$ indicate that an operator or variable is discretized on a regular grid with step size $\bm{h}$.  
 Now, assume there exists the prolongation and restriction operators, $I_h^{2h}$ and $I_{2h}^h$, that enable us to obtain an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
 \begin{equation}
 	\bm{x}_{2h} \approx I_h^{2h} \bm{x}_{h}, \;
@@ -409,18 +409,18 @@ In most cases, it is beneficial to incorporate this information into the coarse 
 This idea leads to the so-called \emph{full-weighting} and \emph{half-weighting} restriction operators.
 Using our previously defined stencil notation, the one-dimensional full-weighting restriction operator is given by
 \begin{equation}
-	FW_{h_x}^{(3)} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_h^{2h}
+	I_{h_x}^{2 h_x} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_{h_x}^{2h_x}
 \end{equation} 
 or equivalently using the matrix notation
 \begin{equation}
-	FW_{h_x}^{(3)} =  \frac{1}{4} \begin{bmatrix}
+	I_{h_x}^{2h_x} =  \frac{1}{4} \begin{bmatrix}
 			1 & 2 & 1
-		\end{bmatrix}_h^{2h}.
+		\end{bmatrix}_{h_x}^{2h_x}.
 	\label{eq:full-weighting-restriction}
 \end{equation} 
 If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
-	FW^{(9)}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
+	I^{2h_x, 2h_y}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
 		1 \\ 2 \\ 1
 	\end{bmatrix}_{h_y}^{2h_y} \otimes \frac{1}{4} \begin{bmatrix}
 		1 & 2 & 1
@@ -430,20 +430,20 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 	1 & 2 & 1 \\
 	2 & 4 & 2 \\
 	1 & 2 & 1
-\end{bmatrix}_h^{2h},
+\end{bmatrix}^{2h_x, 2h_y}_{h_x, h_y},
 \end{equation} 
 \begin{equation}
 \begin{split}
-	FW^{(27)}_{h_x, h_y, h_z} = & \frac{1}{4} \begin{bmatrix}
+	& I^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z} = \frac{1}{4} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_h^{2h} \otimes 
+	\end{bmatrix}_{h_z}^{2h_z} \otimes 
 	\frac{1}{16} 
 	\begin{bmatrix}
 		1 & 2 & 1 \\
 		2 & 4 & 2 \\
 		1 & 2 & 1
-	\end{bmatrix}_h^{2h} \\
-= & \frac{1}{64} \begin{bmatrix}
+	\end{bmatrix}^{2h_x, 2h_y}_{h_x, h_y} \\
+& = \frac{1}{64} \begin{bmatrix}
 \begin{bmatrix}
 	1 & 2 & 1 \\
 	2 & 4 & 2 \\
@@ -458,32 +458,32 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 	2 & 4 & 2 \\
 	1 & 2 & 1
 \end{bmatrix}
-\end{bmatrix}_h^{2h}.
+\end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}.
 \end{split}
 \end{equation}
 A second restriction operator based on the idea of averaging neighboring fine grid point is the half-weighting restriction operator, whose two- and three-dimensional versions are defined as
 \begin{equation}
-	R_{HW}^{(5,2)} = \frac{1}{8}
+	I^{2h_x,2h_y}_{h_x, h_y} = \frac{1}{8}
 	\begin{bmatrix}
-		 & 1 &  \\
+		0 & 1 & 0 \\
 		1 & 4 & 1 \\
-		 & 1 & 
-	\end{bmatrix}_h^{2h},
+		0 & 1 & 0
+	\end{bmatrix}^{2h_x}_{h_x},
 \end{equation} 
 \begin{equation}
 \begin{split}
-	R_{HW}^{(15,3)} = & 
+	& I^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z} = 
 \frac{1}{4} \begin{bmatrix}
 	1 & 2 & 1
-\end{bmatrix}_h^{2h}
+\end{bmatrix}_{h_z}^{2h_z}
 \otimes 
 \frac{1}{8}
 	\begin{bmatrix}
-	& 1 &  \\
+	0 & 1 & 0 \\
 	1 & 4 & 1 \\
-	& 1 & 
-\end{bmatrix}_h^{2h} \\
-= &
+	0 & 1 & 0 
+\end{bmatrix}^{2h_x,2h_y}_{h_x, h_y} \\
+& =
 \frac{1}{32} \begin{bmatrix}
 	\begin{bmatrix}
 		& 1 &  \\
@@ -500,56 +500,56 @@ A second restriction operator based on the idea of averaging neighboring fine gr
 	1 & 4 & 1 \\
 	& 1 & 
 \end{bmatrix}
-\end{bmatrix}_h^{2h}
+\end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}
 \end{split}
 \end{equation} 
 Note that in contrast to our original definition of the stencil operator in Equation~\eqref{eq:stencil-application}, which applies the stencil to each grid point on the current grid, the restriction stencils defined here only have to be applied on each point on the fine grid that coincides with a coarse grid point.
 We can therefore replace it with the following slightly adapted definition of stencil application
 \begin{equation}
 	\begin{split}
-		& R^{(m, d)} \bullet u_{\bm i}^{h} = \sum_{k=1}^m b_k u_{\bm i + \bm{a}_k}^{h} \quad 
-		\text{with} \; \bm{i} \in \mathcal G_{2h} \supset \mathcal G_{h} \mathbb{N}^d, \\ & (\bm{a}_k, b_k) \in R^{(m,d)} \; \forall \, k \in \{ 1, 2, \dots m \} 
+		& I_{h}^{2h} \cdot u_h(\bm{x}) = \sum_{k=1}^m b_k u_h({\bm x + \bm{a}_k} \circ \bm{h}) \quad 
+		\text{with} \; \bm{x} \in G_{2h}, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in I_{h}^{2h} \; \forall \, k \in \{ 1, 2, \dots, m \}
 	\end{split}
 	\label{eq:stencil-restriction-application}
-\end{equation},
-where $u_{\bm i}^{h}$ with $\bm{i} \in \mathcal G_{2h}$ represents an arbitrary point on the fine grid for which there exists a unique coarse-grid point defined at the spatial position within the computational domain, which is an immediate consequence of the fact that the set of coarse-grid points represents a subset of the set of fine-grid points.
+\end{equation}
+where $u_h(\bm{x})$ with $\bm{x} \in G_{2h}$ represents an arbitrary point on the fine grid for which there exists a unique coarse-grid point defined at the spatial position within the computational domain, which is an immediate consequence of the fact that the set of coarse-grid points represents a subset of the set of fine-grid points.
 
 Conversely, for prolongation our goal is to define an operator that transfers an approximation of the error computed on a certain discretization level to a grid of higher resolution.
 In contrast to restriction, where the coarse grid can be considered a subset of the fine grid, we must be able to restore a higher number of grid points from the given values on the coarse grid, which can be considered as a distribution process.
 The application of this operator to a given coarse grid point $u_{\bm{i}}^{2h}$ with $\bm{i} \in \mathcal G_{2h} \supset \mathcal{G}_h \supset \mathbb{N}^d$ can be defined as
 \begin{equation}
-	P^{(m,d)} \bullet u_{\bm{i}}^{2h} \rightarrow
+	I_{h}^{2h} \cdot u_{2h}(\bm{x}) \rightarrow
 	\begin{cases}
-		& \forall \, (\bm{a}_k, b_k) \in P^{(m,d)} \; \text{with} \; k \in \{ 1, 2, \dots m \} : \\
-		& u_{\bm i + \bm{a}_k}^{h} = u_{\bm i + \bm{a}_k}^{h} + b_k u_{\bm i}^{2h} 
+		& \forall \, (\bm{a}_k, b_k) \in I_{2h}^{h} \; \text{with} \; k \in \{ 1, 2, \dots, m \} \; \wedge \; \bm{x} \in G_{2h} : \\
+		& u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) = u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) + b_k u_{2h}(\bm{x}) 
 	\end{cases},
 	\label{eq:stencil-prolongation application}
 \end{equation}
-whereby we assume that initially $\forall u_{\bm{j}}^{h} \; \text{with} \; \bm{j} \in \mathcal G_h : u_{\bm{j}}^{h} = 0$.
+whereby we assume that initially $\forall u_h(\bm{x}) \; \text{with} \; \bm{x} \in \mathcal G_h : u_h(\bm{x}) = 0$.
 A common choice for one-dimensional prolongation is the linear interpolation operator~\cite{trottenberg2000multigrid}, which can be defined as
 \begin{equation}
-	P_{LI}^{(3,1)} =  \frac{1}{2} \begin{bmatrix}
+	I_{h_x}^{2h_x} =  \frac{1}{2} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_{2h}^{h}.
+	\end{bmatrix}_{h_x}^{2h_x}.
 	\label{eq:linear-interpolation}
 \end{equation}
 Similar to full-weighting restriction we can define the two- and three-dimensional versions of this operator as tensor products of the form
 \begin{equation}
-	P_{LI}^{(9,2)} = \frac{1}{2} \begin{bmatrix}
+	I_{h_x, h_y}^{2h_x, 2h_y} = \frac{1}{2} \begin{bmatrix}
 		1 \\ 2 \\ 1
-	\end{bmatrix}_{2h}^{h} \otimes \frac{1}{2} \begin{bmatrix}
+	\end{bmatrix}_{h_y}^{2h_y} \otimes \frac{1}{2} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_{2h}^{h} =
+	\end{bmatrix}_{h_x}^{2h_x} =
 	\frac{1}{4} 
 	\begin{bmatrix}
 		1 & 2 & 1 \\
 		2 & 4 & 2 \\
 		1 & 2 & 1
-	\end{bmatrix}_{2h}^{h},
+	\end{bmatrix}_{h_x, h_y}^{2h_x, 2h_y},
 \end{equation}
 \begin{equation}
 	\begin{split}
-		P_{LI}^{(27,3)} = & \frac{1}{2} \begin{bmatrix}
+		I_{h_x, h_y, h_z}^{2h_x, 2h_y, 2h_z} = & \frac{1}{2} \begin{bmatrix}
 			1 & 2 & 1
 		\end{bmatrix}_{2h}^{h} \otimes 
 		\frac{1}{4} 
