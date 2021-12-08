@@ -516,7 +516,7 @@ where $u_h(\bm{x})$ with $\bm{x} \in G_{2h}$ represents an arbitrary point on th
 
 Conversely, for prolongation our goal is to define an operator that transfers an approximation of the error computed on a certain discretization level to a grid of higher resolution.
 In contrast to restriction, where the coarse grid can be considered a subset of the fine grid, we must be able to restore a higher number of grid points from the given values on the coarse grid, which can be considered as a distribution process.
-The application of this operator to a given coarse grid point $u_{\bm{i}}^{2h}$ with $\bm{i} \in \mathcal G_{2h} \supset \mathcal{G}_h \supset \mathbb{N}^d$ can be defined as
+The application of this operator to a given coarse grid point $u_{2h}(\bm{x})$ with $\bm{x} \in G_{2h} \supset G_h$ can be defined as
 \begin{equation}
 	I_{h}^{2h} \cdot u_{2h}(\bm{x}) \rightarrow
 	\begin{cases}
