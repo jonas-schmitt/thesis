@@ -32,8 +32,41 @@ Assume $\Sigma$ is an alphabet, then $\Sigma^*$ is the set of strings obtained b
 Consequently, $\Sigma^*$ always contains the empty string $\lambda$.
 To exclude $\lambda$ from the set, we define $\Sigma^+ = \Sigma^* \setminus \lambda$.
 Since the number of strings that can be created from an alphabet through concatenation is infinite, both $\Sigma^+$ and $\Sigma^*$ represent infinite sets.
-In general, a \emph{language} is then defined as a subset of $\Sigma^*$ (or $\Sigma^+$)
+For example again let $\Sigma = \left\{a, b\right\}$ then
+\begin{equation*}
+	\Sigma^{*} = \left\{\lambda, a, b, aa, ab, ba, bb, aaa, aab, aba, \dots \right\}
+\end{equation*} 
+In general, for a given alphabet the \emph{language} $L$ is defined as a subset of $\Sigma^*$ (or $\Sigma^+$)
 \begin{equation}
-	L \supset \Sigma^*,
+	L \supset \Sigma^*.
+	\label{eq:language-basic-definition}
 \end{equation}
-where $\Sigma$ is an alphabet.
+However, in practice we usually want to obtain a language $L_G$ that represents a specific subset of $\Sigma^*$.
+One way to achieve this is to define a set of rules that generate $L_G$.
+These rules can be formally specified in form of a \emph{grammar}.
+\begin{definition}[Grammar]
+	\begin{equation*}
+		G = \left(V, T, S, P \right),
+	\end{equation*}
+	where $V$ is a finite set of \emph{variables},
+	$T$ a finite set of \emph{terminal symbols},
+	$S \in V$ is the \emph{start} variable and 
+	$P$ a finite set of \emph{productions} or \emph{production rules}.
+	We also assume that $V \neq \emptyset$, $T \neq \emptyset$ and $V \cap T = \emptyset$.
+\end{definition}
+The core of a grammar are the productions $P$, which are usually specified as a set of mappings of the form
+\begin{equation*}
+	x \to y,
+\end{equation*}
+where $x \in \left(V \cup T\right)^+$ and $y \in \left(V \cup T\right)^*$.
+Each production rule $x \to y$ can then be applied in the following way.
+Given a string $u$ of the form 
+\begin{equation}
+	u = vxw,
+\end{equation}
+we can replace $x$ with $y$ to \emph{derive} a new string
+\begin{equation}
+	u' = vyw.
+\end{equation}
+We usually write this transformation as $u \Rightarrow u'$.
+
