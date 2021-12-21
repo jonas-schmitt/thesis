@@ -1,0 +1,37 @@
+\section{Genetic Programming}
+\emph{Genetic Programming} (GP) is a class of search algorithms for finding optimal programs based on the principle of natural evolution first proposed by John Koza~\cite{koza1994genetic}.
+In general, a program $p$ can be considered as a mapping from the set of inputs $\mathcal{I}$ to the corresponding set of outputs $\mathcal{O}$
+\begin{equation}
+	p : \mathcal{I} \to \mathcal{O}.
+\end{equation}
+However, since not all input-output pairs are known in advance, this mapping is usually given in form of a finite set of training cases.
+The goal of GP is then to find a program that correctly computes the correct output for each input contained in the training set.
+Since there is often not a unique program that satisfies this condition, usually a number of additional constraints are applied to assess the quality of each correct program.
+For instance, in practice one is often interested in finding the shortest or fastest program that is able to pass all training cases.
+Based on a program's effectiveness in solving all training cases under the given constraints, GP then assigns a \emph{fitness} value to each program, which is then treated as an \emph{individual} within a \emph{population} of programs.
+In evolutionary computation, the population is a set of individuals currently considered within the search and, therefore, spans a subspace within the space of solutions for the given search problem.
+Each subsequent step of the search is then performed by generating a new population based on the previous one through \emph{mutation} or recombination (often called \emph{crossover}) of the individuals contained in the current one.
+Usually, the candidates for mutation and crossover are sampled from the current population based on the fitness value computed for each individual.
+If we repeat this procedure for a number of $n$ steps, we arrive at a final population $P_n$, which can then additionally be evaluated on a test set, to obtain the best overall program.
+The resulting search method is summarized in Algorithm~\ref{alg:genetic-programming}. 
+\begin{algorithm}[t]
+	\caption{Genetic Programming}
+	\label{alg:genetic-programming}
+	\begin{algorithmic} % The number tells where the line numbering should start
+		\State \textbf{Randomly generate} an initial population $P_0$ of programs
+		\State \textbf{Evaluate} $P_0$ on the \textbf{training set} 
+		\For{$i := 1, \dots, n$}
+		\State \textbf{Select} a subset of individuals $M_i \supset P_{i-1}$ based on their \textbf{fitness}
+		\State \textbf{Generate} new programs $C_i$ based on $M_i$ using \textbf{mutation} and \textbf{crossover}
+		\State \textbf{Evaluate} $C_i$ on the \textbf{training set} 
+		\State \textbf{Select} $P_{i}$ from $C_i \cup P_{i-1}$
+		\EndFor
+		\State \textbf{Evaluate} the final population $P_{n}$ on a \textbf{test set}  to obtain the best overall program
+	\end{algorithmic}
+\end{algorithm}
+While Algorithm~\ref{alg:genetic-programming} gives an overview of the general structure of a GP method, we have not yet considered how the individual operations such as the generation of an initial population and the creation of new individuals through mutation and crossover can be performed.
+Since all these operations are based on manipulating the internal structure of a given program, the first step in the implementation of a GP method choosing a suitable program representation.
+Note that this representation does not necessarily need to be equal to the target language in which the actual program is supposed to be implemented but rather needs to define a unique mapping that enables its automatic generation.
+This process is usually called \emph{genotype} to \emph{phenotype} mapping, where genotype refers to the internal representation used within GP while phenotype then represents the actual program implemented on the target machine.
+One of the most widely used genotype representations is tree-based GP, where each program is internally represented as a tree of expressions, which was also initially proposed by John Koza~\cite{koza1994genetic}.
+While within the last decades numerous other GP variants have been proposed~\cite{poli2008field}, such as grammatical evolution~\cite{o2001grammatical}, linear GP~\cite{brameier2007linear} and cartesian GP~\cite{miller2008cartesian}, we focus on tree-based GP as it forms the basis for our implementation, which will be presented in later chapters.
