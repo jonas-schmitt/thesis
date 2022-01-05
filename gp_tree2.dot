@@ -1,0 +1,20 @@
+digraph G {  
+  ordering=in ;
+  A1[texlbl="$-$"];
+  A1 -> A3
+  A1 -> A2
+  A2[texlbl="$\cdot$"];
+  A2 -> y1
+  A2 -> y2
+  y1[texlbl="$y$"];
+  y2[texlbl="$y$"];
+  A3[texlbl="exp"];
+  A3 -> x1
+  A3 -> A4
+  A4[texlbl="$+$"];
+  A4 -> x2
+  A4 -> y3
+  x1[texlbl="$x$"];
+  x2[texlbl="$x$"];
+  y3[texlbl="$y$"];
+}

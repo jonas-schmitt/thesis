@@ -1,0 +1,24 @@
+digraph G {  
+  ordering=in ;
+  E[texlbl="if-then-else"];
+  E -> B
+  E -> A1
+  E -> A2
+  B[texlbl="$\wedge$"];
+  B -> B1
+  B -> v
+  v[texlbl="$v$"];
+  B1[texlbl="$\neg$"];
+  B1 -> u
+  u[texlbl="$u$"];
+  A1[texlbl="$\cdot$"];
+  A2[texlbl="$/$"];
+  A1 -> x1;
+  A1 -> x2;
+  A2 -> x3;
+  A2 -> y;
+  x1[texlbl="$x$"];
+  x2[texlbl="$x$"];
+  x3[texlbl="$x$"];
+  y[texlbl="$y$"];
+}
