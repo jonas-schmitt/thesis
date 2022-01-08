@@ -73,7 +73,7 @@ Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression 
 	\begin{subfigure}{0.41\textwidth}
 		\includegraphics{figures/gp_tree2.pdf}
 	\end{subfigure}
- \caption{Expression trees for $f_1$ and $f_2$.}
+ \caption{Expression trees for $f_1$ and $f_2$, where we have simplified the if-then-else construct to a single ternary operator.}
  \label{fig:gp-expression-tree-examples}
 \end{figure}
 On the other hand, given a certain expression tree, we can easily restore the original expression by traversing the tree recursively in a top-down manner while generating the corresponding expression for each node as soon as each of its operands has been recursively processed or in case it is available as a terminal symbol.
@@ -87,5 +87,10 @@ However, the main step of GP is the creation of new individuals based on the exi
 Both operations require us to investigate which nodes and subtrees of a given expression trees can be safely replaced by an alternative branch without violating the type constraints imposed within the productions of our grammar.
 While it is possible to deal with this problem by simply evicting those individuals that violate any type constraints from the population, depending on the number of constraints, this will be the case for a high percentage of individuals, leading to a highly inefficient method.
 A different and usually more efficient approach is to annotate each node within an expression tree with additional type information, which leads to the concept of strongly-typed GP, first proposed by David Montana~\cite{montana1995strongly}.
-While strongly-typed GP represents a viable solution to the problem of retaining type correctness, it requires us to transform the implicit type information contained within the productions of our grammar into explicit type annotations at the nodes of each expression tree.
-%TODO grammar-based GP
+Strongly-typed GP represents a viable solution to the problem of retaining type correctness, but it requires us to transform the implicit type information contained within the productions of our grammar into explicit type annotations at the nodes of each expression tree.
+As an alternative we can instead utilize the information encoded in the productions of a grammar $G$ by considering the \emph{derivations} of an expression $e \in L_G$, as defined by
+\begin{equation}
+	S \Rightarrow e_1 \Rightarrow e_2 \Rightarrow \dots \Rightarrow e_n \Rightarrow e.
+\end{equation}
+If $G$ is context-free each of its possible derivations can be represented as a tree, where the root node is always the start variable $S$ and each level of the tree corresponds to a sequential form $e_i$ within the derivation~\cite{linz2006introduction}.
+%Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form. 
