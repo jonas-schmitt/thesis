@@ -92,5 +92,29 @@ As an alternative we can instead utilize the information encoded in the producti
 \begin{equation}
 	S \Rightarrow e_1 \Rightarrow e_2 \Rightarrow \dots \Rightarrow e_n \Rightarrow e.
 \end{equation}
-If $G$ is context-free each of its possible derivations can be represented as a tree, where the root node is always the start variable $S$ and each level of the tree corresponds to a sequential form $e_i$ within the derivation~\cite{linz2006introduction}.
-%Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form. 
+If $G$ is context-free each of its possible derivations can be represented as a tree, where the root node is always the start variable $S$ and each vertex of the tree corresponds to a transition between sequential forms within the derivation~\cite{linz2006introduction}.
+More formally we can define a derivation tree as follows:
+\begin{definition}[Derivation Tree]\label{def:derivation-tree}
+	Let $G = \left\{V, T, S, P\right\}$ be a context-free grammar, then a derivation tree is an ordered tree with the following properties
+\begin{enumerate}
+	\item The start variable $S$ is the root of the tree.
+	\item If $a$ is a leaf then $a \in T \cup \{\lambda \}$.
+	\item If $A$ is an interior node then $A \in V$.
+	\item If $A$ is an interior node and its children are $a_1, a_2, \dots, a_n$, then $P$ must contain a production of the form
+	\begin{equation}
+		A \to a_1 a_2 \dots a_n.
+	\end{equation}  
+\end{enumerate}
+\end{definition} 
+%Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form.
+Consider again the grammar whose productions are shown in Equation~\eqref{eq:gp-example-grammar} and the example functions $f_1$ and $f_2$ as defined in Equation~\eqref{eq:gp-example-functions}.
+Based on these productions, we can formulate derivations that lead to the expressions of both functions, for example 
+\begin{equation}
+\begin{aligned}
+	\bm{S} & \Rightarrow \bm E \Rightarrow \bm A \Rightarrow A - A \Rightarrow A^A - \bm A \Rightarrow A^{\bm A} - (A \cdot A) \Rightarrow \bm{A}^{A + A} - (A \cdot A) \\  
+	& \Rightarrow x^{\bm A + A} - (A \cdot A) \Rightarrow x^{x + \bm A} - (A \cdot A) \Rightarrow x^{x + y} - (\bm A \cdot A) \\ 
+	& \Rightarrow x^{x + y} - (y \cdot \bm A) \Rightarrow x^{x + y} - (y \cdot y) = f_2(x,y,u,v)
+\end{aligned}
+\end{equation}
+represents a valid derivation for $f_2$, where each variable that is transformed next is written in bold font.
+
