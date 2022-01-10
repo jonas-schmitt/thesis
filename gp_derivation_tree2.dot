@@ -3,53 +3,44 @@ digraph G {
   S[texlbl="$S$"];
   S -> E
   E[texlbl="$E$"];
-  E -> if
-  if[texlbl="if"];
-  E -> B1
-  B1[texlbl="$B$"]; 
-  B1 -> B2
-  B2[texlbl="$B$"]; 
-  B2 -> neg
-  neg[texlbl="$\neg$"]; 
-  B2 -> B3
-  B3[texlbl="B"]; 
-  B3 -> u 
-  u[texlbl="$u$"];
-  B1 -> and
-  and[texlbl="$\wedge$"]; 
-  B1 -> B4
-  B4[texlbl="$B$"]; 
-  B4 -> v 
-  v[texlbl="$v$"];
+  E->A1
+  A1[texlbl="$A$"];
+  A1->A2
+  A1->sub
+  A1->A3
+  A2[texlbl="$A$"];
+  sub[texlbl="$-$"];
+  A3[texlbl="$A$"];
 
-  E -> then
-  then[texlbl="then"];
-  E -> A1
-  A1[texlbl="$A$"]; 
-  E -> else
-  else[texlbl="else"];
-  E -> A2
-  A2[texlbl="$A$"]; 
+  A2->A4
+  A2->pow
+  pow[texlbl="pow"];
+  A2->A5
+  A5->A6
+  A5->add
+  add[texlbl="$+$"];
+  A5->A7
 
-  A1 -> A3
-  A3[texlbl="$A$"]; 
-  A1 -> mul
+  A3->A8
+  A3->mul
   mul[texlbl="$\cdot$"];
-  A1 -> A4
-  A4[texlbl="$A$"]; 
-  A3 -> x1
-  A4 -> x2
+  A3->A9
+  
+  A4[texlbl="$A$"];
+  A5[texlbl="$A$"];
+  A6[texlbl="$A$"];
+  A7[texlbl="$A$"];
+  A8[texlbl="$A$"];
+  A9[texlbl="$A$"];
+  A4->x1
+  A6->x2
+  A7->y1
+  A8->y2
+  A9->y3
+  
   x1[texlbl="$x$"];
   x2[texlbl="$x$"];
-
-  A2 -> A5
-  A5[texlbl="$A$"]; 
-  A2 -> div
-  div[texlbl="$/$"];
-  A2 -> A6
-  A6[texlbl="$A$"]; 
-  A5 -> x3
-  A6 -> y
-  x3[texlbl="$x$"];
-  y[texlbl="$y$"];
+  y1[texlbl="$y$"];
+  y2[texlbl="$y$"];
+  y3[texlbl="$y$"];
 }

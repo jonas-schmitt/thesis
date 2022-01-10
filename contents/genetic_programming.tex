@@ -92,23 +92,26 @@ As an alternative we can instead utilize the information encoded in the producti
 \begin{equation}
 	S \Rightarrow e_1 \Rightarrow e_2 \Rightarrow \dots \Rightarrow e_n \Rightarrow e.
 \end{equation}
-If $G$ is context-free each of its possible derivations can be represented as a tree, where the root node is always the start variable $S$ and each vertex of the tree corresponds to a transition between sequential forms within the derivation~\cite{linz2006introduction}.
-More formally we can define a derivation tree as follows:
-\begin{definition}[Derivation Tree]\label{def:derivation-tree}
-	Let $G = \left\{V, T, S, P\right\}$ be a context-free grammar, then a derivation tree is an ordered tree with the following properties
-\begin{enumerate}
-	\item The start variable $S$ is the root of the tree.
-	\item If $a$ is a leaf then $a \in T \cup \{\lambda \}$.
-	\item If $A$ is an interior node then $A \in V$.
-	\item If $A$ is an interior node and its children are $a_1, a_2, \dots, a_n$, then $P$ must contain a production of the form
-	\begin{equation}
-		A \to a_1 a_2 \dots a_n.
-	\end{equation}  
-\end{enumerate}
-\end{definition} 
 %Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form.
 Consider again the grammar whose productions are shown in Equation~\eqref{eq:gp-example-grammar} and the example functions $f_1$ and $f_2$ as defined in Equation~\eqref{eq:gp-example-functions}.
-Based on these productions, we can formulate derivations that lead to the expressions of both functions, for example 
+Based on these productions, we can formulate derivations that lead to the expressions of both functions, where
+\begin{equation}
+	\begin{aligned}
+		\bm{S} & \Rightarrow \bm E \Rightarrow \text{if} \; \bm B \; \text{then} \; E \; \text{else} \; E \; \Rightarrow \text{if} \; (\bm B \wedge B) \; \text{then} \; E \; \text{else} \; E \;
+		\\ & \Rightarrow \text{if} \; (\neg B \wedge B) \; \text{then} \; \bm E \; \text{else} \; E 
+		\Rightarrow \text{if} \; (\neg B \wedge B) \; \text{then} \; \bm A \; \text{else} \; E
+		\\ & \Rightarrow \text{if} \; (\bm B \wedge B) \; \text{then} \; (A \cdot A) \; \text{else} \; \bm E  
+		 \Rightarrow \text{if} \; (\bm B \wedge B) \; \text{then} \; (A \cdot A) \; \text{else} \; \bm A  
+		\\ & \Rightarrow \text{if} (\; B \wedge B) \; \text{then} \; (A \cdot A) \; \text{else} \; (A / A)  
+		\Rightarrow \text{if} \; (u \wedge \bm B) \; \text{then} \; (A \cdot A) \; \text{else} \; (A / A)  
+		\\ & \Rightarrow \text{if} \; ( u \wedge v) \; \text{then} \; (\bm A \cdot A) \; \text{else} \; (A / A)  
+		\Rightarrow \text{if} \; ( u \wedge v) \; \text{then} \; (x \cdot \bm A) \; \text{else} \; (A / A) 
+		\\ & \Rightarrow \text{if} \; (u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (\bm A / A) 
+		\Rightarrow \text{if} \; (u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (x / \bm A) 
+		\\ & \Rightarrow \text{if} \; (u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (x / y) = f_1(x,y,u,v)
+	\end{aligned}
+\end{equation}
+represents a valid derivation for $f_1$ while the same is true for the derivation
 \begin{equation}
 \begin{aligned}
 	\bm{S} & \Rightarrow \bm E \Rightarrow \bm A \Rightarrow A - A \Rightarrow A^A - \bm A \Rightarrow A^{\bm A} - (A \cdot A) \Rightarrow \bm{A}^{A + A} - (A \cdot A) \\  
@@ -116,5 +119,36 @@ Based on these productions, we can formulate derivations that lead to the expres
 	& \Rightarrow x^{x + y} - (y \cdot \bm A) \Rightarrow x^{x + y} - (y \cdot y) = f_2(x,y,u,v)
 \end{aligned}
 \end{equation}
-represents a valid derivation for $f_2$, where each variable that is transformed next is written in bold font.
+with respect to $f_2$. 
+In both cases each variable that is transformed next is written in bold font.
+Note that while each derivation contains the same sequential forms, the order in which they occur is not fixed and depends on the application order of the productions.
+If a grammar is context-free, which is the case for the example grammar shown in Equation~\ref{eq:gp-example-grammar}, each of its possible derivations can be represented as a tree, where the root node is always the start variable $S$ and each vertex of the tree corresponds to a transition between sequential forms within the derivation~\cite{linz2006introduction}.
+More formally we can define a derivation tree as follows:
+\begin{definition}[Derivation Tree]\label{def:derivation-tree}
+	Let $G = \left\{V, T, S, P\right\}$ be a context-free grammar, then a derivation tree is an ordered tree with the following properties
+	\begin{enumerate}
+		\item The start variable $S$ is the root of the tree.
+		\item If $a$ is a leaf then $a \in T \cup \{\lambda \}$.
+		\item If $A$ is an interior node then $A \in V$.
+		\item If $A$ is an interior node and its children are $a_1, a_2, \dots, a_n$, then $P$ must contain a production of the form
+		\begin{equation}
+			A \to a_1 a_2 \dots a_n.
+		\end{equation}  
+	\end{enumerate}
+\end{definition}
+Note that multiple derivations can refer to the same tree, as the order in which the productions are performed is not specified within its structure.
+%TODO discuss ambiguity yes or not? 
+%In general, a context-free grammar $G$ is said to \emph{ambiguous} if there exists an expression $e \in L_G$ that has at least two distinct derivation trees~\cite{linz2006introduction}.
+%With respect to the terminology of evolutionary algorithms, this means that there exist multiple genotype representations that map to the same phenotype, which results in an unnecessarily bloated search space.
+Again, as an example, the derivation trees for $f_1$ and $f_2$ are shown in Figure~\ref{fig:gp-derivation-tree-example-1} and~\ref{fig:gp-derivation-tree-example-2}, respectively.
+\begin{figure}
+\includegraphics{figures/gp_derivation_tree1.pdf}
+\caption{Derivation tree for $f_1$.}
+\label{fig:gp-derivation-tree-example-1}
+\end{figure}
+\begin{figure}
+	\includegraphics{figures/gp_derivation_tree2.pdf}
+	\caption{Derivation tree for $f_2$.}
+	\label{fig:gp-derivation-tree-example-2}
+\end{figure}
 

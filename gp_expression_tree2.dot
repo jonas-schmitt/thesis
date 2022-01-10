@@ -8,7 +8,7 @@ digraph G {
   A2 -> y2
   y1[texlbl="$y$"];
   y2[texlbl="$y$"];
-  A3[texlbl="exp"];
+  A3[texlbl="pow"];
   A3 -> x1
   A3 -> A4
   A4[texlbl="$+$"];
