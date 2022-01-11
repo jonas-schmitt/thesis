@@ -95,6 +95,7 @@ As an alternative we can instead utilize the information encoded in the producti
 \end{equation}
 %Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form.
 Consider again the grammar whose productions are shown in Equation~\eqref{eq:gp-example-grammar} and the example functions $f_1$ and $f_2$ as defined in Equation~\eqref{eq:gp-example-functions}.
+% TODO Produce always leftmost symbol
 Based on these productions, we can formulate derivations that lead to the expressions of both functions, where
 \begin{equation}
 	\begin{aligned}
@@ -115,7 +116,7 @@ Based on these productions, we can formulate derivations that lead to the expres
 represents a valid derivation for $f_1$ while the same is true for the derivation
 \begin{equation}
 \begin{aligned}
-	\bm{S} & \Rightarrow \bm E \Rightarrow \bm A \Rightarrow A - A \Rightarrow A^A - \bm A \Rightarrow A^{\bm A} - (A \cdot A) \Rightarrow \bm{A}^{A + A} - (A \cdot A) \\  
+	\bm{S} & \Rightarrow \bm E \Rightarrow \bm A \Rightarrow \bm A - A \Rightarrow A^A - \bm A \Rightarrow A^{\bm A} - (A \cdot A) \Rightarrow \bm{A}^{A + A} - (A \cdot A) \\  
 	& \Rightarrow x^{\bm A + A} - (A \cdot A) \Rightarrow x^{x + \bm A} - (A \cdot A) \Rightarrow x^{x + y} - (\bm A \cdot A) \\ 
 	& \Rightarrow x^{x + y} - (y \cdot \bm A) \Rightarrow x^{x + y} - (y \cdot y) = f_2(x,y,u,v)
 \end{aligned}
@@ -157,6 +158,23 @@ In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree s
 Each variable encodes which production can be applied at a particular point within a derivation.
 Consequently, by only allowing the replacement of a certain subtree by those productions whose left-hand side matches with its parent node, we can ensure that the resulting tree will always correspond to an expression contained in $L_G$. 
 %TODO describe how expression trees are obtained from derivation trees
-The use of derivation trees as a genotype representation within genetic programming is usually referred to as tree-based \emph{grammar-guided genetic-programming} (GGGP)~\cite{mckay2010grammar}.
+To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar}.
+Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with a small distance between genotype and phenotype it represents a widely used GP paradigms~\cite{mckay2010grammar}.
+However, within the last decades grammatical evolution (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
+With this approach GE offers the advantage of a simpler type-safe genotype representation, which however requires additional steps for being mapped to a phenotype.
+Furthermore, a small change in the genotype of a GE program does not necessarily correspond in a small change in the phenotype, since the interpretation of each entry in the array usually depends on its predecessors.
+As a consequence, changing a single value within the genotype can potentially affect the interpretation of all following values.
+For instance, consider the following encoding of our example grammar,
+\begin{equation}
+	\begin{split}
+		S & \to \underbrace{E}_{0} \\
+		E & \to \underbrace{\text{if} \; B \; \text{then} \; E \; \text{else} \; E}_{0} \; | \; \underbrace{A}_{1} \\
+		A & \to \underbrace{-A}_0 \; | \; \underbrace{(A + A)}_{1} \; | \; \underbrace{(A - A)}_2 \; | \; \underbrace{(A \cdot A)}_{3} \; | \; \underbrace{A^A}_{4} \; | \; \underbrace{x}_{5} \; | \; \underbrace{y}_{6} \\  
+		B & \to \underbrace{\neg B}_{0} \; | \; \underbrace{(B \wedge B)}_{1} \; | \; \underbrace{(B \vee B)}_{2} \; | \; \underbrace{u}_3 \; | \; \underbrace{v}_4,
+	\end{split}
+	\label{eq:gp-example-grammar-ge-encoding}
+\end{equation}
+based on which we can encode $f_1$ as %TODO show example
+
 
 
