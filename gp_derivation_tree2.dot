@@ -1,16 +1,16 @@
 digraph G {  
   ordering=in ;
-  S[texlbl="$S$"];
+  S[texlbl="$\langle S \rangle$"];
   S -> E
-  E[texlbl="$E$"];
+  E[texlbl="$\langle E \rangle$"];
   E->A1
-  A1[texlbl="$A$"];
+  A1[texlbl="$\langle A \rangle$"];
   A1->A2
   A1->sub
   A1->A3
-  A2[texlbl="$A$"];
+  A2[texlbl="$\langle A \rangle$"];
   sub[texlbl="$-$"];
-  A3[texlbl="$A$"];
+  A3[texlbl="$\langle A \rangle$"];
 
   A2->A4
   A2->pow
@@ -26,12 +26,12 @@ digraph G {
   mul[texlbl="$\cdot$"];
   A3->A9
   
-  A4[texlbl="$A$"];
-  A5[texlbl="$A$"];
-  A6[texlbl="$A$"];
-  A7[texlbl="$A$"];
-  A8[texlbl="$A$"];
-  A9[texlbl="$A$"];
+  A4[texlbl="$\langle A \rangle$"];
+  A5[texlbl="$\langle A \rangle$"];
+  A6[texlbl="$\langle A \rangle$"];
+  A7[texlbl="$\langle A \rangle$"];
+  A8[texlbl="$\langle A \rangle$"];
+  A9[texlbl="$\langle A \rangle$"];
   A4->x1
   A6->x2
   A7->y1
