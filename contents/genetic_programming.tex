@@ -43,7 +43,7 @@ To illustrate this, we consider the following example grammar $G$ with the produ
 	\begin{split}
 		\ps S & \to \ps E \\
 		\ps E & \to \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
-		\ps A & \to -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \; (\ps A \cdot \ps A) \; | \; \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
+		\ps A & \to -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \; (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
 		\ps B & \to \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v,
 	\end{split}
 \label{eq:gp-example-grammar}
@@ -104,13 +104,16 @@ Based on these productions, we can formulate derivations that lead to the expres
 		\\ & \Rightarrow \text{if} \; (\neg \bps B \wedge \ps B) \; \text{then} \; \ps E \; \text{else} \; \ps E 
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge \bps B) \; \text{then} \; \ps E \; \text{else} \; \ps E 
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; \bps E \; \text{else} \; \ps E 	
+		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; \bps A \; \text{else} \; \ps E 	
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (\bps A \cdot \ps A) \; \text{else} \; \ps E 	 
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot \bps A) \; \text{else} \; \ps E 
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; \bps E
+		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; \bps A
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (\bps A / \ps A)
 		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (x / \bps A)
-		\\ & \Rightarrow \text{if} \; (u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (x / y) = f_1(x,y,u,v)
+		\\ & \Rightarrow \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot y) \; \text{else} \; (x / y) = f_1(x,y,u,v)
 	\end{aligned}
+\label{eq:gp-derivation-f1}
 \end{equation}
 represents a valid derivation for $f_1$ while the same is true for the derivation
 \begin{equation}
@@ -161,25 +164,59 @@ Consequently, by only allowing the replacement of a certain subtree by those pro
 %TODO describe how expression trees are obtained from derivation trees
 To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar}.
 Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with a small distance between genotype and phenotype it represents a widely used GP paradigms~\cite{mckay2010grammar}.
-However, within the last decades grammatical evolution (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
+However, within the last decades \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
 With this approach GE offers the advantage of a simpler type-safe genotype representation, which however requires additional steps for being mapped to a phenotype.
 Furthermore, a small change in the genotype of a GE program does not necessarily correspond in a small change in the phenotype, since the interpretation of each entry in the array usually depends on its predecessors.
 As a consequence, changing a single value within the genotype can potentially affect the interpretation of all following values.
 For instance, consider the following encoding of our example grammar
-\begin{equation}
+\begin{equation*}
 	\begin{split}
 		\ps S \to & \underbrace{\ps E}_{0} \\
 		\ps E \to & \underbrace{\text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E}_{0} \; | \; \underbrace{\ps A}_{1} \\
 		\ps A \to & \underbrace{-\ps A}_0 \; | \; \underbrace{(\ps A + \ps A)}_{1} \; | \; \underbrace{(\ps A - \ps A)}_2 \; |   \\  
-		& \underbrace{(\ps A \cdot \ps A)}_{3} \; | \; \underbrace{\ps{A}^{\ps A}}_{4} \; | \; \underbrace{x}_{5} \; | \; \underbrace{y}_{6} \\
+		& \underbrace{(\ps A \cdot \ps A)}_{3} \; | \; \underbrace{(\ps A / \ps A)}_{4} \; | \; \underbrace{\ps{A}^{\ps A}}_{5} \; | \; \underbrace{x}_{6} \; | \; \underbrace{y}_{7} \\
 		\ps B \to & \underbrace{\neg \ps B}_{0} \; | \; \underbrace{(\ps B \wedge \ps B)}_{1} \; | \; \underbrace{(\ps B \vee \ps B)}_{2} \; | \; \underbrace{u}_3 \; | \; \underbrace{v}_4,
 	\end{split}
 	\label{eq:gp-example-grammar-ge-encoding}
-\end{equation}
-based on which we can encode $f_1$ as
-\begin{equation}
-	0 0 1 
-\end{equation}
+\end{equation*}
+based on which we can encode $f_1$ with the array of integers
+\begin{equation*}
+	\left[ 0, 0, 1, 0, 3, 4, 1, 3, 6, 7, 1, 4, 6, 7 \right].
+\end{equation*}
+Since we are always transforming the leftmost variable first, each number corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
+While in this case, we have chosen each number from the range available for each production, in practice, we can always map an arbitrary positive integer to this range by applying a module $n$ operation, where $n$ is the number of available productions for each variable.
+As a consequence, changing a single entry within this array will always affect the interpretation of all subsequent ones.
+For instance, changing the second entry to one results in the choice of the production 
+\begin{equation*}
+	\ps E \Rightarrow \ps A,
+\end{equation*}
+instead of 
+\begin{equation*}
+	\ps E \Rightarrow \text{if} \; (\ps B \wedge \ps B) \; \text{then} \; \ps E \; \text{else} \; \ps E,
+\end{equation*}
+which means that all subsequent entries are exclusively interpreted as productions starting from $\ps A$.
+Therefore, even slight changes in the genotype of a GE representation can have a drastic effect on the phenotype expression.
+
+As both tree-based GGGP and GE both represent a trade-off between the simplicity of their genotype representation and its closeness to the phenotype, it is usually impossible to predict which variant will lead to a better outcome in practice.
+Since we have chosen to use tree-based GGGP in our implementation, we will exclusively focus on this variant in our treatment of mutation, crossover and fitness evaluation.
+%TODO Probably too much, since GE is not considered further
+%Furthermore, if at a certain position within the array the corresponding sequential form contains already no more variables, the remainder is usually ignored or removed.
+%Now we can investigate the effect of changing a single number within this array on the resulting derivation.
+%For instance changing the second entry leads to 
+%\begin{equation}
+%	\left[ 0, 1, 1, 0, 3, 4, 1, 3, 6, 7, 1, 4, 6, 7 \right],
+%\end{equation}
+%which can be translated to the following derivation
+%\begin{equation}
+%	\begin{aligned}
+%		0 \mod 1 = 0: \quad & \bps{S} \Rightarrow \bps E \\
+%		1 \mod 2 = 1: \quad & \Rightarrow \bps A \\
+%		1 \mod 8 = 1: \quad & \Rightarrow \bps A + \ps A \\ 
+%		0 \mod 8 = 0: \quad & \Rightarrow -\bps A + \ps A \\ 
+%		3 \mod 8 = 3: \quad & \Rightarrow -(\bps A \cdot \ps A) + \ps A \\ 
+%		\dots & 
+%	\end{aligned}
+%\end{equation}
 
 
 
