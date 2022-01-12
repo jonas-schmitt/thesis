@@ -34,17 +34,17 @@ Since all these operations are based on manipulating the internal structure of a
 Note that this representation does not necessarily need to be equal to the target language in which the actual program is supposed to be implemented but rather needs to define a unique mapping that enables its automatic generation.
 This process is usually called \emph{genotype} to \emph{phenotype} mapping, where the genotype refers to the internal representation used within GP while the phenotype then represents the actual program implemented on the target machine.
 One of the most widely used genotype representations is tree-based GP, where each program is internally represented as a tree of expressions, which was also initially proposed by John Koza~\cite{koza1994genetic}.
-While within the last decades numerous other GP variants have been proposed~\cite{poli2008field}, such as grammatical evolution~\cite{o2001grammatical}, linear GP~\cite{brameier2007linear} and cartesian GP~\cite{miller2008cartesian}, we focus on tree-based GP as it forms the basis for our implementation, which will be presented in later chapters.
 \subsection{Representation}
 In contrast to other evolutionary algorithms algorithms, which usually represent the solution to an optimization problem as an array of discrete or continuous numbers~\cite{back1997handbook}, GP deals with the optimization of programs and, hence, each solution corresponds to an executable program.
 %Before we consider these operations in detail, we first need to define a procedure to generate program expression trees in a structured way. 
 To illustrate this, we consider the following example grammar $G$ with the productions
 \begin{equation}
 	\begin{split}
-		\ps S & \to \ps E \\
-		\ps E & \to \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
-		\ps A & \to -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \; (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
-		\ps B & \to \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v,
+		\ps S \to & \ps E \\
+		\ps E \to & \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
+		\ps A \to & -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \\
+		 & (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
+		\ps B \to & \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v,
 	\end{split}
 \label{eq:gp-example-grammar}
 \end{equation}
@@ -161,9 +161,11 @@ By investigating the structure of these trees, the advantage of this representat
 In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree stores the variable at the left-hand side of each production used for generating a certain subtree as a parent.
 Each variable encodes which production can be applied at a particular point within a derivation.
 Consequently, by only allowing the replacement of a certain subtree by those productions whose left-hand side matches with its parent node, we can ensure that the resulting tree will always correspond to an expression contained in $L_G$. 
-%TODO describe how expression trees are obtained from derivation trees
+However, while derivation trees contain additional information, they are still structurally close to the expression trees originally introduced in this section, which means that a certain structural change within a derivation tree will have a comparably strong effect on the corresponding phenotypic expression.
+In the GP literature this property is usually summarized under the term \emph{locality}.
+%In fact, we can easily obtain the corresponding expression tree by applying a bottom-up replacement of each variable node by a vertex that represents a combination of its direct leafs.
 To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar}.
-Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with a small distance between genotype and phenotype it represents a widely used GP paradigms~\cite{mckay2010grammar}.
+Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with high locality between genotype and phenotype, it represents a widely used GP paradigms~\cite{mckay2010grammar}.
 However, within the last decades \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
 With this approach GE offers the advantage of a simpler type-safe genotype representation, which however requires additional steps for being mapped to a phenotype.
 Furthermore, a small change in the genotype of a GE program does not necessarily correspond in a small change in the phenotype, since the interpretation of each entry in the array usually depends on its predecessors.
@@ -179,12 +181,12 @@ For instance, consider the following encoding of our example grammar
 	\end{split}
 	\label{eq:gp-example-grammar-ge-encoding}
 \end{equation*}
-based on which we can encode $f_1$ with the array of integers
+based on which we can encode $f_1$ with an array consisting of the following integers:
 \begin{equation*}
 	\left[ 0, 0, 1, 0, 3, 4, 1, 3, 6, 7, 1, 4, 6, 7 \right].
 \end{equation*}
-Since we are always transforming the leftmost variable first, each number corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
-While in this case, we have chosen each number from the range available for each production, in practice, we can always map an arbitrary positive integer to this range by applying a module $n$ operation, where $n$ is the number of available productions for each variable.
+Since we are always transforming the leftmost variable first, each array entry corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
+While in this case, we have chosen each number from the available range of productions, in practice, we can always map an arbitrary non-negative integer to this range by applying a module $n$ operation, where $n$ is the number of available productions for each variable.
 As a consequence, changing a single entry within this array will always affect the interpretation of all subsequent ones.
 For instance, changing the second entry to one results in the choice of the production 
 \begin{equation*}
@@ -195,10 +197,11 @@ instead of
 	\ps E \Rightarrow \text{if} \; (\ps B \wedge \ps B) \; \text{then} \; \ps E \; \text{else} \; \ps E,
 \end{equation*}
 which means that all subsequent entries are exclusively interpreted as productions starting from $\ps A$.
-Therefore, even slight changes in the genotype of a GE representation can have a drastic effect on the phenotype expression.
+Therefore, even slight changes in the genotype of a GE representation can have a dramatic effect on the phenotype expression.
 
-As both tree-based GGGP and GE both represent a trade-off between the simplicity of their genotype representation and its closeness to the phenotype, it is usually impossible to predict which variant will lead to a better outcome in practice.
-Since we have chosen to use tree-based GGGP in our implementation, we will exclusively focus on this variant in our treatment of mutation, crossover and fitness evaluation.
+As both tree-based GGGP and GE both represent a trade-off between the simplicity of their genotype representation and high locality with respect to the phenotype, it is usually impossible to predict which variant will lead to a better outcome in practice.
+Furthermore, we have to mention that, in addition to tree-based GP and GE, numerous other variants have been proposed since the original invention of GP~\cite{poli2008field}, the most prominent ones being linear GP~\cite{brameier2007linear} and cartesian GP~\cite{miller2008cartesian}. 
+However, since we have chosen to use tree-based GGGP in our implementation, we will exclusively focus on this variant in our subsequent treatment of mutation, crossover and fitness evaluation.
 %TODO Probably too much, since GE is not considered further
 %Furthermore, if at a certain position within the array the corresponding sequential form contains already no more variables, the remainder is usually ignored or removed.
 %Now we can investigate the effect of changing a single number within this array on the resulting derivation.
@@ -218,5 +221,9 @@ Since we have chosen to use tree-based GGGP in our implementation, we will exclu
 %	\end{aligned}
 %\end{equation}
 
+\subsection{Initialization, Mutation and Crossover}
+After choosing a suitable genotype representation, the next ingredients of a GP method is the definition of suitable operators for the creation of new individuals, either from scratch or based on an existing population.
+Due to the stochastic nature of evolutionary algorithms these operations are usually performed using a certain degree of randomness.
 
+\subsection{Fitness Evaluation}
 
