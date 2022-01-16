@@ -1,0 +1,35 @@
+digraph G {  
+  ordering=in ;
+  S[texlbl="$\langle S \rangle$"];
+  S -> E
+  E[texlbl="$\langle E \rangle$"];
+  E->A1
+  A1[texlbl="$\langle A \rangle$"];
+  A1->A3
+  A1->add
+  A1->A2
+  A2[texlbl="$\langle A \rangle$"];
+  add[texlbl="$+$"];
+  A3[texlbl="$\langle A \rangle$"];
+
+  A3->A5
+  A3->mul
+  mul[texlbl="$\cdot$"];
+  A3->A4
+  
+  A4[texlbl="$\langle A \rangle$"];
+  A5[texlbl="$\langle A \rangle$"];
+  A4->x1
+  A5->y1
+
+  A2->A6
+  A2->sub
+  A2->A7
+  A6[texlbl="$\langle A \rangle$"];
+  sub[texlbl="$-$"];
+  A7[texlbl="$\langle A \rangle$"];
+  
+  
+  x1[texlbl="$x$"];
+  y1[texlbl="$y$"];
+}
