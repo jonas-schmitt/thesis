@@ -234,23 +234,24 @@ Consider for instance the tree shown in Figure~\ref{fig:gp-tree-growing-options}
 \begin{figure}
 	\centering
 	\includegraphics[height=0.7\textheight]{figures/gp_grow_tree_options.pdf}
-	\caption{Different options of derivation tree growing - An unfinished branch consisting of a variable can either be extended by applying a production that includes at least one variable or it is ended by inserting a terminal symbol as a leaf.}
+	\caption{Different options of extending a derivation tree - An unfinished branch consisting of a variable can either be extended by applying a production that includes at least one variable (lower-right tree) or it is ended by inserting a terminal symbol as a leaf (upper-right tree).}
 	\label{fig:gp-tree-growing-options}
 \end{figure}
 As it can be seen in this figure, the productions available for the variable $\ps{A}$ can be classified into two categories, which we call \emph{terminal} and \emph{non-terminal productions}.
-Terminal productions are those that generate subexpressions exclusively consisting of terminal symbols, leading to the creation of one or multiple leafs and, thus, ending the growth of the tree at this particular point, which is illustrated by the upper-left tree in Figure~\ref{fig:gp-tree-growing-options}.
+Terminal productions are those that generate subexpressions exclusively consisting of terminal symbols, leading to the creation of one or multiple leafs and, thus, ending the growth of the tree at this particular point, which is illustrated by the upper-right tree in Figure~\ref{fig:gp-tree-growing-options}.
 In contrast, non-terminal productions include all those that generate expressions which include at least one variable.
 The consequence of applying such a production is that the growth of the tree continues at the respective branch based on the productions available for the generated variables.
-This is illustrated by the lower-left tree shown in Figure~\ref{fig:gp-tree-growing-options}. 
+This is illustrated by the lower-right tree shown in Figure~\ref{fig:gp-tree-growing-options}. 
 Therefore, we can utilize this categorization to control the shape of the generated derivation trees within the population initialization by choosing productions from the respective category.
 Two commonly used initialization operators that are based on this observation are the \emph{full} and \emph{grow} operators~\cite{poli2008field}.  
 The goal of both operators is to generate a tree that satisfies a certain \emph{depth}, which is defined as the maximum over the length of all paths from the root node to any of the leafs.
 As the name suggests, the \emph{full} operator aims to generate a tree with even depth throughout all branches, which means that the paths to all leafs have roughly the same length, for instance by applying non-terminal productions within each subtree until all branches have reached the same depth.
-In contrast, the \emph{grow} operator does not impose any constraints on the depth of each path within the tree, but instead only requires the longest path to fulfill this property.
+In contrast, the \emph{grow} operator does not impose any constraints on the depth of each path within the tree, but instead only requires the longest path to fulfill this property, which means that both terminal and non-terminal productions are allowed until the depth limit is reached.
 Note that in general a grammar is not required to include both terminal and non-terminal productions for each variable and, hence, the \emph{full} operator can only be applied to a subset of all possible grammars.
 In contrast, the \emph{grow} operator is more widely applicable, since it only requires the construction of a single path of certain depth within the tree, but has the disadvantage that the average shape of the generated trees strongly depends on the ratio of terminal to non-terminal productions and the arity of the latter, i.e. the number of variables in the generated expressions.
 However, this problem can be mitigated by adapting the probability to choose a production from both categories accordingly. 
-Finally, another possibility to initialize the population is to simply employ both operators, \emph{full} and \emph{grow}, on a certain proportion of the individuals. If this proportion is roughly 50 \%, the operator is called \emph{ramped half-and-half}~\cite{poli2008field,koza1994genetic}.
+Finally, another possibility to initialize the population is to simply employ both operators, \emph{full} and \emph{grow}, on a certain proportion of the individuals using a variety of different depth limits. 
+If the proportion of individuals is roughly 50 \% for both operators, the initialization is called \emph{ramped half-and-half}~\cite{poli2008field,koza1994genetic}.
  \subsection{Mutation and Crossover}
 \subsection{Fitness Evaluation and Selection}
 
