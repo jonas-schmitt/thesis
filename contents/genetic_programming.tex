@@ -17,7 +17,7 @@ The resulting search method is summarized in Algorithm~\ref{alg:genetic-programm
 \begin{algorithm}[t]
 	\caption{Genetic Programming}
 	\label{alg:genetic-programming}
-	\begin{algorithmic} % The number tells where the line numbering should start
+	\begin{algorithmic}[1] % The number tells where the line numbering should start
 		\State \textbf{Randomly generate} an initial population $P_0$ of programs
 		\State \textbf{Evaluate} $P_0$ on the \textbf{training set} 
 		\For{$i := 1, \dots, n$}
@@ -164,7 +164,7 @@ Consequently, by only allowing the replacement of a certain subtree by those pro
 However, while derivation trees contain additional information, they are still structurally close to the expression trees originally introduced in this section, which means that a certain structural change within a derivation tree will have a comparably strong effect on the corresponding phenotypic expression.
 In the GP literature this property is usually summarized under the term \emph{locality}.
 %In fact, we can easily obtain the corresponding expression tree by applying a bottom-up replacement of each variable node by a vertex that represents a combination of its direct leafs.
-To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar}.
+To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar,whigham1995grammatically}.
 Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with high locality between genotype and phenotype, it represents a widely used GP paradigms~\cite{mckay2010grammar}.
 However, within the last decades \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
 With this approach GE offers the advantage of a simpler type-safe genotype representation, which however requires additional steps for being mapped to a phenotype.
@@ -252,6 +252,32 @@ In contrast, the \emph{grow} operator is more widely applicable, since it only r
 However, this problem can be mitigated by adapting the probability to choose a production from both categories accordingly. 
 Finally, another possibility to initialize the population is to simply employ both operators, \emph{full} and \emph{grow}, on a certain proportion of the individuals using a variety of different depth limits. 
 If the proportion of individuals is roughly 50 \% for both operators, the initialization is called \emph{ramped half-and-half}~\cite{poli2008field,koza1994genetic}.
- \subsection{Mutation and Crossover}
-\subsection{Fitness Evaluation and Selection}
-
+Furthermore, while both initialization operators presented here can also be applied to other non-grammar-based GP variants, alternative methods specifically designed for GGGP have been proposed in~\cite{garcia2006initialization,criado2020grammatically}.
+These operators aim to exploit the structure of a given grammar, for instance to generate a population that is more uniformly distributed across the search space~\cite{criado2020grammatically}.
+\subsection{Fitness Evaluation and Elitism}
+\subsection{Selection, Mutation and recombination}
+While the initalization operator aims to generate a population that is evenly spread over the whole search space, the purpose of mutation and recombination is to create novel individuals based on an existing population that are located in a more promising subspace.  
+For this purpose, evolutionary algorithms usually employ a preliminary selection phase to identify promising candidates in the current population based on which these operations are performed, as it outlined in line 4 of Algorithm~\ref{alg:genetic-programming}.
+Note that within this process certain individuals can be selected multiple times.
+Common operators represent fitness proportionate selection, where individuals are randomly chosen according to a probability equal to their relative fitness value~\cite{lipowski2012roulette}, and tournament selection, where individuals are compared in a tournament-like fashion to identify the fittest among them~\cite{fang2010review}.
+In contrast to the other operations discussed in this section, selection is independent of the genotype representation of an individual, but depends solely on the objective function of the target optimization problem.
+In general, selection operators are, therefore, agnostic of the type of evolutionary algorithm they are applied to. 
+We, therefore, only briefly discuss selection here and for a more complete treatment of this operation, the reader is referred to one of the following publications:~\cite{back1997handbook,beyer2002evolution,goldberg1991comparative}.
+As in the case of elitism, also several selection operators that deal with multi-objective optimization problems have been proposed, about which an overview can be found in~\cite{deb2015multi}.
+%In contrast, to the selection of the new population $P_i$ at the end of each generation, this phase usually allows certain individuals to be selected multiple times.
+After selecting a number of candidate individuals from the population, mutation and recombination represent two complementary options to extend the current population towards more promising regions of the search space.
+\paragraph{Mutation}
+The term mutation is usually referred to as the process of altering the genotype of a given individual, usually in a randomized way, with the purpose of creating an individual that, in the best case, has a higher fitness than its predecessor.
+Therefore, mutation is usually applied to one individual at a time.
+Since the possibilities of alternating an individual depends on its genotype representation, mutation operators need to be customized to the type of evolutionary algorithm employed.
+For this purpose, different mutation operators have been proposed for tree-based genotype representations used within GP~\cite{poli2008field,koza1994genetic}.
+The most commonly used GP mutation operator is \emph{subtree mutation}, in which a certain branch of an individual is replaced by a randomly generated subtree, which can, for instance, be created using a similar tree-generation operator as within the population initialization~\cite{poli2008field}.
+While subtree mutation has originally been defined for classical GP, it can be easily adapted to GGGP by introducing the additional constraint that branches with a certain variable as their root node can only be replaced by a subtree generated starting from the exact same variable. 
+%TODO illustrate subtree mutation
+Furthermore, a second mutation operator, which can be directly derived from subtree mutation, is \emph{insertion}.
+While in subtree mutation the original branch is replaced and, hence, completely evicted from the original tree, insertion only creates a partial subtree at whose end the original subtree is then attached again.
+In contrast to subtree mutation, whose applicability in the context of GGGP is independent of the grammar, insertion requires the generation of a subtree that includes the root node of the original branch as a child node at which the latter can then be attached.
+While both subtree mutation and insertion, depending on the size of the randomly generated subtree, have the potential to drastically change the structure of the original tree, another possibility to alter a given tree is to replace only a single node with one of the same arity, which is called point mutation.
+In the context of GGGP, this operation corresponds to the replacement of a production by an a different one that is available for the same variable.
+However, for being valid, the newly inserted production needs to generate a sequence of child nodes in which the same variables occur as in the original sequence.
+As a consequence, point mutation can only be applied to the subset of productions that fulfills this conditions, which limits its applicability within GGGP-based search algorithms. 
