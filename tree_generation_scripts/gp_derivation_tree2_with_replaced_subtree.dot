@@ -1,0 +1,59 @@
+digraph G {  
+  ordering=in ;
+  S[texlbl="$\langle S \rangle$"];
+  S -> E
+  E[texlbl="$\langle E \rangle$"];
+  E->A1
+  A1[texlbl="$\langle A \rangle$"];
+  A1->A2
+  A1->sub
+  A1->A3
+  A2[texlbl="$\langle A \rangle$"];
+  sub[texlbl="$-$"];
+  A3[texlbl="$\langle A \rangle$"];
+
+  A2->A4
+  A2->pow1
+  pow1[texlbl="pow"];
+  A2->A5
+  A5->A6
+  A5->add1
+  add1[texlbl="$+$"];
+  A5->A7
+
+  A4[texlbl="$\langle A \rangle$"];
+  A5[texlbl="$\langle A \rangle$"];
+  A6[texlbl="$\langle A \rangle$"];
+  A7[texlbl="$\langle A \rangle$"];
+  A4->x1
+  A6->x2
+  A7->y1
+  
+  x1[texlbl="$x$"];
+  x2[texlbl="$x$"];
+  y1[texlbl="$y$"];
+
+  A2[texlbl="$\langle A \rangle$"];
+
+  A3->A8
+  A3->pow2
+  pow2[texlbl="pow"];
+  A3->A9
+  A9->A10
+  A9->sub2
+  sub2[texlbl="$-$"];
+  A9->A11
+
+  A8[texlbl="$\langle A \rangle$"];
+  A9[texlbl="$\langle A \rangle$"];
+  A10[texlbl="$\langle A \rangle$"];
+  A11[texlbl="$\langle A \rangle$"];
+  A8->y2
+  A10->x3
+  A11->y3
+  
+  x3[texlbl="$x$"];
+  y2[texlbl="$y$"];
+  y3[texlbl="$y$"];
+
+}

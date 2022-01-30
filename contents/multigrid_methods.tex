@@ -23,25 +23,25 @@ Figure~\ref{fig:different-error-components} shows the impact of applying the Jac
 	\centering
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_jacobi_4pi.pdf}
-		\includegraphics[width=\textwidth]{figures/initial_error_jacobi_16pi.pdf}
-		\includegraphics[width=\textwidth]{figures/initial_error_jacobi_32pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_4pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_16pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_32pi.pdf}
 		\caption{Initial error}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/final_error_jacobi_4pi.pdf}
-		\includegraphics[width=\textwidth]{figures/final_error_jacobi_16pi.pdf}
-		\includegraphics[width=\textwidth]{figures/final_error_jacobi_32pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_4pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_16pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_32pi.pdf}
 	\caption{Error after applying Jacobi}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_4pi.pdf}
-		\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_16pi.pdf}
-		\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_32pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_4pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_16pi.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_32pi.pdf}
 	\caption{Error after applying Gauss-Seidel}
 	\end{subfigure}
 	\caption{Different error components on a grid with step size $h = 2^{-9}$ before and after applying either 100 steps of the Jacobi or Gauss-Seidel method.}
@@ -59,18 +59,18 @@ As it can be seen here, the attained improvement with both methods can be almost
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 	\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_jacobi_combined.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_combined.pdf}
 		\caption{Initial error}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.32\textwidth}
 	\centering
-		\includegraphics[width=\textwidth]{figures/final_error_jacobi_combined.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_combined.pdf}
 		\caption{Error after applying Jacobi}
 \end{subfigure}
 \begin{subfigure}[b]{0.32\textwidth}
 	\centering
-	\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_combined.pdf}
+	\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_combined.pdf}
 	\caption{Error after applying Gauss-Seidel}
 \end{subfigure}
 	\caption{Combination of two error components discretized on a grid with step size $h = 2^{-9}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
@@ -84,19 +84,19 @@ The resulting error reduction, again after 100 iterations of each of both iterat
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 	\centering
-	\includegraphics[width=\textwidth]{figures/initial_error_jacobi_4pi_coarse.pdf}
+	\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_4pi_coarse.pdf}
 	\caption{Initial error}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.32\textwidth}
 	\centering
-	\includegraphics[width=\textwidth]{figures/final_error_jacobi_4pi_coarse.pdf}
+	\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_4pi_coarse.pdf}
 	\caption{Error after applying Jacobi}
 \end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/final_error_gauss_seidel_4pi_coarse.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_4pi_coarse.pdf}
 		\caption{Error after applying Gauss-Seidel}
 	\end{subfigure}
 	\caption{Low-frequency error component discretized on a coarse grid with step size $h = 2^{-6}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
@@ -310,33 +310,33 @@ In contrast, the characteristics of the second error component, which is relativ
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_16pi_level7.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_16pi_level7.pdf}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_16pi_level6.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_16pi_level6.pdf}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_16pi_level5.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_16pi_level5.pdf}
 	\end{subfigure}
 		\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_2pi_level7.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_2pi_level7.pdf}
 		\caption{$h = 2^{-7}$}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_2pi_level6.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_2pi_level6.pdf}
 		\caption{$h = 2^{-6}$}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/initial_error_2pi_level5.pdf}
+		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_2pi_level5.pdf}
 		\caption{$h = 2^{-5}$}
 	\end{subfigure}
 	\caption{Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size.}

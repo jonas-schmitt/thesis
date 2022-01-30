@@ -1,0 +1,25 @@
+digraph G {  
+  ordering=in ;
+  A2[texlbl="$\langle A \rangle$"];
+
+  A2->A4
+  A2->pow
+  pow[texlbl="pow"];
+  A2->A5
+  A5->A6
+  A5->add
+  add[texlbl="$-$"];
+  A5->A7
+
+  A4[texlbl="$\langle A \rangle$"];
+  A5[texlbl="$\langle A \rangle$"];
+  A6[texlbl="$\langle A \rangle$"];
+  A7[texlbl="$\langle A \rangle$"];
+  A4->y1
+  A6->x1
+  A7->y2
+  
+  x1[texlbl="$x$"];
+  y1[texlbl="$y$"];
+  y2[texlbl="$y$"];
+}
