@@ -5,7 +5,7 @@ import pathlib
 
 base_dir = "./tree_generation_scripts"
 target_dir ="./figures/trees"
-check_if_exists = True
+check_if_exists = False
 for i, file_name in enumerate(os.listdir(base_dir)):
     if file_name.endswith(".dot") and (not check_if_exists or pathlib.Path(file_name.replace(".dot", ".pdf")).is_file()):
         output = sp.run(["dot2tex", "-c", "-f", "tikz", "--prog", "dot", "--preproc", f"{base_dir}/{file_name}"], stdout=sp.PIPE).stdout.decode("utf-8")
