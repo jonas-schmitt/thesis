@@ -225,8 +225,9 @@ However, since we have chosen to use tree-based GGGP in our implementation, we w
 After choosing a suitable genotype representation, the next ingredients of a GP method is the definition of suitable operators for the creation of new individuals, either from scratch or based on an existing population.
 Due to the stochastic nature of evolutionary algorithms these operations are usually performed using a certain degree of randomness.
 As shown in Algorithm~\ref{alg:genetic-programming}, the first step within each GP-based search method is the initialization of the population. 
-While in some cases it is possible choose a certain proportion of the initial population from a set of promising individuals, either generated in previous optimization runs on a similar problem or hand-picked by a human domain expert, this restricts the solution space considered at the beginning of the search.
-This problem can be avoided by including a sufficiently high number of randomly generated individuals into the initial population. 
+While in some cases it is possible choose a certain proportion of the initial population from a set of promising individuals, either generated in previous optimization runs on a similar problem or hand-picked by a human domain expert, which is called \emph{seeding}.
+However, seeding the population with too many individuals may introduce an excessive bias into the search and, thus, as a result, the descendants of the seeded individuals quickly take over the population~\cite{poli2008field}.
+This risk can be mitigated by including a sufficiently high number of randomly generated individuals into the initial population. 
 In tree-based GGGP each individual is represented by a grammar derivation tree.
 Therefore, to generate an individual from scratch, starting with $S$ as a root node one, we can grow a tree by choosing a production for each variable present in the tree until all leafs consist exclusively of terminal symbols.
 Note that within each choice of a production, one has to decide between growing the tree further, which correspond to applying a production that contains at least one variable, or between cutting the current branch of by choosing one that generates exclusively terminal symbols only.
@@ -254,8 +255,9 @@ Finally, another possibility to initialize the population is to simply employ bo
 If the proportion of individuals is roughly 50 \% for both operators, the initialization is called \emph{ramped half-and-half}~\cite{poli2008field,koza1994genetic}.
 Furthermore, while both initialization operators presented here can also be applied to other non-grammar-based GP variants, alternative methods specifically designed for GGGP have been proposed in~\cite{garcia2006initialization,criado2020grammatically}.
 These operators aim to exploit the structure of a given grammar, for instance to generate a population that is more uniformly distributed across the search space~\cite{criado2020grammatically}.
+%TODO Mention seeding
 \subsection{Fitness Evaluation and Elitism}
-\subsection{Selection, Mutation and recombination}
+\subsection{Selection, Mutation and Recombination}
 While the initalization operator aims to generate a population that is evenly spread over the whole search space, the purpose of mutation and recombination is to create novel individuals based on an existing population that are located in a more promising subspace.  
 For this purpose, evolutionary algorithms usually employ a preliminary selection phase to identify promising candidates in the current population based on which these operations are performed, as it outlined in line 4 of Algorithm~\ref{alg:genetic-programming}.
 Note that within this process certain individuals can be selected multiple times.
@@ -292,4 +294,21 @@ In contrast to subtree replacement, whose applicability in the context of GGGP i
 While both subtree replacement and insertion, depending on the size of the randomly generated subtree, have the potential to drastically change the structure of the original tree, another possibility to alter a given tree is to replace only a single node with one of the same arity, which is called point mutation.
 In the context of GGGP, this operation corresponds to exchanging a certain production with a different one that is available for the same variable.
 However, for being valid, the newly inserted production needs to generate a sequence of child nodes in which the same variables occur as in the original sequence.
-As a consequence, point mutation can only be applied to the subset of productions that fulfills this conditions, which limits its applicability within GGGP-based search algorithms. 
+As a consequence, point mutation can only be applied to the subset of productions that fulfills this conditions, which limits its applicability within GGGP-based search algorithms.
+
+\paragraph{Recombination}
+While the goal of mutation is to introduce new genetic information into the population, recombination, often also called crossover, aims to combine the genotypes of existing individuals in novel ways, resulting in an individual with improved fitness compared to its predecessors.
+In general, recombination operators can be classified into \emph{homologous} and non-homologous ones, whereby those from the former category preserve the position of the individual elements of the genome.
+A straightforward way to perform recombination in tree-based GP is to exchange subtrees between two individuals at a certain (crossover) point within both trees, which is called \emph{subtree crossover}.
+Again, to apply this operator within GGGP, the crossover point must be chosen in a way that the root nodes of the exchanged trees correspond to the same variable.  
+%TODO include figure
+As subtree crossover permits the exchange of arbitrary subtrees with matching root nodes between two individuals, this operator is non-homologous.
+To obtain a similarly functioning homologous recombination operator, one-point crossover has been proposed~\cite{poli1998schema}.
+One-point crossover first aligns both trees by traversing them recursively until there occurs a mismatch between the arity of two non-terminal nodes of both trees at the same position.
+The crossover point is then chosen from all positions in both trees where such a mismatch occurs and the subtree exchange is performed in a similar way as in subtree crossover.
+While this operator preserves the relative position of each node within both trees, only a limited number of crossover points can be selected.
+Therefore, its applicability within GGGP depends on the amount of productions available for each variable within the grammar.
+For instance, if the majority of productions generates only a single variable, the average derivation tree possesses a small branching factor and, therefore, the number of possible crossover points for performing single-point crossover is low.
+%TODO mention other crossover operators
+Finally, besides the ones discussed here a variety of different mutation and crossover operators have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
+Furthermore, since these operators are designed for general tree-based GP systems and, hence, when applied in a GGGP setting do not take the underlying grammatical representation into account, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored towards GGGP have been proposed    
