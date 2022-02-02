@@ -5,9 +5,12 @@ import pathlib
 
 base_dir = "./tree_generation_scripts"
 target_dir ="./figures/trees"
-check_if_exists = False
+check_if_exists = True
 for i, file_name in enumerate(os.listdir(base_dir)):
-    if file_name.endswith(".dot") and (not check_if_exists or pathlib.Path(file_name.replace(".dot", ".pdf")).is_file()):
+    tmp = file_name.replace(".dot", ".pdf")
+    path_to_pdf = f"{target_dir}/{tmp}"
+    print(path_to_pdf)
+    if file_name.endswith(".dot") and (not check_if_exists or not pathlib.Path(path_to_pdf).is_file()):
         output = sp.run(["dot2tex", "-c", "-f", "tikz", "--prog", "dot", "--preproc", f"{base_dir}/{file_name}"], stdout=sp.PIPE).stdout.decode("utf-8")
         tmp_file_name = f"tmp{i}.dot"
         with open(f"{base_dir}/{tmp_file_name}", "w") as tmp_file:
@@ -28,6 +31,8 @@ for i, file_name in enumerate(os.listdir(base_dir)):
         os.remove(f"{base_dir}/{tmp}")
         tmp = file_name.replace(".dot", ".log")
         os.remove(f"{base_dir}/{tmp}")
+    else:
+        print("Skipping.")
 
 
 

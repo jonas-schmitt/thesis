@@ -1,0 +1,58 @@
+digraph G {  
+  ordering=in ;
+  S[texlbl="$\langle S \rangle$"];
+  S -> E
+  E[texlbl="$\langle E \rangle$"];
+  E -> if
+  if[texlbl="if"];
+  E -> B1
+  B1[texlbl="$\langle B \rangle$"]; 
+  B1 -> neg
+  neg[texlbl="$\neg$"]; 
+  B1 -> B2
+  B2 -> B3
+  B2 -> or
+  B2 -> B4
+
+  B3 -> B5
+  B3 -> and
+  B3 -> B6
+
+  B4 -> u1
+  B5 -> u2
+  B6 -> v
+
+  or[texlbl="$\vee$"]; 
+  and[texlbl="$\wedge$"]; 
+  B2[texlbl="$\langle B \rangle$"]; 
+  B3[texlbl="$\langle B \rangle$"]; 
+  B4[texlbl="$\langle B \rangle$"]; 
+  B5[texlbl="$\langle B \rangle$"]; 
+  B6[texlbl="$\langle B \rangle$"]; 
+  u1[texlbl="$u$"];
+  u2[texlbl="$u$"];
+  v[texlbl="$v$"];
+
+  E -> then
+  then[texlbl="then"];
+  E -> A1
+  A1[texlbl="$\langle A \rangle$"]; 
+  E -> else
+  else[texlbl="else"];
+  E -> A2
+  A2[texlbl="$\langle A \rangle$"]; 
+
+  A1 -> A3
+  A3[texlbl="$\langle A \rangle$"]; 
+  A1 -> mul
+  mul[texlbl="$+$"];
+  A1 -> A4
+  A4[texlbl="$\langle A \rangle$"]; 
+  A3 -> y1
+  A4 -> x2
+  y1[texlbl="$y$"];
+  x2[texlbl="$x$"];
+
+  A2 -> x3
+  x3[texlbl="$x$"];
+}

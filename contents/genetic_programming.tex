@@ -300,15 +300,23 @@ As a consequence, point mutation can only be applied to the subset of production
 While the goal of mutation is to introduce new genetic information into the population, recombination, often also called crossover, aims to combine the genotypes of existing individuals in novel ways, resulting in an individual with improved fitness compared to its predecessors.
 In general, recombination operators can be classified into \emph{homologous} and non-homologous ones, whereby those from the former category preserve the position of the individual elements of the genome.
 A straightforward way to perform recombination in tree-based GP is to exchange subtrees between two individuals at a certain (crossover) point within both trees, which is called \emph{subtree crossover}.
-Again, to apply this operator within GGGP, the crossover point must be chosen in a way that the root nodes of the exchanged trees correspond to the same variable.  
+Again, to apply this operator within GGGP, the crossover point must be chosen in a way that the root nodes of the exchanged trees correspond to the same variable.
+The resulting operation is illustrated in Figure~\ref{fig:gp-subtree-crossover}.  
 %TODO include figure
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.4]{figures/trees/subtree_crossover.pdf}
+	\caption{Illustration of subtree crossover within a derivation tree.}
+	\label{fig:gp-subtree-crossover}
+\end{figure}
 As subtree crossover permits the exchange of arbitrary subtrees with matching root nodes between two individuals, this operator is non-homologous.
 To obtain a similarly functioning homologous recombination operator, one-point crossover has been proposed~\cite{poli1998schema}.
 One-point crossover first aligns both trees by traversing them recursively until there occurs a mismatch between the arity of two non-terminal nodes of both trees at the same position.
 The crossover point is then chosen from all positions in both trees where such a mismatch occurs and the subtree exchange is performed in a similar way as in subtree crossover.
 While this operator preserves the relative position of each node within both trees, only a limited number of crossover points can be selected.
-Therefore, its applicability within GGGP depends on the amount of productions available for each variable within the grammar.
-For instance, if the majority of productions generates only a single variable, the average derivation tree possesses a small branching factor and, therefore, the number of possible crossover points for performing single-point crossover is low.
-%TODO mention other crossover operators
+For instance, the subtree exchange shown in Figure~\ref{fig:gp-subtree-crossover} is not a valid single-point crossover operation, as the first arity mismatch already occurs above the chosen crossover point within the respective branches of both trees.
+In general, the applicability of single-point crossover within a GGGP system depends on the amount of productions available for each variable within the grammar.
+In particular, if the majority of productions generates only a single variable, the average derivation tree possesses a small branching factor and, therefore, the number of possible crossover points for performing single-point crossover is low.
+
 Finally, besides the ones discussed here a variety of different mutation and crossover operators have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
 Furthermore, since these operators are designed for general tree-based GP systems and, hence, when applied in a GGGP setting do not take the underlying grammatical representation into account, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored towards GGGP have been proposed    
