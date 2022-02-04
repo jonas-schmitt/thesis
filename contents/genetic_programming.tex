@@ -3,6 +3,7 @@
 In general, a program $p$ can be considered as a mapping from the set of inputs $\mathcal{I}$ to the corresponding set of outputs $\mathcal{O}$
 \begin{equation}
 	p : \mathcal{I} \to \mathcal{O}.
+	\label{eq:gp-program}
 \end{equation}
 However, since not all input-output pairs are known in advance, this mapping is usually given in form of a finite set of training cases.
 The goal of GP is then to find a program that correctly computes the correct output for each input contained in the training set.
@@ -257,6 +258,24 @@ Furthermore, while both initialization operators presented here can also be appl
 These operators aim to exploit the structure of a given grammar, for instance to generate a population that is more uniformly distributed across the search space~\cite{criado2020grammatically}.
 %TODO Mention seeding
 \subsection{Fitness Evaluation and Elitism}
+Since GGGP is a program optimization technique, each individual corresponds to a program of the form of Equation~\eqref{eq:gp-program}.
+However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, which corresponds to a program in the target language.
+In many GGGP program synthesis tasks, the grammar employed within the search is either equivalent or represents a subset of that of the target programming language.
+While in such cases a direct correspondence between the derivation and expression tree of the target programming language exists, there is also the possibility to employ multiple layers of intermediate representations before an actual program is generated, which necessitates the implementation of multiple code generation steps.
+After an executable program is available in the target language, the final step within fitness evaluation is then to measure its performance in a number of test cases, which is then condensed to one or multiple measure of an individuals fitness, usually each in form of a single numerical value.
+For instance, one simple way to assess a program's quality in solving a number of test cases is to represent its performance in each individual test case as a separate optimization objective.
+An alternative possibility is to represent different aspects of a program's quality in form of distinct objectives, each of which is determined from a combination of its performance in multiple or even the complete test cases.
+With respect to fitness evaluation, GP algorithms can be categorized into single and multi-objective variants.
+Similar to other evolutionary algorithms, GP treats fitness evaluation as a block box, which means that its inner workings are independent of the computational details of fitness evaluation, but instead the search is performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
+However, as fitness evaluation often represents the computationally most expensive part of an evolutionary algorithm, it drastically impacts to what extent the given search space can be explored.
+Since each individual represents a distinct program that can be executed on a unique set of test instances, each evaluation can be performed independently which facilitates its concurrent execution on a multi-processor system.
+For this purpose, parallel~\cite{sudholt2015parallel} and distributed~\cite{gong2015distributed} evolutionary algorithm variants have been proposed, that can be executed on recent manycore architectures and computer clusters.
+Due to the inherent similarity of the internal structure of Algorithm~\ref{alg:genetic-programming} to other evolutionary algorithms, these approaches are equally applicable to GP-based search methods. 
+
+After a single or multi-objective fitness value has been assigned to each individual, obtained either through random initialization or mutation and recombination of existing individual, the questions remains how the search should be progressed by selecting a novel population for the next generation from the set of available individuals.
+ 
+
+
 \subsection{Selection, Mutation and Recombination}
 While the initalization operator aims to generate a population that is evenly spread over the whole search space, the purpose of mutation and recombination is to create novel individuals based on an existing population that are located in a more promising subspace.  
 For this purpose, evolutionary algorithms usually employ a preliminary selection phase to identify promising candidates in the current population based on which these operations are performed, as it outlined in line 4 of Algorithm~\ref{alg:genetic-programming}.
@@ -266,6 +285,9 @@ In contrast to the other operations discussed in this section, selection is inde
 In general, selection operators are, therefore, agnostic of the type of evolutionary algorithm they are applied to. 
 We, therefore, only briefly discuss selection here and for a more complete treatment of this operation, the reader is referred to one of the following publications:~\cite{back1997handbook,beyer2002evolution,goldberg1991comparative}.
 As in the case of elitism, also several selection operators that deal with multi-objective optimization problems have been proposed, about which an overview can be found in~\cite{deb2015multi}.
+Another recently proposed selection operator that is especially geared towards problems where the fitness evaluation is performed on multiple test cases, is lexicase selection.
+In lexicase selection individuals are selected according their performance in a randomly chosen ordering of the test cases, whereby a decreasing precedence is assigned to each subsequent case. 
+For a more detailed description of this operator, the reader is referred to~\cite{helmuth2014solving,la2016epsilon}.
 %In contrast, to the selection of the new population $P_i$ at the end of each generation, this phase usually allows certain individuals to be selected multiple times.
 After selecting a number of candidate individuals from the population, mutation and recombination represent two complementary options to extend the current population towards more promising regions of the search space.
 \paragraph{Mutation}
