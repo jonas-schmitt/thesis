@@ -256,7 +256,7 @@ Finally, another possibility to initialize the population is to simply employ bo
 If the proportion of individuals is roughly 50 \% for both operators, the initialization is called \emph{ramped half-and-half}~\cite{poli2008field,koza1994genetic}.
 Furthermore, while both initialization operators presented here can also be applied to other non-grammar-based GP variants, alternative methods specifically designed for GGGP have been proposed in~\cite{garcia2006initialization,criado2020grammatically}.
 These operators aim to exploit the structure of a given grammar, for instance to generate a population that is more uniformly distributed across the search space~\cite{criado2020grammatically}.
-%TODO Mention seeding
+
 \subsection{Fitness Evaluation and Selection}
 Since GGGP is a program optimization technique, each individual corresponds to a program of the form of Equation~\eqref{eq:gp-program}.
 However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, which corresponds to a program in the target language.
@@ -282,7 +282,7 @@ Consequently, a selection operator is agnostic of the type of evolutionary algor
 For this reason, we only briefly discuss selection here and for a more complete treatment of this operation, the reader is referred to one of the following publications:~\cite{back1997handbook,beyer2002evolution,goldberg1991comparative}.
 To deal with multi-objective optimization problems, several selection operators have been proposed, about which an overview can be found in~\cite{coello2007evolutionary,deb2011multi,deb2015multi}.
 Many of these operators are based on idea of identifying a domination hierarchy between the individuals of the population, whereby an individual is said to dominate another one if it possesses a superior fitness in all of the objectives.
-One way to identify such a hierarchy is to employ a non-dominated sorting procedure, for instance those proposed in~\cite{deb2002fast,deb2013evolutionary}.
+One way to identify such a hierarchy is to employ a non-dominated sorting procedure, which has been, for instance, proposed in~\cite{deb2002fast,deb2013evolutionary}.
 The actual selection can then be performed using a dominance-based tournament selection, while additional diversity metrics can be incorporated to decide between non-dominating individuals~\cite{coello2007evolutionary}.
 Another recently proposed multi-objective selection operator that is especially geared towards GP problems where the fitness evaluation is performed on multiple test cases, is lexicase selection.
 In lexicase selection individuals are selected according their performance in a randomly chosen ordering of the test cases, whereby a decreasing precedence is assigned to each subsequent case. 
@@ -339,6 +339,22 @@ While this operator preserves the relative position of each node within both tre
 For instance, the subtree exchange shown in Figure~\ref{fig:gp-subtree-crossover} is not a valid single-point crossover operation, as the first arity mismatch already occurs above the chosen crossover point within the respective branches of both trees.
 In general, the applicability of single-point crossover within a GGGP system depends on the amount of productions available for each variable within the grammar.
 In particular, if the majority of productions generates only a single variable, the average derivation tree possesses a small branching factor and, therefore, the number of possible crossover points for performing single-point crossover is low.
+Finally, it must be mentioned that, besides the ones discussed here, a variety of different mutation and crossover operators have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
+Furthermore, since these operators are designed for general tree-based GP systems and, hence, when applied in a GGGP setting do not take the underlying grammatical representation into account, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored towards GGGP have been proposed. 
 
-Finally, besides the ones discussed here a variety of different mutation and crossover operators have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
-Furthermore, since these operators are designed for general tree-based GP systems and, hence, when applied in a GGGP setting do not take the underlying grammatical representation into account, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored towards GGGP have been proposed    
+After creating a number of novel individuals by means of mutation and crossover, the remaining questions that needs to be addressed is how the search should be progressed by assembling a new population from the combined set of the newly created ones and those from the previous generation, as illustrated in line 7 Algorithm~\ref{alg:genetic-programming}.
+Here one possibility is to completely replace the previous generation by the individual created by the mentioned genetic operators.
+However, this approach incurs the danger of evicting individuals that are located in promising areas the search space, which then need to be rediscovered later in order to continue the search at this point.
+Therefore, many evolutionary algorithms employ \emph{elitism}, which means that individuals from the previous population are allowed to pass over to the next one in case their fitness is not surpassed by enough newly created individuals.
+While the application of elitism prevents the occurrence of fitness regressions from one generation to the next, it comprises the danger of getting stuck in local optima.
+For this purpose, the amount of elitism always represents a compromise between the loss of promising individuals and the danger of premature convergence to local optima.
+Options to mitigate this risk and prevent locally-optimal individuals from quickly overtaking the population are, for instance, to restrict the amount of elitism to only a subset of the population and to introduce additional niching or diversity criteria into to process of selecting individuals for the next population, which is especially common in multi-objective evolutionary algorithms~\cite{coello2007evolutionary}.
+
+\paragraph{Final Remarks}
+With the treatment of grammar-guided genetic programming, we have concluded the theoretical section of this thesis.
+Consequently, the reader should now be prepared to follow the subsequent introduction of a grammar-based approach for the optimization of multigrid methods and its implementation in the Python programming.
+In the following we, therefore, assume the reader to be familiar with Python, due to its widespread use in both academia and industry.
+If this should not be the case the reader is advised to consult one of the many available resources for learning Python\footnote{Python:~\url{https://www.python.org/doc/}}.
+Furthermore, while hardware-specific code optimization is not a focus of this thesis, the reader should have some basic understanding about the architectural features of recent multiprocessor systems and supercomputers.
+Along with this, we also assume a familiarity with programming techniques and tools for performing a shared and distributed memory parallelization on these systems, such as OpenMP\footnote{OpenMP:~\url{https://www.openmp.org/}} and MPI\footnote{MPI:~\url{https://www.mpi-forum.org/}}. 
+
