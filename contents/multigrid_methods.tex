@@ -1,4 +1,4 @@
-\section{Multigrid Methods}
+\section{Multigrid Methods}\label{sec:multigrid-methods}
 Multigrid methods have been designed to accelerate the convergence of iterative methods by eliminating certain error components on a so-called coarser representation of the original problem.
 While the basic iterative methods discussed in the last section are applicable to many PDE-based problems, in practice, their speed of convergence is often insufficient, which means that a large number of iterations is required until an acceptable approximation accuracy can be attained. 
 The main reason for this behavior is that these methods are only efficient in the reduction of certain error components, while others remain mostly unaffected~\cite{briggs2000multigrid}.
@@ -273,7 +273,7 @@ In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method,
 While we here only provide a brief introductions to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
 Finally, one can also define overlapping block smoothers needs, which means that multiple blocks contain the same grid point as an unknown to be solved.
 
-\subsection{The coarse grid correction scheme}
+\subsection{The Coarse-Grid Correction Scheme}
 The core idea behind multigrid methods is to reduce the oscillatory components of an error by obtaining an approximation of the same problem on a coarser grid.
 As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using similar relaxation techniques that are effective to reduce oscillatory components on the finer grid.
 Before defining this procedure, observe that our original system
@@ -578,7 +578,7 @@ Similar to full-weighting restriction we can define the two- and three-dimension
 \end{equation}
 Finally, we want to emphasize again that the prolongation and restriction operators presented here
 
-\subsection{The Multigrid Cycle}
+\subsection{The Multigrid Cycle}\label{sec:multigrid-cycles}
 By putting this all together we can formulate a recursive version of Algorithm~\ref{alg:two-grid-method}, that enables us to perform an arbitrary number of coarsening steps until we solve the resulting error equation precisely on a certain discretization level, which can be seen in Algorithm~\ref{alg:multigrid-cycle}.
 Note that the function \textsc{mg-cycle} has a number of additional parameters compared to our original two-grid method.
 First, of all $l$ represents the number of recursive coarsening steps until the respective system of linear equations is solved directly.
