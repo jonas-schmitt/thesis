@@ -70,42 +70,67 @@ To overcome these limitations and construct multgrid methods with an arbitrary s
 The first step towards the development of this language is to find a way to represent the current state within each step of a multigrid method and then define transition rules between those states.
 \section{Multigrid States and Transitions}
 In order to determine how the state of a multigrid method can be represented, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
-As it can be seen here, on each level $l > 0$ the following operations are employed within a multgrid cycle:
+The sake of simplicity, in the following we write symbols that correspond to vectors also in regular font.
+In case the mathematical interpretation of a certain lower case symbol is ambiguous, its meaning will be explicitly stated. 
+On each level $l > 0$ only the following three operations are employed within a multgrid cycle:
 \begin{description}
-	\item[Smoothing:] Reduce the oscillatory error components of the approximate solution $\tilde{\bm{x}}_h$ on the current level. 
+	\item[Smoothing:] Reduce the oscillatory error components of the approximate solution $\tilde{x}_h$ on the current level. 
 	\begin{equation*}
-		\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right) \; \text{where} \; A_h = M_h + N_h
+		\tilde{x}_h = \tilde{x}_h + \omega A_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = A_h + N_h
 	\end{equation*}
-	\item[Restriction:] Restrict the residual to obtain the right-hand side $\bm{b}_{2h}$ of the error equation on the next coarser level.
+	\item[Restriction:] Restrict the residual to obtain the right-hand side $b_{2h}$ of the error equation on the next coarser level.
 	\begin{align*}
-		\tilde{\bm{x}}_{2h} & = 0 \\
- 		\bm{b}_{2h} & = I_h^{2h} (\bm{b}_h - A_h \tilde{\bm {x}}_h)
+		\tilde{x}_{2h} & = 0 \\
+ 		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
 	\end{align*}
-	\item[Coarse-Grid Correction:] Prolongate a correction $\tilde{\bm{x}}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{\bm{x}}_h$.
+	\item[Coarse-Grid Correction:] Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
 	\begin{equation*}
-		\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \tilde{\bm{x}}_{2h}
+		\tilde{x}_h = \tilde{x}_h + I_{2h}^h \tilde{x}_{2h}
 	\end{equation*}
 \end{description}
-Now note that except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{\bm{x}}_{h}$ and $\tilde{\bm{x}}_{2h}$, and the right-hand side $b_h$.
-However, in contrast to coarse-grid correction which utilizes the current approximate solution on the coarse grid, both smoothing and restriction are based on computing the residual $\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$ first, which can be considered as an intermediate step.
-We can therefore distinguish these operations by considering whether the residual has been computed or not.
-Therefore, the value of these variables uniquely identify the current state within each step of the method.
-To illustrate this in a more concrete way, consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}.
+Now note that except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
+However, in contrast to coarse-grid correction which utilizes the current approximate solution on the coarse grid, both smoothing and restriction first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
+While this differentiation is not strictly necessary it leads to simpler operations, since both restriction and smoothing can then be split into two steps.
+Furthermore, as in practice the actual error can usually not be computed, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be repeatedly computed.
+%The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a correction term of the form $\omega A_h^{-1} r_h$.
+To derive a general representation for the state of a multigrid method based on our previous observations, we consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}, which corresponds to a three-grid V-cycle that performs one step of underrelaxed Jacobi smoothing on the second finest level.
 \begin{algorithm}
 	\begin{algorithmic}[1]
-		\State $\tilde{\bm{x}}_{h} = 0$
-		\State $\bm{r}_{h} = \bm{b}_{h} - M_h \tilde{\bm{x}}_{h} $
-		\State $\quad \tilde{\bm{x}}_{2h} = 0$
-		\State $\quad \bm{b}_{2h} = I_{h}^{2h} r_{h}$
-		\State $\quad \bm{r}_{2h} = \bm{b}_{2h} - M_{2h} \tilde{\bm{x}}_{2h}$
-		\State $\quad \tilde{\bm{x}}_{2h} = \tilde{\bm{x}}_{2h} + I_{4h}^{2h} M_{4h}^{-1} I_{2h}^{4h} \bm{r}_{2h}$
-		\State $\quad \bm{r}_{2h} = \bm{b}_{2h} - M_{2h} \tilde{\bm{x}}_{2h}$
-		\State $\quad \tilde{\bm{x}}_{2h} = \tilde{\bm{x}}_{2h} + 0.6 \cdot D_{2h}^{-1} \bm{r}_{2h}$
-		\State $\tilde{\bm{x}}_{h} = \tilde{\bm{x}}_{h}  + I_{2h}^h \tilde{\bm{x}}_{2h}$
+		\State $\tilde{x}_{h} = x_{h}^0$
+		\State $r_{h} = b_{h} - A_h \tilde{x}_{h} $
+		\State $ \tilde{x}_{2h} = 0$
+		\State $ b_{2h} = I_{h}^{2h} r_{h}$
+		\State $ r_{2h} = b_{2h} - A_{2h} \tilde{x}_{2h}$
+		\State $ \tilde{x}_{2h} = \tilde{x}_{2h} + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} r_{2h}$
+		\State $ r_{2h} = b_{2h} - A_{2h} \tilde{x}_{2h}$
+		\State $ \tilde{x}_{2h} = \tilde{x}_{2h} + 0.6 \cdot D_{2h}^{-1} r_{2h}$
+		\State $\tilde{x}_{h} = \tilde{x}_{h}  + I_{2h}^h \tilde{x}_{2h}$
 	\end{algorithmic}
 \caption{Example for a three-grid V-cycle}
 \label{alg:example-three-grid-method}
 \end{algorithm}
-
-
-
+Starting from the first line we can observe that in each step of the method either the approximate solution, right-hand side or residual is updated on a certain level.
+While in practice each of these variables corresponds to a data structure encompassing numerical values, our goal is to represent the algorithmic structure of a multigrid solver in the form of symbolic expressions.
+In this case the value of each variable is determined by the expression that computes its value.
+Updating a variable, therefore, corresponds to assigning a new expression to the corresponding symbol.
+For this purpose, we consider the tuple $(\tilde{x}_h, b_h, r_h)$ on each level $h$, where we store the expression of each of the corresponding three variables.
+\begin{equation*}
+\begin{array}{l l}
+\hline
+	& \quad \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
+1: & \quad  x_{h}^0, \, b_h, \, \lambda \\
+2: & \quad  x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0 \\ \hline
+& \quad \bm{(\tilde{x}_{2h}, \, b_{2h}, \, r_{2h})} \\
+3: & \quad  0, \, \lambda, \, \lambda \\
+4: & \quad  0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda \\
+5: & \quad  0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \,\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} 0 \\
+6: & \quad 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0}_{r_{2h}}), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda\\
+7: & \quad 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \\ & \quad \underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{u}_{2h}}) \\
+8: & \quad  (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{u}_{2h}}) + 0.6 \cdot D_{2h}^{-1} \cdot \\ 
+& \quad (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0))}_{r_{2h}}), \\ 
+& \quad I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda \\ \hline 
+& \quad \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
+9: & \quad x_{h}^0 + I_{2h}^h ((0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)) + 0.6 \cdot D_{2h}^{-1} \cdot \\ & \quad (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)))), \\ & \quad b_h, \, \lambda \\
+\hline
+\end{array}
+\end{equation*}
