@@ -72,11 +72,11 @@ The first step towards the development of this language is to find a way to repr
 In order to determine how the state of a multigrid method can be represented, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
 The sake of simplicity, in the following we write symbols that correspond to vectors also in regular font.
 In case the mathematical interpretation of a certain lower case symbol is ambiguous, its meaning will be explicitly stated. 
-On each level $l > 0$ only the following three operations are employed within a multgrid cycle:
+On each level $l > 0$ only the following three operations are employed within a multgrid cycle.
 \begin{description}
 	\item[Smoothing:] Reduce the oscillatory error components of the approximate solution $\tilde{x}_h$ on the current level. 
 	\begin{equation*}
-		\tilde{x}_h = \tilde{x}_h + \omega A_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = A_h + N_h
+		\tilde{x}_h = \tilde{x}_h + \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = M_h + N_h
 	\end{equation*}
 	\item[Restriction:] Restrict the residual to obtain the right-hand side $b_{2h}$ of the error equation on the next coarser level.
 	\begin{align*}
@@ -113,8 +113,8 @@ In each step of this sequence of operations either the approximate solution, rig
 While in practice each of these variables corresponds to a data structure encompassing numerical values, our goal is to represent the algorithmic structure of a multigrid solver in the form of symbolic expressions.
 In this case the value of each variable is determined by the expression that computes its value.
 Updating a variable, therefore, corresponds to assigning a new expression to the corresponding symbol.
-For this purpose, we consider the tuple $(\tilde{x}_h, b_h, r_h)$ on each level $h$, which then contains expression of each of the corresponding three variables.
-Starting from the first line we can then progressively update the contents of this tuple with the expression contained in each line whereby the occurrence of each symbol is replaced by the respective expression currently contained in the tuple.
+For this purpose, we consider the tuple $(\tilde{x}_h, b_h, r_h)$ on each level with step size $h$, which then contains expression of each of the corresponding three variables.
+Starting from the first line we can then progressively update the contents of this tuple with the expression contained in each line, whereby the occurrence of each symbol is replaced by the respective expression currently contained in the tuple.
 Figure~\ref{fig:example-tree-grid-method-states} shows the respective state tuple for each line of Algorithm~\ref{alg:example-three-grid-method}.
 \begin{figure}
 	\begin{equation*}
@@ -140,27 +140,28 @@ Figure~\ref{fig:example-tree-grid-method-states} shows the respective state tupl
 	\caption{State tuple in each step of Algorithm~\ref{alg:example-three-grid-method}.}
 	\label{fig:example-tree-grid-method-states}
 \end{figure}
-As in Section~\ref{sec:formal-languages} the empty symbol $\lambda$ denotes that a certain component of the tuple is unspecificed.
+As it has been introduced in Section~\ref{sec:formal-languages}, the empty symbol $\lambda$ denotes that a certain component of the tuple is unspecified.
 After the last step of the sequence (line 9) the first component of the tuple ($\tilde{x}_h$) then combines all computational steps of the method in a single expression.
 
-While Figure~\ref{fig:example-tree-grid-method-states} illustrates that the ternary tuple contains all relevant information of a multigrid methods current state on a certain level we have not yet considered how to transition between the states of two subsequent levels.
+While Figure~\ref{fig:example-tree-grid-method-states} illustrates that the ternary tuple contains all relevant information of a multigrid method's current state on a certain level, we have not yet considered how to transition between the states of two subsequent levels.
 First, consider the case of transitioning from a certain level with step size $h$ to the next coarser level with step size $2h$, which is shown in line 3 and 4 of Figure~\ref{fig:example-tree-grid-method-states}.
 Here the tuple $(0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)$ corresponds to the coarse-grid error equation $A_{2h} x_{2h} = I_{h}^{2h}(b_{h} - A_h x_{h}^0)$ whose solution is to be approximated starting with an initial guess of zero.
 Therefore, all information to create this state is obtained from the next finer level in form of the restricted residual $I_h^{2h} r_h = I_h^{2h} (b_{h} - A_h x_{h}^0)$.
 On the other hand, consider the transition from a coarse grid back to the next finer grid in form of the coarse-grid correction in line 9.
 In this case we both require the approximate solution $\tilde{x}_{2h}$, computed on the coarse grid, as well as the previous values of the first two components $\tilde{x}_h$ and $b_h$ of the fine-grid state tuple.
-While in the case of restriction we can neglect all previous states represented on the coarser grid, as it is explicitly contained in the residual, for coarse-grid correction the previous state on the fine-grid needs to be restored.
+While in the case of restriction we can neglect all previous states represented on the coarser grid, as it is explicitly contained in the residual, for a coarse-grid correction the previous state on the fine-grid needs to be restored.
 Note that in case of a multigrid method that operates on a hierarchy of discretizations of even larger depth than the example shown in Algorithm~\ref{alg:example-three-grid-method}, this process must be recursively performed for each bottom up transition within the hierarchy.
 To resolve this issue we need to extend our original formulation of a multgrid state by a fourth component with the purpose of preserving current state of the next finer level.
-While at the topmost level this component is always empty, whenever restriction is performed the current state of the finer level is included.
+While at the topmost level this component is always empty, whenever restriction is performed the state of the current level is included.
 For instance in line 4 of Figure~\ref{fig:example-tree-grid-method-states} we have to extend the given ternary tuple $(0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0, \, \lambda)$ by including the state $S_h = (x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0, \, \lambda)$ as a fourth entry. 
 Hence, all required information for restoring the previous fine-grid state values is then included in the quaternary tuple $(0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0, \, \lambda, \, S_h)$.
 %TODO clarify that line 3 and 4 can in practice be combined to one step
 Note that since $(x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0, \, \lambda)$ represents the current state on the finest grid, its fourth component is empty, while otherwise it would refer to the previous state of the next level in the discretization hierarchy.
-Now to demonstrate the feasibility of this approach consider what happens when a coarse-grid correction is performed, as in line 9 of Figure~\ref{fig:example-tree-grid-method-states}.
-Since both the approximate solution $\tilde{x}_h$ and right-hand side $b_h$ are contained in the fourth component of the coarse-grid state tuple, the expression corresponding to the application of the coarse-grid correction can be assembled in a straightforward manner.
+To assess the feasibility of this approach, we have to check whether all components required to construct the coarse-grid correction expression, as in line 9 of Figure~\ref{fig:example-tree-grid-method-states}, are available within the current state.
+However, since in addition to $\tilde{x}_{2h}$, both the approximate solution $\tilde{x}_h$ and right-hand side $b_h$ are now contained in the fourth component of the coarse-grid state tuple, this expression can be assembled in a straightforward manner.
 After resolving the issue of restoring previous states during coarse-grid correction, we can, thus, now provide a complete formal definition of the state of a multigrid method.
 \begin{definition}[Multigrid State]
+\label{def:multigrid-state}
 The state of a multigrid method for solving the equation $A_{2h} x_{2h} = b_{2h}$ on a certain grid with step size $2h$ is given by the quaternary tuple
 \begin{equation*}
 	S_{2h} = \left( \tilde{x}_{2h}, b_{2h}, c_{2h}, S_{h}\right), 
@@ -170,9 +171,12 @@ where
 	\item $\tilde{x}_{2h}$ is a mathematical expression for computing an approximate solution of the above equation,
 	\item $b_{2h}$ is an expression for computing the right-hand side of the above equation,
 	\item $c_{2h}$ is a correction term for improving the accuracy of the approximate solution,
-	\item $S_{h}$ is either the current state on the next finer level with a step size $h$ or the empty symbol $\lambda$ in case $2h$ represents the topmost level in the given hierarchy of discretizations. 
+	\item $S_{h}$ is either the current state on the next finer level with a step size $h$ or the empty symbol $\lambda$ in case $2h$ represents the topmost level in the given hierarchy of discretizations.
 \end{itemize}
 \end{definition}
+Note that in Definition~\ref{def:multigrid-state} the third component $c_{2h}$ of a multigrid state no longer only refers to the residual, but now represents an expression that corresponds to a general correction term.
+While in the classical multigrid formulation, as presented in Section~\ref{sec:multigrid-methods}, all smoothing expressions are directly derived from the residual, alternative relaxation methods which can not be easily formulated in the simple framework of stationary iterative methods, such as distributive smoothing, have been proposed~\cite{trottenberg2000multigrid}.
+Furthermore, the general notion of a correction term enables us to also represent intermediate expressions that do not specifically refer to the current residual within a multigrid state, for instance $c_h = \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right)$ which corresponds to the complete term that is added to the current approximate solution within smoothing.   
 %Finally, note that the computation of the coarse-grid correction does not require the value of the previous fine-grid residual.
 %Therefore, the corresponding expression does not need to be restored and the residual can be omitted in the respective state tuple when performing the fine-to-coarse grid transition.
  
