@@ -70,6 +70,7 @@ To overcome these limitations and construct multgrid methods with an arbitrary s
 The first step towards the development of this language is to find a way to represent the current state within each step of a multigrid method and then define transition rules between those states.
 
 \section{Multigrid States}
+\label{}
 In order to determine how the state of a multigrid method can be represented, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
 The sake of simplicity, in the following we write symbols that correspond to vectors also in regular font.
 In case the mathematical interpretation of a certain lower case symbol is ambiguous, its meaning will be explicitly stated. 
@@ -196,14 +197,14 @@ After resolving the issue of restoring previous states during coarse-grid correc
 \label{def:multigrid-state}
 The state of a multigrid method for solving the equation $A_{2h} x_{2h} = b_{2h}$ on a certain grid with step size $2h$ is given by the quaternary tuple
 \begin{equation*}
-	S_{2h} = \left( \tilde{x}_{2h}, b_{2h}, c_{2h}, S_{h}\right), 
+	S_{h} = \left( \tilde{x}_{h}, b_{h}, c_{h}, S_{h}\right), 
 \end{equation*}
 where
 \begin{itemize}
-	\item $\tilde{x}_{2h}$ is a mathematical expression for computing an approximate solution of the above equation,
-	\item $b_{2h}$ is an expression for computing the right-hand side of the above equation,
-	\item $c_{2h}$ is a correction term for improving the accuracy of the approximate solution,
-	\item $S_{h}$ is either the current state on the next finer level with a step size $h$ or the empty symbol $\lambda$ in case $2h$ represents the topmost level in the given hierarchy of discretizations.
+	\item $\tilde{x}_{h}$ is a mathematical expression for computing an approximate solution of the above equation,
+	\item $b_{h}$ is an expression for computing the right-hand side of the above equation,
+	\item $c_{h}$ is a correction term for improving the accuracy of the approximate solution,
+	\item $S_{h/2}$ is either the current state on the next finer level with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
 \end{itemize}
 \end{definition}
 Note that in Definition~\ref{def:multigrid-state} the third component $c_{2h}$ of a multigrid state no longer only refers to the residual, but now represents an expression that corresponds to a general correction term.
@@ -214,8 +215,58 @@ Furthermore, the general notion of a correction term enables us to also represen
 \section{State Transition Rules}
 After defining the state of a multigrid method, the next step towards developing a formal language for representing arbitrary sequences of multigrid operations,
 such as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is to formally define a set of rules that describes the transitions between all possible states.
-For this purpose, we need to consider the set of possible operations within a multigrid method.
- 
- 
-
+For this purpose, we need to consider the set of possible operations within a multigrid method, as described at the beginning of the last section.
+From a mathematical point of view, these operations exclusively consist of either matrix-vector multiplications or vector additions and subtractions.
+%TODO describe residual
+%TODO include references to functions
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{residual}{$A_h$, ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$)}
+		\State $c_h \gets b_h - A_h \tilde{x}_h$
+		\State return ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+First of all note, that a matrix-vector multiplication is always applied within an expression that corresponds to a correction term $c_h$, either within a smoother or in the form of a coarse-grid correction.
+Therefore, based on our representation of a multigrid state, as formulated in Definition~\ref{def:multigrid-state}, we can define the following two functions that correspond to the respective state transitions
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{apply}{$B_h$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_h$)}
+		\State return ($\tilde{x}_h$, $b_h$, $B_h\cdot c_h$, $S_h$)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+In both cases, a new correction term is obtained by applying an operator ($B_h$ and $I_{2h}^h$) to a vector ($c_h$ and $\tilde{x}_{2h}$), which is then included into the state returned by both functions.
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{cgc}{$I_{2h}^{h}$, ($\tilde{x}_{2h}$, $b_{2h}$, $\lambda$, $S_{h}$)}
+		\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+		\State $c_h \gets I_{2h}^{h} \cdot \tilde{x}_{2h}$
+		\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+As described in the last section, coarse-grid correction (\textsc{cgc}) comprises an additional preliminary step in which the previous state on the next higher level is restored.
+After constructing a correction term, we next need to define a state transition that corresponds to the application of this correction to the current approximate solution in order to further improve its accuracy.
+Again, we formulate this transition as a function of the following form.
+\begin{algorithm}
+\begin{algorithmic}
+	\Function{iterate}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
+	\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
+	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
+	\EndFunction
+\end{algorithmic}
+\end{algorithm}
+%TODO describe restriction
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+		\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
+		\State $b_{2h} \gets c_{2h}$
+		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
+		\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
+		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
 
