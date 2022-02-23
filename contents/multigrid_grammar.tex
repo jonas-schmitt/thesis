@@ -217,26 +217,47 @@ After defining the state of a multigrid method, the next step towards developing
 such as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is to formally define a set of rules that describes the transitions between all possible states.
 For this purpose, we need to consider the set of possible operations within a multigrid method, as described at the beginning of the last section.
 From a mathematical point of view, these operations exclusively consist of either matrix-vector multiplications or vector additions and subtractions.
+First of all, the computation of the residual $r_h = b_h - A_h \tilde{x}_h$ represents the fundamental operation based on which an approximation to the solution of the target system $A_h x_h = b_h$ is iteratively improved, either with means of smoothing or by computing a coarse-grid correction.
+The \textsc{residual} function implements the corresponding state transition for computing the residual on a certain level with step size $h$.
+For this purpose first the residual expression is assembled based on the system matrix $A_h$ and the given state $S_h = (\tilde{x}_h, b_h, \lambda, S_{h/2})$, which contains the current approximate solution $\tilde{x}_h$ and right-hand side $b_h$.
+The resulting expression is included as a the correction term $c_h$ into $S_h$, which is then returned at the end of the function.
 %TODO describe residual
 %TODO include references to functions
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{residual}{$A_h$, ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$)}
+		\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, S_{h/2})$}
 		\State $c_h \gets b_h - A_h \tilde{x}_h$
-		\State return ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)
+		\State return $(\tilde{x}_h, b_h, c_h, S_{h/2})$
 		\EndFunction
 	\end{algorithmic}
+\label{alg:state-transition-residual}
 \end{algorithm}
-First of all note, that a matrix-vector multiplication is always applied within an expression that corresponds to a correction term $c_h$, either within a smoother or in the form of a coarse-grid correction.
-Therefore, based on our representation of a multigrid state, as formulated in Definition~\ref{def:multigrid-state}, we can define the following two functions that correspond to the respective state transitions
+After constructing an initial correction $c_h$ from the residual expression $b_h - A_h \tilde{x}_h$, next we can apply an operator $B_h$ to this term, either as part of a smoothing expression or in form of restriction to obtain the right-hand side $b_h$ of the coarse-grid error equation.
+Since both operations can be formulated as a matrix-vector multiplication, we consider this operator application as an intermediate step that is implemented in form of the function \textsc{apply}.
+This function applies to operator $B_h$ to the current correction term. 
+The resulting expression then serves as a new correction term within the returned state.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{apply}{$B_h$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_h$)}
-		\State return ($\tilde{x}_h$, $b_h$, $B_h\cdot c_h$, $S_h$)
+		\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, S_h)$}
+		\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
-In both cases, a new correction term is obtained by applying an operator ($B_h$ and $I_{2h}^h$) to a vector ($c_h$ and $\tilde{x}_{2h}$), which is then included into the state returned by both functions.
+In general, the choice of the operator $B_h$ corresponds to the two elementary options available within a multigrid method, i.e. smoothing and solving the given problem on a coarser grid.
+For instance, the choice of $B_h = D_h^{-1}$ leads to the expression
+\begin{equation*}
+	c_h = D_{-1} (b_h - A_h \tilde{x}_h),
+\end{equation*}
+which corresponds to one step of the Jacobi method as shown in Equation~\ref{eq:jacobi-method}.
+In contrast, choosing $B_h$ as the restriction operator $I_h^{2h}$ leads to
+\begin{equation*}
+	c_{2h} = I_{h}^{2h} (b_h - A_h \tilde{x}_h),
+\end{equation*}
+which then serves as a right-hand side $b_{2h}$ of the corresponding coarse-grid error equation.
+In both cases the correction term obtained from the \textsc{apply} function serves a different purpose.
+First of all, we must be able to generate an expression that computes an improved approximate solution $\tilde{x}_h$ by applying an update in form of the correction term $c_h$ to the previous value of $\tilde{x}_h$. 
+This behavior is implemented in the function \textsc{iterate}, which returns a state tuple with the expression for computing an updated approximate solution as its first entry.
+In addition to the sole application of correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$ which enables both the formulation of underrelaxed, overrelaxed and potentially colored versions of each operation, for instance those described in Section~\ref{sec:rb-gs}.
 \begin{algorithm}
 	\begin{algorithmic}
 		\Function{cgc}{$I_{2h}^{h}$, ($\tilde{x}_{2h}$, $b_{2h}$, $\lambda$, $S_{h}$)}
@@ -246,6 +267,9 @@ In both cases, a new correction term is obtained by applying an operator ($B_h$ 
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
+%TODO describe partitioning and relaxation factor
+%TODO describe cocy first! Then cgc
+
 As described in the last section, coarse-grid correction (\textsc{cgc}) comprises an additional preliminary step in which the previous state on the next higher level is restored.
 After constructing a correction term, we next need to define a state transition that corresponds to the application of this correction to the current approximate solution in order to further improve its accuracy.
 Again, we formulate this transition as a function of the following form.

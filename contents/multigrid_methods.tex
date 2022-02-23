@@ -119,6 +119,7 @@ To further improve the smoothing property of a basic iterative methods, it is of
 \end{equation}
 Again, a weighted Jacobi or Gauss-Seidel can then be obtained by replacing the matrix $M$ by the respective term.
 \subsubsection{Red-Black Gauss-Seidel}
+\label{sec:rb-gs}
 While the Gauss-Seidel method exhibits superior smoothing properties compared to the Jacobi method, each iteration requires solving a lower triangular system of the form
 \begin{equation*}
 	(D - L) (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)},
