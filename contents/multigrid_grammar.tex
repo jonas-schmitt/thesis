@@ -257,7 +257,7 @@ which then serves as a right-hand side $b_{2h}$ of the corresponding coarse-grid
 In both cases the correction term obtained from the \textsc{apply} function serves a different purpose.
 First of all, we must be able to generate an expression that computes an improved approximate solution $\tilde{x}_h$ by applying an update in form of the correction term $c_h$ to the previous value of $\tilde{x}_h$. 
 This behavior is implemented in the function \textsc{iterate}, which returns a state tuple with the expression for computing an updated approximate solution as its first entry.
-In addition to the sole application of correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$ which enables both the formulation of underrelaxed, overrelaxed and potentially colored versions of each operation, for instance those described in Section~\ref{sec:rb-gs}.
+In addition to the mere application of a correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$ which enables both the formulation of underrelaxed, overrelaxed and potentially colored versions of each operation, for instance those described in Section~\ref{sec:rb-gs}.
 \begin{algorithm}
 	\begin{algorithmic}
 		\Function{cgc}{$I_{2h}^{h}$, ($\tilde{x}_{2h}$, $b_{2h}$, $\lambda$, $S_{h}$)}
@@ -267,25 +267,15 @@ In addition to the sole application of correction term, this function also inclu
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
-%TODO describe partitioning and relaxation factor
-%TODO describe cocy first! Then cgc
-
-As described in the last section, coarse-grid correction (\textsc{cgc}) comprises an additional preliminary step in which the previous state on the next higher level is restored.
-After constructing a correction term, we next need to define a state transition that corresponds to the application of this correction to the current approximate solution in order to further improve its accuracy.
-Again, we formulate this transition as a function of the following form.
-\begin{algorithm}
-\begin{algorithmic}
-	\Function{iterate}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
-	\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
-	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
-	\EndFunction
-\end{algorithmic}
-\end{algorithm}
-%TODO describe restriction
+The second possibility to apply an operator to the current residual is in form of the restriction expression $c_{2h} = I_{h}^{2h} r_h$.
+As denoted by the subscript, the result of this operation represents an expression on a coarser grid of step size $2h$.
+To construct the coarse-grid error equation $A_{2h} x_{2h} = I_{h}^{2h} r_h$ we have to assign this expression to the right-hand side $b_{2h}$ within the corresponding state tuple.
+Furthermore, as discussed within the last section, before we can transition to a state on the next coarser grid, we have to store the previous state as a fourth component in the corresponding tuple.
+The resulting state transition is implemented in the function \textsc{cocy} (coarse cycle).
 \begin{algorithm}
 	\begin{algorithmic}
 		\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
-		\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
+		\State $\tilde{x}_{2h} \gets 0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
 		\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
@@ -293,4 +283,17 @@ Again, we formulate this transition as a function of the following form.
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
+Note that within this function we already construct an expression for the initial residual
+\begin{equation}
+	r_{2h} = b_{2h} - A_{2h} 0,
+\end{equation} 
+and include it as a correction term into the newly created state tuple.
+The reason for this decision is that there is no benefit in performing a coarse-grid correction with the initial approximate solution $0$, and, thus, computing the residual always represents the first step of solving the coarse-grid error equation with subsequent multigrid operations.
+%TODO describe partitioning and relaxation factor
+%TODO describe cocy first! Then cgc
+
+As described in the last section, coarse-grid correction (\textsc{cgc}) comprises an additional preliminary step in which the previous state on the next higher level is restored.
+After constructing a correction term, we next need to define a state transition that corresponds to the application of this correction to the current approximate solution in order to further improve its accuracy.
+Again, we formulate this transition as a function of the following form.
+%TODO describe restriction
 
