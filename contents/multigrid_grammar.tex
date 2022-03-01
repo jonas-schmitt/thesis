@@ -309,9 +309,9 @@ The remaining step within the development of a formal system for the constructio
 			\bnfpn{$s_h$}
 		} \\
 		\bnfprod{$s_h$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfpn{$c_h$}, \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor 	\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor
 		} \\
-		\bnfprod{$s_h$} {
+		\bnfmore {
 			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_h$} {
@@ -319,27 +319,53 @@ The remaining step within the development of a formal system for the constructio
 		} \\
 		\bnfprod{$B_h$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
-		} \\
+		} \\ \\
 		\bnfprod{$s_{2h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfpn{$c_{2h}$}, \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor 			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor
 		} \\
-		\bnfprod{$s_{2h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+		\bnfmore {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			%\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_{2h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$u^{0}_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 		} \\
 		\bnfprod{$B_{2h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}
+		} \\ \\
+		\bnfprod{$s_{4h}$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
 		} \\
-		\bnfprod{${c}_{4h}$} {
-			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+		\bnfmore {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$s_{8h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			%\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+		} \\
+		\bnfprod{$c_{4h}$} {
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+		} \\
+		\bnfprod{$B_{4h}$} {
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{4h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = A_{4h}^{+} + A_{4h}^{-}$}
+		} \\ \\
+		\bnfprod{$s_{8h}$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+		} \\
+		\bnfmore {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{16h}^{8h}$}, \bnfsp \bnfpn{$c_{16h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+		} \\
+		\bnfprod{$c_{8h}$} {
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+		} \\
+		\bnfprod{$B_{8h}$} {
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{8h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = A_{8h}^{+} + A_{8h}^{-}$}
+		} \\ \\
+		\bnfprod{${c}_{16h}$} {
+			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{16h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{16h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 		} \\
 		\bnfprod{$P$} {
 			\bnfts{\textnormal{\textsc{partitioning}}} \bnfor \bnfes
 		}
 	\end{bnf*}
 \label{alg:multigrid-grammar}
-\caption{Multigrid Grammar Productions}
+\caption{Grammar Productions for a Five-Grid Method}
 \end{algorithm}
 
