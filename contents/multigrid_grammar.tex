@@ -262,10 +262,10 @@ The second possibility to apply an operator to the current residual is in form o
 As denoted by the subscript, the result of this operation represents an expression on a coarser grid of step size $2h$.
 To construct the coarse-grid error equation $A_{2h} x_{2h} = I_{h}^{2h} r_h$ we have to assign this expression to the right-hand side $b_{2h}$ within the corresponding state tuple.
 Furthermore, as discussed within the last section, before we can transition to a state on the next coarser grid, we have to store the previous state as a fourth component in the corresponding tuple.
-The resulting state transition is implemented in the function \textsc{cocy}, which is abbreviation of the term coarse cycle.
+The resulting state transition is implemented in the function \textsc{cge}, which is abbreviation of the term coarse-grid equation.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+		\Function{cge}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
 		\State $\tilde{x}_{2h} \gets 0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
@@ -301,5 +301,45 @@ The functions described in this section can therefore be considered as a \textsc
 At this point we also have to revisit one of the main goals of this language: The description of methods that incorporate an arbitrary sequence of multigrid operations and, thus, can not be formulated in the classical framework of multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
 As we have described in this section, we have ensured that each possible state transition within a multigrid method is described by the application of either a specific combination of functions or even a single one.
 However, we have carefully avoided to introduce functions that correspond to a transition spanning over multiple states, which would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
-The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.  
+The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
+\section{Multigrid Grammar}
+\begin{algorithm}
+	\begin{bnf*}
+		\bnfprod{$S$} {
+			\bnfpn{$s_h$}
+		} \\
+		\bnfprod{$s_h$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfpn{$c_h$}, \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor 	\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+		} \\
+		\bnfprod{$s_h$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
+		} \\
+		\bnfprod{$c_h$} {
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
+		} \\
+		\bnfprod{$B_h$} {
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
+		} \\
+		\bnfprod{$s_{2h}$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfpn{$c_{2h}$}, \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor 			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+		} \\
+		\bnfprod{$s_{2h}$} {
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+		} \\
+		\bnfprod{$c_{2h}$} {
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$u^{0}_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+		} \\
+		\bnfprod{$B_{2h}$} {
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}
+		} \\
+		\bnfprod{${c}_{4h}$} {
+			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+		} \\
+		\bnfprod{$P$} {
+			\bnfts{\textnormal{\textsc{partitioning}}} \bnfor \bnfes
+		}
+	\end{bnf*}
+\label{alg:multigrid-grammar}
+\caption{Multigrid Grammar Productions}
+\end{algorithm}
 
