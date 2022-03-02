@@ -68,29 +68,36 @@ While this method reaches the coarsest level twice and, hence, at first sight lo
 As a consequence, this method can not be represented within the classical framework of multigrid cycles, as formulated in Algorithm~\ref{alg:multigrid-cycle}.
 To overcome these limitations and construct multgrid methods with an arbitrary sequence of computations on each discretization level, as illustrated by the example in Figure~\ref{fig:non-traditional-multigrid-cycle}, a new formal language for their representation is needed.
 The first step towards the development of this language is to find a way to represent the current state within each step of a multigrid method and then define transition rules between those states.
-
 \section{Multigrid States}
-\label{}
+\label{sec:multigrid-states}
 In order to determine how the state of a multigrid method can be represented, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
 The sake of simplicity, in the following we write symbols that correspond to vectors also in regular font.
 In case the mathematical interpretation of a certain lower case symbol is ambiguous, its meaning will be explicitly stated. 
-On each level $l > 0$ only the following three operations are employed within a multgrid cycle.
-\begin{description}
-	\item[Smoothing:] Reduce the oscillatory error components of the approximate solution $\tilde{x}_h$ on the current level. 
+With the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, denoted by
+\begin{equation*}
+	x_{H} = A^{-1}_H b_H,
+\end{equation*}
+where $H$ is the discretization step size on the coarsest level, we can identify three elementary multigrid operations that can be employed within a cycle.
+\begin{definition}[Elementary Multigrid Operations]
+\label{def:elementary-multigrid-operations}
+On each level $l > 0$ the following three operations are employed within a multgrid cycle.
+\begin{itemize}
+	\item \textbf{Smoothing}: Reduce the oscillatory error components of the approximate solution $\tilde{x}_h$ on the current level. 
 	\begin{equation*}
 		\tilde{x}_h = \tilde{x}_h + \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = M_h + N_h
 	\end{equation*}
-	\item[Restriction:] Restrict the residual to obtain the right-hand side $b_{2h}$ of the error equation on the next coarser level.
+	\item \textbf{Restriction}: Restrict the residual to obtain the right-hand side $b_{2h}$ of the error equation on the next coarser level.
 	\begin{align*}
 		\tilde{x}_{2h} & = 0 \\
- 		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
+		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
 	\end{align*}
-	\item[Coarse-Grid Correction:] Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
+	\item \textbf{Coarse-Grid Correction}: Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
 	\begin{equation*}
 		\tilde{x}_h = \tilde{x}_h + I_{2h}^h \tilde{x}_{2h}
 	\end{equation*}
-\end{description}
-Now note that except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
+\end{itemize}
+\end{definition}
+Except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
 However, in contrast to coarse-grid correction which utilizes the current approximate solution on the coarse grid, both smoothing and restriction first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
 While this differentiation is not strictly necessary it leads to simpler operations, since both restriction and smoothing can then be split into two steps.
 Furthermore, as in practice the actual error can usually not be computed, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be repeatedly computed.
@@ -212,17 +219,16 @@ While in the classical multigrid formulation, as presented in Section~\ref{sec:m
 Furthermore, the general notion of a correction term enables us to also represent intermediate expressions that do not specifically refer to the current residual within a multigrid state, for instance $c_h = \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right)$ which corresponds to the complete term that is added to the current approximate solution within smoothing.   
 %Finally, note that the computation of the coarse-grid correction does not require the value of the previous fine-grid residual.
 %Therefore, the corresponding expression does not need to be restored and the residual can be omitted in the respective state tuple when performing the fine-to-coarse grid transition.
-\section{State Transition Rules}
+\section{State Transition Functions}
+\label{sec:multigrid-state-transitions}
 After defining the state of a multigrid method, the next step towards developing a formal language for representing arbitrary sequences of multigrid operations,
 such as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is to formally define a set of rules that describes the transitions between all possible states.
-For this purpose, we need to consider the set of possible operations within a multigrid method, as described at the beginning of the last section.
+For this purpose, we need to consider the set of possible operations within a multigrid method, as shown in Definition~\ref{def:elementary-multigrid-operations}.
 From a mathematical point of view, these operations exclusively consist of either matrix-vector multiplications or vector additions and subtractions.
 First of all, the computation of the residual $r_h = b_h - A_h \tilde{x}_h$ represents the fundamental operation based on which an approximation to the solution of the target system $A_h x_h = b_h$ is iteratively improved, either with means of smoothing or by computing a coarse-grid correction.
 The \textsc{residual} function implements the corresponding state transition for computing the residual on a certain level with step size $h$.
 For this purpose first the residual expression is assembled based on the system matrix $A_h$ and the given state $S_h = (\tilde{x}_h, b_h, \lambda, S_{h/2})$, which contains the current approximate solution $\tilde{x}_h$ and right-hand side $b_h$.
 The resulting expression is included as a the correction term $c_h$ into $S_h$, which is then returned at the end of the function.
-%TODO describe residual
-%TODO include references to functions
 \begin{algorithm}
 	\begin{algorithmic}
 		\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, S_{h/2})$}
@@ -257,6 +263,14 @@ which then serves as a right-hand side $b_{2h}$ of the corresponding coarse-grid
 In both cases the correction term obtained from the \textsc{apply} function serves a different purpose.
 First of all, we must be able to generate an expression that computes an improved approximate solution $\tilde{x}_h$ by applying an update in form of the correction term $c_h$ to the previous value of $\tilde{x}_h$. 
 This behavior is implemented in the function \textsc{iterate}, which returns a state tuple with the expression for computing an updated approximate solution as its first entry.
+\begin{algorithm}
+	\begin{algorithmic}
+		\Function{iterate}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
+			\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
+			\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
 In addition to the mere application of a correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$ which enables both the formulation of underrelaxed, overrelaxed and potentially colored versions of each operation, for instance those described in Section~\ref{sec:rb-gs}.
 The second possibility to apply an operator to the current residual is in form of the restriction expression $c_{2h} = I_{h}^{2h} r_h$.
 As denoted by the subscript, the result of this operation represents an expression on a coarser grid of step size $2h$.
@@ -305,9 +319,9 @@ The remaining step within the development of a formal system for the constructio
 \section{Multigrid Grammar}
 In Section~\ref{sec:formal-languages} we have already introduced the definition of a general grammar $G$ as the quaternary tuple 
 \begin{equation*}
-	G = \left(V, T, S, P \right),
+	G = \left(V, T, \ps S, P \right),
 \end{equation*}
-where $V$ is the set of variables, $T$ the set of terminal symbols, $S \in V$ the start symbol and $P$ the set of productions.
+where $V$ is the set of variables, $T$ the set of terminal symbols, $\ps S \in V$ the start symbol and $P$ the set of productions.
 However, before we start defining a grammars individual components, the question arises whether it is necessary to impose additional restrictions on its structure.
 As it has been discussed in Section~\ref{sec:chomsky-hierarchy}, the Chomsky hierarchy defines four grammatical levels, where each subsequent level introduces additional constraints on a grammar's structure.
 While an unrestricted or type-0 grammar represents the most general model of computation, it also leads to the highest degree of complexity.
@@ -318,26 +332,64 @@ The class of grammars that fulfills this property corresponds to the type-2 cate
 Type-2 grammars are characterized by the constraint that only single variable is allowed to be placed on the left-hand side of each production, which means that the applicability of each production is independent of the context in which the variable is embedded. 
 These grammar are, thus, said to be context-free.
 As each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar all operations that are required within a GGGP can be defined in a straightforward manner, which has been shown in Section~\ref{sec:gggp-initialization} and~\ref{sec:gggp-initialization}.
-In the following, we will derive a family of context-free grammars for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in the last section.
-Therefore, starting from the initial state $S_h^0 = (x_h^0, b_h, \lambda, \lambda)$ for each possible operation within a multigrid method, we need to define a production in form of sequence of transitions that yields the corresponding state at the end of the operation.
+In the following, we will derive a family of context-free grammars for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-state-transitions}.
+Therefore, starting from the initial state 
+\begin{equation*}
+	S^0_h = (x_h^0, b_h, \lambda, \lambda)
+\end{equation*}
+for each possible operation within a multigrid method, we need to define a production in form of sequence of transitions that yields the corresponding state at the end of the operation.
 In the previous section, we have made the distinction between states where the approximate solution $\tilde{x}_h$ has been computed on a certain level $h$ and between those where a correction term $c_h$ is being constructed based on the residual expression $r_h = b_h - A_h \tilde{x}_h$.
 To define a production for each of these two states on every level of a given discretization hierarchy, we have to recursively consider how we can arrive at the final state of a multigrid method, which always represents a state where all computational steps of the method are combined in $\tilde{x}_h$ as a single expression.
 We represent this state as the variable $\ps{s_h}$ and, hence, obtain the initial production
 \begin{bnf}
 	\bnfprod{$S$} {
 		\bnfpn{$s_h$}
-	}
+	}.
 \end{bnf}
+Next we have to consider the different possibilities to obtain a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
+According to Definition~\ref{def:elementary-multigrid-operations} $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction, which can both be expressed as a combination of state transition functions that leads to the productions
+\begin{bnf}
+	\bnfprod{$s_h$} {
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}))
+	},
+\label{prod:smoothing}
+\end{bnf}
+\begin{bnf}
+	\bnfprod{$s_h$} {
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}))
+	}.
+\end{bnf}
+In case of smoothing, the approximate solution is updated applying the operator $\ps{B_h}$ to a correction term that is included in the previous state represented by the variable $\ps{c_h}$.
+Different smoothers can then be defined by expressing both the operator $\ps{B_h}$ and partitioning $\ps{P}$ in form of a separate production, such that
+\begin{bnf}
+	\bnfprod{$B_h$} {
+		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
+	},
+\end{bnf}
+\begin{bnf}
+	\bnfprod{$P$} {
+		\bnfts{\textnormal{\textsc{partitioning}}} \bnfor \bnfes
+	},
+\end{bnf}
+where the empty symbol $\lambda$ indicates that no partitioning is used. On the finest level, a correction state is then obtained by computing the residual based on the previous approximate solution, which leads to the production
+\begin{bnf}
+	\bnfprod{$c_h$} {
+		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
+	}.
+\label{prod:residual}
+\end{bnf}
+Multiple smoothing steps can, therefore, be defined by means of repeated application of the productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
+%TODO explain CGC
 \begin{algorithm}
 	\begin{bnf*}
 		\bnfprod{$S$} {
 			\bnfpn{$s_h$}
 		} \\
 		\bnfprod{$s_h$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$})) \bnfor
 		} \\
 		\bnfmore {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$})) \bnfor (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_h$} {
 			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
@@ -346,43 +398,43 @@ We represent this state as the variable $\ps{s_h}$ and, hence, obtain the initia
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
 		} \\ \\
 		\bnfprod{$s_{2h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$}) \bnfor
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
 		} \\
 		\bnfmore {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}))
 			%\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_{2h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor \bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 		} \\
 		\bnfprod{$B_{2h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}
 		} \\ \\
 		\bnfprod{$s_{4h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$}))
 		} \\
 		\bnfmore {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$s_{8h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$s_{8h}$}))
 			%\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_{4h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor \bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
 		} \\
 		\bnfprod{$B_{4h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{4h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = A_{4h}^{+} + A_{4h}^{-}$}
 		} \\ \\
 		\bnfprod{$s_{8h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfpn{$P$})
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 		} \\
 		\bnfmore {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{16h}^{8h}$}, \bnfsp \bnfpn{$c_{16h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{16h}^{8h}$}, \bnfsp \bnfpn{$c_{16h}$}))
 		} \\
 		\bnfprod{$c_{8h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor 			\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
-		} \\
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor \bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+		} \\ 
 		\bnfprod{$B_{8h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{8h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = A_{8h}^{+} + A_{8h}^{-}$}
-		} \\ \\
+ 		} \\ \\
 		\bnfprod{${c}_{16h}$} {
 			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{16h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{16h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 		} \\
