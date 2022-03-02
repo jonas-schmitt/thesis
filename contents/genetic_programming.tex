@@ -1,4 +1,5 @@
 \section{Grammar-Guided Genetic Programming}
+\label{sec:gggp}
 \emph{Genetic Programming} (GP) is a class of search algorithms for finding optimal programs based on the principle of natural evolution first proposed by John Koza~\cite{koza1994genetic}.
 In general, a program $p$ can be considered as a mapping from the set of inputs $\mathcal{I}$ to the corresponding set of outputs $\mathcal{O}$
 \begin{equation}
@@ -41,11 +42,11 @@ In contrast to other evolutionary algorithms algorithms, which usually represent
 To illustrate this, we consider the following example grammar $G$ with the productions
 \begin{equation}
 	\begin{split}
-		\ps S \to & \ps E \\
-		\ps E \to & \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
-		\ps A \to & -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \\
-		 & (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
-		\ps B \to & \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v,
+		\ps S \; \; \bnfpo & \; \; \ps E \\
+		\ps E \; \; \bnfpo & \; \; \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
+		\ps A \; \; \bnfpo & \; \; -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \\
+		 & \; \; (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
+		\ps B \; \; \bnfpo & \; \;  \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v,
 	\end{split}
 \label{eq:gp-example-grammar}
 \end{equation}
@@ -174,11 +175,11 @@ As a consequence, changing a single value within the genotype can potentially af
 For instance, consider the following encoding of our example grammar
 \begin{equation*}
 	\begin{split}
-		\ps S \to & \underbrace{\ps E}_{0} \\
-		\ps E \to & \underbrace{\text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E}_{0} \; | \; \underbrace{\ps A}_{1} \\
-		\ps A \to & \underbrace{-\ps A}_0 \; | \; \underbrace{(\ps A + \ps A)}_{1} \; | \; \underbrace{(\ps A - \ps A)}_2 \; |   \\  
-		& \underbrace{(\ps A \cdot \ps A)}_{3} \; | \; \underbrace{(\ps A / \ps A)}_{4} \; | \; \underbrace{\ps{A}^{\ps A}}_{5} \; | \; \underbrace{x}_{6} \; | \; \underbrace{y}_{7} \\
-		\ps B \to & \underbrace{\neg \ps B}_{0} \; | \; \underbrace{(\ps B \wedge \ps B)}_{1} \; | \; \underbrace{(\ps B \vee \ps B)}_{2} \; | \; \underbrace{u}_3 \; | \; \underbrace{v}_4,
+		\ps S \; \; \bnfpo & \; \; \underbrace{\ps E}_{0} \\
+		\ps E \; \; \bnfpo & \; \; \underbrace{\text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E}_{0} \; | \; \underbrace{\ps A}_{1} \\
+		\ps A \; \; \bnfpo & \; \; \underbrace{-\ps A}_0 \; | \; \underbrace{(\ps A + \ps A)}_{1} \; | \; \underbrace{(\ps A - \ps A)}_2 \; |   \\  
+		&  \; \; \underbrace{(\ps A \cdot \ps A)}_{3} \; | \; \underbrace{(\ps A / \ps A)}_{4} \; | \; \underbrace{\ps{A}^{\ps A}}_{5} \; | \; \underbrace{x}_{6} \; | \; \underbrace{y}_{7} \\
+		\ps B \; \; \bnfpo & \; \; \underbrace{\neg \ps B}_{0} \; | \; \underbrace{(\ps B \wedge \ps B)}_{1} \; | \; \underbrace{(\ps B \vee \ps B)}_{2} \; | \; \underbrace{u}_3 \; | \; \underbrace{v}_4,
 	\end{split}
 	\label{eq:gp-example-grammar-ge-encoding}
 \end{equation*}
@@ -223,6 +224,7 @@ However, since we have chosen to use tree-based GGGP in our implementation, we w
 %\end{equation}
 
 \subsection{Initialization}
+\label{sec:gggp-initialization}
 After choosing a suitable genotype representation, the next ingredients of a GP method is the definition of suitable operators for the creation of new individuals, either from scratch or based on an existing population.
 Due to the stochastic nature of evolutionary algorithms these operations are usually performed using a certain degree of randomness.
 As shown in Algorithm~\ref{alg:genetic-programming}, the first step within each GP-based search method is the initialization of the population. 
@@ -289,6 +291,7 @@ In lexicase selection individuals are selected according their performance in a 
 For a more detailed description of this operator, the reader is referred to~\cite{helmuth2014solving,la2016epsilon}.
  
 \subsection{Mutation and Recombination}
+\label{sec:gggp-mutation-and-recombination}
 After selecting a number of candidate individuals from the population, mutation and recombination represent two complementary options to extend the current population towards more promising regions of the search space.
 \paragraph{Mutation}
 The term mutation is usually referred to as the process of altering the genotype of a given individual, usually in a randomized way, with the purpose of creating an individual that, in the best case, has a higher fitness than its predecessor.

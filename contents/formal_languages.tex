@@ -61,6 +61,11 @@ The core of a grammar are the productions $P$, which are usually specified as a 
 	\label{eq:unrestricted-production}
 \end{equation}
 where $x \in \left(V \cup T\right)^+$ and $y \in \left(V \cup T\right)^*$.
+Note that alternatively the operator
+\begin{equation*}
+	x \bnfpo y
+\end{equation*}
+is also often used to denote a production.
 Each production rule $x \to y$ can then be applied in the following way.
 Given a string $u$ of the form 
 \begin{equation}
