@@ -347,24 +347,20 @@ We represent this state as the variable $\ps{s_h}$ and, hence, obtain the initia
 	}.
 \end{bnf}
 Next we have to consider the different possibilities to obtain a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
-According to Definition~\ref{def:elementary-multigrid-operations} $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction, which can both be expressed as a combination of state transition functions that leads to the productions
+According to Definition~\ref{def:elementary-multigrid-operations} $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction.
+In case of smoothing, the approximate solution is updated applying the operator $\ps{B_h}$ to a correction term that is included in the previous state represented by the variable $\ps{c_h}$, which can be expressed as a combination of the state transition functions $\textsc{iterate}$ and $\textsc{apply}$ to obtain the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}))
-	},
+	}.
 \label{prod:smoothing}
 \end{bnf}
-\begin{bnf}
-	\bnfprod{$s_h$} {
-		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}))
-	}.
-\end{bnf}
-In case of smoothing, the approximate solution is updated applying the operator $\ps{B_h}$ to a correction term that is included in the previous state represented by the variable $\ps{c_h}$.
 Different smoothers can then be defined by expressing both the operator $\ps{B_h}$ and partitioning $\ps{P}$ in form of a separate production, such that
 \begin{bnf}
 	\bnfprod{$B_h$} {
 		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
 	},
+\label{prod:smoothing-operator}
 \end{bnf}
 \begin{bnf}
 	\bnfprod{$P$} {
@@ -378,8 +374,55 @@ where the empty symbol $\lambda$ indicates that no partitioning is used. On the 
 	}.
 \label{prod:residual}
 \end{bnf}
-Multiple smoothing steps can, therefore, be defined by means of repeated application of the productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
-%TODO explain CGC
+Multiple smoothing steps can, therefore, be defined by means of repeated applications of the productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
+In contrast to smoothing coarse-grid correction updates the current approximate solution with a correction term obtained from an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
+We can express this operation as a combination of the \textsc{iterate} and \textsc{cgc} transition functions, which leads to the production
+\begin{bnf}
+	\bnfprod{$s_h$} {
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}))
+	}.
+\label{prod:coarse-grid-correction}
+\end{bnf}
+Similar to Production~\eqref{prod:smoothing} the previous state that is passed as a second argument to the \textsc{cgc} function is encoded by the variable $\ps{s_{2h}}$, which means that this state is obtained through a sequence of productions.
+However, in contrast to smoothing the second argument of the \textsc{iterate} function, which represents the choice of a partitioning, is intentionally left empty, since it is not required in this case.
+Furthermore, note that while we have specified the prolongation operator as a terminal symbol here, it would be also possible to specify the choice of this operators in each coarse-grid correction step in a similar way as Production~\eqref{prod:smoothing-operator} for the smoothing operator $\ps{B_h}$.
+Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, that corresponds to a state on the next coarser level with step size $2h$, we next have to consider the different possibilities to transition to this state.
+First of all, as multigrid methods recursively apply the same operations on each level, we can define the Productions~\eqref{prod:smoothing},~\eqref{prod:smoothing-operator},~\eqref{prod:residual} and~\eqref{prod:coarse-grid-correction} on a coarser level which yields
+\begin{bnf}
+	\bnfprod{$s_{2h}$} {
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
+	} \\
+	\bnfmore {
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}))
+		%\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
+	} \\
+	\bnfprod{$c_{2h}$} {
+		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$})
+	} \\
+	\bnfprod{$B_{2h}$} {
+		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}.
+	}\label{prod:coarse-coarse-grid-correction}
+\end{bnf}
+Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser level with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
+In contrast to coarse-grid correction, which represents a transition to a state on the next finer level, we have not yet considered the opposite direction: The construction of the error equation on a coarser level based on the state on the current level.
+While the state on the finest level is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cge}$ in combination with $\textsc{apply}$ to obtain a new state on the next coarser-grid that includes the initial residual as a correction term, which yields the production
+\begin{bnf}
+\bnfprod{$c_{2h}$} {
+	\bnfts{\textnormal{\textsc{cge}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+}.
+\end{bnf}
+With the definition of this production we are now capable of generating state transitions both in top-down as well as bottom-up direction within the given hierarchy of discretizations.
+Finally, the remaining steps required for the formulation of complete grammar is the definition of those productions that are only available on the finest and coarsest levels, i.e. the definition of the initial problem and the application of the coarse-grid solver.
+First of all, note that the initial problem corresponds the state $S_h^0 = (x_h^0, b_h, \lambda, \lambda)$.
+As $S_h^0$ represents the starting point of each possible sequence of multigrid operations, we have to introduce it as an additional production of the variable $\ps{s_h}$ that can be defined as
+\begin{bnf}
+	\bnfprod{$s_h$} {
+	 (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes).
+	}
+\end{bnf} 
+%TODO describe special structure of grammar and why it ends always with this production
+
+ 
 \begin{algorithm}
 	\begin{bnf*}
 		\bnfprod{$S$} {
