@@ -317,6 +317,7 @@ As we have described in this section, we have ensured that each possible state t
 However, we have carefully avoided to introduce functions that correspond to a transition spanning over multiple states, which would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
 The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
 \section{Multigrid Grammar}
+\setcounter{equation}{0}
 In Section~\ref{sec:formal-languages} we have already introduced the definition of a general grammar $G$ as the quaternary tuple 
 \begin{equation*}
 	G = \left(V, T, \ps S, P \right),
@@ -347,7 +348,7 @@ We represent this state as the variable $\ps{s_h}$ and, hence, obtain the initia
 	}.
 \end{bnf}
 Next we have to consider the different possibilities to obtain a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
-According to Definition~\ref{def:elementary-multigrid-operations} $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction.
+According to Definition~\ref{def:elementary-multigrid-operations}, $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction.
 In case of smoothing, the approximate solution is updated applying the operator $\ps{B_h}$ to a correction term that is included in the previous state represented by the variable $\ps{c_h}$, which can be expressed as a combination of the state transition functions $\textsc{iterate}$ and $\textsc{apply}$ to obtain the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
@@ -441,12 +442,17 @@ By utilizing a combination of the \textsc{apply} and \textsc{iterate} function, 
 	} 	\label{prod:coarse-grid-solver-correction}
 \end{bnf}
 where $H$ is the step size on the second coarsest level.
-As we now have all the components together, we can finally specify the complete grammar for constructing multigrid methods on a given hierarchy of discretizations.
+\paragraph{Specification of the Complete Grammar}
+Having now assembled all necessary components, we can finally specify the complete grammar for constructing multigrid methods on a given hierarchy of discretizations.
+As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest.
+Therefore, on the coarsest level a step size of $16h$ is obtained.
 For this purpose, we first define the set of variables 
 \begin{align*}
 	V = \{ & \ps{S}, \ps{s_h}, \ps{c_h}, \ps{B_h}, \ps{s_{2h}}, \ps{c_{2h}}, \ps{B_{2h}}, \ps{s_{4h}}, \ps{c_{4h}}, \ps{B_{4h}}, \\
-	& \ps{s_{8h}}, \ps{c_{8h}}, \ps{B_{8h}}, \ps{c_{16h}}, \ps{P} \}
+	& \ps{s_{8h}}, \ps{c_{8h}}, \ps{B_{8h}}, \ps{c_{16h}}, \ps{P} \},
 \end{align*}
+for each of which we then specify the list of productions available on the respective level. 
+Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
 \begin{algorithm}
 	\caption{Grammar Productions for a Five-Grid Method}
 	\label{alg:multigrid-grammar}
@@ -503,7 +509,7 @@ For this purpose, we first define the set of variables
 		} \\ 
 		\bnfprod{$B_{8h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{8h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = A_{8h}^{+} + A_{8h}^{-}$}
- 		} \\ \\
+		} \\ \\
 		\bnfprod{${c}_{16h}$} {
 			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{16h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{16h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 		} \\
@@ -512,10 +518,34 @@ For this purpose, we first define the set of variables
 		}
 	\end{bnf*}
 \end{algorithm}
-Algorithm~\ref{alg:multigrid-grammar} shows the resulting productions of the grammar.
 For the sake of simplicity we omit the specification of all terminal symbols here, but instead state that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is assumed to be a terminal symbol.
 Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the finest level the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the coarsest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
-%TODO discuss how grammar can be adapted to other discretization hierarchies
+\paragraph{Final Remarks}
+Before we conclude this section and continue with description of our grammar-based evolutionary optimization approach for constructing efficient multigrid methods and its implementation, we need to make a number of final remarks about the properties of the grammar presented in this section.
+First of all, note that while we have used a five-grid hierarchy as an example for constructing a complete grammar here, it is easily possible to specify a similar grammar on a hierarchy of discretizations with different depth.
+Furthermore, while the maximum number of coarsening steps depends on whether we have defined the required productions on each subsequent level, we can extend the given search space to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e. two-, three- and four-grid methods.
+For this purpose, we simply have to include additional productions for the application of the coarse-grid solver on each subsequent level except for the finest, which in the case of Algorithm~\ref{alg:multigrid-grammar} leads to
+\begin{bnf*}
+	\bnfprod{$c_{2h}$} {
+		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{h}^{2h}$}, \bnfsp\bnfpn{$c_{h}$}))
+	} \\
+	\bnfprod{$s_{h}$}{
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+	} \\ \\
+		\bnfprod{$c_{4h}$} {
+		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp\bnfpn{$c_{2h}$}))
+	} \\
+	\bnfprod{$s_{2h}$}{
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+	} \\ \\
+	\bnfprod{$c_{8h}$} {
+		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp\bnfpn{$c_{4h}$}))
+	} \\
+	\bnfprod{$s_{4h}$}{
+		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$c_{8h}$}))
+	}.
+\end{bnf*}
+
 %TODO discuss branching factor
 %TODO conclude section
 
