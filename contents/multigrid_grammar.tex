@@ -522,10 +522,8 @@ Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions fo
 \end{algorithm}
 For the sake of simplicity we omit the specification of all terminal symbols here, but instead state that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is assumed to be a terminal symbol.
 Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the finest level the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the coarsest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
-\paragraph{Final Remarks}
-Before we conclude this section and continue with description of our grammar-based evolutionary optimization approach for constructing efficient multigrid methods and its implementation, we need to make a number of final remarks about the properties of the grammar presented in this section.
-First of all, note that while we have used a five-grid hierarchy as an example for constructing a complete grammar here, it is easily possible to specify a similar grammar on a hierarchy of discretizations with different depth.
-Furthermore, while the maximum number of coarsening steps depends on whether we have defined the required productions on each subsequent level, we can extend the given search space to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e. two-, three- and four-grid methods.
+While we have used a five-grid hierarchy as an example for constructing a complete grammar here, it is easily possible to specify a similar grammar on a hierarchy of discretizations with different depth.
+Furthermore, while the maximum number of coarsening steps depends on whether we have defined the required productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e. two-, three- and four-grid methods.
 For this purpose, we simply have to include additional productions for the application of the coarse-grid solver on each subsequent level except for the finest, which in the case of Algorithm~\ref{alg:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
@@ -534,7 +532,7 @@ For this purpose, we simply have to include additional productions for the appli
 	\bnfprod{$s_{h}$}{
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{h}$}, \bnfsp \bnfpn{$c_{2h}$}))
 	} \\ \\
-		\bnfprod{$c_{4h}$} {
+	\bnfprod{$c_{4h}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp\bnfpn{$c_{2h}$}))
 	} \\
 	\bnfprod{$s_{2h}$}{
@@ -547,6 +545,26 @@ For this purpose, we simply have to include additional productions for the appli
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 	}.
 \end{bnf*}
+
+\section{Search Space Estimation}
+Before we conclude this chapter and continue with description of our grammar-based evolutionary optimization approach for constructing efficient multigrid methods and its implementation, it is important to estimate how many different multigrid methods can be constructed with the type of grammar presented here.
+In particular, if we treat the grammar-based construction of an efficient multigrid method as a search problem, we aim to determine the size of the search space spanned by the underlying grammar.
+In practice, in case of a small search problem it can be feasible to simply enumerate and evaluate all possible solutions of a given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, are in general not guaranteed to converge find it.
+For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as shown in Algorithm~\ref{alg:multigrid-grammar}. 
+As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to effectively reduce both the high and low-frequency components of the error.
+While, in practice, often multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
+To simplify the search space estimation, we, therefore, introduce the additional constraint that on each level the number of coarse-grid correction is always equal or lower than the number of smoothing steps.
+Furthermore, we restrict ourselves to those multigrid methods that employ at least one, but not more than six smoothing steps per level.
+Note that as a consequence the number of restriction and coarse-grid correction steps is, hence, also bound to be between one and six on each level.
+For smoothing, we then always choose between two alternatives, for example Jacobi and red-black Gauss-Seidel, while we additionally assume that a restriction and coarse-grid correction step can only be performed immediately after smoothing, otherwise it is omitted. 
+Now to arrive at a formula for the total number of multigrid variants that can constructed within this setting, we need to consider how many options are available within each individual step of the method.
+Starting from the finest level, in each step of the method, we can decide whether we want to apply one of the two smoothers and if we subsequently want to proceed on the next coarser level using restriction, which means that we are granted with a total number of four options.
+For the latter, we simply proceed at that level, where we are confronted with the same number of choices.
+In case we decide to not perform any additional smoothing steps, the sequence on the current level is finished by either returning to the next finer level or in case of the finest level by ending the complete sequence.
+%TODO arrive at formula for a particular number of smoothing steps : levels (except for the coarsest) * smoothing steps * 2 * 2 - levels (Option where not restriction is performed at all)
+%TODO relaxation factors?
+
+
 Finally, while we have already discussed that all derivations of our grammar are of the form of Equation~\eqref{eq:multigrid-grammar-derivation}, we have not yet considered how many different multigrid methods can be generated based on its productions.
 First of all, note that with the exception of Production~\eqref{prod:smoothing-operator},~\eqref{prod:partitioning} and~\eqref{prod:initial-solution} the right-hand side of each of the productions includes exactly one variable.
 Furthermore, with the exception of the finest level, the number of available productions for the variables $\ps{s_H}$ and $\ps{c_H}$ on each level with a step size $H > h$ is always exactly two.
