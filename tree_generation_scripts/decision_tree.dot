@@ -1,0 +1,28 @@
+digraph G {  
+  ordering=in ;
+  root[texlbl="root"];
+  root -> a1
+  root -> b1
+  root -> c1
+  root -> a2
+  root -> b2
+  root -> c2
+  a1[texlbl="$S_1$"];
+  b1[texlbl="$S_1R$"];
+  c1[texlbl="$RS_1$"];
+  a2[texlbl="$S_2$"];
+  b2[texlbl="$S_2R$"];
+  c2[texlbl="$RS_2$"];
+  a1 -> aa1
+  a1 -> ab1
+  a1 -> ac1
+  a1 -> aa2
+  a1 -> ab2
+  a1 -> ac2
+  aa1[texlbl="$S_1$"];
+  ab1[texlbl="$S_1R$"];
+  ac1[texlbl="$RS_1$"];
+  aa2[texlbl="$S_2$"];
+  ab2[texlbl="$S_2R$"];
+  ac2[texlbl="$RS_2$"];
+}

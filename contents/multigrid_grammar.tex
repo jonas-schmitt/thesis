@@ -488,7 +488,7 @@ Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions fo
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}
 		} \\ \\
 		\bnfprod{$s_{4h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$})) \bnfor
 		} \\
 		\bnfmore {
 			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$s_{8h}$}))
@@ -501,7 +501,7 @@ Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions fo
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{4h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = A_{4h}^{+} + A_{4h}^{-}$}
 		} \\ \\
 		\bnfprod{$s_{8h}$} {
-			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$}))
+			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$})) \bnfor
 		} \\
 		\bnfmore {
 			\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{16h}^{8h}$}, \bnfsp \bnfpn{$c_{16h}$}))
@@ -553,10 +553,70 @@ In practice, in case of a small search problem it can be feasible to simply enum
 For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as shown in Algorithm~\ref{alg:multigrid-grammar}. 
 As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to effectively reduce both the high and low-frequency components of the error.
 While, in practice, often multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
-To simplify the search space estimation, we, therefore, introduce the additional constraint that on each level the number of coarse-grid correction is always equal or lower than the number of smoothing steps.
-Furthermore, we restrict ourselves to those multigrid methods that employ at least one, but not more than six smoothing steps per level.
-Note that as a consequence the number of restriction and coarse-grid correction steps is, hence, also bound to be between one and six on each level.
-For smoothing, we then always choose between two alternatives, for example Jacobi and red-black Gauss-Seidel, while we additionally assume that a restriction and coarse-grid correction step can only be performed immediately after smoothing, otherwise it is omitted. 
+To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
+Furthermore, we enforce that restriction and prolongation can only be performed after smoothing, with the exception of the finest level, where we additionally allow restriction to be applied as a first operation.
+As on finest level the original system is solved directly while smoothing is significantly more expensive than on subsequent levels, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method and we, hence, want to enforce fewer constraints on the order in which the individual operations are performed.
+Consequently, using the symbols $S$, $R$ and $P$ for smoothing, restriction and prolongation, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
+\begin{align*}
+	S | RS | SR & \quad \text{for} \; l = l_{max} \\
+	A^{-1} & \quad \text{for} \; l = l_{min} \\
+	S | SR | SP & \quad \text{otherwise}.
+\end{align*}
+Therefore, with the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, the number of options for regarding the order of operations is always three.
+However, since each step also includes the application of a smoother, we additionally have to choose a suitable method for this purpose.
+Assuming the the number of available relaxation method is $n$, which includes different types of smoothers, partitionings and relaxation factors, this results in a total number of $3 \cdot n$ options in each step of the method. 
+While none of these constraints is present in our original grammar shown in Algorithm~\ref{alg:multigrid-grammar}, they enable us to derive a simple closed-form expression which then acts as a lower bound for the actual size of the search space.
+We can obtain such an expression in form of a finite sum of polynomials by considering the total number smoothing steps that are supposed to be performed within a multigrid method, whereby we know that for each step we need to choose from $3 \cdot n$ options independent from the level on which the operations are performed.
+As a consequence, if our method incorporates $k$ smoothing steps, the total number of options is 
+\begin{equation}
+	N_{n,k} = (3 n)^k
+	\label{eq:simplified-number-of-options}
+\end{equation}
+We can illustrate this observation by considering the corresponding decision tree, which is shown in Figure~\ref{fig:decision-tree} for $n = 2$.
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{figures/trees/decision_tree_annotated.pdf}
+	\caption{Simplified decision tree - Each node has the same number of children.}
+	\label{fig:decision-tree}
+\end{figure}
+Each node in this tree corresponds to a particular choice from the available set of options.
+Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with restriction or prolongation, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
+Consequently, each leaf of the tree corresponds to a different multigrid method, and the total number of leaves is thus equal to $N_{2,k} = 6^k$.
+However, since the optimal amount of smoothing depends on the properties of the linear system that we aim to solve and a varying total number of smoothing steps should be considered for each problem.
+Now note that each decision tree that corresponds to a certain number of smoothing steps $k$ contains all those with less smoothing steps as a subtree, whereby each subtree is obtained by performing a top-down breadth-first traversal until the depth of the tree coincides with the respective number of smoothing steps.
+Therefore, the total number of different multigrid methods with at least $k_{min}$ but at most $k_{max}$ smoothing steps is equal to the total number of leaf nodes of all subtrees of a decision tree of depth $k_{max}$ that have at least depth $k_{min}$.
+As we have already seen the number of leaf nodes of a decision tree with depth is given by Equation~\ref{eq:simplified-number-of-options}.
+Hence, the total number of different multigrid methods that employ between $k_{min}$ and $k_{max}$ smoothing steps is given by the finite sum
+\begin{equation}
+	N(n, k_{min}, k_{max}) = \sum_{k = k_{min}}^{k_{max}} N_{n,k} = \sum_{k = k_{min}}^{k_{max}} (3 n)^k,
+\end{equation}
+which corresponds to a polynomial of degree $k_{max}$.
+We can now finally utilize this formula to obtain an estimated lower bound for the total number of different five-grid method that can be constructed with the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}.
+For this purpose, we need to choose a reasonable interval for the minimum and maximum total number of smoothing steps of our method.
+In Algorithm~\ref{alg:multigrid-cycle} the total number of smoothing steps per level depends on the parameters $\nu_1$, $\nu_2$ and $\gamma$, which specify the number of pre-smoothing steps, post-smoothing steps and recursive descents per level, respectively.
+Therefore, the total number of smoothing steps is given by
+\begin{equation}
+	\sum_{k = 1}^{l} (\gamma *  (\nu_1 + \nu_2))^k.
+\end{equation}
+%TODO only true for W-cycle, fix formula!
+%Now let us consider how different choices of $\nu_1$, $\nu_2$ and $\gamma$ lead to a different number of total smoothing steps for a five-grid method ($l = 4$).
+%\begin{itemize}
+%	\item $V(1,0)$: $\gamma = 1$, $\nu_1$ $\Rightarrow$  
+%\end{itemize}
+
+
+
+
+  
+
+
+Furthermore, we restrict ourselves to those multigrid methods that employ at least one, but not more than six smoothing steps per level, whereby in each step we choose the smoother from a given number of alternatives.
+First of all, we restrict ourselves to multigrid methods with a total number of smoothing steps 
+\begin{equation}
+	\left(l_{max} - l_{min}\right) \cdot \nu
+\end{equation}
+where $l_{min}$ is the minimum level, $l_{max}$ the maximum level, $\nu \in \left[1, 2, 3, 4, 5, 6 \right]$ and each smoother is chosen from a given number of alternatives $n$.
+ 
 Now to arrive at a formula for the total number of multigrid variants that can constructed within this setting, we need to consider how many options are available within each individual step of the method.
 Starting from the finest level, in each step of the method, we can decide whether we want to apply one of the two smoothers and if we subsequently want to proceed on the next coarser level using restriction, which means that we are granted with a total number of four options.
 For the latter, we simply proceed at that level, where we are confronted with the same number of choices.
