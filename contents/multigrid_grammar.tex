@@ -545,7 +545,7 @@ For this purpose, we simply have to include additional productions for the appli
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 	}.
 \end{bnf*}
-
+\setcounter{equation}{118}
 \section{Search Space Estimation}
 Before we conclude this chapter and continue with description of our grammar-based evolutionary optimization approach for constructing efficient multigrid methods and its implementation, it is important to estimate how many different multigrid methods can be constructed with the type of grammar presented here.
 In particular, if we treat the grammar-based construction of an efficient multigrid method as a search problem, we aim to determine the size of the search space spanned by the underlying grammar.
@@ -595,9 +595,9 @@ We can now finally utilize this formula to obtain an estimated lower bound for t
 For this purpose, we need to choose a reasonable interval for the minimum and maximum total number of smoothing steps of our method.
 In Algorithm~\ref{alg:multigrid-cycle} the total number of smoothing steps per level depends on the parameters $\nu_1$, $\nu_2$ and $\gamma$, which specify the number of pre-smoothing steps, post-smoothing steps and recursive descents per level, respectively.
 Therefore, the total number of smoothing steps is given by
-\begin{equation}
+\begin{equation*}
 	\sum_{k = 0}^{n_c - 1} \gamma^k (\nu_1 + \nu_2),
-\end{equation}
+\end{equation*}
 where $n_c$ is the number of coarsening steps.
 %TODO only true for W-cycle, fix formula!
 Now let us consider how different choices of $\nu_1$, $\nu_2$ and $\gamma$ lead to a different number of total smoothing steps for a five-grid method ($n_c = 4$):
@@ -612,10 +612,17 @@ Setting $k_{min} = 4$ and $k_{max} = 30$ as an upper limit for the number of smo
 Finally, the only remaining parameter is the number of different relaxation methods from which we can choose in each smoothing step.
 To obtain a conservative estimate for a lower bound of the search space size we set $n = 2$, which means that in each step we only have to choose from two alternatives, for example the Jacobi and red-black Gauss-Seidel method.
 By utilizing Equation~\eqref{eq:search-space-estimation} we, therefore, obtain 
-\begin{equation}
+\begin{equation*}
 	N(2, 4, 30) = \sum_{k = 4}^{30} 6^k \approx 2.65 \cdot 10^{24}
-\end{equation}
+\end{equation*}
 as an estimated lower bound for the search space spanned by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}.
+If we now assume that a modern multi-core CPU is capable of evaluating each multigrid method in an average time of one millisecond,
+even a supercomputer consisting of one trillion ($10^{12}$) such processors would require more than 8 years to evaluate all methods that are contained in this search space.
+Furthermore, in practice it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.
+As a consequence, while a pure brute-force-approach that aims to evaluate all possible multigrid methods may be feasible for the constrained parameter space that results from the classical formulation in Algorithm~\ref{alg:multigrid-cycle}, a grammar-based optimization requires the utilization of search strategies, such as grammar-guided genetic programming (GGGP) as it has been presented in Section~\ref{sec:gggp}.
+In the remainder of this thesis we will present on the implementation of a GGGP-based approach for the optimization of multigrid methods in the Python programming language, called \emph{EvoStencils}, that is based on the formal framework presented in this section.
+Furthermore, we will demonstrate the effectiveness of our approach by evolving efficient multigrid methods for a number of different partial differential equations (PDEs).
+
 %\begin{figure}
 %	\captionsetup{justification=centering}
 %	\begin{subfigure}{0.1\textwidth}
@@ -654,10 +661,4 @@ as an estimated lower bound for the search space spanned by the grammar formulat
 %	\caption{Five-grid cycle with $\nu_1 = 1$ and $\nu_2 = 0$. Smoothing is only performed in the steps corresponding to blue-colored nodes.}
 %	\label{fig:five-grid-V-cycle}
 %\end{figure}
-Therefore, the number of different multigrid methods that can be constructed with a grammar-based approach clearly exceeds the number of options considered within the classical formulation of a multigrid cycle as shown in Algorithm~\ref{alg:multigrid-cycle}.
-Furthermore, since a grammar approach enables us to alter each step within the method by choosing a different production, the majority of these methods can not be formulated within the framework of Algorithm~\ref{alg:multigrid-cycle}, similar to the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}.
-%TODO describe parameters for controlling the computational structure of a multigrid cycle
-%TODO conclude section
-\setcounter{equation}{118}
-
 

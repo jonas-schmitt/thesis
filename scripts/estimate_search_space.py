@@ -6,6 +6,7 @@ for i in range(minimum_smoothing_steps, maximum_smoothing_steps + 1):
     s += (number_of_smoothers * 3)**i
 
 print(s)
+print(s * 1e-3 / 60 / 60 / 24 / 365 * 1e-12)
 
 nu_1 = 2
 nu_2 = 1
@@ -15,4 +16,4 @@ s = 0.0
 for i in range(0, level):
     # s += gamma**i * (nu_1 + nu_2)
     s += 0.5 * (gamma**i * (nu_1 + nu_2) + (nu_1 + nu_2))
-print(s)
+# print(s)
