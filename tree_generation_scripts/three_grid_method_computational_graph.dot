@@ -1,0 +1,46 @@
+digraph G {  
+  solution_0 [texlbl="$x_{h}^0$"];
+  rhs_0 [texlbl="$b_{h}$"];
+  operator_0 [texlbl="$A_{h}$"];
+  restriction_0 [texlbl="$I_{h}^{2h}$"];
+  mult_0 [texlbl="$*$"];
+  mult_1 [texlbl="$*$"];
+  mult_2 [texlbl="$*$"];
+  mult_3 [texlbl="$*$"];
+  mult_4 [texlbl="$*$"];
+  mult_5 [texlbl="$*$"];
+  mult_6 [texlbl="$*$"];
+  mult_7 [texlbl="$*$"];
+  mult_8 [texlbl="$*$"];
+  mult_9 [texlbl="$*$"];
+  add_5 [texlbl="$+$"];
+  add_8 [texlbl="$+$"]; 
+  add_9 [texlbl="$+$"];
+  sub_0 [texlbl="$-$", ordering="out"];
+  sub_2 [texlbl="$-$", ordering="out"]; 
+  sub_5 [texlbl="$-$", ordering="out"];
+  mult_0 -> {operator_0 solution_0}
+  sub_0 -> {rhs_0 mult_0}
+  mult_1 -> {restriction_0 sub_0}
+  solution_2 [texlbl="$u_{2h}^0$"];
+  operator_2 [texlbl="$A_{2h}$"];
+  mult_2 -> {operator_2 solution_2}
+  sub_2 -> {mult_1 mult_2}
+  mult_3 -> {restriction_3 sub_2}
+  restriction_3 [texlbl="$I_{2h}^{4h}$"];
+  mult_4 -> {cgs mult_3}
+  cgs [texlbl="$A_{4h}^{-1}$"];
+  mult_5 -> {prolongation_5 mult_4}
+  prolongation_5 [texlbl="$I_{4h}^{2h}$"];
+  add_5 -> {solution_2 mult_5}
+  sub_5 -> {mult_1 mult_6}
+  mult_6 -> {operator_2 add_5}
+  mult_7 -> {jacobi_7 sub_5}
+  jacobi_7 [texlbl="$D_{2h}^{-1}$"];
+  mult_8 -> {omega_8 mult_7}
+  omega_8 [texlbl="$0.6$"];
+  add_8 -> {add_5 mult_8}
+  mult_9 -> {prolongation_9 add_8}
+  prolongation_9 [texlbl="$I_{2h}^{h}$"];
+  add_9 -> {solution_0 mult_9}
+}

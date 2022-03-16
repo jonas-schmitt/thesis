@@ -1,0 +1,88 @@
+digraph G {  
+  ordering=in ;
+  start [texlbl="$\langle S \rangle$"];
+  start -> sh_1
+  sh_1 [texlbl="$\langle s_h\rangle$"];
+  sh_1 -> iterate_1
+  sh_1 -> omega_1
+  sh_1 -> P_1
+  sh_1 -> cgc_1
+  sh_1 -> prolongation_1
+  sh_1 -> s2h_2
+  iterate_1 [texlbl="\textsc{iterate}"];
+  omega_1 [texlbl="$1.0$"];
+  P_1 [texlbl="$\langle \mathcal P \rangle$"];
+  P_1 -> lambda_1
+  lambda_1 [texlbl="$\lambda$"];
+  cgc_1 [texlbl="\textsc{cgc}"];
+  prolongation_1 [texlbl="$P_{2h}^h$"];
+  s2h_2 [texlbl="$\langle s_{2h}\rangle$"];
+  s2h_2 -> iterate_2
+  iterate_2 [texlbl="\textsc{iterate}"];
+  s2h_2 -> omega_2
+  omega_2 [texlbl="$0.6$"];
+  s2h_2 -> P_2
+  P_2 [texlbl="$\langle \mathcal P \rangle$"];
+  P_2 -> lambda_2
+  lambda_2 [texlbl="$\lambda$"];
+  s2h_2 -> apply_2
+  apply_2 [texlbl="\textsc{apply}"];
+  s2h_2 -> Bh_2
+  Bh_2 [texlbl="$\langle B_h \rangle$"];
+  Bh_2 -> jacobi_2
+  jacobi_2 [texlbl="$D_{h}^{-1}$"];
+  s2h_2 -> c2h_2
+
+  c2h_2 [texlbl="$\langle c_{2h} \rangle$"];
+  c2h_2 -> residual_2
+  residual_2 [texlbl="\textsc{residual}"];
+  c2h_2 -> operator_2
+  operator_2 [texlbl="$A_{2h}$"];
+  c2h_2 -> s2h_3
+  s2h_3 [texlbl="$\langle s_{2h}\rangle$"]; 
+  s2h_3 -> iterate_3
+  iterate_3 [texlbl="\textsc{iterate}"];
+  s2h_3 -> omega_3
+  omega_3 [texlbl="$1.0$"];
+  s2h_3 -> P_3
+  P_3 -> lambda_3
+  P_3 [texlbl="$\langle \mathcal P \rangle$"];
+  lambda_3 [texlbl="$\lambda$"];
+  s2h_3 -> apply_3
+  apply_3 [texlbl="\textsc{apply}"];
+  s2h_3 -> prolongation_3
+  prolongation_3 [texlbl="$I_{4h}^{2h}$"];
+  s2h_3 -> c4h_4
+  c4h_4 [texlbl="$\langle c_{4h} \rangle$"];
+  apply_4 [texlbl="\textsc{apply}"];
+  c4h_4 -> CGS
+  CGS [texlbl="$A_{2h}^{-1}$"];
+  c4h_4 -> apply_4
+  apply_4 [texlbl="\textsc{apply}"];
+  c4h_4 -> restriction_4
+  restriction_4 [texlbl="$I_{2h}^{4h}$"];
+  c4h_4 -> c2h_5
+  c2h_5 [texlbl="$\langle c_{2h} \rangle$"];
+  c2h_5 -> coarse_cycle_5
+  coarse_cycle_5 [texlbl="\textsc{cge}"];
+  c2h_5 -> operator_5
+  operator_5 [texlbl="$A_{2h}$"];
+  c2h_5 -> solution_5
+  solution_5 [texlbl="$x_{2h}^0$"];
+  c2h_5 -> apply_5
+  apply_5 [texlbl="\textsc{apply}"];
+  c2h_5 -> restriction_5
+  restriction_5 [texlbl="$I_{h}^{2h}$"];
+  c2h_5 -> ch_6
+  ch_6 [texlbl="$\langle c_{h} \rangle$"];
+  ch_6 -> residual_6
+  residual_6 [texlbl="\textsc{residual}"];
+  ch_6 -> operator_6
+  operator_6 [texlbl="$A_{h}$"];
+  ch_6 -> sh_7
+  sh_7 [texlbl="$\langle s_{h} \rangle$"];
+  sh_7 -> end
+  
+  
+  end [texlbl="$(x_h^0, b_h, \lambda, \lambda)$"];
+}

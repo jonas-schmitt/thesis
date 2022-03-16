@@ -317,6 +317,7 @@ As we have described in this section, we have ensured that each possible state t
 However, we have carefully avoided to introduce functions that correspond to a transition spanning over multiple states, which would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
 The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
 \section{Multigrid Grammar}
+\label{sec:multigrid-grammar}
 \setcounter{equation}{0}
 In Section~\ref{sec:formal-languages} we have already introduced the definition of a general grammar $G$ as the quaternary tuple 
 \begin{equation*}
@@ -575,7 +576,7 @@ As a consequence, if our method incorporates $k$ smoothing steps, the total numb
 We can illustrate this observation by considering the corresponding decision tree, which is shown in Figure~\ref{fig:decision-tree} for $n = 2$.
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.8]{figures/trees/decision_tree_annotated.pdf}
+	\includegraphics[width=\textwidth]{figures/trees/decision_tree_annotated.pdf}
 	\caption{Simplified decision tree - Each node has the same number of children.}
 	\label{fig:decision-tree}
 \end{figure}
