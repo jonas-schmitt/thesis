@@ -204,7 +204,7 @@ After resolving the issue of restoring previous states during coarse-grid correc
 \label{def:multigrid-state}
 The state of a multigrid method for solving the equation $A_{2h} x_{2h} = b_{2h}$ on a certain grid with step size $2h$ is given by the quaternary tuple
 \begin{equation*}
-	S_{h} = \left( \tilde{x}_{h}, b_{h}, c_{h}, S_{h}\right), 
+	S_{h} = \left( \tilde{x}_{h}, b_{h}, c_{h}, S_{h/2}\right), 
 \end{equation*}
 where
 \begin{itemize}
@@ -450,10 +450,11 @@ Having now assembled all necessary components, we can finally specify the comple
 As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest.
 Therefore, on the coarsest level a step size of $16h$ is obtained.
 For this purpose, we first define the set of variables 
-\begin{align*}
+\begin{align}
 	V = \{ & \ps{S}, \ps{s_h}, \ps{c_h}, \ps{B_h}, \ps{s_{2h}}, \ps{c_{2h}}, \ps{B_{2h}}, \ps{s_{4h}}, \ps{c_{4h}}, \ps{B_{4h}}, \\
 	& \ps{s_{8h}}, \ps{c_{8h}}, \ps{B_{8h}}, \ps{c_{16h}}, \ps{P} \},
-\end{align*}
+	\label{eq:multigrid-grammar-variables}
+\end{align}
 for each of which we then specify the list of productions available on the respective level. 
 Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
 \begin{algorithm}
