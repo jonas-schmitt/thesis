@@ -28,7 +28,27 @@ We can, however, remove this redundancy by considering Equation~\eqref{eq:exampl
 The resulting graph for Equation~\eqref{eq:example-three-grid-method-expression} is shown in Figure~\ref{fig:example-three-grid-method-computational graph}.
 \begin{figure}
 	\centering
-	\includegraphics[height=\textheight]{figures/trees/three_grid_method_computational_graph.pdf}
-	\caption{Computational graph for the three-grid method shown in Algorithm~\ref{alg:example-three-grid-method}.}
-	\label{fig:example-three-grid-method-computational graph}
-\end{figure}  
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[scale=0.5]{figures/trees/three_grid_method_computational_graph.pdf}
+		\caption{Computational graph for the three-grid method shown in Algorithm~\ref{alg:example-three-grid-method}.}
+		\label{fig:example-three-grid-method-computational-graph}
+	\end{subfigure}
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\includegraphics[scale=0.5]{figures/trees/three_grid_method_computational_graph_annotated.pdf}
+		\caption{Assignment of subgraphs to the respective intermediate values.}
+		\label{fig:example-three-grid-method-computational-graph-annotated}
+	\end{subfigure}
+\end{figure}
+Again each node within this graph either corresponds to predefined symbol or an operation defined on vectors and matrices, whereby in case of the letter there exists a direct edge to each of the nodes that corresponds to one of its arguments.  
+Therefore, whenever a certain node serves as an argument to more than one operations, multiple edges are directed towards it.
+Based on this representation we can now define a redundancy-free sequence of computations that corresponds to the given multigrid method.
+The most straightforward way to achieve this for a general graph is to simply introduce a temporary value for each non-leaf node of the graph.
+However, note that each intermediate result in graph~\ref{fig:example-three-grid-method-computational-graph} that serves as an argument to multiple nodes either refers to a term representing the computation of an approximate solution or right-hand side on the respective level.
+To verify this observation, consider again the three elementary multigrid operations listed in Definition~\ref{def:elementary-multigrid-operations}.
+While a correction term is always discarded after its application, the current approximate solution is both needed in the construction of the current residual as well as whenever its value is updated, either through the application of smoothing or a coarse-grid correction.
+Note that the same is true for the right-hand side, which is required whenever a new residual is constructed on a certain level.
+This is illustrated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}, where we have annotated all subgraph that correspond to the computation of an approximate solution or right-hand side.
+
+
+ 
