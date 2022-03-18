@@ -36,7 +36,7 @@ Since all these operations are based on manipulating the internal structure of a
 Note that this representation does not necessarily need to be equal to the target language in which the actual program is supposed to be implemented but rather needs to define a unique mapping that enables its automatic generation.
 This process is usually called \emph{genotype} to \emph{phenotype} mapping, where the genotype refers to the internal representation used within GP while the phenotype then represents the actual program implemented on the target machine.
 One of the most widely used genotype representations is tree-based GP, where each program is internally represented as a tree of expressions, which was also initially proposed by John Koza~\cite{koza1994genetic}.
-\subsection{Representation}
+\subsection{Representation}\label{sec:gggp-representation}
 In contrast to other evolutionary algorithms algorithms, which usually represent the solution to an optimization problem as an array of discrete or continuous numbers~\cite{back1997handbook}, GP deals with the optimization of programs and, hence, each solution corresponds to an executable program.
 %Before we consider these operations in detail, we first need to define a procedure to generate program expression trees in a structured way. 
 To illustrate this, we consider the following example grammar $G$ with the productions
