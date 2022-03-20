@@ -68,7 +68,7 @@ digraph G {
   c2h_5 -> operator_5
   operator_5 [texlbl="$A_{2h}$"];
   c2h_5 -> solution_5
-  solution_5 [texlbl="$x_{2h}^0$"];
+  solution_5 [texlbl="$0_{2h}$"];
   c2h_5 -> apply_5
   apply_5 [texlbl="\textsc{apply}"];
   c2h_5 -> restriction_5
