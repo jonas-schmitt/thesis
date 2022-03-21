@@ -1,28 +1,44 @@
 import abc
-from functools import reduce
-from evostencils.expressions import partitioning as part
-from evostencils.stencils import periodic, gallery
-from evostencils.stencils import constant
 
 
-# Base classes
+class Grid:
+    def __init__(self, size, step_size, level):
+        assert len(size) == len(step_size), "Dimensions of the size and step size must match"
+        self._size = size
+        self._step_size = step_size
+        self._level = level
+
+    @property
+    def size(self):
+        return self._size
+
+    @property
+    def step_size(self):
+        return self._step_size
+
+    @property
+    def level(self):
+        return self._level
+
+    @property
+    def dimension(self):
+        return len(self.size)
+
+    def __eq__(self, other):
+        if isinstance(other, Grid):
+            return self.size == other.size and self.step_size == other.step_size
+
+
 class Expression(abc.ABC):
-    def __init__(self):
-        self.lfa_symbol = None
-        self.valid = False
-        self.runtime = None
 
     @property
     @abc.abstractmethod
     def shape(self):
         pass
 
+    @property
     @abc.abstractmethod
-    def apply(self, transform: callable, *args):
-        pass
-
-    @abc.abstractmethod
-    def mutate(self, f: callable, *args):
+    def grid(self):
         pass
 
 
@@ -36,14 +52,9 @@ class Entity(Expression):
     def shape(self):
         return self._shape
 
-    def __str__(self):
-        return f'{self.name}'
-
-    def apply(self, _, *args):
-        return self
-
-    def mutate(self, f: callable, *args):
-        pass
+    @property
+    def grid(self):
+        return self._grid
 
 
 class UnaryExpression(Expression):
@@ -60,12 +71,6 @@ class UnaryExpression(Expression):
     @property
     def shape(self):
         return self._shape
-
-    def apply(self, transform: callable, *args):
-        return type(self)(transform(self.operand, *args))
-
-    def mutate(self, f: callable, *args):
-        f(self.operand, *args)
 
     @property
     def grid(self):
@@ -86,9 +91,6 @@ class BinaryExpression(Expression):
     def shape(self):
         return self._shape
 
-    def apply(self, transform: callable, *args):
-        return type(self)(transform(self.operand1, *args), transform(self.operand2, *args))
-
-    def mutate(self, f: callable, *args):
-        f(self.operand1, *args)
-        f(self.operand2, *args)
+    @property
+    def grid(self):
+        return self.operand1.grid
