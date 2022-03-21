@@ -626,18 +626,18 @@ Since we can apply the same approach to arbitrary computational graphs obtained 
 	\item Transform the derivation tree to a graph-based intermediate representation.
 	\item Generate expressions for each approximate solution and right-hand side by means of recursive graph traversal.
 \end{enumerate}
-With the formulation of this approach, we have now described all necessary steps from the grammar-based generation multigrid method to their transformation to an algorithmic representation based on which can then apply these methods as numerical solvers.
+With the formulation of this approach, we have now outlined all necessary steps from the grammar-based generation of a multigrid method to its transformation to an algorithmic representation based on which can then apply these methods as numerical solvers.
 However, we have not yet discussed in details how the individual steps of our approach, as described in this section, can be carried out in an automatic way on a modern computer.
-%TODO überleitung zu EvoStencils
- 
+In the remaining part of this thesis, we will, therefore, close these gaps by presenting our implementation of a grammar-guided multigrid optimization in form of the Python framework \emph{EvoStencils}, which is freely available as an open-source software library\footnote{EvoStencils: \url{https://github.com/jonas-schmitt/evostencils}}.
+Since the EvoStencils framework builds substantially on the evolutionary optimization techniques presented in Section~\ref{sec:gggp}, it is important to consider first whether these algorithms are suitable for the given task or if a mere brute-force search is sufficient to identify the single best method among the set of possible ones for a given problem.
+For this purpose, we aim to estimate the size of the search space that is created by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}, i.e. the number of different individuals that can be generated based on its productions.
 
 \section{Search Space Estimation}
-Before we conclude this chapter and continue with description of our grammar-based evolutionary optimization approach for constructing efficient multigrid methods and its implementation, it is important to estimate how many different multigrid methods can be constructed with the type of grammar presented here.
-In particular, if we treat the grammar-based construction of an efficient multigrid method as a search problem, we aim to determine the size of the search space spanned by the underlying grammar.
-In practice, in case of a small search problem it can be feasible to simply enumerate and evaluate all possible solutions of a given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, are in general not guaranteed to converge find it.
-For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as shown in Algorithm~\ref{alg:multigrid-grammar}. 
-As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to effectively reduce both the high and low-frequency components of the error.
-While, in practice, often multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
+If we treat the grammar-based optimization of multigrid method as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
+In practice, in case of a small search space it can be feasible to simply enumerate and evaluate all possible solutions of the given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, is, in general, not guaranteed to find the same solution in each of its executions.
+For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}. 
+As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to efficiently reduce both the high and low-frequency components of the error.
+While often in practice multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
 To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
 Furthermore, we enforce that restriction and prolongation can only be performed after smoothing, with the exception of the finest level, where we additionally allow restriction to be applied as a first operation.
 As on finest level the original system is solved directly while smoothing is significantly more expensive than on subsequent levels, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method and we, hence, want to enforce fewer constraints on the order in which the individual operations are performed.
@@ -705,8 +705,8 @@ If we now assume that a modern multi-core CPU is capable of evaluating each mult
 even a supercomputer consisting of one trillion ($10^{12}$) such processors would require more than 8 years to evaluate all methods that are contained in this search space.
 Furthermore, in practice it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.
 As a consequence, while a pure brute-force-approach that aims to evaluate all possible multigrid methods may be feasible for the constrained parameter space that results from the classical formulation in Algorithm~\ref{alg:multigrid-cycle}, a grammar-based optimization requires the utilization of search strategies, such as grammar-guided genetic programming (GGGP) as it has been presented in Section~\ref{sec:gggp}.
-In the remainder of this thesis we will present on the implementation of a GGGP-based approach for the optimization of multigrid methods in the Python programming language, called \emph{EvoStencils}, that is based on the formal framework presented in this section.
-Furthermore, we will demonstrate the effectiveness of our approach by evolving efficient multigrid methods for a number of different partial differential equations (PDEs).
+In the remainder of this thesis we will describe how these techniques can be applied as part of \emph{EvoStencils}, our implementation of a grammar-guided optimization of multigrid methods in the Python programming language, which is based on the formal framework presented in this chapter.
+We will, furthermore, demonstrate EvoStencils' effectiveness by evolving efficient multigrid methods for a number of different partial differential equations (PDEs).
 
 %\begin{figure}
 %	\captionsetup{justification=centering}
