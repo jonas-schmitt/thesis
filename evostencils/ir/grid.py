@@ -1,3 +1,4 @@
+
 class Grid:
     def __init__(self, size, step_size, level):
         assert len(size) == len(step_size), 

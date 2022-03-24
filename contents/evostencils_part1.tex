@@ -1,5 +1,61 @@
-\inputminted{python}{evostencils/ir/grid.py}
-\inputminted{python}{evostencils/ir/expression.py}
-\inputminted{python}{evostencils/ir/entity.py}
-\inputminted{python}{evostencils/ir/unary_expression.py}
-\inputminted{python}{evostencils/ir/binary_expression.py}
+\usemintedstyle{tango}
+\setminted[python]{fontsize=\footnotesize}
+In the first part of this thesis we have established a theoretical basis about multigrid methods, formal languages and genetic programming.
+In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
+While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet demonstrate its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
+We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the grammar-guided optimization of multigrid methods.
+Using this framework we will then show how it is possible to evolve methods that are more efficient than all common multigrid cycles in solving a number of PDE-based problems while being structurally different that any other known method of this type.
+However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview about its workflow and software architecture.
+In general, we can distinguish between EvoStencils' core implementation and the functionality of the framework that is build upon the use of external libraries.
+First of all, since our formulation of the rules to construct a multigrid methods in the form of a context-free grammar, we can utilize the grammar-guided genetic programming techniques presented Chapter~\ref{chapter:formal-languages-and-gp} without adapting their inner workings.
+For this purpose, we employ the popular evolutionary computation framework DEAP~\cite{rainville2012deap}, which enables us to implement GGGP in a modular way without little adaption.
+
+\begin{figure}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tikzpicture}
+			%\draw [help lines] (-10,-10) grid (10,10);
+			\node[draw, minimum width=3cm, minimum height=1.5cm, rounded corners] (evo) at (0,0) {EvoStencils};
+			\node[draw, inner sep=3mm, rounded corners] (bindings) at (0, -2) {MPI Bindings};
+			\node[draw, inner sep=3mm, rounded corners] (deap) at (0, 2) {DEAP};
+			\node[draw, minimum width=3cm, minimum height=1.5cm, rounded corners] (exa) at (4.5, 0) {ExaStencils};
+			\node[draw, inner sep=3mm, rounded corners] (code) at (9, 0) {Solver Code};
+			\node[draw, inner sep=3mm, rounded corners] (mpi) at (9, -2) {MPI Library};
+			\draw[dashed] (2.25, 2.3) -- (2.25,0.5);
+			\draw[dashed] (2.25, -0.15) -- (2.25,-3.7);
+			\draw[dashed] (7, 2.3) -- (7,0.5);
+			\draw[dashed] (7, -0.15) -- (7,-3.7);
+			\node (python) at (0, -3.5) {Python};
+			\node (java) at (4.5, -3.5) {Java, Scala};
+			\node (c) at (9, -3.5) {C, C++};
+			\draw[->] (evo)-- node[anchor=west] {uses} (deap);
+			\draw[->] (evo)-- node[anchor=south]{runs} (exa);
+			\draw[->] (exa)--node[anchor=south] {generates} (code);
+			\draw[->] (evo) to [out=25,in=140] node[anchor=south] {executes} (code);
+			\draw[->] (bindings)--node[anchor=south] {interface}(mpi);
+			\draw[->] (evo)--node[anchor=west] {uses}(bindings);
+			%\draw[->] (mpi)--(code);
+		\end{tikzpicture}
+	}\caption{Software Architecture of EvoStencils.}
+	\label{fig:evostencils-architecture}
+\end{figure}
+
+\begin{listing}
+	\inputminted{python}{evostencils/ir/grid.py}
+	\caption{Class for Representing Uniform Grids}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/expression.py}
+	\caption{Abstract Expression Base Class}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/entity.py}
+	\caption{Base Class for Representing Entities}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/unary_expression.py}
+	\caption{Base Class for Representing Unary Expressions}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/binary_expression.py}
+	\caption{Base Class for Representing Binary Expressions}
+\end{listing}
