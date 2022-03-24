@@ -8,7 +8,9 @@ Using this framework we will then show how it is possible to evolve methods that
 However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview about its workflow and software architecture.
 In general, we can distinguish between EvoStencils' core implementation and the functionality of the framework that is build upon the use of external libraries.
 First of all, since our formulation of the rules to construct a multigrid methods in the form of a context-free grammar, we can utilize the grammar-guided genetic programming techniques presented Chapter~\ref{chapter:formal-languages-and-gp} without adapting their inner workings.
-For this purpose, we employ the popular evolutionary computation framework DEAP~\cite{rainville2012deap}, which enables us to implement GGGP in a modular way without little adaption.
+For this purpose, we employ the widely-used evolutionary computation framework DEAP\footnote{DEAP: \url{https://github.com/deap/deap}}~\cite{rainville2012deap}, which enables us to implement GGGP in a modular way while requiring only a limited amount of adaption.
+However, the questions that then remains to be answered how we can evaluate each multigrid method obtained through GGGP in an automatic and reproducible manner.
+As we have seen in Section~\ref{sec:grammar-based-algorithm-generation} the 
 
 \begin{figure}
 	\resizebox{\columnwidth}{!}{%
