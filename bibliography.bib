@@ -492,6 +492,25 @@ numpages = {37}
 	series = {GECCO '20}
 }
 
+@inproceedings{lengauer2014exastencils,
+	title={ExaStencils: Advanced stencil-code engineering},
+	author={Lengauer, Christian and Apel, Sven and Bolten, Matthias and Gr{\"o}{\ss}linger, Armin and Hannig, Frank and K{\"o}stler, Harald and R{\"u}de, Ulrich and Teich, J{\"u}rgen and Grebhahn, Alexander and Kronawitter, Stefan and others},
+	booktitle={European Conference on Parallel Processing},
+	pages={553--564},
+	year={2014},
+	organization={Springer}
+}
+
+@article{kostler2020code,
+	title={Code generation approaches for parallel geometric multigrid solvers},
+	author={K{\"o}stler, Harald and Heisig, Marco and Kohl, Nils and Kuckuk, Sebastian and Bauer, Martin and R{\"u}de, Ulrich},
+	journal={Analele Universitatii" Ovidius" Constanta-Seria Matematica},
+	volume={28},
+	number={3},
+	pages={123--152},
+	year={2020}
+}
+
 % General Stuff
 
 @book{varga1962iterative,
@@ -542,6 +561,15 @@ numpages = {37}
 	year={2020}
 }
 
+@inproceedings{schmitt2014exaslang,
+	title={ExaSlang: A domain-specific language for highly scalable multigrid solvers},
+	author={Schmitt, Christian and Kuckuk, Sebastian and Hannig, Frank and K{\"o}stler, Harald and Teich, J{\"u}rgen},
+	booktitle={2014 Fourth international workshop on domain-specific languages and high-level frameworks for high performance computing},
+	pages={42--51},
+	year={2014},
+	organization={IEEE}
+}
+
 @incollection{schmitt2016systems,
 	title={Systems of partial differential equations in ExaSlang},
 	author={Schmitt, Christian and Kuckuk, Sebastian and Hannig, Frank and Teich, J{\"u}rgen and K{\"o}stler, Harald and R{\"u}de, Ulrich and Lengauer, Christian},
@@ -551,14 +579,21 @@ numpages = {37}
 	publisher={Springer}
 }
 
-@inproceedings{schmitt2014exaslang,
-	title={ExaSlang: A domain-specific language for highly scalable multigrid solvers},
-	author={Schmitt, Christian and Kuckuk, Sebastian and Hannig, Frank and K{\"o}stler, Harald and Teich, J{\"u}rgen},
-	booktitle={2014 Fourth international workshop on domain-specific languages and high-level frameworks for high performance computing},
-	pages={42--51},
-	year={2014},
-	organization={IEEE}
+@article{kuckuk2016automatic,
+	AUTHOR = {Kuckuk, Sebastian and Köstler, Harald},
+	TITLE = {Automatic Generation of Massively Parallel Codes from ExaSlang},
+	JOURNAL = {Computation},
+	VOLUME = {4},
+	YEAR = {2016},
+	NUMBER = {3},
+	ARTICLE-NUMBER = {27},
+	URL = {https://www.mdpi.com/2079-3197/4/3/27},
+	ISSN = {2079-3197},
+	ABSTRACT = {Domain-specific languages (DSLs) have the potential to provide an intuitive interface for specifying problems and solutions for domain experts. Based on this, code generation frameworks can produce compilable source code. However, apart from optimizing execution performance, parallelization is key for pushing the limits in problem size and an essential ingredient for exascale performance. We discuss necessary concepts for the introduction of such capabilities in code generators. In particular, those for partitioning the problem to be solved and accessing the partitioned data are elaborated. Furthermore, possible approaches to expose parallelism to users through a given DSL are discussed. Moreover, we present the implementation of these concepts in the ExaStencils framework. In its scope, a code generation framework for highly optimized and massively parallel geometric multigrid solvers is developed. It uses specifications from its multi-layered external DSL ExaSlang as input. Based on a general version for generating parallel code, we develop and implement widely applicable extensions and optimizations. Finally, a performance study of generated applications is conducted on the JuQueen supercomputer.},
+	DOI = {10.3390/computation4030027}
 }
+
+
 
 @inproceedings{fortin2013generalizing,
 	author = {Fortin, F\'{e}lix-Antoine and Grenier, Simon and Parizeau, Marc},
@@ -733,4 +768,25 @@ numpages = {37}
 	author={Sterling, Thomas and Brodowicz, Maciej and Anderson, Matthew},
 	year={2017},
 	publisher={Morgan Kaufmann}
+}
+
+@article{dalcin2021mpi4py,
+	title={Mpi4py: Status update after 12 years of development},
+	author={Dalcin, Lisandro and Fang, Yao-Lung L},
+	journal={Computing in Science \& Engineering},
+	volume={23},
+	number={4},
+	pages={47--54},
+	year={2021},
+	publisher={IEEE}
+}
+
+@article{walker1996mpi,
+	title={MPI: a standard message passing interface},
+	author={Walker, David W and Dongarra, Jack J},
+	journal={Supercomputer},
+	volume={12},
+	pages={56--68},
+	year={1996},
+	publisher={ASFRA BV}
 }
