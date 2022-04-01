@@ -1,10 +1,10 @@
 
 class Grid:
-    def __init__(self, size, step_size, level):
-        assert len(size) == len(step_size), 
+    def __init__(self, size, spacing, level):
+        assert len(size) == len(spacing), 
         "Dimensions of the size and step size must match"
         self._size = size
-        self._step_size = step_size
+        self._spacing = spacing
         self._level = level
 
     @property
@@ -12,8 +12,8 @@ class Grid:
         return self._size
 
     @property
-    def step_size(self):
-        return self._step_size
+    def spacing(self):
+        return self._spacing
 
     @property
     def level(self):

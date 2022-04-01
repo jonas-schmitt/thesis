@@ -55,14 +55,28 @@ In the following, we will now consider the individual parts of this architecture
 As a first step, we will outline the implementation of an intermediate representation for multigrid methods that can be easily obtained from a given derivation tree and which then acts as a basis for all subsequent steps of solver generation and evaluation.
 
 \section{Intermediate Representation}
+Before we can represent the actual method and its computational structure, we need to be aware of the fact that all operations of a multigrid method are defined on a grid with certain step size.
+Note that algebraic multigrid methods~\cite{stuben2001introduction,ruge1987algebraic}, which are not considered in this work, represent an exception to this, as they directly operate on sparse matrix and vector data structures.
+In Section~\ref{sec:discretization} we have already made the assumption that we are able to discretize the underlying PDE on a hierarchy of structured grids.
+Therefore, to identify a grid within this hierarchy certain information is required, which we store in a \texttt{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
+In general a structured grid is identified by its size, i.e. the number of grid points, and spacing $h$ in each dimension.
+In addition we also include the grid's level to identify it within the discretization hierarchy.
+Note that in case the grid is uniform we only need to store a single value for the spacing in each dimension, while otherwise a value needs to be stored for each pair of grid points.
+As the problems considered in this work are all solved on a hierarchy of uniform grids, we focus on this particular case.
+However, whenever we apply this restriction it is clearly stated within the respective part of the code.  
 \begin{listing}
 	\inputminted{python}{evostencils/ir/grid.py}
 	\caption{Class for Representing Uniform Grids}
+	\label{code:ir:grid}
 \end{listing}
+After defining a data structure that provides all information about a certain grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
+For this purpose, first in Listing~\ref{code:ir:abstact-base-class} a common abstract base class is provided from which all subsequent expression classes are derived.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/expression.py}
 	\caption{Abstract Expression Base Class}
+	\label{code:ir:abstact-base-class}
 \end{listing}
+In addition to the already mentioned grid data structure this class also defines the shape of the operator.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/entity.py}
 	\caption{Base Class for Representing Entities}
