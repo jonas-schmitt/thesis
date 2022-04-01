@@ -1,5 +1,5 @@
 \usemintedstyle{tango}
-\setminted[python]{fontsize=\footnotesize}
+\setminted[python]{fontsize=\footnotesize, breaklines}
 In the first part of this thesis we have established a theoretical basis about multigrid methods, formal languages and genetic programming.
 In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
 While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet demonstrate its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
@@ -66,7 +66,7 @@ As the problems considered in this work are all solved on a hierarchy of uniform
 However, whenever we apply this restriction it is clearly stated within the respective part of the code.  
 \begin{listing}
 	\inputminted{python}{evostencils/ir/grid.py}
-	\caption{Class for Representing Uniform Grids}
+	\caption{Class for Representing Structured Grids}
 	\label{code:ir:grid}
 \end{listing}
 After defining a data structure that provides all information about a certain grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
@@ -89,7 +89,8 @@ First of all, Listing~\ref{code:ir:entity} contains the implementation of the en
 	\label{code:ir:entity}
 \end{listing}
 In addition to the previously mentioned properties, this class also contains a \texttt{name} to identify the respective entity.
-Next, we can define classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
+Based on this implementation we can then further define classes for representing an approximate solution, right-hand side, system and inter-grid operators, whose implementation can be found in the appendix.
+Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
 	\caption{Base Class for Representing Unary Expressions}
@@ -103,3 +104,14 @@ Next, we can define classes for representing unary and binary expressions, which
 In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
 However, as in case of a binary expression the shape of the result depends on the type of operation, we raise an error if this method is not implemented in one of the derived classes. 
 While we will later see that there exist certain expressions that do not fall into these categories the majority of multigrid operations can be already expressed based on these two classes.
+Again a number of examples can be found in the appendix.
+\begin{listing}
+	\inputminted{python}{evostencils/ir/residual.py}
+	\caption{Class for Representing the Residual}
+	\label{code:ir:residual}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/iteration.py}
+	\caption{Class for Representing an Iteration}
+	\label{code:ir:iteration}
+\end{listing}
