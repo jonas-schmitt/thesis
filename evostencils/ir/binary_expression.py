@@ -15,7 +15,7 @@ class BinaryExpression(Expression):
 
     @property
     def shape(self):
-        return self._shape
+        raise NotImplementedError("Shape undefined in binary expression")
 
     @property
     def grid(self):

@@ -76,16 +76,30 @@ For this purpose, first in Listing~\ref{code:ir:abstact-base-class} a common abs
 	\caption{Abstract Expression Base Class}
 	\label{code:ir:abstact-base-class}
 \end{listing}
-In addition to the already mentioned grid data structure this class also defines the shape of the operator.
+In addition to the already mentioned grid data structure this class also defines a \texttt{shape} for each expression.
+In a multigrid method each expression either computes a matrix or a vector.
+For example, multiplying a $m \times n$-matrix with a $n \times m$-matrix yields a $m \times m$-matrix.
+The shape of the corresponding expression is then defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns, which in the given example is both $m$.
+As in the case of matrix multiplication, the shape of each expression can always be derived from its operands, whose shape can be recursively determined in a similar manner.
+Based on this abstract class, we can then further distinguish between predefined entities, such as the system matrix and right-hand side, and expressions that refer to the mathematical operations of a multigrid method.
+First of all, Listing~\ref{code:ir:entity} contains the implementation of the entity base class.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/entity.py}
 	\caption{Base Class for Representing Entities}
+	\label{code:ir:entity}
 \end{listing}
+In addition to the previously mentioned properties, this class also contains a \texttt{name} to identify the respective entity.
+Next, we can define classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
 	\caption{Base Class for Representing Unary Expressions}
+	\label{code:ir:unary-expression}
 \end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/ir/binary_expression.py}
 	\caption{Base Class for Representing Binary Expressions}
+	\label{code:ir:binary-expression}
 \end{listing}
+In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
+However, as in case of a binary expression the shape of the result depends on the type of operation, we raise an error if this method is not implemented in one of the derived classes. 
+While we will later see that there exist certain expressions that do not fall into these categories the majority of multigrid operations can be already expressed based on these two classes.
