@@ -104,14 +104,38 @@ Next, we need to provide classes for representing unary and binary expressions, 
 In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
 However, as in case of a binary expression the shape of the result depends on the type of operation, we raise an error if this method is not implemented in one of the derived classes. 
 While we will later see that there exist certain expressions that do not fall into these categories the majority of multigrid operations can be already expressed based on these two classes.
-Again a number of examples can be found in the appendix.
+Again we have included a number of specific examples in the appendix.
+As it has been discussed in Section~\ref{sec:grammar-based-algorithm-generation}, we aim to represent the computational structure of a given multigrid method in form of a redundancy-free directed graph. 
+While the previously defined base classes allow us to represent the arithmetic expressions that occur within the correction terms of a multigrid method, there are two operations that require a special treatment.
+As we have already seen in Figure~\ref{fig:example-three-grid-method-computational-graph} it is necessary to access previously computed intermediate results at multiple occasions within a multigrid method.
+In particular, each time a coarse-grid correction is performed we have to restore the previous approximate solution and right-hand side on the respective level.
+Furthermore, whenever we compute a new residual the current expression for both the right-hand side as well as the approximate solution are required.
+For this purpose, we implement the classes \texttt{Residual} and \texttt{Iteration}, which serve the special-purpose of including additional references to previously defined expressions within a multigrid method.
+Each of these references then corresponds to one of the subgraphs in Figure~\ref{fig:example-three-grid-method-computational-graph} whose root node possesses multiple incoming edges, i.e. the ones that have been annotated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}.
+We will later see how to utilize these references in order to construct a complete graph from the grammar-based representation of a multigrid method.
+Listing~\ref{code:ir:residual} shows the implementation of the \texttt{Residual} class, which contains references to the system operator $A_H$, the expression for computing the current approximate solution $\tilde{x}_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
+Based on these components we can, thus, easily construct the corresponding residual expression $b_H - A_H \tilde{x}_H$.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/residual.py}
 	\caption{Class for Representing the Residual}
 	\label{code:ir:residual}
 \end{listing}
+As a final step in the implementation of our intermediate representation, the definition of the \texttt{Iteration} class is shown in Listing~\ref{code:ir:iteration}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/iteration.py}
-	\caption{Class for Representing an Iteration}
+	\caption{Class for Representing a Multigrid Iteration}
 	\label{code:ir:iteration}
+\end{listing}
+This class implements the functionality to represent a single step of multigrid iteration on a certain level with spacing $H$ with the purpose to compute a new value for the approximate solution $\tilde{x}_H$, i.e.
+\begin{equation}
+	\tilde{x}_H = \tilde{x}_H + \omega c_H \; \text{with} \; P,
+\end{equation}
+where $c_H$ is a correction term, $\omega$ the relaxation factor and $P$ a partitioning.
+Furthermore, to make the right-hand side available to subsequent steps of the method, such as for the computation of the residual, we, again, need to include an additional reference into the data structure.
+Finally, we also include a reference to the previous state on the next finer level, such that in case the result of an iteration is applied a coarse-grid correction, the previous expression for the approximate solution and right-hand side can be restored on that level.
+To better understand the purpose of these two classes consider the following example shown in Listing~
+\begin{listing}
+	\inputminted{python}{evostencils/ir/example.py}
+	\caption{Example Usage of the Intermediate Representation}
+	\label{code:ir:example.py}
 \end{listing}

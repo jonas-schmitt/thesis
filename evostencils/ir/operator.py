@@ -1,7 +1,7 @@
 from operator import mul
 
 class Operator(Entity):
-    def __init__(self, name, grid, stencil_generator):
+    def __init__(self, name, grid, stencil_generator=None):
         tmp = reduce(mul, grid.size)
         shape = (tmp, tmp)
         self._stencil_generator = stencil_generator

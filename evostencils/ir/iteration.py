@@ -1,6 +1,5 @@
 class Iteration(Expression):
-    def __init__(self, approximation, rhs, correction, partitioning=None,
-                 relaxation_factor=1.0, predecessor=None):
+    def __init__(self, approximation, rhs, correction=None, relaxation_factor=1.0, partitioning=None, predecessor=None):
         self.approximation = approximation
         self.rhs = rhs
         self.correction = correction
@@ -11,7 +10,7 @@ class Iteration(Expression):
 
     @property
     def shape(self):
-        return self._approximation.shape
+        return self.approximation.shape
 
     @property
     def grid(self):
