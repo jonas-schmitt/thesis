@@ -133,9 +133,23 @@ This class implements the functionality to represent a single step of multigrid 
 where $c_H$ is a correction term, $\omega$ the relaxation factor and $P$ a partitioning.
 Furthermore, to make the right-hand side available to subsequent steps of the method, such as for the computation of the residual, we, again, need to include an additional reference into the data structure.
 Finally, we also include a reference to the previous state on the next finer level, such that in case the result of an iteration is applied a coarse-grid correction, the previous expression for the approximate solution and right-hand side can be restored on that level.
-To better understand the purpose of these two classes consider the following example shown in Listing~
+To better understand the purpose of these two classes consider the following example shown in Listing~\ref{code:ir:example.py}, which demonstrate the construction of a computational graph based on the intermediate representation introduced in this section.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/example.py}
 	\caption{Example Usage of the Intermediate Representation}
 	\label{code:ir:example.py}
 \end{listing}
+Starting on the original problem on the finest level, we first store references to the initial approximate solution and right-hand side in an \texttt{Iteration} object, which itself is included as a \texttt{predecessor} reference into the subsequently created coarse-grid \texttt{Iteration} object.
+Finally, in order to apply the latter in form of a coarse-grid correction on the finest level, the original fine-grid \texttt{Iteration} object is restored and its \texttt{correction} variable is replaced by the respective expression which is obtained by prolongating the previously computed approximation on the coarse grid.
+As this example demonstrate our intermediate representation (IR) enables us to construct the computational graph of a multigrid method in an iterative manner.
+The next step towards the automatic generation of a multigrid method based on a grammar-based representation, now is to translate a sequence of derivations into the corresponding IR object.
+For this purpose, we first have to consider how we can implement the formal system introduced in Section~\ref{sec:multigrid-grammar} using the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
+However, before we proceed with this discussion, we want to address some final remarks about the IR presented in this section.
+First of all, note that while the main purpose of the implementation presented here is to uniquely represent the computational pattern of a multigrid method in form of a redundancy-free directed graph, in order to be able to construct this graph in a step-wise manner we have to include additional references into the respective nodes.
+As we have shown in the previous discussion, the \texttt{Iteration} class serves this purpose by including additional information about the current state of a multigrid method, according to Definition~\ref{def:multigrid-state}, in form of references to the current approximate solution and right-hand side.
+While this information is important for the construction of the graph, it could be later discarded by replacing each \texttt{Iteration} node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{iterate} function in Section~\ref{sec:multigrid-state-transitions}.
+However, preserving these additional references has the advantage of being able to easily traverse the sequence of \texttt{Iteration} nodes within each graph.
+This does not only enable us to quickly grasp the computational structure of the corresponding multigrid method, but also facilitates the identification of potential errors in the implementation.
+We, therefore, represent each newly computed approximate solution by an \texttt{Iteration} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
+Furthermore, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
+\section{Grammar Generation}
