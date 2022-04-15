@@ -237,6 +237,7 @@ The resulting expression is included as a the correction term $c_h$ into $S_h$, 
 		\EndFunction
 	\end{algorithmic}
 \label{alg:state-transition-residual}
+%\caption{Residual computation}
 \end{algorithm}
 After constructing an initial correction $c_h$ from the residual expression $b_h - A_h \tilde{x}_h$, next we can apply an operator $B_h$ to this term, either as part of a smoothing expression or in form of restriction to obtain the right-hand side $b_h$ of the coarse-grid error equation.
 Since both operations can be formulated as a matrix-vector multiplication, we consider this operator application as an intermediate step that is implemented in form of the function \textsc{apply}.
@@ -248,6 +249,7 @@ The resulting expression then serves as a new correction term within the returne
 		\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
 		\EndFunction
 	\end{algorithmic}
+\caption{Operator application}
 \end{algorithm}
 In general, the choice of the operator $B_h$ corresponds to the two elementary options available within a multigrid method, i.e. smoothing and solving the given problem on a coarser grid.
 For instance, the choice of $B_h = D_h^{-1}$ leads to the expression
@@ -270,6 +272,7 @@ This behavior is implemented in the function \textsc{iterate}, which returns a s
 			\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
 		\EndFunction
 	\end{algorithmic}
+%\caption{Iteration}
 \end{algorithm}
 In addition to the mere application of a correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$ which enables both the formulation of underrelaxed, overrelaxed and potentially colored versions of each operation, for instance those described in Section~\ref{sec:rb-gs}.
 The second possibility to apply an operator to the current residual is in form of the restriction expression $c_{2h} = I_{h}^{2h} r_h$.
@@ -287,6 +290,7 @@ The resulting state transition is implemented in the function \textsc{cocy}, whi
 		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
 		\EndFunction
 	\end{algorithmic}
+%\caption{Coarse-grid cycle}
 \end{algorithm}
 Note that within this function we already construct an expression for the initial residual
 \begin{equation}
@@ -307,11 +311,45 @@ Note that the complete coarse-grid correction step is then obtained through subs
 		\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
 		\EndFunction
 	\end{algorithmic}
+%\caption{Coarse-grid correction}
 \end{algorithm}
 %TODO describe coarse-grid solver A_{4h}^{-1}
-As it has been described in this section, the application of each of these functions corresponds to a certain transition between the possible states of a multigrid solver, and, hencce, for every possible multigrid method a sequence of function applications can be assembled.
+As it has been described in this section, the application of each of these functions corresponds to a certain transition between the possible states of a multigrid solver, and, hence, for every possible multigrid method a sequence of function applications can be assembled.
 The evaluation of this sequence then leads to a state whose first component $\tilde{x}_h$ contains an expression that corresponds to the step wise execution of all steps of the method.
 The functions described in this section can therefore be considered as a \textsc{language} for the formal description of multigrid methods.
+\begin{table}
+	\label{table:grammar-semantics}
+	\caption{State transition functions}
+	\begin{algorithmic}
+	\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, S_{h/2})$}
+	\State $c_h \gets b_h - A_h \tilde{x}_h$
+	\State return $(\tilde{x}_h, b_h, c_h, S_{h/2})$
+	\EndFunction
+	%\State
+	\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, S_h)$}
+	\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
+	\EndFunction
+	%\State
+	\Function{iterate}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
+	\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
+	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
+	\EndFunction
+	%\State
+	\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+	\State $\tilde{x}_{2h} \gets 0$ 
+	\State $b_{2h} \gets c_{2h}$
+	\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
+	\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
+	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+	\EndFunction
+	%\State
+	\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, S_{h})$}
+	\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+	\State $c_h \gets I_{2h}^{h} \cdot \tilde{x}_{2h}$
+	\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+	\EndFunction
+	\end{algorithmic}
+\end{table}
 At this point we also have to revisit one of the main goals of this language: The description of methods that incorporate an arbitrary sequence of multigrid operations and, thus, can not be formulated in the classical framework of multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
 As we have described in this section, we have ensured that each possible state transition within a multigrid method is described by the application of either a specific combination of functions or even a single one.
 However, we have carefully avoided to introduce functions that correspond to a transition spanning over multiple states, which would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
@@ -456,10 +494,10 @@ For this purpose, we first define the set of variables
 	\label{eq:multigrid-grammar-variables}
 \end{align}
 for each of which we then specify the list of productions available on the respective level. 
-Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
-\begin{algorithm}
+Table~\ref{table:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
+\begin{table}
 	\caption{Grammar Productions for a Five-Grid Method}
-	\label{alg:multigrid-grammar}
+	\label{table:multigrid-grammar}
 	\begin{bnf*}
 		\bnfprod{$S$} {
 			\bnfpn{$s_h$}
@@ -521,12 +559,12 @@ Algorithm~\ref{alg:multigrid-grammar} shows the resulting grammar productions fo
 			\bnfts{\textnormal{\textsc{partitioning}}} \bnfor \bnfes
 		}
 	\end{bnf*}
-\end{algorithm}
+\end{table}
 For the sake of simplicity we omit the specification of all terminal symbols here, but instead state that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is assumed to be a terminal symbol.
 Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the finest level the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the coarsest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
 While we have used a five-grid hierarchy as an example for constructing a complete grammar here, it is easily possible to specify a similar grammar on a hierarchy of discretizations with different depth.
 Furthermore, while the maximum number of coarsening steps depends on whether we have defined the required productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e. two-, three- and four-grid methods.
-For this purpose, we simply have to include additional productions for the application of the coarse-grid solver on each subsequent level except for the finest, which in the case of Algorithm~\ref{alg:multigrid-grammar} leads to
+For this purpose, we simply have to include additional productions for the application of the coarse-grid solver on each subsequent level except for the finest, which in the case of Table~\ref{table:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{h}^{2h}$}, \bnfsp\bnfpn{$c_{h}$}))
@@ -563,7 +601,7 @@ We can now express this method as a sequence of the productions defined in Secti
 	\label{fig:example-three-grid-method-derivation-tree}
 \end{figure}
 Note that each inner node of the tree corresponds to a symbol that is contained in the set of variables $V$ of the grammar, as shown in Equation~\eqref{eq:multigrid-grammar-variables}, while all leaf nodes correspond to a terminal symbol.
-As in the context of Algorithm~\ref{alg:multigrid-grammar} the application order of each function is well-defined, for the sake of simplicity, we have omitted all brackets in the tree.
+As in the context of Table~\ref{table:multigrid-grammar} the application order of each function is well-defined, for the sake of simplicity, we have omitted all brackets in the tree.
 %TODO evtl darauf eingehen, dass der CGS auf dem entsprechenden level spezifiziert sein muss
 Until now we have been exclusively concerned with the problem of developing a formal representation for a multigrid method that is based on its algorithmic formulation, as for instance shown in Algorithm~\ref{alg:example-three-grid-method}, which can then be used to adapt each of its computational steps individually, granting us the possibility to apply the grammar-based program optimization techniques presented in Section~\ref{sec:gggp}.
 However, in contrast to Figure~\ref{fig:example-three-grid-method-derivation-tree} where we have started with an algorithmic representation, within grammar-guided genetic programming (GGGP) a derivation tree is usually \emph{grown} by applying a sequence of productions in a randomly-chosen order, either to alter an already existing tree or to create a completely new one from scratch.
@@ -634,12 +672,12 @@ With the formulation of this approach, we have now outlined all necessary steps 
 However, we have not yet discussed in details how the individual steps of our approach, as described in this section, can be carried out in an automatic way on a modern computer.
 In the remaining part of this thesis, we will, therefore, close these gaps by presenting our implementation of a grammar-guided multigrid optimization in form of the Python framework \emph{EvoStencils}, which is freely available as an open-source software library\footnote{EvoStencils: \url{https://github.com/jonas-schmitt/evostencils}}.
 Since the EvoStencils framework builds substantially on the evolutionary optimization techniques presented in Section~\ref{sec:gggp}, it is important to consider first whether these algorithms are suitable for the given task or if a mere brute-force search is sufficient to identify the single best method among the set of possible ones for a given problem.
-For this purpose, we aim to estimate the size of the search space that is created by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}, i.e. the number of different individuals that can be generated based on its productions.
+For this purpose, we aim to estimate the size of the search space that is created by the grammar formulated in Table~\ref{table:multigrid-grammar}, i.e. the number of different individuals that can be generated based on its productions.
 
 \section{Search Space Estimation}
 If we treat the grammar-based optimization of multigrid method as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
 In practice, in case of a small search space it can be feasible to simply enumerate and evaluate all possible solutions of the given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, is, in general, not guaranteed to find the same solution in each of its executions.
-For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}. 
+For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Table~\ref{table:multigrid-grammar}. 
 As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to efficiently reduce both the high and low-frequency components of the error.
 While often in practice multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
 To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
@@ -654,7 +692,7 @@ Consequently, using the symbols $S$, $R$ and $P$ for smoothing, restriction and 
 Therefore, with the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, the number of options for regarding the order of operations is always three.
 However, since each step also includes the application of a smoother, we additionally have to choose a suitable method for this purpose.
 Assuming the the number of available relaxation method is $n$, which includes different types of smoothers, partitionings and relaxation factors, this results in a total number of $3 \cdot n$ options in each step of the method. 
-While none of these constraints is present in our original grammar shown in Algorithm~\ref{alg:multigrid-grammar}, they enable us to derive a simple closed-form expression which then acts as a lower bound for the actual size of the search space.
+While none of these constraints is present in our original grammar shown in Table~\ref{table:multigrid-grammar}, they enable us to derive a simple closed-form expression which then acts as a lower bound for the actual size of the search space.
 We can obtain such an expression in form of a finite sum of polynomials by considering the total number smoothing steps that are supposed to be performed within a multigrid method, whereby we know that for each step we need to choose from $3 \cdot n$ options independent from the level on which the operations are performed.
 As a consequence, if our method incorporates $k$ smoothing steps, the total number of options is 
 \begin{equation}
@@ -680,7 +718,7 @@ Hence, the total number of different multigrid methods that employ between $k_{m
 	N(n, k_{min}, k_{max}) = \sum_{k = k_{min}}^{k_{max}} N_{n,k} = \sum_{k = k_{min}}^{k_{max}} (3 n)^k.
 	\label{eq:search-space-estimation}
 \end{equation}
-We can now finally utilize this formula to obtain an estimated lower bound for the total number of different five-grid method that can be constructed with the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}.
+We can now finally utilize this formula to obtain an estimated lower bound for the total number of different five-grid method that can be constructed with the grammar formulated in Table~\ref{table:multigrid-grammar}.
 For this purpose, we need to choose a reasonable interval for the minimum and maximum total number of smoothing steps of our method.
 In Algorithm~\ref{alg:multigrid-cycle} the total number of smoothing steps per level depends on the parameters $\nu_1$, $\nu_2$ and $\gamma$, which specify the number of pre-smoothing steps, post-smoothing steps and recursive descents per level, respectively.
 Therefore, the total number of smoothing steps is given by
@@ -704,7 +742,7 @@ By utilizing Equation~\eqref{eq:search-space-estimation} we, therefore, obtain
 \begin{equation*}
 	N(2, 4, 30) = \sum_{k = 4}^{30} 6^k \approx 2.65 \cdot 10^{24}
 \end{equation*}
-as an estimated lower bound for the search space spanned by the grammar formulated in Algorithm~\ref{alg:multigrid-grammar}.
+as an estimated lower bound for the search space spanned by the grammar formulated in Table~\ref{table:multigrid-grammar}.
 If we now assume that a modern multi-core CPU is capable of evaluating each multigrid method in an average time of one millisecond,
 even a supercomputer consisting of one trillion ($10^{12}$) such processors would require more than 8 years to evaluate all methods that are contained in this search space.
 Furthermore, in practice it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.

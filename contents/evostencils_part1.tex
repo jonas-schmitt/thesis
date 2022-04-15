@@ -153,3 +153,8 @@ This does not only enable us to quickly grasp the computational structure of the
 We, therefore, represent each newly computed approximate solution by an \texttt{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
 Furthermore, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
 \section{Grammar Generation}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/terminals.py}
+	\caption{Terminals defined on each level.}
+	\label{code:grammar:terminals.py}
+\end{listing}
