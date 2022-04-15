@@ -325,16 +325,16 @@ The functions described in this section can therefore be considered as a \textsc
 	\State $c_h \gets b_h - A_h \tilde{x}_h$
 	\State return $(\tilde{x}_h, b_h, c_h, S_{h/2})$
 	\EndFunction
-	%\State
+	\State
 	\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, S_h)$}
 	\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
 	\EndFunction
-	%\State
+	\State
 	\Function{iterate}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
 	\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
 	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
 	\EndFunction
-	%\State
+	\State
 	\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
 	\State $\tilde{x}_{2h} \gets 0$ 
 	\State $b_{2h} \gets c_{2h}$
@@ -342,7 +342,7 @@ The functions described in this section can therefore be considered as a \textsc
 	\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
 	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
 	\EndFunction
-	%\State
+	\State
 	\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, S_{h})$}
 	\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
 	\State $c_h \gets I_{2h}^{h} \cdot \tilde{x}_{2h}$
