@@ -5,17 +5,15 @@ digraph G {
   sh_1 [texlbl="$\langle s_h\rangle$"];
   sh_1 -> iterate_1
   sh_1 -> omega_1
-  sh_1 -> P_1
+  sh_1 -> lambda_1
   sh_1 -> cgc_1
   sh_1 -> prolongation_1
   sh_1 -> s2h_2
   iterate_1 [texlbl="\textsc{iterate}"];
   omega_1 [texlbl="$1.0$"];
-  P_1 [texlbl="$\langle \mathcal P \rangle$"];
-  P_1 -> lambda_1
   lambda_1 [texlbl="$\lambda$"];
   cgc_1 [texlbl="\textsc{cgc}"];
-  prolongation_1 [texlbl="$P_{2h}^h$"];
+  prolongation_1 [texlbl="$I_{2h}^h$"];
   s2h_2 [texlbl="$\langle s_{2h}\rangle$"];
   s2h_2 -> iterate_2
   iterate_2 [texlbl="\textsc{iterate}"];
@@ -28,9 +26,9 @@ digraph G {
   s2h_2 -> apply_2
   apply_2 [texlbl="\textsc{apply}"];
   s2h_2 -> Bh_2
-  Bh_2 [texlbl="$\langle B_h \rangle$"];
+  Bh_2 [texlbl="$\langle B_{2h} \rangle$"];
   Bh_2 -> jacobi_2
-  jacobi_2 [texlbl="$D_{h}^{-1}$"];
+  jacobi_2 [texlbl="$D_{2h}^{-1}$"];
   s2h_2 -> c2h_2
 
   c2h_2 [texlbl="$\langle c_{2h} \rangle$"];
@@ -44,9 +42,7 @@ digraph G {
   iterate_3 [texlbl="\textsc{iterate}"];
   s2h_3 -> omega_3
   omega_3 [texlbl="$1.0$"];
-  s2h_3 -> P_3
-  P_3 -> lambda_3
-  P_3 [texlbl="$\langle \mathcal P \rangle$"];
+  s2h_3 -> lambda_3
   lambda_3 [texlbl="$\lambda$"];
   s2h_3 -> apply_3
   apply_3 [texlbl="\textsc{apply}"];
@@ -56,7 +52,7 @@ digraph G {
   c4h_4 [texlbl="$\langle c_{4h} \rangle$"];
   apply_4 [texlbl="\textsc{apply}"];
   c4h_4 -> CGS
-  CGS [texlbl="$A_{2h}^{-1}$"];
+  CGS [texlbl="$A_{4h}^{-1}$"];
   c4h_4 -> apply_4
   apply_4 [texlbl="\textsc{apply}"];
   c4h_4 -> restriction_4
@@ -68,7 +64,7 @@ digraph G {
   c2h_5 -> operator_5
   operator_5 [texlbl="$A_{2h}$"];
   c2h_5 -> solution_5
-  solution_5 [texlbl="$0_{2h}$"];
+  solution_5 [texlbl="$x^0_{2h}$"];
   c2h_5 -> apply_5
   apply_5 [texlbl="\textsc{apply}"];
   c2h_5 -> restriction_5

@@ -1,4 +1,4 @@
-class Iteration(Expression):
+class Cycle(Expression):
     def __init__(self, approximation, rhs, correction=None, relaxation_factor=1.0, partitioning=None, predecessor=None):
         self.approximation = approximation
         self.rhs = rhs

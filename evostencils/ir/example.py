@@ -13,8 +13,8 @@ x_h = Approximation("x_h", grid)
 b_h = RightHandSide("b_h", grid)
 A_h = Operator("A_h", grid)
 r_h = Residual(A_h, x_h, b_h)
-# Create temporary Iteration node without correction term
-x_h = Iteration(x_h, b_h)
+# Create temporary Cycle node without correction term
+x_h = Cycle(x_h, b_h)
 
 # Define entities on coarse-grid
 A_H = Operator("A_H", coarse_grid)
@@ -23,7 +23,7 @@ b_H = Multiplication(Restriction("I_hH", grid, coarse_grid), r_h)
 r_H = Residual(A_H, x_H, b_H)
 
 # Define state on the coarse level
-x_H = Iteration(x_H, b_H, r_H, predecessor=x_h)
+x_H = Cycle(x_H, b_H, r_H, predecessor=x_h)
 # Restore iteration on the fine level
 x_h = x_H.predecessor
 # Replace old correction term with the computed coarse-grid correction
