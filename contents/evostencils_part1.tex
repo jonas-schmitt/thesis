@@ -153,8 +153,15 @@ This does not only enable us to quickly grasp the computational structure of the
 We, therefore, represent each newly computed approximate solution by an \texttt{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
 Furthermore, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
 \section{Grammar Generation}
+According to Section~\ref{sec:multigrid-grammar} our family of context-free grammar for the generation of multigrid methods consists of three components, a set of terminals, variables and productions, while additionally we have to choose a starting symbol $\ps{S}$ from the set of variables.
+Furthermore, in Table~\ref{table:grammar-semantics} we have defined the semantics of each state transition function occurring within the productions listed in Table~\ref{table:multigrid-grammar}.
+While Table~\ref{table:multigrid-grammar} fixes the number of coarsening steps, we have already seen that it is possible to define a similar grammar formulated on a different hierarchy of grid, for instance with a higher or lower number of coarsening steps.
+We can, therefore, utilize this property to parametrize the generation of a grammar formulated on a particular hierarchy of grids with the employed number of coarsening steps.
+For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in~\ref{code:grammar:terminals.py}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
 	\caption{Terminals defined on each level.}
 	\label{code:grammar:terminals.py}
 \end{listing}
+Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
+First of all, 
