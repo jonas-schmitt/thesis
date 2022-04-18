@@ -66,14 +66,14 @@ As the problems considered in this work are all solved on a hierarchy of uniform
 However, whenever we apply this restriction it is clearly stated within the respective part of the code.  
 \begin{listing}
 	\inputminted{python}{evostencils/ir/grid.py}
-	\caption{Class for Representing Structured Grids}
+	\caption{IR: Structure Grid}
 	\label{code:ir:grid}
 \end{listing}
 After defining a data structure that provides all information about a certain grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
 For this purpose, first in Listing~\ref{code:ir:abstact-base-class} a common abstract base class is provided from which all subsequent expression classes are derived.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/expression.py}
-	\caption{Abstract Expression Base Class}
+	\caption{IR: Abstract Expression Base Class}
 	\label{code:ir:abstact-base-class}
 \end{listing}
 In addition to the already mentioned grid data structure this class also defines a \texttt{shape} for each expression.
@@ -85,7 +85,7 @@ Based on this abstract class, we can then further distinguish between predefined
 First of all, Listing~\ref{code:ir:entity} contains the implementation of the entity base class.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/entity.py}
-	\caption{Base Class for Representing Entities}
+	\caption{IR: Entity Base Class}
 	\label{code:ir:entity}
 \end{listing}
 In addition to the previously mentioned properties, this class also contains a \texttt{name} to identify the respective entity.
@@ -93,12 +93,12 @@ Based on this implementation we can then further define classes for representing
 Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
-	\caption{Base Class for Representing Unary Expressions}
+	\caption{IR: Unary Expression Base Class}
 	\label{code:ir:unary-expression}
 \end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/ir/binary_expression.py}
-	\caption{Base Class for Representing Binary Expressions}
+	\caption{IR: Binary Expressions Base Class}
 	\label{code:ir:binary-expression}
 \end{listing}
 In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
@@ -117,13 +117,13 @@ Listing~\ref{code:ir:residual} shows the implementation of the \texttt{Residual}
 Based on these components we can, thus, easily construct the corresponding residual expression $b_H - A_H \tilde{x}_H$.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/residual.py}
-	\caption{Class for Representing the Residual}
+	\caption{IR: Residual}
 	\label{code:ir:residual}
 \end{listing}
 As a final step in the implementation of our intermediate representation, the definition of the \texttt{Cycle} class is shown in Listing~\ref{code:ir:cycle}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/cycle.py}
-	\caption{Class for Representing a Multigrid Cycle}
+	\caption{IR: Multigrid Cycle}
 	\label{code:ir:cycle}
 \end{listing}
 This class implements the functionality to represent a single step of multigrid cycle on a certain level with spacing $H$ with the purpose to compute a new value for the approximate solution $\tilde{x}_H$, i.e.
@@ -151,17 +151,23 @@ While this information is important for the construction of the graph, it could 
 However, preserving these additional references has the advantage of being able to easily traverse the sequence of \texttt{Cycle} nodes within each graph.
 This does not only enable us to quickly grasp the computational structure of the corresponding multigrid method, but also facilitates the identification of potential errors in the implementation.
 We, therefore, represent each newly computed approximate solution by an \texttt{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
-Furthermore, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
+Also, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
 \section{Grammar Generation}
 According to Section~\ref{sec:multigrid-grammar} our family of context-free grammar for the generation of multigrid methods consists of three components, a set of terminals, variables and productions, while additionally we have to choose a starting symbol $\ps{S}$ from the set of variables.
 Furthermore, in Table~\ref{table:grammar-semantics} we have defined the semantics of each state transition function occurring within the productions listed in Table~\ref{table:multigrid-grammar}.
 While Table~\ref{table:multigrid-grammar} fixes the number of coarsening steps, we have already seen that it is possible to define a similar grammar formulated on a different hierarchy of grid, for instance with a higher or lower number of coarsening steps.
 We can, therefore, utilize this property to parametrize the generation of a grammar formulated on a particular hierarchy of grids with the employed number of coarsening steps.
-For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in~\ref{code:grammar:terminals.py}.
+For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in Listing~\ref{code:grammar:terminals.py}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
 	\caption{Terminals defined on each level.}
 	\label{code:grammar:terminals.py}
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
-First of all, 
+First of all, as, at least in the applications considered in this work, each smoother is derived directly from the system operator, it does not need to be provided explicitly, but instead can be generated automatically within the grammar.
+Also, while so far we have abstractly represented the application of the coarse-grid solver in form of a multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, to be provided by the user.
+The implementation of this class can again be found in the appendix.
+Note that the coarse-grid solver can additionally contain an expression, which then again represents a multigrid method, given in form of the intermediate representation introduced in the last section.
+Based on these terminals we can next implement the state transition functions shown in Table~\ref{table:grammar-semantics}.
+However, at this point it is important to keep in mind, that our intermediate representation deviates from the expressions generated within the functions shown in Table~\ref{table:grammar-semantics} with respect to its treatment of multiply occurring subexpressions, in particular in form of the previous approximate solution and right-hand side on each level.
+While the construction of a computational graph similar to Figure~\ref{fig:example-three-grid-method-computational-graph} based on the expression of a multigrid method, obtained from a grammar derivation tree, can be considered as an additional step, from an implementation perspective, we can simplify this process to a single operation.

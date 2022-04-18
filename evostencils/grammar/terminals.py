@@ -1,13 +1,15 @@
+from evostencils.ir import partitioning as part
+
 class Terminals:
-    def __init__(self, approximation, operator, coarse_operator, restriction, prolongation, coarse_grid_solver_expression=None):
-        self.approximation = approximation
+    def __init__(self, approximation, operator, coarse_operator, restriction_operators, prolongation_operators, coarse_grid_solver, partitionings=None):
         self.operator = operator
         self.coarse_operator = coarse_operator
-        self.prolongation = prolongation
-        self.restriction = restriction
-        self.coarse_grid_solver = base.CoarseGridSolver(self.coarse_operator, expression=coarse_grid_solver_expression)
+        self.approximation = approximation
+        self.prolongation_operators = prolongation_operators
+        self.restriction_operators = restriction_operators
+        self.coarse_grid_solver = coarse_grid_solver
         self.no_partitioning = part.Single
-        self.red_black_partitioning = part.RedBlack
+        self.partitionings = partitionings
 
     @property
     def grid(self):
