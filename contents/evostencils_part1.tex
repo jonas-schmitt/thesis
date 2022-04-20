@@ -167,7 +167,19 @@ Note that this class comprises a few notable differences compared to our grammar
 First of all, as, at least in the applications considered in this work, each smoother is derived directly from the system operator, it does not need to be provided explicitly, but instead can be generated automatically within the grammar.
 Also, while so far we have abstractly represented the application of the coarse-grid solver in form of a multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, to be provided by the user.
 The implementation of this class can again be found in the appendix.
-Note that the coarse-grid solver can additionally contain an expression, which then again represents a multigrid method, given in form of the intermediate representation introduced in the last section.
-Based on these terminals we can next implement the state transition functions shown in Table~\ref{table:grammar-semantics}.
-However, at this point it is important to keep in mind, that our intermediate representation deviates from the expressions generated within the functions shown in Table~\ref{table:grammar-semantics} with respect to its treatment of multiply occurring subexpressions, in particular in form of the previous approximate solution and right-hand side on each level.
-While the construction of a computational graph similar to Figure~\ref{fig:example-three-grid-method-computational-graph} based on the expression of a multigrid method, obtained from a grammar derivation tree, can be considered as an additional step, from an implementation perspective, we can simplify this process to a single operation.
+Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
+This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
+As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions shown in Table~\ref{table:grammar-semantics}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
+From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/residual_apply_iterate.py}
+	\caption{}
+	\label{code:grammar:residual-apply-iterate}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/cocy_cgc.py}
+	\caption{}
+	\label{code:grammar:cocy-cgc}
+\end{listing}
+
+
