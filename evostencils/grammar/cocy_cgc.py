@@ -1,4 +1,4 @@
-def coarse_grid_correction(interpolation, state, relaxation_factor_index, restriction=None):
+def coarse_grid_correction(relaxation_factor_index, interpolation, state):
     cycle = state[0]
     correction = base.Multiplication(interpolation, cycle)
     cycle.predecessor.correction = correction

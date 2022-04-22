@@ -89,7 +89,23 @@ First of all, Listing~\ref{code:ir:entity} contains the implementation of the en
 	\label{code:ir:entity}
 \end{listing}
 In addition to the previously mentioned properties, this class also contains a \texttt{name} to identify the respective entity.
-Based on this implementation we can then further define classes for representing an approximate solution, right-hand side, system and inter-grid operators, whose implementation can be found in the appendix.
+Based on this implementation we can then further define classes for representing an approximate solution and right-hand side and operator, which are shown in the Listings~\ref{code:ir:approximation} and~\ref{code:ir:operator}.
+\begin{listing}
+	\inputminted{python}{evostencils/ir/approximation.py}
+	\caption{IR: Approximate Solution and Right-Hand Side}
+	\label{code:ir:approximation}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/ir/operator.py}
+	\caption{IR: Operator}
+	\label{code:ir:operator}
+\end{listing}
+In both cases, the shape of the respective entity is obtained by computing the grid size product over all dimensions, whereas in case of the approximation and right-hand side the result can be considered as a vector while the shape of an operator corresponds to a quadratic matrix.
+Note that as the \texttt{Approximation} and \texttt{RightHandSide} class, from a mathematical point of view, can be both considered as a vector and we simply derive them from each other.
+As a consequence we can still differentiate the objects of both classes with respect to their type, while avoiding unnecessary code duplication.
+In addition to the attributes defined in its parent class, the \texttt{Approximation} 
+
+Additionally, the implementation of inter-grid operator classes can be found in the appendix.
 Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}

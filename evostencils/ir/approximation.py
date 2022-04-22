@@ -6,13 +6,8 @@ class Approximation(Entity):
         super().__init__(name, grid, shape)
 
     @property
-    def grid(self):
-        return self._grid
-
-    @property
-    def dimension(self):
-        return len(self.grid.dimension)
-
+    def predecessor(self):
+        return None
 
 class RightHandSide(Approximation):
     pass

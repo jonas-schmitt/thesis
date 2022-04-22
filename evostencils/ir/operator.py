@@ -2,14 +2,10 @@ from operator import mul
 
 class Operator(Entity):
     def __init__(self, name, grid, stencil_generator=None):
-        tmp = reduce(mul, grid.size)
-        shape = (tmp, tmp)
+        n = reduce(mul, grid.size)
+        shape = (n, n)
         self._stencil_generator = stencil_generator
         super().__init__(name, grid, shape)
-
-    @property
-    def grid(self):
-        return self._grid
 
     @property
     def stencil_generator(self):
