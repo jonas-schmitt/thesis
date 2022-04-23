@@ -104,10 +104,27 @@ In both cases, the shape of the respective entity is obtained by computing the g
 Note that as the \texttt{Approximation} and \texttt{RightHandSide} class, from a mathematical point of view, can be both considered as a vector, we only implement the former and then utilize inheritance to avoid unnecessary code duplication.
 In addition to the attributes defined in its parent class, the \texttt{Approximation} includes a \texttt{predecessor} attribute, whose meaning will be discussed later within the implementation of grammar generation.
 While the other two entities discussed here correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given in form of one or multiple stencil codes.
-In Section~\ref{subsec:stencil-codes} we have already introduced a mathematical notation for stencil codes in form of Equation~\ref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner that leads to
+In Section~\ref{subsec:stencil-codes} we have already introduced a mathematical notation for stencil codes in form of Equation~\ref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner that leads to the \texttt{Stencil} class shown in Listing~\ref{code:ir:stencil}.
 %TODO introduce stencil implementation here
+\begin{listing}
+	\inputminted{python}{evostencils/ir/stencil.py}
+	\caption{IR: Stencil}
+	\label{code:ir:stencil}
+\end{listing}
+The \texttt{entries} attribute of this class directly corresponds to the set $S_h$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \texttt{tuple} object to represent this set in the Python programming language.
+Each entry $e_i$ of this tuple then again represents a tuple of the form of
+\begin{equation}
+	e_i = \left(\bm{a}_i, b_i \right),
+\end{equation} 
+where $\bm{a}_i$ is the offset from the current grid point in each dimension, given as an array of integer values, and $b_i$ is the stencil value that corresponds to each offset, given as a floating point number.
+Based on this class we can then provide implementations for all operations on stencil codes that have been defined in Section~\ref{subsec:stencil-codes}.
+Furthermore, in accordance with Section~\ref{subsec:systems-of-pdes} and~\ref{subsec:block-smoothing}, we can extend this implementation to systems of PDEs and block smoothers, which will be briefly covered in the next Chapter of this thesis. %TODO insert ref to next chapter here or remove sentence
+Now note that in our implementation of the \texttt{Operator} class in Listing~\ref{code:ir:operator} the stencil is not included directly, but instead we provide a so-called \emph{stencil generator}.
+A stencil generator is a function that returns the instance of a certain stencil defined on a given grid, which enables us to obtain the corresponding stencil of a given discretized differential operator on different grids.
+For instance, the Laplace operator $\nabla^2$ can be discretized on grids with different spacing and dimensionality.
+Therefore, instead of storing a stencil for each individual problem instance, we can instead parametrize its generation based on the features of the applied discretization.
 
-
+%TODO mention that we can not cover the full implementation here, refer to appendix
 Additionally, the implementation of inter-grid operator classes can be found in the appendix.
 Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}

@@ -191,6 +191,7 @@ We can achieve a similar behavior by assigning neighboring grid points to differ
 \end{equation}
 In many cases, the resulting method has better smoothing properties than the Jacobi method without sacrificing much of its parallelism, since the computations on each partition can be performed in parallel~\cite{trottenberg2000multigrid}.
 \subsubsection{Block Smoothing}
+\label{subsec:block-smoothing}
 In Section~\ref{subsec:smoothing}, we have only discussed smoothers that operate in a pointwise manner.
 For instance, in the Jacobi method, Equation~\eqref{eq:jacobi-element-wise} is computed for each individual grid point.
 The idea of block smoothing is to reorder the original system in such a way, that the same operations can be defined on blocks of grid points.
