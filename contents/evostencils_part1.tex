@@ -120,11 +120,17 @@ where $\bm{a}_i$ is the offset from the current grid point in each dimension, gi
 Based on this class we can then provide implementations for all operations on stencil codes that have been defined in Section~\ref{subsec:stencil-codes}.
 Furthermore, in accordance with Section~\ref{subsec:systems-of-pdes} and~\ref{subsec:block-smoothing}, we can extend this implementation to systems of PDEs and block smoothers, which will be briefly covered in the next Chapter of this thesis. %TODO insert ref to next chapter here or remove sentence
 Now note that in our implementation of the \texttt{Operator} class in Listing~\ref{code:ir:operator} the stencil is not included directly, but instead we provide a so-called \emph{stencil generator}.
-A stencil generator is a function that returns the instance of a certain stencil defined on a given grid, which enables us to obtain the corresponding stencil of a given discretized differential operator on different grids.
-For instance, the Laplace operator $\nabla^2$ can be discretized on grids with different spacing and dimensionality.
-Therefore, instead of storing a stencil for each individual problem instance, we can instead parametrize its generation based on the features of the applied discretization.
-
-%TODO mention that we can not cover the full implementation here, refer to appendix
+A stencil generator is a function that returns the discretization of an operator on a particular grid in the form of a stencil.
+For instance, the finite-difference discretization of the Laplace operator $\nabla^2$ on a two-dimensional uniform grid leads to the stencil 
+\begin{equation*}
+	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
+\end{equation*}
+in which the value at each offset depends on the grid spacing $h$.
+Furthermore, in certain cases it is possible to construct the higher-dimensional version of a stencil from its lower dimensional counterparts, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
+Therefore, instead of storing a unique stencil for each individual operator instance, we can instead parametrize its generation based on the features of the applied discretization, by including a reference to the respective generator function.
+Finally, as prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator.
+We, therefore, implement prolongation and restrictions by extending the \texttt{Operator} class with 
+%TODO discuss prolongation and restriction
 Additionally, the implementation of inter-grid operator classes can be found in the appendix.
 Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}

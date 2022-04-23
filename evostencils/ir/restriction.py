@@ -1,9 +1,9 @@
 from operator import mul
+from functools import reduce
 
 class Restriction(InterGridOperator):
     def __init__(self, name, fine_grid, coarse_grid, stencil_generator=None):
         super().__init__(name, coarse_grid, fine_grid, coarse_grid, stencil_generator)
-        from functools import reduce
         tmp1 = reduce(mul, fine_grid.size)
         tmp2 = reduce(mul, coarse_grid.size)
         self._shape = (tmp2, tmp1)

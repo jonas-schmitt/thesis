@@ -397,6 +397,7 @@ with an initial guess of $\bm{x}_{2h}^{(0)} = I_{h}^{2h} \bm{x}_{h}^{(0)}$.
 Because smoothing aims to remove the remaining oscillatory components of the error obtained from the fine grid, performing a relaxation of the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
 
 \subsection{Restriction and Prolongation}
+\label{subsec:restriction-and-prolongation}
 %TODO fix stencil notation in this section
 Before we can define an actual multigrid method, which recursively applies the techniques introduced here to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{2h}^{h}$ and $I_{h}^{2h}$.
 Here, the restriction operator $I_{2h}^{h}$ must be able to compute an approximation of the current residual on a coarser grid, while the goal of the prolongation operator $I_{h}^{2h}$ is to transfer a approximation for the solution of the error equation back to a finer grid.
