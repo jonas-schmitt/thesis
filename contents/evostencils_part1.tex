@@ -55,6 +55,7 @@ In the following, we will now consider the individual parts of this architecture
 As a first step, we will outline the implementation of an intermediate representation for multigrid methods that can be easily obtained from a given derivation tree and which then acts as a basis for all subsequent steps of solver generation and evaluation.
 
 \section{Intermediate Representation}
+\label{sec:intermediate-representation}
 Before we can represent the actual method and its computational structure, we need to be aware of the fact that all operations of a multigrid method are defined on a grid with certain step size.
 Note that algebraic multigrid methods~\cite{stuben2001introduction,ruge1987algebraic}, which are not considered in this work, represent an exception to this, as they directly operate on sparse matrix and vector data structures.
 In Section~\ref{sec:discretization} we have already made the assumption that we are able to discretize the underlying PDE on a hierarchy of structured grids.
@@ -216,6 +217,22 @@ This enables the construction of multigrid methods in a hierarchical manner, whi
 As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions shown in Table~\ref{table:grammar-semantics}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
 First of all, Listing~\ref{code:grammar:residual-apply-iterate} contains the implementation of the functions \texttt{residual}, \texttt{apply} and \texttt{iterate}, which correspond to the eponymous state transitions functions defined in Table~\ref{table:grammar-semantics}.
+While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \texttt{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
+In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \texttt{Cycle} object.
+As a consequence, the application of each state transition function either alters a given \texttt{Cycle} or returns a new object of this type.
+However, the \texttt{residual} function deviates from this statement as it expects a \texttt{state} variable as its argument, which corresponds to tuple, consisting of an approximation and right-hand side object.
+The necessity of this modification can be understood by considering the grammar productions shown in Table~\ref{table:multigrid-grammar}.
+While within each subsequent step of a multigrid method, each approximate solution is represented by a \texttt{Cycle} objects that incorporates all steps required to compute its value, at the beginning of a multigrid method, the residual is computed based on the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \texttt{Approximation} and \texttt{RightHandSide} object, respectively.
+In this case, we, therefore, need to pass the initial state 
+\begin{equation*}
+	S_h^0 = (x_h^0, b_h, \lambda, \lambda)
+\end{equation*} explicitly to the respective residual function.
+As the third and fourth entry of this tuple is empty, in Python this corresponds to a binary tuple consisting of the respective \texttt{Approximation} and \texttt{RightHandSide} object.
+Even though in all subsequent computations, the first entry of this tuple then consists of a \texttt{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \texttt{residual} function within all grammar productions.
+For this purpose, the \texttt{iterate} function is adapted accordingly, such that the respective binary state tuple, in the form of Cycle for computing a new approximate solution and the current right-hand side, is returned.
+The second main difference in the implementation shown in Listing~\ref{code:grammar:residual-apply-iterate} compared to our original definition of the iterate function, which is the representation of the relaxation factor as an index within interval included in the respective \texttt{Terminal} object.
+The reason why we do not explicitly store the relaxation factor as a floating point number is that its representation then depends on the accuracy of the underlying floating point format, which might lead to issues whenever we aim to evaluate a given derivation tree, that has been stored in a binary or string format, in a different environment.
+
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/residual_apply_iterate.py}
 	\caption{Basic state transition functions}
