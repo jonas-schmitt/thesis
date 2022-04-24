@@ -2,7 +2,7 @@
 \setminted[python]{fontsize=\footnotesize, breaklines}
 In the first part of this thesis we have established a theoretical basis about multigrid methods, formal languages and genetic programming.
 In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
-While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet demonstrate its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
+While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet prove its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
 We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the grammar-guided optimization of multigrid methods.
 Using this framework we will then show how it is possible to evolve methods that are more efficient than all common multigrid cycles in solving a number of PDE-based problems while being structurally different that any other known method of this type.
 However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview about its workflow and software architecture.
@@ -76,11 +76,9 @@ For this purpose, first in Listing~\ref{code:ir:abstact-base-class} a common abs
 	\caption{IR: Abstract Expression Base Class}
 	\label{code:ir:abstact-base-class}
 \end{listing}
-In addition to the already mentioned grid data structure this class also defines a \texttt{shape} for each expression.
-In a multigrid method each expression either computes a matrix or a vector.
-For example, multiplying a $m \times n$-matrix with a $n \times m$-matrix yields a $m \times m$-matrix.
+In addition to the already mentioned grid data structure this class also defines a \emph{shape} for each expression.
+From a mathematical point of view, each expression contained in a multigrid method either computes a matrix or a vector, whose shape can be derived recursively from its operands
 The shape of the corresponding expression is then defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns, which in the given example is both $m$.
-As in the case of matrix multiplication, the shape of each expression can always be derived from its operands, whose shape can be recursively determined in a similar manner.
 Based on this abstract class, we can then further distinguish between predefined entities, such as the system matrix and right-hand side, and expressions that refer to the mathematical operations of a multigrid method.
 First of all, Listing~\ref{code:ir:entity} contains the implementation of the entity base class.
 \begin{listing}
@@ -88,7 +86,7 @@ First of all, Listing~\ref{code:ir:entity} contains the implementation of the en
 	\caption{IR: Entity Base Class}
 	\label{code:ir:entity}
 \end{listing}
-In addition to the previously mentioned properties, this class also contains a \texttt{name} to identify the respective entity.
+In addition to the previously mentioned attributes, this class is also given a \emph{name} to identify the respective entity.
 Based on this implementation we can then further define classes for representing an approximate solution and right-hand side and operator, which are shown in the Listings~\ref{code:ir:approximation} and~\ref{code:ir:operator}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/approximation.py}
@@ -101,7 +99,7 @@ Based on this implementation we can then further define classes for representing
 	\label{code:ir:operator}
 \end{listing}
 In both cases, the shape of the respective entity is obtained by computing the grid size product over all dimensions, whereas in case of the approximation and right-hand side the result can be considered as a vector while the shape of an operator corresponds to a quadratic matrix.
-Note that as the \texttt{Approximation} and \texttt{RightHandSide} class, from a mathematical point of view, can be both considered as a vector, we only implement the former and then utilize inheritance to avoid unnecessary code duplication.
+Note that as the \texttt{Approximation} and \texttt{RightHandSide} classes, from a mathematical point of view, can be both considered as a vector, we only implement the former and then utilize inheritance to avoid unnecessary code duplication.
 In addition to the attributes defined in its parent class, the \texttt{Approximation} includes a \texttt{predecessor} attribute, whose meaning will be discussed later within the implementation of grammar generation.
 While the other two entities discussed here correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given in form of one or multiple stencil codes.
 In Section~\ref{subsec:stencil-codes} we have already introduced a mathematical notation for stencil codes in form of Equation~\ref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner that leads to the \texttt{Stencil} class shown in Listing~\ref{code:ir:stencil}.
@@ -123,16 +121,19 @@ Now note that in our implementation of the \texttt{Operator} class in Listing~\r
 A stencil generator is a function that returns the discretization of an operator on a particular grid in the form of a stencil.
 For instance, the finite-difference discretization of the Laplace operator $\nabla^2$ on a two-dimensional uniform grid leads to the stencil 
 \begin{equation*}
-	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
+	\begin{split}
+		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h}.
+	\end{split}
 \end{equation*}
 in which the value at each offset depends on the grid spacing $h$.
 Furthermore, in certain cases it is possible to construct the higher-dimensional version of a stencil from its lower dimensional counterparts, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
 Therefore, instead of storing a unique stencil for each individual operator instance, we can instead parametrize its generation based on the features of the applied discretization, by including a reference to the respective generator function.
-Finally, as prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator.
-We, therefore, implement prolongation and restrictions by extending the \texttt{Operator} class with 
-%TODO discuss prolongation and restriction
-Additionally, the implementation of inter-grid operator classes can be found in the appendix.
-Next, we need to provide classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
+Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \texttt{shape} attribute.
+For this purpose, the class \texttt{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \texttt{Operator} class with the required functionality.
+For the sake of brevity, the implementation of this class and the respective \texttt{Restriction} and \texttt{Prolongation} subclasses can be found in the appendix.
+
+After discussing the implementation of the different entities based on which a multigrid method is built, we next shift our attention to the implementation of those IR classes that let us represent the expressions that correspond to the actual computations performed within its application. 
+For this purpose we, first provide general classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
 	\caption{IR: Unary Expression Base Class}
@@ -211,16 +212,18 @@ Also, while so far we have abstractly represented the application of the coarse-
 The implementation of this class can again be found in the appendix.
 Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
+
 As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions shown in Table~\ref{table:grammar-semantics}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
+First of all, Listing~\ref{code:grammar:residual-apply-iterate} contains the implementation of the functions \texttt{residual}, \texttt{apply} and \texttt{iterate}, which correspond to the eponymous state transitions functions defined in Table~\ref{table:grammar-semantics}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/residual_apply_iterate.py}
-	\caption{}
+	\caption{Basic state transition functions}
 	\label{code:grammar:residual-apply-iterate}
 \end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/cocy_cgc.py}
-	\caption{}
+	\caption{Inter-grid state transition functions}
 	\label{code:grammar:cocy-cgc}
 \end{listing}
 

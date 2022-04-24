@@ -14,6 +14,3 @@ class Multiplication(BinaryExpression):
     @property
     def shape(self):
         return self._shape
-
-    def generate_stencil(self):
-        return stencils.multiple.mul(self.operand1.generate_stencil(), self.operand2.generate_stencil())

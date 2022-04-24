@@ -316,7 +316,7 @@ Note that the complete coarse-grid correction step is then obtained through subs
 %TODO describe coarse-grid solver A_{4h}^{-1}
 As it has been described in this section, the application of each of these functions corresponds to a certain transition between the possible states of a multigrid solver, and, hence, for every possible multigrid method a sequence of function applications can be assembled.
 The evaluation of this sequence then leads to a state whose first component $\tilde{x}_h$ contains an expression that corresponds to the step wise execution of all steps of the method.
-The functions described in this section can therefore be considered as a \textsc{language} for the formal description of multigrid methods.
+The functions described in this section can therefore be considered as a \emph{language} for the formal description of multigrid methods, which is summarized in Table~\ref{table:grammar-semantics}.
 \begin{table}
 	\caption{State transition functions}
 	\label{table:grammar-semantics}
@@ -336,7 +336,7 @@ The functions described in this section can therefore be considered as a \textsc
 	\EndFunction
 	\State
 	\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
-	\State $\tilde{x}_{2h} \gets 0$ 
+	\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 	\State $b_{2h} \gets c_{2h}$
 	\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
 	\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)

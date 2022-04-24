@@ -207,7 +207,6 @@ As a two-dimensional example we consider the following five-point stencil define
 Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields 
 \begin{equation}
 	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
-	\label{eq:2D-laplace-stencil}
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
 From this example it becomes evident that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
