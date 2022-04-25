@@ -217,6 +217,11 @@ This enables the construction of multigrid methods in a hierarchical manner, whi
 As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions shown in Table~\ref{table:grammar-semantics}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
 First of all, Listing~\ref{code:grammar:residual-apply-iterate} contains the implementation of the functions \texttt{residual}, \texttt{apply} and \texttt{iterate}, which correspond to the eponymous state transitions functions defined in Table~\ref{table:grammar-semantics}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/residual_apply_iterate.py}
+	\caption{Basic state transition functions}
+	\label{code:grammar:residual-apply-iterate}
+\end{listing}
 While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \texttt{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
 In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \texttt{Cycle} object.
 As a consequence, the application of each state transition function either alters a given \texttt{Cycle} or returns a new object of this type.
@@ -232,16 +237,15 @@ Even though in all subsequent computations, the first entry of this tuple then c
 For this purpose, the \texttt{iterate} function is adapted accordingly, such that the respective binary state tuple, in the form of Cycle for computing a new approximate solution and the current right-hand side, is returned.
 The second main difference in the implementation shown in Listing~\ref{code:grammar:residual-apply-iterate} compared to our original definition of the iterate function, which is the representation of the relaxation factor as an index within interval included in the respective \texttt{Terminal} object.
 The reason why we do not explicitly store the relaxation factor as a floating point number is that its representation then depends on the accuracy of the underlying floating point format, which might lead to issues whenever we aim to evaluate a given derivation tree, that has been stored in a binary or string format, in a different environment.
-
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/residual_apply_iterate.py}
-	\caption{Basic state transition functions}
-	\label{code:grammar:residual-apply-iterate}
-\end{listing}
+Next we consider the implementation of the functions \texttt{coarse\_cycle} and \texttt{coarse\_grid\_correction} shown in Listing~\ref{code:grammar:cocy-cgc}, which are responsible for transferring information between adjacent grids within the hierarchy of discretizations.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/cocy_cgc.py}
 	\caption{Inter-grid state transition functions}
 	\label{code:grammar:cocy-cgc}
 \end{listing}
+As their names suggest these function correspond to the state transition functions \textsc{cocy} and \textsc{cgc} defined in Table~\ref{table:grammar-semantics}.
+While the \texttt{coarse\_cycle} function corresponds directly to its eponymous counterpart, the \texttt{coarse\_grid\_correction}, for the sake of simplicity, additionally applies the \texttt{iterate} function at the end of its computation.
+The latter is justified by the fact that in our multigrid grammar, as shown in Table~\ref{table:multigrid-grammar}, the \textsc{cgc} function is always applied in conjunction with the \textsc{iterate} function.
+%TODO continue here: After defining the basic 
 
 

@@ -282,13 +282,13 @@ Furthermore, as discussed within the last section, before we can transition to a
 The resulting state transition is implemented in the function \textsc{cocy}, which is abbreviation of the term coarse-grid cycle, which is derived from the fact that a new cycle is initiated on the next coarser grid that is later completed by applying the computed coarse-grid correction.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
-		\State $\tilde{x}_{2h} \gets 0$ 
+	\Function{cocy}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+		\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
 		\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
 		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
-		\EndFunction
+	\EndFunction
 	\end{algorithmic}
 %\caption{Coarse-grid cycle}
 \end{algorithm}
