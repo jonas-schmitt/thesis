@@ -1,12 +1,12 @@
 def coarse_cycle(coarse_approximation, cycle):
-    tmp = Cycle(coarse_approximation, cycle.correction, Residual(terminals.coarse_operator, coarse_approximation, cycle.correction))
-    cycle.correction = tmp
-    cycle.correction.predecessor = cycle
-    return cycle.correction
+    coarse_residual = base.Residual(terminals.coarse_operator, coarse_approximation, cycle.correction)
+    new_cycle = base.Cycle(coarse_approximation, cycle.correction, coarse_residual)
+    new_cycle.predecessor = cycle
+    return new_cycle
 
-def coarse_grid_correction(relaxation_factor_index, interpolation, state):
+def coarse_grid_correction(prolongation, state):
     cycle = state[0]
-    correction = base.Multiplication(interpolation, cycle)
-    cycle.predecessor.correction = correction
-    return iterate(relaxation_factor_index, terminals.no_partitioning, cycle.predecessor)
+    predecessor = cycle.predecessor
+    predecessor.correction = base.Multiplication(prolongation, cycle)
+    return predecessor
 

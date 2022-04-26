@@ -201,11 +201,11 @@ According to Section~\ref{sec:multigrid-grammar} our family of context-free gram
 Furthermore, in Table~\ref{table:grammar-semantics} we have defined the semantics of each state transition function occurring within the productions listed in Table~\ref{table:multigrid-grammar}.
 While Table~\ref{table:multigrid-grammar} fixes the number of coarsening steps, we have already seen that it is possible to define a similar grammar formulated on a different hierarchy of grid, for instance with a higher or lower number of coarsening steps.
 We can, therefore, utilize this property to parametrize the generation of a grammar formulated on a particular hierarchy of grids with the employed number of coarsening steps.
-For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in Listing~\ref{code:grammar:terminals.py}.
+For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in Listing~\ref{code:grammar:terminals}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
 	\caption{Terminals defined on each level.}
-	\label{code:grammar:terminals.py}
+	\label{code:grammar:terminals}
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
 First of all, as, at least in the applications considered in this work, each smoother is derived directly from the system operator, it does not need to be provided explicitly, but instead can be generated automatically within the grammar.
@@ -243,9 +243,29 @@ Next we consider the implementation of the functions \texttt{coarse\_cycle} and 
 	\caption{Inter-grid state transition functions}
 	\label{code:grammar:cocy-cgc}
 \end{listing}
-As their names suggest these function correspond to the state transition functions \textsc{cocy} and \textsc{cgc} defined in Table~\ref{table:grammar-semantics}.
-While the \texttt{coarse\_cycle} function corresponds directly to its eponymous counterpart, the \texttt{coarse\_grid\_correction}, for the sake of simplicity, additionally applies the \texttt{iterate} function at the end of its computation.
-The latter is justified by the fact that in our multigrid grammar, as shown in Table~\ref{table:multigrid-grammar}, the \textsc{cgc} function is always applied in conjunction with the \textsc{iterate} function.
-%TODO continue here: After defining the basic 
+Again our implementation of these functions directly correspond to the respective state transition functions \textsc{cocy} and \textsc{cgc} defined in Table~\ref{table:grammar-semantics}.
+While these four functions provide us the basic functionality to generate the IR representation of arbitrarily structured multigrid method on each level, we have not yet considered how we can apply different smoothers and the coarse-grid solver.
+First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way.
+Each of these productions corresponds to the application of a certain smoothing operator 
+\begin{equation*}
+	\ps{B_{h}} = \left( A^+_{h} \right)^{-1},
+\end{equation*}
+where $A^+_{h}$ obtained from a splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
+While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
+Therefore, we can instead represent its generation as a function \texttt{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
+If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \texttt{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/smoothing.py}
+	\caption{General smoothing state transition function.}
+	\label{code:grammar:smoothing}
+\end{listing}
+Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{iterate}, whereby we generate $\ps{B_{h}}$ using the aforementioned smoother generator.
+Consequently, for each specific smoother, we then only need to provide a different generator function.
+For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/jacobi.py}
+	\caption{Example for generating Jacobi-based smoothers.}
+	\label{code:grammar:jacobi}
+\end{listing}
 
 
