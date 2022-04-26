@@ -244,7 +244,7 @@ Next we consider the implementation of the functions \texttt{coarse\_cycle} and 
 	\label{code:grammar:cocy-cgc}
 \end{listing}
 Again our implementation of these functions directly correspond to the respective state transition functions \textsc{cocy} and \textsc{cgc} defined in Table~\ref{table:grammar-semantics}.
-While these four functions provide us the basic functionality to generate the IR representation of arbitrarily structured multigrid method on each level, we have not yet considered how we can apply different smoothers and the coarse-grid solver.
+While these four functions provide us the basic functionality to generate the IR representation of arbitrarily structured multigrid method on each level, we have not yet considered how we can apply different smoothers, restriction and the coarse-grid solver.
 First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way.
 Each of these productions corresponds to the application of a certain smoothing operator 
 \begin{equation*}
@@ -267,5 +267,14 @@ For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother
 	\caption{Example for generating Jacobi-based smoothers.}
 	\label{code:grammar:jacobi}
 \end{listing}
+Finally, both the creation of a new cycle on the next coarser level as well as the application of the coarse grid solver on the coarsest level require us to restrict the correction part of a given \texttt{Cycle} object.
+While this can be accomplished within a single application of the \texttt{apply} function, for the sake of clarity, we still implement this functionality in a separate function, which is shown in Listing~\ref{code:grammar:restriction}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/restrict.py}
+	\caption{Restriction function.}
+	\label{code:grammar:restriction}
+\end{listing}
+Note that in Table~\ref{table:multigrid-grammar} the application of this function corresponds to the 
+%TODO adapt according to updated functions in current evostencils code
 
 

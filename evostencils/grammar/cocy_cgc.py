@@ -4,9 +4,9 @@ def coarse_cycle(coarse_approximation, cycle):
     new_cycle.predecessor = cycle
     return new_cycle
 
-def coarse_grid_correction(prolongation, state):
+def coarse_grid_correction(prolongation_operator, state):
     cycle = state[0]
     predecessor = cycle.predecessor
-    predecessor.correction = base.Multiplication(prolongation, cycle)
+    predecessor.correction = base.Multiplication(prolongation_operator, cycle)
     return predecessor
 
