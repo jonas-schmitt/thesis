@@ -8,8 +8,19 @@ def apply(operator, cycle):
 
 def iterate(relaxation_factor_index, partitioning, cycle):
     relaxation_factor = terminals.relaxation_factor_interval[relaxation_factor_index]
-    rhs = cycle.rhs
     cycle.relaxation_factor = relaxation_factor
     cycle.partitioning = partitioning
-    approximation = cycle
+    approximation, rhs = cycle, cycle.rhs
     return approximation, rhs
+
+def coarse_cycle(coarse_operator, coarse_approximation, cycle):
+    coarse_residual = base.Residual(coarse_operator, coarse_approximation, cycle.correction)
+    new_cycle = base.Cycle(coarse_approximation, cycle.correction, coarse_residual)
+    new_cycle.predecessor = cycle
+    return new_cycle
+
+def coarse_grid_correction(prolongation_operator, state):
+    cycle = state[0]
+    correction = base.Multiplication(prolongation_operator, cycle)
+    cycle.predecessor.correction = correction
+    return cycle.predecessor
