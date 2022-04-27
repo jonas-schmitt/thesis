@@ -13,7 +13,7 @@ def iterate(relaxation_factor_index, partitioning, cycle):
     approximation, rhs = cycle, cycle.rhs
     return approximation, rhs
 
-def coarse_cycle(coarse_operator, coarse_approximation, cycle):
+def initiate_cycle(coarse_operator, coarse_approximation, cycle):
     coarse_residual = base.Residual(coarse_operator, coarse_approximation, cycle.correction)
     new_cycle = base.Cycle(coarse_approximation, cycle.correction, coarse_residual)
     new_cycle.predecessor = cycle

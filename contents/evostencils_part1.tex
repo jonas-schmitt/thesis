@@ -214,14 +214,9 @@ The implementation of this class can again be found in the appendix.
 Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
 
-As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions shown in Table~\ref{table:grammar-semantics}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
+As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions that have been formulated in Section~\ref{sec:multigrid-state-transitions}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
-First of all, Listing~\ref{code:grammar:basic-functions} contains the implementation of the functions \texttt{residual}, \texttt{apply} and \texttt{iterate}, which correspond to the eponymous state transitions functions defined in Table~\ref{table:grammar-semantics}.
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/base.py}
-	\caption{Basic state transition functions}
-	\label{code:grammar:basic-functions}
-\end{listing}
+Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
 While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \texttt{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
 In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \texttt{Cycle} object.
 As a consequence, the application of each state transition function either alters a given \texttt{Cycle} or returns a new object of this type.
@@ -233,13 +228,22 @@ In this case, we, therefore, need to pass the initial state
 	S_h^0 = (x_h^0, b_h, \lambda, \lambda)
 \end{equation*} explicitly to the respective residual function.
 As the third and fourth entry of this tuple is empty, in Python this corresponds to a binary tuple consisting of the respective \texttt{Approximation} and \texttt{RightHandSide} object.
-Even though in all subsequent computations, the first entry of this tuple then consists of a \texttt{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \texttt{residual} function within all grammar productions.
-For this purpose, the \texttt{iterate} function is adapted accordingly, such that the respective binary state tuple, in the form of Cycle for computing a new approximate solution and the current right-hand side, is returned.
-The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the iterate function, which is the representation of the relaxation factor as an index within interval included in the respective \texttt{Terminal} object.
-The reason why we do not explicitly store the relaxation factor as a floating point number is that its representation then depends on the accuracy of the underlying floating point format, which might lead to issues whenever we aim to evaluate a given derivation tree, that has been stored in a binary or string format, in a different environment.
-Next we consider the implementation of the functions \texttt{coarse\_cycle} and \texttt{coarse\_grid\_correction} shown in Listing~\ref{code:grammar:basic-functions}, which are responsible for transferring information between adjacent grids within the hierarchy of discretizations.
-Again our implementation of these functions directly correspond to the respective state transition functions \textsc{cocy} and \textsc{cgc} defined in Table~\ref{table:grammar-semantics}.
-While these four functions provide us the basic functionality to generate the IR representation of arbitrarily structured multigrid method on each level, we have not yet considered how we can apply different smoothers, restriction and the coarse-grid solver.
+Even though in all subsequent computations, the first entry of this tuple consists of a \texttt{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \texttt{residual} function within all grammar productions.
+For this purpose, we need to adapt the \texttt{iterate} function accordingly, such that the respective binary state tuple, in the form of a \texttt{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
+Finally, as the last argument of the\texttt{coarse\_grid\_correction} function result of an application of the \texttt{iterate} function, it needs to be treated in a similar way.
+
+The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the \textsc{iterate} function is the representation of the relaxation factor as an index within a uniformly-sampled interval, which is included in the respective \texttt{Terminal} object.
+While we instead could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
+Now assume we want to encode a certain derivation tree in a string-based format, which then later needs to be decoded in a different environment to restore the original information.
+In case, each relaxation factor is stored as a floating point number, we need to ensure that each of these numbers is represented with the same accuracy in both environments.
+In contrast, an index can always be accurately represented in form of a single positive integer value.
+
+While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation for arbitrarily structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
+For instance, smoothing is performed through consecutive application of \textsc{apply} and \textsc{iterate}.
+We can, therefore, simplify the grammar generation by identifying the possible combinations on each level and, then, implementing each of them in a separate function.
+In Definition~\
+%TODO continue here
+%TODO maybe rename iterate to update
 First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way.
 Each of these productions corresponds to the application of a certain smoothing operator 
 \begin{equation*}
@@ -249,27 +253,36 @@ where $A^+_{h}$ obtained from a splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid 
 While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
 Therefore, we can instead represent its generation as a function \texttt{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
 If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \texttt{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/smoothing.py}
-	\caption{General smoothing state transition function.}
-	\label{code:grammar:smoothing}
-\end{listing}
 Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{iterate}, whereby we generate $\ps{B_{h}}$ using the aforementioned smoother generator.
 Consequently, for each specific smoother, we then only need to provide a different generator function.
 For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/jacobi.py}
-	\caption{Example for generating Jacobi-based smoothers.}
-	\label{code:grammar:jacobi}
-\end{listing}
 Finally, both the creation of a new cycle on the next coarser level as well as the application of the coarse grid solver on the coarsest level require us to restrict the correction part of a given \texttt{Cycle} object.
 While this can be accomplished within a single application of the \texttt{apply} function, for the sake of clarity, we still implement this functionality in a separate function, which is shown in Listing~\ref{code:grammar:restriction}.
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/restrict.py}
-	\caption{Restriction function.}
-	\label{code:grammar:restriction}
-\end{listing}
 Note that in Table~\ref{table:multigrid-grammar} the application of this function corresponds to the 
-%TODO adapt according to updated functions in current evostencils code
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/base.py}
+	\caption{State Transition: Basic Functions}
+	\label{code:grammar:basic-functions}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/smoothing.py}
+	\caption{State Transition: Smoothing}
+	\label{code:grammar:smoothing}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/jacobi.py}
+	\caption{Example for generating Jacobi-based smoothers}
+	\label{code:grammar:jacobi}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
+	\caption{State Transition: Coarse-Grid Solver}
+	\label{code:grammar:coarse-grid-solver}
+\end{listing}
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
+	\caption{State Transition: Inter-Grid Operations}
+	\label{code:grammar:inter-grid-operations}
+\end{listing}
 
 
