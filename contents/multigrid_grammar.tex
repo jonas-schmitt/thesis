@@ -86,7 +86,7 @@ On each level $l > 0$ the following three operations are employed within a multg
 	\begin{equation*}
 		\tilde{x}_h = \tilde{x}_h + \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = M_h + N_h
 	\end{equation*}
-	\item \textbf{Cycle}: A new cycle is initiated by recursively solving the error equation on the next coarser level, whose right-hand side $b_{2h}$ is obtained by restricting the residual.
+	\item \textbf{Coarsening}: A coarse problem is obtained by restricting the residual.
 	\begin{align*}
 		\tilde{x}_{2h} & = 0 \\
 		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
@@ -98,8 +98,8 @@ On each level $l > 0$ the following three operations are employed within a multg
 \end{itemize}
 \end{definition}
 Except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
-However, in contrast to the correction step which utilizes the current approximate solution on the coarse grid, both smoothing and the initiation of a new cycle on the coarse-grid require us to first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
-While this differentiation is not strictly necessary it leads to simpler operations, since both restriction and smoothing can then be split into two steps.
+However, in contrast to the correction step which utilizes the current approximate solution on the coarse grid, both smoothing and coarsening require us to first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
+While this differentiation is not strictly necessary it leads to simpler operations, since both coarsening and smoothing can then be split into two steps.
 Furthermore, as in practice the actual error can usually not be computed, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be repeatedly computed.
 %The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a correction term of the form $\omega A_h^{-1} r_h$.
 To derive a general representation for the state of a multigrid method based on our previous observations, we consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}, which corresponds to a three-grid V-cycle that performs one step of underrelaxed Jacobi smoothing on the second finest level.
@@ -173,10 +173,10 @@ whose solution is to be approximated starting with an initial guess of zero.
 Therefore, all information to create this state is obtained from the next finer level in form of the restricted residual $I_h^{2h} r_h = I_h^{2h} (b_{h} - A_h x_{h}^0)$.
 On the other hand, consider the transition from a coarse grid back to the next finer grid in form of the coarse-grid correction in line 9.
 In this case we both require the approximate solution $\tilde{x}_{2h}$, computed on the coarse grid, as well as the previous values of the first two components $\tilde{x}_h$ and $b_h$ of the fine-grid state tuple.
-While in the case of restriction we can neglect all previous states represented on the coarser grid, as it is explicitly contained in the residual, for a coarse-grid correction the previous state on the fine-grid needs to be restored.
+While in the case of coarsening we can neglect all previous states represented on the coarser grid, as it is explicitly contained in the residual, for a coarse-grid correction the previous state on the fine-grid needs to be restored.
 Note that in case of a multigrid method that operates on a hierarchy of discretizations of even larger depth than the example shown in Algorithm~\ref{alg:example-three-grid-method}, this process must be recursively performed for each bottom up transition within the hierarchy.
 To resolve this issue we need to extend our original formulation of a multgrid state by a fourth component with the purpose of preserving current state of the next finer level.
-While at the topmost level this component is always empty, whenever restriction is performed the state of the current level is included.
+While at the topmost level this component is always empty, whenever coarsening is performed the state of the current level is included.
 For instance in line 4 of Figure~\ref{fig:example-tree-grid-method-states} we have to extend the given ternary tuple 
 \begin{equation*}
 S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
@@ -681,9 +681,9 @@ For this purpose, we consider the following simplified model calculation which a
 As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to efficiently reduce both the high and low-frequency components of the error.
 While often in practice multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
 To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
-Furthermore, we enforce that restriction and prolongation can only be performed after smoothing, with the exception of the finest level, where we additionally allow restriction to be applied as a first operation.
+Furthermore, we enforce that coarsening and correction can only be performed after smoothing, with the exception of the finest level, where we additionally allow coarsening to be applied as a first operation.
 As on finest level the original system is solved directly while smoothing is significantly more expensive than on subsequent levels, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method and we, hence, want to enforce fewer constraints on the order in which the individual operations are performed.
-Consequently, using the symbols $S$, $R$ and $P$ for smoothing, restriction and prolongation, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
+Consequently, using the symbols $S$, $R$ and $P$ for smoothing, coarsening and correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and correction.}, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
 \begin{align*}
 	S | RS | SR & \quad \text{for} \; l = l_{max} \\
 	A^{-1} & \quad \text{for} \; l = l_{min} \\
@@ -707,7 +707,7 @@ We can illustrate this observation by considering the corresponding decision tre
 	\label{fig:decision-tree}
 \end{figure}
 Each node in this tree corresponds to a particular choice from the available set of options.
-Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with restriction or prolongation, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
+Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with coarsening or correction, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
 Consequently, each leaf of the tree corresponds to a different multigrid method, and the total number of leaves is thus equal to $N_{2,k} = 6^k$.
 However, since the optimal amount of smoothing depends on the properties of the linear system that we aim to solve and a varying total number of smoothing steps should be considered for each problem.
 Now note that each decision tree that corresponds to a certain number of smoothing steps $k$ contains all those with less smoothing steps as a subtree, whereby each subtree is obtained by performing a top-down breadth-first traversal until the depth of the tree coincides with the respective number of smoothing steps.
