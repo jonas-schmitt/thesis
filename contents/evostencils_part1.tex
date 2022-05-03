@@ -59,7 +59,7 @@ As a first step, we will outline the implementation of an intermediate represent
 Before we can represent the actual method and its computational structure, we need to be aware of the fact that all operations of a multigrid method are defined on a grid with certain step size.
 Note that algebraic multigrid methods~\cite{stuben2001introduction,ruge1987algebraic}, which are not considered in this work, represent an exception to this, as they directly operate on sparse matrix and vector data structures.
 In Section~\ref{sec:discretization} we have already made the assumption that we are able to discretize the underlying PDE on a hierarchy of structured grids.
-Therefore, to identify a grid within this hierarchy certain information is required, which we store in a \texttt{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
+Therefore, to identify a grid within this hierarchy certain information is required, which we store in a \emph{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
 In general a structured grid is identified by its size, i.e. the number of grid points, and spacing $h$ in each dimension.
 In addition we also include the grid's level to identify it within the discretization hierarchy.
 Note that in case the grid is uniform we only need to store a single value for the spacing in each dimension, while otherwise a value needs to be stored for each pair of grid points.
@@ -100,17 +100,17 @@ Based on this implementation we can then further define classes for representing
 	\label{code:ir:operator}
 \end{listing}
 In both cases, the shape of the respective entity is obtained by computing the grid size product over all dimensions, whereas in case of the approximation and right-hand side the result can be considered as a vector while the shape of an operator corresponds to a quadratic matrix.
-Note that as the \texttt{Approximation} and \texttt{RightHandSide} classes, from a mathematical point of view, can be both considered as a vector, we only implement the former and then utilize inheritance to avoid unnecessary code duplication.
-In addition to the attributes defined in its parent class, the \texttt{Approximation} includes a \texttt{predecessor} attribute, whose meaning will be discussed later within the implementation of grammar generation.
+Note that as the \emph{Approximation} and \emph{RightHandSide} classes, from a mathematical point of view, can be both considered as a vector, we only implement the former and then utilize inheritance to avoid unnecessary code duplication.
+In addition to the attributes defined in its parent class, the \emph{Approximation} includes a \emph{predecessor} attribute, whose meaning will be discussed later within the implementation of grammar generation.
 While the other two entities discussed here correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given in form of one or multiple stencil codes.
-In Section~\ref{subsec:stencil-codes} we have already introduced a mathematical notation for stencil codes in form of Equation~\ref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner that leads to the \texttt{Stencil} class shown in Listing~\ref{code:ir:stencil}.
+In Section~\ref{subsec:stencil-codes} we have already introduced a mathematical notation for stencil codes in form of Equation~\ref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner that leads to the \emph{Stencil} class shown in Listing~\ref{code:ir:stencil}.
 %TODO introduce stencil implementation here
 \begin{listing}
 	\inputminted{python}{evostencils/ir/stencil.py}
 	\caption{IR: Stencil}
 	\label{code:ir:stencil}
 \end{listing}
-The \texttt{entries} attribute of this class directly corresponds to the set $S_h$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \texttt{tuple} object to represent this set in the Python programming language.
+The \emph{entries} attribute of this class directly corresponds to the set $S_h$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this set in the Python programming language.
 Each entry $e_i$ of this tuple then again represents a tuple of the form of
 \begin{equation}
 	e_i = \left(\bm{a}_i, b_i \right),
@@ -118,7 +118,7 @@ Each entry $e_i$ of this tuple then again represents a tuple of the form of
 where $\bm{a}_i$ is the offset from the current grid point in each dimension, given as an array of integer values, and $b_i$ is the stencil value that corresponds to each offset, given as a floating point number.
 Based on this class we can then provide implementations for all operations on stencil codes that have been defined in Section~\ref{subsec:stencil-codes}.
 Furthermore, in accordance with Section~\ref{subsec:systems-of-pdes} and~\ref{subsec:block-smoothing}, we can extend this implementation to systems of PDEs and block smoothers, which will be briefly covered in the next Chapter of this thesis. %TODO insert ref to next chapter here or remove sentence
-Now note that in our implementation of the \texttt{Operator} class in Listing~\ref{code:ir:operator} the stencil is not included directly, but instead we provide a so-called \emph{stencil generator}.
+Now note that in our implementation of the \emph{Operator} class in Listing~\ref{code:ir:operator} the stencil is not included directly, but instead we provide a so-called \emph{stencil generator}.
 A stencil generator is a function that returns the discretization of an operator on a particular grid in the form of a stencil.
 For instance, the finite-difference discretization of the Laplace operator $\nabla^2$ on a two-dimensional uniform grid leads to the stencil 
 \begin{equation*}
@@ -129,9 +129,9 @@ For instance, the finite-difference discretization of the Laplace operator $\nab
 in which the value at each offset depends on the grid spacing $h$.
 Furthermore, in certain cases it is possible to construct the higher-dimensional version of a stencil from its lower dimensional counterparts, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
 Therefore, instead of storing a unique stencil for each individual operator instance, we can instead parametrize its generation based on the features of the applied discretization, by including a reference to the respective generator function.
-Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \texttt{shape} attribute.
-For this purpose, the class \texttt{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \texttt{Operator} class with the required functionality.
-For the sake of brevity, the implementation of this class and the respective \texttt{Restriction} and \texttt{Prolongation} subclasses can be found in the appendix.
+Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \emph{shape} attribute.
+For this purpose, the class \emph{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \emph{Operator} class with the required functionality.
+For the sake of brevity, the implementation of this class and the respective \emph{Restriction} and \emph{Prolongation} subclasses can be found in the appendix.
 
 After discussing the implementation of the different entities based on which a multigrid method is built, we next shift our attention to the implementation of those IR classes that let us represent the expressions that correspond to the actual computations performed within its application. 
 For this purpose we, first provide general classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
@@ -154,17 +154,17 @@ While the previously defined base classes allow us to represent the arithmetic e
 As we have already seen in Figure~\ref{fig:example-three-grid-method-computational-graph} it is necessary to access previously computed intermediate results at multiple occasions within a multigrid method.
 In particular, each time a coarse-grid correction is performed we have to restore the previous approximate solution and right-hand side on the respective level.
 Furthermore, whenever we compute a new residual the current expression for both the right-hand side as well as the approximate solution are required.
-For this purpose, we implement the classes \texttt{Residual} and \texttt{Cycle}, which serve the special-purpose of including additional references to previously defined expressions within a multigrid method.
+For this purpose, we implement the classes \emph{Residual} and \emph{Cycle}, which serve the special-purpose of including additional references to previously defined expressions within a multigrid method.
 Each of these references then corresponds to one of the subgraphs in Figure~\ref{fig:example-three-grid-method-computational-graph} whose root node possesses multiple incoming edges, i.e. the ones that have been annotated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}.
 We will later see how to utilize these references in order to construct a complete graph from the grammar-based representation of a multigrid method.
-Listing~\ref{code:ir:residual} shows the implementation of the \texttt{Residual} class, which contains references to the system operator $A_H$, the expression for computing the current approximate solution $\tilde{x}_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
+Listing~\ref{code:ir:residual} shows the implementation of the \emph{Residual} class, which contains references to the system operator $A_H$, the expression for computing the current approximate solution $\tilde{x}_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
 Based on these components we can, thus, easily construct the corresponding residual expression $b_H - A_H \tilde{x}_H$.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/residual.py}
 	\caption{IR: Residual}
 	\label{code:ir:residual}
 \end{listing}
-As a final step in the implementation of our intermediate representation, the definition of the \texttt{Cycle} class is shown in Listing~\ref{code:ir:cycle}.
+As a final step in the implementation of our intermediate representation, the definition of the \emph{Cycle} class is shown in Listing~\ref{code:ir:cycle}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/cycle.py}
 	\caption{IR: Multigrid Cycle}
@@ -183,25 +183,25 @@ To better understand the purpose of these two classes consider the following exa
 	\caption{Example Usage of the Intermediate Representation}
 	\label{code:ir:example.py}
 \end{listing}
-Starting on the original problem on the finest level, we first store references to the initial approximate solution and right-hand side in an \texttt{Cycle} object, which itself is included as a \texttt{predecessor} reference into the subsequently created coarse-grid \texttt{Cycle} object.
-Finally, in order to apply the latter in form of a coarse-grid correction on the finest level, the original fine-grid \texttt{Cycle} object is restored and its \texttt{correction} variable is replaced by the respective expression which is obtained by prolongating the previously computed approximation on the coarse grid.
+Starting on the original problem on the finest level, we first store references to the initial approximate solution and right-hand side in an \emph{Cycle} object, which itself is included as a \emph{predecessor} reference into the subsequently created coarse-grid \emph{Cycle} object.
+Finally, in order to apply the latter in form of a coarse-grid correction on the finest level, the original fine-grid \emph{Cycle} object is restored and its \emph{correction} variable is replaced by the respective expression which is obtained by prolongating the previously computed approximation on the coarse grid.
 As this example demonstrate our intermediate representation (IR) enables us to construct the computational graph of a multigrid method in an iterative manner.
 The next step towards the automatic generation of a multigrid method based on a grammar-based representation, now is to translate a sequence of derivations into the corresponding IR object.
 For this purpose, we first have to consider how we can implement the formal system introduced in Section~\ref{sec:multigrid-grammar} using the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
 However, before we proceed with this discussion, we want to address some final remarks about the IR presented in this section.
 First of all, note that while the main purpose of the implementation presented here is to uniquely represent the computational pattern of a multigrid method in form of a redundancy-free directed graph, in order to be able to construct this graph in a step-wise manner we have to include additional references into the respective nodes.
-As we have shown in the previous discussion, the \texttt{Cycle} class serves this purpose by including additional information about the current state of a multigrid method, according to Definition~\ref{def:multigrid-state}, in form of references to the current approximate solution and right-hand side.
-While this information is important for the construction of the graph, it could be later discarded by replacing each \texttt{Cycle} node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{iterate} function in Section~\ref{sec:multigrid-state-transitions}.
-However, preserving these additional references has the advantage of being able to easily traverse the sequence of \texttt{Cycle} nodes within each graph.
+As we have shown in the previous discussion, the \emph{Cycle} class serves this purpose by including additional information about the current state of a multigrid method, according to Definition~\ref{def:multigrid-state}, in form of references to the current approximate solution and right-hand side.
+While this information is important for the construction of the graph, it could be later discarded by replacing each \emph{Cycle} node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{iterate} function in Section~\ref{sec:multigrid-state-transitions}.
+However, preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} nodes within each graph.
 This does not only enable us to quickly grasp the computational structure of the corresponding multigrid method, but also facilitates the identification of potential errors in the implementation.
-We, therefore, represent each newly computed approximate solution by an \texttt{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
+We, therefore, represent each newly computed approximate solution by an \emph{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
 Also, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects in a computational statement for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation. 
 \section{Grammar Generation}
 According to Section~\ref{sec:multigrid-grammar} our family of context-free grammar for the generation of multigrid methods consists of three components, a set of terminals, variables and productions, while additionally we have to choose a starting symbol $\ps{S}$ from the set of variables.
 Furthermore, in Table~\ref{table:grammar-semantics} we have defined the semantics of each state transition function occurring within the productions listed in Table~\ref{table:multigrid-grammar}.
 While Table~\ref{table:multigrid-grammar} fixes the number of coarsening steps, we have already seen that it is possible to define a similar grammar formulated on a different hierarchy of grid, for instance with a higher or lower number of coarsening steps.
 We can, therefore, utilize this property to parametrize the generation of a grammar formulated on a particular hierarchy of grids with the employed number of coarsening steps.
-For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \texttt{Terminals} shown in Listing~\ref{code:grammar:terminals}.
+For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which is encapsulated into the class \emph{Terminals} shown in Listing~\ref{code:grammar:terminals}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
 	\caption{Terminals defined on each level.}
@@ -214,25 +214,25 @@ The implementation of this class can again be found in the appendix.
 Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
 
-As a next step, based on the \texttt{Terminals} class, we can then implement the state transition functions that have been formulated in Section~\ref{sec:multigrid-state-transitions}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
+As a next step, based on the \emph{Terminals} class, we can then implement the state transition functions that have been formulated in Section~\ref{sec:multigrid-state-transitions}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
-While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \texttt{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
-In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \texttt{Cycle} object.
-As a consequence, the application of each state transition function either alters a given \texttt{Cycle} or returns a new object of this type.
-However, the \texttt{residual} function deviates from this statement as it expects a \texttt{state} variable as its argument, which corresponds to tuple, consisting of an approximation and right-hand side object.
+While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \emph{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
+In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \emph{Cycle} object.
+As a consequence, the application of each state transition function either alters a given \emph{Cycle} or returns a new object of this type.
+However, the \emph{residual} function deviates from this statement as it expects a \emph{state} variable as its argument, which corresponds to tuple, consisting of an approximation and right-hand side object.
 The necessity of this modification can be understood by considering the grammar productions shown in Table~\ref{table:multigrid-grammar}.
-While within each subsequent step of a multigrid method, each approximate solution is represented by a \texttt{Cycle} objects that incorporates all steps required to compute its value, at the beginning of a multigrid method, the residual is computed based on the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \texttt{Approximation} and \texttt{RightHandSide} object, respectively.
+While within each subsequent step of a multigrid method, each approximate solution is represented by a \emph{Cycle} objects that incorporates all steps required to compute its value, at the beginning of a multigrid method, the residual is computed based on the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \emph{Approximation} and \emph{RightHandSide} object, respectively.
 In this case, we, therefore, need to pass the initial state 
 \begin{equation*}
 	S_h^0 = (x_h^0, b_h, \lambda, \lambda)
 \end{equation*} explicitly to the respective residual function.
-As the third and fourth entry of this tuple is empty, in Python this corresponds to a binary tuple consisting of the respective \texttt{Approximation} and \texttt{RightHandSide} object.
-Even though in all subsequent computations, the first entry of this tuple consists of a \texttt{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \texttt{residual} function within all grammar productions.
-For this purpose, we need to adapt the \texttt{iterate} function accordingly, such that the respective binary state tuple, in the form of a \texttt{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
-Finally, as the last argument of the\texttt{coarse\_grid\_correction} function result of an application of the \texttt{iterate} function, it needs to be treated in a similar way.
+As the third and fourth entry of this tuple is empty, in Python this corresponds to a binary tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object.
+Even though in all subsequent computations, the first entry of this tuple consists of a \emph{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \emph{residual} function within all grammar productions.
+For this purpose, we need to adapt the \emph{iterate} function accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
+Finally, as the last argument of the\emph{coarse\_grid\_correction} function result of an application of the \emph{iterate} function, it needs to be treated in a similar way.
 
-The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the \textsc{iterate} function is the representation of the relaxation factor as an index within a uniformly-sampled interval, which is included in the respective \texttt{Terminal} object.
+The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the \textsc{iterate} function is the representation of the relaxation factor as an index within a uniformly-sampled interval, which is included in the respective \emph{Terminal} object.
 While we instead could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
 Now assume we want to encode a certain derivation tree in a string-based format, which then later needs to be decoded in a different environment to restore the original information.
 In case, each relaxation factor is stored as a floating point number, we need to ensure that each of these numbers is represented with the same accuracy in both environments.
@@ -241,24 +241,32 @@ In contrast, an index can always be accurately represented in form of a single p
 While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation for arbitrarily structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
 For instance, smoothing is performed through consecutive application of \textsc{apply} and \textsc{iterate}.
 We can, therefore, simplify the grammar generation by identifying the possible combinations on each level and, then, implementing each of them in a separate function.
-In Definition~\
-%TODO continue here
-%TODO maybe rename iterate to update
-First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way.
+In Definition~\ref{def:elementary-multigrid-operations} we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening} and \emph{coarse-grid correction}.
+In Table~\ref{table:multigrid-grammar} each of these three operations is represented by a combination of two state transition functions.
+First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way and corresponds to the \emph{smoothing} operation in Definition~\ref{def:elementary-multigrid-operations}.
 Each of these productions corresponds to the application of a certain smoothing operator 
 \begin{equation*}
 	\ps{B_{h}} = \left( A^+_{h} \right)^{-1},
 \end{equation*}
 where $A^+_{h}$ obtained from a splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
 While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
-Therefore, we can instead represent its generation as a function \texttt{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
-If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \texttt{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
-Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{iterate}, whereby we generate $\ps{B_{h}}$ using the aforementioned smoother generator.
-Consequently, for each specific smoother, we then only need to provide a different generator function.
+Therefore, we can instead represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
+If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \emph{smoothing\_iteration}, shown in Listing~\ref{code:grammar:smoothing}.
+Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{iterate}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
+Consequently, for each specific smoother, we then only need to provide a different generator.
 For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
-Finally, both the creation of a new cycle on the next coarser level as well as the application of the coarse grid solver on the coarsest level require us to restrict the correction part of a given \texttt{Cycle} object.
-While this can be accomplished within a single application of the \texttt{apply} function, for the sake of clarity, we still implement this functionality in a separate function, which is shown in Listing~\ref{code:grammar:restriction}.
-Note that in Table~\ref{table:multigrid-grammar} the application of this function corresponds to the 
+Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining two basic state transition functions: \textsc{apply} and \textsc{cycle}.
+While the former applies a restriction operator to the previously generated residual expression, the latter is then utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
+Finally, note that the coarse-grid correction operation in Definition~\ref{def:elementary-multigrid-operations} differs from the identically named state transition function in the respect that it additionally applies the computed correction to the current approximate solution.
+In contrast the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
+In Production~\ref{prod:coarse-coarse-grid-correction} we then additionally apply the \textsc{iterate} function to generate an expression that utilizes this term to correct the previous approximate solution in each iteration of the method.
+Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{coarse\_grid\_correction\_iteration}.
+In case of the latter we have included the suffix \emph{iteration} to make it distinguishable from the respective state transition function.
+Finally, we need to provide an implementation for the application of a solver on the coarsest level, which is represented by the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
+While, for the sake of consistency, we have separated the construction of the coarse problem from the actual correction step, as the application of a solver is the only allowed operation on the coarsest level, this separation is not strictly necessary from a practical point of view.
+Instead, we can implement the complete process in a single function that first restricts the correction term of a given \texttt{Cycle} object, to which then the actual coarse-grid solver is applied.
+Finally, similar to the coarse-grid correction on other levels, the obtained solution, which is supposed to be exact, is then prolongated and then utilized to correct the previous approximate solution on the respective level.
+%TODO Ref to function restrict_solve_prolongate, explain splitting into two functions
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
 	\caption{State Transition: Basic Functions}
@@ -275,14 +283,14 @@ Note that in Table~\ref{table:multigrid-grammar} the application of this functio
 	\label{code:grammar:jacobi}
 \end{listing}
 \begin{listing}
-	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
-	\caption{State Transition: Coarse-Grid Solver}
-	\label{code:grammar:coarse-grid-solver}
+	\inputminted{python}{evostencils/grammar/inter_grid_operations.py}
+	\caption{State Transition: Inter-Grid Operations}
+	\label{code:grammar:inter-grid-operations}
 \end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
-	\caption{State Transition: Inter-Grid Operations}
-	\label{code:grammar:inter-grid-operations}
+	\caption{State Transition: Coarse-Grid Solver}
+	\label{code:grammar:coarse-grid-solver}
 \end{listing}
 
 

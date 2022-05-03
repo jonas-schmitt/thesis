@@ -91,17 +91,17 @@ On each level $l > 0$ the following three operations are employed within a multg
 		\tilde{x}_{2h} & = 0 \\
 		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
 	\end{align*}
-	\item \textbf{Correction}: Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
+	\item \textbf{Coarse-Grid Correction}: Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
 	\begin{equation*}
 		\tilde{x}_h = \tilde{x}_h + I_{2h}^h \tilde{x}_{2h}
 	\end{equation*}
 \end{itemize}
 \end{definition}
 Except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e. $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
-However, in contrast to the correction step which utilizes the current approximate solution on the coarse grid, both smoothing and coarsening require us to first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
+However, in contrast to the coarse-grid correction step which utilizes the current approximate solution on the coarse grid, both smoothing and coarsening require us to first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
 While this differentiation is not strictly necessary it leads to simpler operations, since both coarsening and smoothing can then be split into two steps.
 Furthermore, as in practice the actual error can usually not be computed, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be repeatedly computed.
-%The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a correction term of the form $\omega A_h^{-1} r_h$.
+%The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a coarse-grid correction term of the form $\omega A_h^{-1} r_h$.
 To derive a general representation for the state of a multigrid method based on our previous observations, we consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}, which corresponds to a three-grid V-cycle that performs one step of underrelaxed Jacobi smoothing on the second finest level.
 \begin{algorithm}
 	\begin{algorithmic}[1]
@@ -300,7 +300,7 @@ and include it as a correction term into the newly created state tuple.
 Performing a coarse-grid correction with the initial approximate solution $x^0_{2h}$ does not lead to any improvement, and, thus, computing the residual always represents the first computational step on the coarse grid.
 Finally, after deriving an expression $\tilde{x}_{2h}$ for computing the approximate solution of the error equation on the coarse grid, we have to transfer this term back to the fine grid, where it can then be applied as a correction to the current approximate solution on this level.
 For this purpose we first need to restore the previous state on the next finer level including the current approximate solution, right-hand side and, in case this state does not represent the topmost level within the discretization level, also its predecessor state.
-To obtain the coarse-grid expression expression we then need to apply the prolongation operator to the current approximate solution on the coarse-grid.
+To obtain the coarse-grid correction expression we then need to apply the prolongation operator to the current approximate solution on the coarse-grid.
 The resulting state transition is implemented in the function \textsc{cgc}.
 Note that the complete coarse-grid correction step is then obtained through subsequent application of the \textsc{iterate} function, which updates the approximate solution with the correction term obtained within \textsc{cgc}.
 \begin{algorithm}
@@ -416,7 +416,7 @@ where the empty symbol $\lambda$ indicates that no partitioning is used. On the 
 \label{prod:residual}
 \end{bnf}
 Multiple smoothing steps can, therefore, be defined by means of repeated applications of the productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
-In contrast to smoothing coarse-grid correction updates the current approximate solution with a correction term obtained from an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
+In contrast to smoothing, coarse-grid correction updates the current approximate solution with a correction term obtained from an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
 We can express this operation as a combination of the \textsc{iterate} and \textsc{cgc} transition functions, which leads to the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
@@ -451,6 +451,7 @@ While the state on the finest level is always derived from the original system o
 \bnfprod{$c_{2h}$} {
 	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }.
+\label{prod:coarsening}
 \end{bnf}
 With the definition of this production we are now capable of generating state transitions both in top-down as well as bottom-up direction within the given hierarchy of discretizations.
 Finally, the remaining steps required for the formulation of complete grammar is the definition of those productions that are only available on the finest and coarsest levels, i.e. the definition of the initial problem and the application of the coarse-grid solver.
@@ -465,12 +466,9 @@ As $S_h^0$ represents the starting point of each possible sequence of multigrid 
 If we now consider the structure of all the productions defined so far, it becomes obvious that on each level except for the finest only the productions~\eqref{prod:smoothing-operator} and~\eqref{prod:partitioning} generate an expression that consists exclusively of terminal symbols.
 Furthermore, note that all other productions generate exactly one variable of type $\ps{s_H}$ or $\ps{c_H}$, where $H$ is the step size on an arbitrary level in the given hierarchy of discretizations, and that starting from each of these variables there exists a sequence of productions that leads to an expression that contains the variable $\ps{s_h}$, based on which we can apply the production~\eqref{prod:initial-solution} to finalize the derivation process.
 Since each sequence of productions also starts with this variable, all derivations of our grammar possess the following structure
-\setcounter{equation}{116}
-\begin{equation}
+\begin{equation*}
 	\ps{S} \Rightarrow \ps{s_h} \Rightarrow \dots \Rightarrow u \ps{s_h} v \Rightarrow u (x_h^0, b_h, \lambda, \lambda) v,
-	\label{eq:multigrid-grammar-derivation}
-\end{equation}
-\setcounter{equation}{12}
+\end{equation*}
 where $u (x_h^0, b_h, \lambda, \lambda) v$ is a word in the language generated by our multigrid grammar.
 This word then represents a multigrid method whose structure is determined by the order of productions in the corresponding sequence of function applications.
 As a final step we have define one or multiple productions that correspond to the application of the coarse-grid solver on the coarsest level to obtain the correct solution of the corresponding error equation, which is then used to improve the accuracy of the approximate solution on the second coarsest.
@@ -483,16 +481,19 @@ By utilizing a combination of the \textsc{apply} and \textsc{iterate} function, 
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2H}^{H}$}, \bnfsp \bnfpn{$c_{2H}$}))
 	} 	\label{prod:coarse-grid-solver-correction}
 \end{bnf}
+\setcounter{equation}{116}
 where $H$ is the step size on the second coarsest level.
 Having now assembled all necessary components, we can finally specify the complete grammar for constructing multigrid methods on a given hierarchy of discretizations.
 As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest.
 Therefore, on the coarsest level a step size of $16h$ is obtained.
 For this purpose, we first define the set of variables 
-\begin{align}
+\begin{equation}
+\begin{split}
 	V = \{ & \ps{S}, \ps{s_h}, \ps{c_h}, \ps{B_h}, \ps{s_{2h}}, \ps{c_{2h}}, \ps{B_{2h}}, \ps{s_{4h}}, \ps{c_{4h}}, \ps{B_{4h}}, \\
 	& \ps{s_{8h}}, \ps{c_{8h}}, \ps{B_{8h}}, \ps{c_{16h}}, \ps{P} \},
-	\label{eq:multigrid-grammar-variables}
-\end{align}
+\end{split}
+\label{eq:multigrid-grammar-variables}
+\end{equation}
 for each of which we then specify the list of productions available on the respective level. 
 Table~\ref{table:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
 \begin{table}
@@ -585,7 +586,6 @@ For this purpose, we simply have to include additional productions for the appli
 		\bnfts{\textnormal{\textsc{iterate}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 	}.
 \end{bnf*}
-\setcounter{equation}{118}
 
 \subsection{Grammar-Based Algorithm Generation}
 \label{sec:grammar-based-algorithm-generation}
@@ -683,7 +683,7 @@ While often in practice multiple smoothing steps are employed, the application o
 To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
 Furthermore, we enforce that coarsening and correction can only be performed after smoothing, with the exception of the finest level, where we additionally allow coarsening to be applied as a first operation.
 As on finest level the original system is solved directly while smoothing is significantly more expensive than on subsequent levels, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method and we, hence, want to enforce fewer constraints on the order in which the individual operations are performed.
-Consequently, using the symbols $S$, $R$ and $P$ for smoothing, coarsening and correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and correction.}, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
+Consequently, using the symbols $S$, $R$ and $P$ for smoothing, coarsening and coarse-grid correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and coarse-grid correction.}, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
 \begin{align*}
 	S | RS | SR & \quad \text{for} \; l = l_{max} \\
 	A^{-1} & \quad \text{for} \; l = l_{min} \\
@@ -707,7 +707,7 @@ We can illustrate this observation by considering the corresponding decision tre
 	\label{fig:decision-tree}
 \end{figure}
 Each node in this tree corresponds to a particular choice from the available set of options.
-Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with coarsening or correction, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
+Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with coarsening or coarse-grid correction, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
 Consequently, each leaf of the tree corresponds to a different multigrid method, and the total number of leaves is thus equal to $N_{2,k} = 6^k$.
 However, since the optimal amount of smoothing depends on the properties of the linear system that we aim to solve and a varying total number of smoothing steps should be considered for each problem.
 Now note that each decision tree that corresponds to a certain number of smoothing steps $k$ contains all those with less smoothing steps as a subtree, whereby each subtree is obtained by performing a top-down breadth-first traversal until the depth of the tree coincides with the respective number of smoothing steps.
