@@ -244,32 +244,34 @@ We can, therefore, simplify the grammar generation by identifying the possible c
 In Definition~\ref{def:elementary-multigrid-operations} we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening} and \emph{coarse-grid correction}.
 In Table~\ref{table:multigrid-grammar} each of these three operations is represented by a combination of two state transition functions.
 First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way and corresponds to the \emph{smoothing} operation in Definition~\ref{def:elementary-multigrid-operations}.
-Each of these productions corresponds to the application of a certain smoothing operator 
+Each of these productions corresponds to the application of an operator
 \begin{equation*}
 	\ps{B_{h}} = \left( A^+_{h} \right)^{-1},
 \end{equation*}
-where $A^+_{h}$ obtained from a splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
+obtained as the inverse of a smoothing operator $A^+_{h}$, which is defined by the splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
 While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
 Therefore, we can instead represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
-If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
+If we assume the availability of such a function, the next step is then the implementation of the actual smoother application, in form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
 Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
 Consequently, for each specific smoother, we then only need to provide a different generator.
-For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
-Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining two basic state transition functions: \textsc{apply} and \textsc{cycle}.
-While the former applies a restriction operator to the previously generated residual expression, the latter is then utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
-Finally, note that the coarse-grid correction operation in Definition~\ref{def:elementary-multigrid-operations} differs from the identically named state transition function in the respect that it additionally applies the computed correction to the current approximate solution.
-In contrast the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
-In Production~\ref{prod:coarse-coarse-grid-correction} we then additionally apply the \textsc{update} function to generate an expression that updates the current approximate solution with this term.
+For instance, Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
+Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining the functions \textsc{apply} and \textsc{cycle}.
+After the former applies a restriction operator to the previously generated residual expression, the latter is utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
+Next, we need to provide an implementation for Production~\ref{prod:coarse-grid-correction}, which corresponds to the \emph{coarse-grid correction} operation in Definition~\ref{def:elementary-multigrid-operations}.
+Note that this operation differs from the identically named state transition function in the respect that it additionally updates the current approximate solution with the computed correction.
+In contrast, the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
+In Production~\ref{prod:coarse-grid-correction} we then additionally apply the \textsc{update} function to generate an expression that updates the current approximate solution with this term.
 Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{update\_with\_coarse\_grid\_correction}.
 In case of the latter we have included the prefix \emph{update\_with} to make it distinguishable from the respective state transition function.
-Finally, we need to provide an implementation for the application of a solver on the coarsest level, which is represented by the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
-For the sake of consistency, we have separated the construction of the coarse problem from the actual correction step.
-However, as the application of a solver is the only allowed operation on the coarsest level, this separation is not strictly necessary from a practical point of view and we can implement the complete process in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
-Similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
+Finally, in contrast to the functions defined so far, which can be applied on multiple levels, on the coarsest level the only possible operation is the application of a coarse-grid solver, which corresponds to the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
+Here, Production~\ref{prod:coarse-grid-solver} corresponds to the construction of the coarse problem, similar to the coarsening step defined by Production~\ref{prod:coarsening}, while Production~\ref{prod:coarse-grid-solver-correction} performs the actual correction step based on the exact solution obtained on the coarsest level. 
+However, note that only a single productions is available for the variable $\ps{c_{16h}}$ in Table~\ref{table:multigrid-grammar}, which means that the two productions can only be applied in succession.
+We can, therefore, combine the complete process of updating the current approximate solution with a coarse-grid solver-based correction in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
+For this purpose, similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
 However, in contrast to all other levels, the resulting error equations is solved directly, which is denoted by the application of the coarse-grid solver.
 As a last step, the obtained solution is then transferred to the next finer level to correct the current approximate solution.
- 
-%TODO Ref to function restrict_solve_prolongate, explain splitting into two functions
+Therefore, with the implementation of the functions shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, we can now continue with the actual generation of Table~\ref{table:multigrid-grammar} based on the GP module of the DEAP framework.
+%TODO mention that EvoStencils includes additional functionality not mentioned here
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
 	\caption{State Transition: Basic Functions}
