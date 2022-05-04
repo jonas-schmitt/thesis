@@ -191,7 +191,7 @@ For this purpose, we first have to consider how we can implement the formal syst
 However, before we proceed with this discussion, we want to address some final remarks about the IR presented in this section.
 First of all, note that while the main purpose of the implementation presented here is to uniquely represent the computational pattern of a multigrid method in form of a redundancy-free directed graph, in order to be able to construct this graph in a step-wise manner we have to include additional references into the respective nodes.
 As we have shown in the previous discussion, the \emph{Cycle} class serves this purpose by including additional information about the current state of a multigrid method, according to Definition~\ref{def:multigrid-state}, in form of references to the current approximate solution and right-hand side.
-While this information is important for the construction of the graph, it could be later discarded by replacing each \emph{Cycle} node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{iterate} function in Section~\ref{sec:multigrid-state-transitions}.
+While this information is important for the construction of the graph, it could be later discarded by replacing each \emph{Cycle} node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{update} function in Section~\ref{sec:multigrid-state-transitions}.
 However, preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} nodes within each graph.
 This does not only enable us to quickly grasp the computational structure of the corresponding multigrid method, but also facilitates the identification of potential errors in the implementation.
 We, therefore, represent each newly computed approximate solution by an \emph{Cycle} object, which is then referenced at each place of occurrence within subsequent computational steps of the method.
@@ -229,17 +229,17 @@ In this case, we, therefore, need to pass the initial state
 \end{equation*} explicitly to the respective residual function.
 As the third and fourth entry of this tuple is empty, in Python this corresponds to a binary tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object.
 Even though in all subsequent computations, the first entry of this tuple consists of a \emph{Cycle} object, for the sake of simplicity, we simply include the right-hand side already included in this object as a second tuple entry, which enables us to utilize the same \emph{residual} function within all grammar productions.
-For this purpose, we need to adapt the \emph{iterate} function accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
-Finally, as the last argument of the\emph{coarse\_grid\_correction} function result of an application of the \emph{iterate} function, it needs to be treated in a similar way.
+For this purpose, we need to adapt the \emph{update} function accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
+Finally, as the last argument of the\emph{coarse\_grid\_correction} function result of an application of the \emph{update} function, it needs to be treated in a similar way.
 
-The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the \textsc{iterate} function is the representation of the relaxation factor as an index within a uniformly-sampled interval, which is included in the respective \emph{Terminal} object.
+The second main difference in the implementation shown in Listing~\ref{code:grammar:basic-functions} compared to our original definition of the \textsc{update} function is the representation of the relaxation factor as an index within a uniformly-sampled interval, which is included in the respective \emph{Terminal} object.
 While we instead could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
 Now assume we want to encode a certain derivation tree in a string-based format, which then later needs to be decoded in a different environment to restore the original information.
 In case, each relaxation factor is stored as a floating point number, we need to ensure that each of these numbers is represented with the same accuracy in both environments.
 In contrast, an index can always be accurately represented in form of a single positive integer value.
 
 While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation for arbitrarily structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
-For instance, smoothing is performed through consecutive application of \textsc{apply} and \textsc{iterate}.
+For instance, smoothing is performed through consecutive application of \textsc{apply} and \textsc{update}.
 We can, therefore, simplify the grammar generation by identifying the possible combinations on each level and, then, implementing each of them in a separate function.
 In Definition~\ref{def:elementary-multigrid-operations} we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening} and \emph{coarse-grid correction}.
 In Table~\ref{table:multigrid-grammar} each of these three operations is represented by a combination of two state transition functions.
@@ -251,21 +251,24 @@ Each of these productions corresponds to the application of a certain smoothing 
 where $A^+_{h}$ obtained from a splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
 While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
 Therefore, we can instead represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
-If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \emph{smoothing\_iteration}, shown in Listing~\ref{code:grammar:smoothing}.
-Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{iterate}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
+If we assume the availability of such a function, the next step is then implement the actual application of a smoother, in form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
+Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
 Consequently, for each specific smoother, we then only need to provide a different generator.
 For instance Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
 Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining two basic state transition functions: \textsc{apply} and \textsc{cycle}.
 While the former applies a restriction operator to the previously generated residual expression, the latter is then utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
 Finally, note that the coarse-grid correction operation in Definition~\ref{def:elementary-multigrid-operations} differs from the identically named state transition function in the respect that it additionally applies the computed correction to the current approximate solution.
 In contrast the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
-In Production~\ref{prod:coarse-coarse-grid-correction} we then additionally apply the \textsc{iterate} function to generate an expression that utilizes this term to correct the previous approximate solution in each iteration of the method.
-Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{coarse\_grid\_correction\_iteration}.
-In case of the latter we have included the suffix \emph{iteration} to make it distinguishable from the respective state transition function.
+In Production~\ref{prod:coarse-coarse-grid-correction} we then additionally apply the \textsc{update} function to generate an expression that updates the current approximate solution with this term.
+Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{update\_with\_coarse\_grid\_correction}.
+In case of the latter we have included the prefix \emph{update\_with} to make it distinguishable from the respective state transition function.
 Finally, we need to provide an implementation for the application of a solver on the coarsest level, which is represented by the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
-While, for the sake of consistency, we have separated the construction of the coarse problem from the actual correction step, as the application of a solver is the only allowed operation on the coarsest level, this separation is not strictly necessary from a practical point of view.
-Instead, we can implement the complete process in a single function that first restricts the correction term of a given \texttt{Cycle} object, to which then the actual coarse-grid solver is applied.
-Finally, similar to the coarse-grid correction on other levels, the obtained solution, which is supposed to be exact, is then prolongated and then utilized to correct the previous approximate solution on the respective level.
+For the sake of consistency, we have separated the construction of the coarse problem from the actual correction step.
+However, as the application of a solver is the only allowed operation on the coarsest level, this separation is not strictly necessary from a practical point of view and we can implement the complete process in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
+Similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
+However, in contrast to all other levels, the resulting error equations is solved directly, which is denoted by the application of the coarse-grid solver.
+As a last step, the obtained solution is then transferred to the next finer level to correct the current approximate solution.
+ 
 %TODO Ref to function restrict_solve_prolongate, explain splitting into two functions
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
