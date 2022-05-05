@@ -299,6 +299,10 @@ As a last step, the obtained solution is then transferred to the next finer leve
 %TODO mention that EvoStencils includes additional functionality not mentioned here
 \subsubsection{Productions}
 After implementing all required terminals and state transition functions, as shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, the next task is to generate the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on these components.
-As it has been already mentioned at the beginning of this chapter, for this purpose, we utilize the GP module of the DEAP framework~\cite{rainville2012deap}. 
+As it has been already mentioned at the beginning of this chapter, for this purpose, we utilize the genetic programming module of the DEAP framework~\cite{rainville2012deap}. 
+In principle DEAP offers support for untyped and strongly-typed tree-based GP.
+It is, therefore, not possible to implement GGGP directly within the framework. 
+However, as we have already discussed in Section~\ref{sec:gggp-initialization} GGGP can be considered as a variation of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
+However, before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
 
 
