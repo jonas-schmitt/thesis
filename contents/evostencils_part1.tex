@@ -214,9 +214,15 @@ The implementation of this class can again be found in the appendix.
 Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
 
+\subsubsection{State Transition Functions}
 As a next step, based on the \emph{Terminals} class, we can then implement the state transition functions that have been formulated in Section~\ref{sec:multigrid-state-transitions}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/base.py}
+	\caption{State Transition: Basic Functions}
+	\label{code:grammar:basic-functions}
+\end{listing}
 While the implementation of these function is semantically equivalent to their original definition, it comprises a number of differences that originate from the properties of the \emph{Cycle} class, shown in Listing~\ref{code:ir:cycle}.
 In Section~\ref{sec:intermediate-representation} we have already discussed the advantages of representing the current state of a multigrid method directly within each \emph{Cycle} object.
 As a consequence, the application of each state transition function either alters a given \emph{Cycle} or returns a new object of this type.
@@ -252,9 +258,19 @@ obtained as the inverse of a smoothing operator $A^+_{h}$, which is defined by t
 While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
 Therefore, we can instead represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
 If we assume the availability of such a function, the next step is then the implementation of the actual smoother application, in form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/smoothing.py}
+	\caption{State Transition: Smoothing}
+	\label{code:grammar:smoothing}
+\end{listing}
 Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
 Consequently, for each specific smoother, we then only need to provide a different generator.
 For instance, Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/jacobi.py}
+	\caption{Example for generating Jacobi-based smoothers}
+	\label{code:grammar:jacobi}
+\end{listing}
 Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining the functions \textsc{apply} and \textsc{cycle}.
 After the former applies a restriction operator to the previously generated residual expression, the latter is utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
 Next, we need to provide an implementation for Production~\ref{prod:coarse-grid-correction}, which corresponds to the \emph{coarse-grid correction} operation in Definition~\ref{def:elementary-multigrid-operations}.
@@ -262,40 +278,27 @@ Note that this operation differs from the identically named state transition fun
 In contrast, the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
 In Production~\ref{prod:coarse-grid-correction} we then additionally apply the \textsc{update} function to generate an expression that updates the current approximate solution with this term.
 Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{update\_with\_coarse\_grid\_correction}.
-In case of the latter we have included the prefix \emph{update\_with} to make it distinguishable from the respective state transition function.
-Finally, in contrast to the functions defined so far, which can be applied on multiple levels, on the coarsest level the only possible operation is the application of a coarse-grid solver, which corresponds to the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
-Here, Production~\ref{prod:coarse-grid-solver} corresponds to the construction of the coarse problem, similar to the coarsening step defined by Production~\ref{prod:coarsening}, while Production~\ref{prod:coarse-grid-solver-correction} performs the actual correction step based on the exact solution obtained on the coarsest level. 
-However, note that only a single productions is available for the variable $\ps{c_{16h}}$ in Table~\ref{table:multigrid-grammar}, which means that the two productions can only be applied in succession.
-We can, therefore, combine the complete process of updating the current approximate solution with a coarse-grid solver-based correction in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
-For this purpose, similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
-However, in contrast to all other levels, the resulting error equations is solved directly, which is denoted by the application of the coarse-grid solver.
-As a last step, the obtained solution is then transferred to the next finer level to correct the current approximate solution.
-Therefore, with the implementation of the functions shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, we can now continue with the actual generation of Table~\ref{table:multigrid-grammar} based on the GP module of the DEAP framework.
-%TODO mention that EvoStencils includes additional functionality not mentioned here
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/base.py}
-	\caption{State Transition: Basic Functions}
-	\label{code:grammar:basic-functions}
-\end{listing}
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/smoothing.py}
-	\caption{State Transition: Smoothing}
-	\label{code:grammar:smoothing}
-\end{listing}
-\begin{listing}
-	\inputminted{python}{evostencils/grammar/jacobi.py}
-	\caption{Example for generating Jacobi-based smoothers}
-	\label{code:grammar:jacobi}
-\end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/inter_grid_operations.py}
 	\caption{State Transition: Inter-Grid Operations}
 	\label{code:grammar:inter-grid-operations}
 \end{listing}
+In case of the latter we have included the prefix \emph{update\_with} to make it distinguishable from the respective state transition function.
+Finally, in contrast to the functions defined so far, which can be applied on multiple levels, on the coarsest level the only possible operation is the application of a coarse-grid solver, which corresponds to the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
+Here, Production~\ref{prod:coarse-grid-solver} corresponds to the construction of the coarse problem, similar to the coarsening step defined by Production~\ref{prod:coarsening}, while Production~\ref{prod:coarse-grid-solver-correction} performs the actual correction step based on the exact solution obtained on the coarsest level. 
+However, note that only a single productions is available for the variable $\ps{c_{16h}}$ in Table~\ref{table:multigrid-grammar}, which means that the two productions can only be applied in succession.
+We can, therefore, combine the complete process of updating the current approximate solution with a coarse-grid solver-based correction in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
 	\caption{State Transition: Coarse-Grid Solver}
 	\label{code:grammar:coarse-grid-solver}
 \end{listing}
+For this purpose, similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
+However, in contrast to all other levels, the resulting error equations is solved directly, which is denoted by the application of the coarse-grid solver.
+As a last step, the obtained solution is then transferred to the next finer level to correct the current approximate solution.
+%TODO mention that EvoStencils includes additional functionality not mentioned here
+\subsubsection{Productions}
+After implementing all required terminals and state transition functions, as shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, the next task is to generate the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on these components.
+As it has been already mentioned at the beginning of this chapter, for this purpose, we utilize the GP module of the DEAP framework~\cite{rainville2012deap}. 
 
 
