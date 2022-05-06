@@ -300,11 +300,37 @@ As a last step, the obtained solution is then transferred to the next finer leve
 \subsubsection{Productions}
 After implementing all required terminals and state transition functions, as shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, the next task is to generate the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on these components.
 As it has been already mentioned at the beginning of this chapter, for this purpose, we utilize the genetic programming module of the DEAP framework~\cite{rainville2012deap}. 
-In principle DEAP offers support for untyped and strongly-typed tree-based GP.
+In principle, DEAP offers support for untyped and strongly-typed tree-based GP.
 It is, therefore, not possible to implement GGGP directly within the framework. 
 However, as we have already discussed in Section~\ref{sec:gggp-initialization} GGGP can be considered as a variation of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
 However, before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
-In DEAP the main data structure to represent a typed GP system is a \emph{PrimitiveSetTyped}, which defines the rules how a program can be constructed based on a set of terminals and so-called \emph{primitives}.
+In DEAP the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines the rules how a program can be constructed based on a set of terminals and so-called \emph{primitives}.
 As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints can be generated.
+To demonstrate how a grammar can be implemented in form of a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, which is defined as
+\begin{equation*}
+	\begin{split}
+		\ps S \; \; \bnfpo & \; \; \ps E \\
+		\ps E \; \; \bnfpo & \; \; \text{if} \; \ps B \; \text{then} \; \ps E \; \text{else} \; \ps E \; | \; \ps A \\
+		\ps A \; \; \bnfpo & \; \; -\ps A \; | \; (\ps A + \ps A) \; | \; (\ps A - \ps A) \; | \\
+		& \; \; (\ps A \cdot \ps A) \; | \; (\ps A / \ps A) \; | \ps{A}^{\ps{A}} \; | \; x \; | \; y \\  
+		\ps B \; \; \bnfpo & \; \;  \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v.
+	\end{split}
+\end{equation*}
+Listing~\ref{code:grammar:pset-example} shows the resulting implementation of the function \emph{generate\_grammar} which generates a \emph{PrimitiveSetTyped} object that corresponds to the given example grammar.
+Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in line $5$--$7$.
+Next, an empty primitive set is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable in the given grammar.
+We can then proceed defining each of the grammar's production in form of a so-called \emph{primitive}, which consists of a function object, a list of input types and an output type.
+Counterintuitively, the output and not the input type then defines which variable is placed on the left side of each production.
+To understand the reasoning behind this design choice, we need to reconsider the process of tree initialization in GGGP.
+As we have seen in Section~\ref{sec:gggp-initialization} a new derivation tree can be generated starting with the variable $\ps{S}$ by recursively choosing productions from the available set of productions for each leaf node of the tree that corresponds to a variable.
+Similarly, to generate a tree based on a given primitive set, starting with the type that has been passed during creation of the empty set, primitives are chosen recursively among those whose return type matches with the current type considered.
+After extending the tree accordingly, the process is continued with each of the input types of the chosen primitive.
+Therefore, in order to terminate this process at a certain point within the tree, a primitive with an empty list of input types must be chosen, which corresponds to a production whose right-hand side does not contain any variables.
+
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/pset_example.py}
+	\caption{Example Grammar Generation with PrimitiveSetTyped}
+	\label{code:grammar:pset-example}
+\end{listing}
 
 
