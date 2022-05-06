@@ -304,5 +304,7 @@ In principle DEAP offers support for untyped and strongly-typed tree-based GP.
 It is, therefore, not possible to implement GGGP directly within the framework. 
 However, as we have already discussed in Section~\ref{sec:gggp-initialization} GGGP can be considered as a variation of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
 However, before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
+In DEAP the main data structure to represent a typed GP system is a \emph{PrimitiveSetTyped}, which defines the rules how a program can be constructed based on a set of terminals and so-called \emph{primitives}.
+As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints can be generated.
 
 
