@@ -25,8 +25,9 @@ def generate_grammar(x, y, u, v):
     pset.addPrimitive(operator.or_, [B, B], B)      # <B> or <B>
 
     def add_argument(pset, arg, type_list):
+        symbolic = True
         for t in type_list:
-            pset._add(gp.Terminal(arg, True, t))
+            pset._add(gp.Terminal(arg, symbolic, t))
             pset.terms_count += 1
         pset.arguments.append(arg)
 
