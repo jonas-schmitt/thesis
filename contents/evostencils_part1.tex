@@ -339,6 +339,24 @@ Note that in order to define the production
 \begin{equation*}
 	\ps E \; \; \bnfpo \; \; \ps A,
 \end{equation*}
-we utilize an identify function, as defined in line 12 of Listing~\ref{code:grammar:pset-example}.
+we utilize an identify function, as defined in line~12 of Listing~\ref{code:grammar:pset-example}.
+After adding each of the grammar's productions to the set in form of a \emph{Primitive} object, what remains is the treatment of the four terminals $x$, $y$, $u$ and $v$.
+In DEAP terminals are represented by objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} without any arguments, and, thus, an empty list of input types.
+Optionally, a \emph{Terminal} object may also refer a Python symbol, which can be achieved by setting the \emph{symbolic} argument accordingly.
+Since, similar to Section~\ref{sec:gggp-representation}, we assume that each of the four terminals represents an argument of the generated Python function, we additionally append it to the list of arguments, which is shown in line~32 of Listing~\ref{code:grammar:pset-example}.
+Note that for each of the two symbols $x$ and $y$ we include two \emph{Terminal} objects into the set, which only differ in their return type.
+As a consequence, our implementation includes two additional productions
+\begin{equation*}
+	\ps E \; \; \bnfpo \; \; \ps x \bnfor \ps y,
+\end{equation*}
+which are not part of the original grammar.
+The reason for this adaption is that within DEAP's implementation of the \emph{grow} operator, as described in Section~\ref{sec:gggp-initialization}, expects the availability of at least one \emph{Terminal} and \emph{Primitive} object for each type within a \emph{PrimitiveSetTyped}.
+In the given case, we only need to include additional \emph{Terminal} objects for the type \emph{E}, as the condition is already fulfilled for all other types.
+While in the given case, we can easily fulfill this condition without changing the grammar's behavior, as the type \emph{E} can already be converted to \emph{A} using the identity function, in general this is not the case.
+In particular for the majority of the variables of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}, only non-terminal productions, i.e. productions that generate strings with at least one variable, are available.
+Therefore, we need to adapt DEAP's implementation of the \emph{grow} operator to handle grammar's that violate the requirement of having at least one terminal production for each of its variables, which we will briefly discuss at the end of this section.
+Finally, after generating a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can generate a random tree using the \emph{genGrow} function, which corresponds to aforementioned \emph{grow} initialization operator.
+Based on the resulting tree, a function object can then be generated using DEAP's \emph{compile} function, which can then be executed similar to any other Python function by providing a value for each of its arguments.
+%Similar to \emph{Primitive} objects, a \emph{Terminal} can be added to an existing \emph{PrimitiveSetTyped} using the \emph{addTerminal} method.
 
 
