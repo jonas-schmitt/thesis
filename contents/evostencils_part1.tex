@@ -340,12 +340,13 @@ Note that in order to define the production
 	\ps E \; \; \bnfpo \; \; \ps A,
 \end{equation*}
 we utilize an identify function, as defined in line~12 of Listing~\ref{code:grammar:pset-example}.
-After adding each of the grammar's productions to the set in form of a \emph{Primitive} object, what remains is the treatment of the four terminals $x$, $y$, $u$ and $v$.
-In DEAP terminals are represented by objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} without any arguments, and, thus, an empty list of input types.
+After adding each of the grammar's productions to the set in form of a \emph{Primitive} object, what remains is the treatment of the four symbols $x$, $y$, $u$ and $v$.
+In DEAP terminals are represented by objects of the \emph{Terminal} class, which corresponds to a primitive without any arguments, and, thus, an empty list of input types.
 Optionally, a \emph{Terminal} object may also refer a Python symbol, which can be achieved by setting the \emph{symbolic} argument accordingly.
-Since, similar to Section~\ref{sec:gggp-representation}, we assume that each of the four terminals represents an argument of the generated Python function, we additionally append it to the list of arguments, which is shown in line~32 of Listing~\ref{code:grammar:pset-example}.
-Note that for each of the two symbols $x$ and $y$ we include two \emph{Terminal} objects into the set, which only differ in their return type.
-As a consequence, our implementation includes two additional productions
+Since, similar to Section~\ref{sec:gggp-representation}, we assume that each of the four symbols represents an argument of the generated Python function, we additionally append it to the list of arguments.
+The resulting locally-defined function \emph{add\_argument} can then be utilized to add each of the four symbols as an argument to the set. 
+Note that for each of the two symbols $x$ and $y$ we include two \emph{Terminal} objects, which only differ in their return type.
+As a consequence, our implementation includes primitives that correspond to two additional productions
 \begin{equation*}
 	\ps E \; \; \bnfpo \; \; \ps x \bnfor \ps y,
 \end{equation*}
@@ -355,8 +356,32 @@ In the given case, we only need to include additional \emph{Terminal} objects fo
 While in the given case, we can easily fulfill this condition without changing the grammar's behavior, as the type \emph{E} can already be converted to \emph{A} using the identity function, in general this is not the case.
 In particular for the majority of the variables of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}, only non-terminal productions, i.e. productions that generate strings with at least one variable, are available.
 Therefore, we need to adapt DEAP's implementation of the \emph{grow} operator to handle grammar's that violate the requirement of having at least one terminal production for each of its variables, which we will briefly discuss at the end of this section.
-Finally, after generating a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can generate a random tree using the \emph{genGrow} function, which corresponds to aforementioned \emph{grow} initialization operator.
-Based on the resulting tree, a function object can then be generated using DEAP's \emph{compile} function, which can then be executed similar to any other Python function by providing a value for each of its arguments.
+Finally, after constructing a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can generate a random tree using the \emph{genGrow} function, which corresponds to aforementioned \emph{grow} initialization operator.
+Based on the resulting tree, a function object is then generated using DEAP's \emph{compile} function, which can be executed similar to any other Python function by providing a value for each of its arguments.
 %Similar to \emph{Primitive} objects, a \emph{Terminal} can be added to an existing \emph{PrimitiveSetTyped} using the \emph{addTerminal} method.
 
+After introducing the functionality of DEAP's GP module, we can continue with the actual implementation of the productions of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}.
+However, before we define a function for constructing the corresponding \emph{PrimitiveSetTyped}, we need to consider the unique structure of our grammar.
+As we have discussed in Section~\ref{sec:multigrid-grammar}, Table~\ref{table:multigrid-grammar} is obtained by repeating the same productions on each level for the corresponding set of variables.
+In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all terminals that are contained in each production.
+Therefore, instead of constructing a \emph{PrimitiveSetTyped} that includes all productions in Table~\ref{table:multigrid-grammar} at once, we can instead add the respective primitives on a per-level basis.
+Furthermore, note that Table~\ref{table:multigrid-grammar} is defined on hierarchy of discretizations with a specific number of coarsening steps.
+Hence, defining a function that enables the iterative construction of a multigrid grammar independent of the total number of coarsening steps, allows us to utilize the same function for the generation of grammars defined on different discretization hierarchies. 
+For this purpose, similar to the above example, the first step is the generation of a unique type for each variable that is defined on each level of our grammar.
+While in Listing~\ref{code:grammar:pset-example} we have encoded each of the grammar's variables by an actual Python type, at this point we have to introduce an additional constraint that prevents us from pursuing the same approach.
+In order to store the state of a program in form of a serialized binary format, Python provides the \emph{pickle} module.
+Pickle enables the serialization of arbitrary Python objects, which can then be restored at a later point in time.
+In our implementation object serialization serves multiple purposes.
+First of all, we want to be able to store the current state of a grammar-guided optimization, such that, for instance in case of a hardware failure, the method can be continued at the same position.
+Furthermore, parallelizing certain parts of the optimization on a distributed computing system, for instance using the Message Passing Library (MPI), requires us to transfer arbitrary Python objects through a communication network, for which the pickle module provides a simple and portable solution.
+Unfortunately, pickle enforces a number of additional constraints on the serializability of a Python object.
+In particular, Python types can only be serialized in case they are defined at the top-level domain of a module.
+However, as our goal is to create a \emph{PrimitiveSetTyped} that is adapted to the details of a grammar that is provided during program execution, we need to create the respective types dynamically as well.
+As a consequence, these types can not be serialized directly, as they are not defined at the topmost level of the given Python module, but instead are generated within a function.
+To resolve this issue, we propose a simple class as an interface to the generated types, which is shown in Listing~\ref{code:grammar:typing}.
+\begin{listing}
+	\inputminted{python}{evostencils/grammar/typing.py}
+	\caption{Type interface}
+	\label{code:grammar:typing}
+\end{listing}
 
