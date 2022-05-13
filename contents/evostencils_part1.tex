@@ -215,6 +215,7 @@ Note that the coarse-grid solver may additionally contain an expression, again g
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
 
 \subsubsection{State Transition Functions}
+\label{sec:evostencils:state-transition-functions}
 As a next step, based on the \emph{Terminals} class, we can then implement the state transition functions that have been formulated in Section~\ref{sec:multigrid-state-transitions}, to construct the corresponding IR object of a multigrid method represented as a derivation tree of the grammar shown in Table~\ref{table:multigrid-grammar}.
 From these components we will then finally be able assemble the actual grammar using the genetic programming module of the DEAP framework~\footnote{\url{https://deap.readthedocs.io/en/master/api/gp.html}}.
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
@@ -378,10 +379,33 @@ Unfortunately, pickle enforces a number of additional constraints on the seriali
 In particular, Python types can only be serialized in case they are defined at the top-level domain of a module.
 However, as our goal is to create a \emph{PrimitiveSetTyped} that is adapted to the details of a grammar that is provided during program execution, we need to create the respective types dynamically as well.
 As a consequence, these types can not be serialized directly, as they are not defined at the topmost level of the given Python module, but instead are generated within a function.
-To resolve this issue, we propose a simple class as an interface to the generated types, which is shown in Listing~\ref{code:grammar:typing}.
+To resolve this issue, we propose a custom \emph{Type} class which enables the dynamic creation of types in form of its instances, which is shown in Listing~\ref{code:grammar:typing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/typing.py}
-	\caption{Type interface}
+	\caption{Type Wrapper Class}
 	\label{code:grammar:typing}
 \end{listing}
+The main feature of this class is the existence of an \emph{identifier} attribute, which allows to distinguish different types within a \emph{PrimitiveSetTyped}.
+Additionally, the class also includes a \emph{guard} attribute in form of a boolean variable, whose purpose we will cover later in this section. 
+To achieve type equivalence checking in an automatic manner, we provide a custom \emph{\_\_eq\_\_} method.
+First of all, since we also want to be able the compare a given \emph{Type} object to other Python objects, we check whether the other object is also an instance of the \emph{Type} class.
+If this condition is fulfilled, we proceed checking whether both the \emph{identifier} and \emph{guard} attributes are equal.
+Furthermore, in order to correctly store \emph{Type} objects in a dictionary, we implement the \emph{\_\_hash\_\_} method, where we utilize Python's builtin \emph{hash} function to generate a unique value based on the two attributes of the class. 
+
+Based on this tailored type representation, we can now implement a data structure in form of the \emph{Types} class that incorporates the corresponding type for each variable defined on a given level of Table~\ref{table:multigrid-grammar}, which is shown in Listing~\ref{code:grammar:types}.
+\begin{listing}
+  	\inputminted[linenos]{python}{evostencils/grammar/types.py}
+  	\caption{Types on each level}
+  	\label{code:grammar:types}
+\end{listing}
+%TODO include line numbers at the respective text positions
+Within this data structure, a type attribute can be initialized in two different ways depending on whether the types of the next-higher level in the discretization hierarchy are provided.
+To distinguish between these two cases, the \emph{\_init\_type} method can be employed, which either creates a new \emph{Type} object using the provided \emph{identifier} or alternatively returns the respective attribute of the given \emph{Types} object.
+Based on this function, we then generate a \emph{Type} object with unique \emph{identifier} for each variable of two subsequent levels of the discretization hierarchy, whereby each attribute with a subscript $h$ and $2h$ corresponds to a variable on the current level and next-coarser level, respectively.
+Consequently, if we provide an existing \emph{Types} object for the initialization of the corresponding object on the next-coarser level, its coarse-level types correspond to the fine-level types of this object.
+We, therefore, only have to generate a unique type for each variable once, which can then be transmitted to the next-coarser level in form of a reference to the respective \emph{Type} object.
+For the sake of simplicity we utilize Python strings as \emph{identifier} for each \emph{Type} object. 
+Finally, in addition to the types that need to be defined for each level, there exist a number of level-independent variables, for which only a single type needs to be defined for the whole grammar.
+While we have already discussed the purpose of the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes in Section~\ref{sec:evostencils:state-transition-functions}, we additionally create a \emph{Type} object for representing the shapes of rectangular blocks within the definition of block smoothers, which have been briefly discussed in Section~\ref{subsec:block-smoothing}.
+
 

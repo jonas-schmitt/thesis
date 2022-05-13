@@ -1,9 +1,6 @@
 class Type:
     def __init__(self, identifier, guard=False):
-        if isinstance(identifier, str):
-            self.identifier = type(identifier, (object,), {})
-        else:
-            self.identifier = identifier
+        self.identifier = identifier
         self.guard = guard
 
     def __eq__(self, other):
