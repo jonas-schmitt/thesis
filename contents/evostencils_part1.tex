@@ -421,8 +421,21 @@ For the majority of productions this does not represent an issue, as, for instan
 However, according to Section~\ref{sec:multigrid-methods}, we consider it as essential that the coarse-grid solver is at least applied once within a multigrid method in order to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
 We enforce this requirement by utilizing the mentioned \emph{guard} attribute of the \emph{Type} class.
 As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
- 
-
+For this purpose, we set the output type of the respective \emph{Terminal} object in line 12 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
+We then define all remaining productions in such a way that all possible derivations include the function \emph{correct\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
+Listing~\ref{code:grammar:add-level} shows how this can be achieved for each level within a discretization hierarchies of arbitrary depth.
+As a first step within this function, we utilize the function \emph{add\_terminals} in line 2, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to add all terminals that are required on the respective level to the given primitive set.
+Next, to facilitate the process of primitive generation, we implement the helper function \emph{add\_primitive}.
+This function has the purpose of generating the same primitive multiple times using different input and output types. 
+We, therefore, utilize this function to include each primitive with a guarded and unguarded version of the same type.
+Now note that each derivation starts with the type \emph{S\_h} and ends with the type \emph{S\_guard\_h}.
+As in each of the \emph{Primitive} objects created in line 10--18 where the list of input types includes exclusively unguarded type the output type is also unguarded, in none of the resulting primitives a transition from an unguarded to a guarded type is possible.
+However, as this transition is required in each derivation, we can exactly achieve the desired behavior by including a transition from an unguarded type to a guarded type, whenever the function \emph{correct\_with\_coarse\_grid\_solver} is applied.
+As we only want to add this production on the coarsest level, as a replacement of the respective productions that apply coarsening and a coarse-grid correction.
+We, therefore, have to check whether the current level represents the coarsest within the given discretization hierarchy, which is performed in line 15 of Listing~\ref{code:grammar:add-level}.
+Furthermore, note that as the same production is also applicable for the respective guarded types, the coarse-grid solver, together with all other productions can also be applied multiple times within each derivation.
+Finally, as determined by the productions of Table~\ref{table:multigrid-grammar}, except for the treatment of different smoothers, only four unique primitives are required on each level.
+%TODO describe generation of complete grammar in generate_grammar function
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/init_grammar.py}
 	\caption{}
