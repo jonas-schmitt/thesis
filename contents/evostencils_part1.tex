@@ -399,13 +399,49 @@ Based on this tailored type representation, we can now implement a data structur
   	\label{code:grammar:types}
 \end{listing}
 %TODO include line numbers at the respective text positions
-Within this data structure, a type attribute can be initialized in two different ways depending on whether the types of the next-higher level in the discretization hierarchy are provided.
+Within this data structure, a type attribute can be initialized in two different ways depending on whether the types of the next-higher level in the discretization hierarchy are available.
 To distinguish between these two cases, the \emph{\_init\_type} method can be employed, which either creates a new \emph{Type} object using the provided \emph{identifier} or alternatively returns the respective attribute of the given \emph{Types} object.
-Based on this function, we then generate a \emph{Type} object with unique \emph{identifier} for each variable of two subsequent levels of the discretization hierarchy, whereby each attribute with a subscript $h$ and $2h$ corresponds to a variable on the current level and next-coarser level, respectively.
+Based on this function, in line 13--33 we then generate a \emph{Type} object with unique \emph{identifier} for each variable of two subsequent levels of the discretization hierarchy, whereby each attribute with a subscript $h$ and $2h$ corresponds to a variable on the current level and next-coarser level, respectively.
 Consequently, if we provide an existing \emph{Types} object for the initialization of the corresponding object on the next-coarser level, its coarse-level types correspond to the fine-level types of this object.
 We, therefore, only have to generate a unique type for each variable once, which can then be transmitted to the next-coarser level in form of a reference to the respective \emph{Type} object.
 For the sake of simplicity we utilize Python strings as \emph{identifier} for each \emph{Type} object. 
-Finally, in addition to the types that need to be defined for each level, there exist a number of level-independent variables, for which only a single type needs to be defined for the whole grammar.
-While we have already discussed the purpose of the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes in Section~\ref{sec:evostencils:state-transition-functions}, we additionally create a \emph{Type} object for representing the shapes of rectangular blocks within the definition of block smoothers, which have been briefly discussed in Section~\ref{subsec:block-smoothing}.
+Furthermore, in addition to the types that need to be defined for each level, both the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes are level-independent variables, and, thus, in both cases only a single type needs to be defined for the whole grammar, which is shown in line 36 and 37.
+
+With the implementation of a type system that allows us to express the productions of a multigrid grammar as a set of typed primitives we are now finally at the point where we can bring everything together.
+Similar to the example shown in Listing~\ref{code:grammar:pset-example}, we first have to create a \emph{PrimitiveSetTyped} to which we can then add the respective \emph{Terminal} and \emph{Primitive} objects in an iterative manner.
+The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}.
+Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given distretization hierarchy.
+Based on these data structures we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state in form of a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object, and a number of level-independent terminals.
+All other \emph{Terminal} and \emph{Primitive} objects are then added using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
+To understand the functioning of this method we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
+The purpose of this attribute is to enforce additional constraints within the grammar, that are not present in the general structure of Table~\ref{table:grammar-semantics}.
+While our grammar enables the generation of multigrid methods that employ an arbitrary sequence of operations on each level, for the sake of simplicity, we have not yet applied any requirements on a method's structure.
+As a consequence, none of the productions must necessarily be included into a given derivation tree.
+For the majority of productions this does not represent an issue, as, for instance, the optimal number of smoothing and coarse-grid correction steps might be different for each case.
+However, according to Section~\ref{sec:multigrid-methods}, we consider it as essential that the coarse-grid solver is at least applied once within a multigrid method in order to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
+We enforce this requirement by utilizing the mentioned \emph{guard} attribute of the \emph{Type} class.
+As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
+ 
+
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/init_grammar.py}
+	\caption{}
+	\label{code:grammar:init-grammar}
+\end{listing}
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
+	\caption{}
+	\label{code:grammar:add-level}
+\end{listing}
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/add_terminals.py}
+	\caption{}
+	\label{code:grammar:add-terminals}
+\end{listing}
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/generate_grammar.py}
+	\caption{}
+	\label{code:grammar:generate-grammar}
+\end{listing}
 
 

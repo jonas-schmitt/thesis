@@ -35,4 +35,3 @@ class Types:
         # General types
         self.Partitioning = self._init_type("Partitioning", previous_types)
         self.RelaxationFactorIndex = self._init_type("RelaxationFactorIndex", previous_types)
-        self.BlockShape = self._init_type("BlockShape", previous_types)
