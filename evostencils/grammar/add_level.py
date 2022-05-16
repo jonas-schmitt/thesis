@@ -17,5 +17,6 @@ def add_level(pset: PrimitiveSetTyped, terminals: Terminals, types: Types, max_l
 
         add_primitive(pset, coarsening, [types.A_2h, types.x_2h, types.R_h], [types.C_h, types.C_guard_h], [types.C_2h, types.C_guard_2h], f"coarsening_{level}")
     else:
+        # Add transition C_guard_h <- S_h to enable derivation termination
         add_primitive(pset, correct_with_coarse_grid_solver, [types.RelaxationFactorIndex, types.P_2h, types.CGS_2h, types.R_h], [types.C_h, types.C_guard_h], [types.S_h, types.S_h], f'correct_with_coarse_grid_solver_{level}')
         pset.addTerminal(terminals.coarse_grid_solver, types.CGS_2h, f'CGS_{level - 1}')
