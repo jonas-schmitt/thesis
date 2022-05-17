@@ -354,7 +354,7 @@ At this point we also have to revisit one of the main goals of this language: Th
 As we have described in this section, we have ensured that each possible state transition within a multigrid method is described by the application of either a specific combination of functions or even a single one.
 However, we have carefully avoided to introduce functions that correspond to a transition spanning over multiple states, which would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
 The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
-\section{Multigrid Grammar}
+\section{A Novel Class of Multigrid Grammars}
 \label{sec:multigrid-grammar}
 \setcounter{equation}{0}
 In Section~\ref{sec:formal-languages} we have already introduced the definition of a general grammar $G$ as the quaternary tuple 
@@ -674,7 +674,7 @@ In the remaining part of this thesis, we will, therefore, close these gaps by pr
 Since the EvoStencils framework builds substantially on the evolutionary optimization techniques presented in Section~\ref{sec:gggp}, it is important to consider first whether these algorithms are suitable for the given task or if a mere brute-force search is sufficient to identify the single best method among the set of possible ones for a given problem.
 For this purpose, we aim to estimate the size of the search space that is created by the grammar formulated in Table~\ref{table:multigrid-grammar}, i.e. the number of different individuals that can be generated based on its productions.
 
-\section{Search Space Estimation}
+\subsection{Search Space Estimation}
 If we treat the grammar-based optimization of multigrid method as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
 In practice, in case of a small search space it can be feasible to simply enumerate and evaluate all possible solutions of the given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, is, in general, not guaranteed to find the same solution in each of its executions.
 For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Table~\ref{table:multigrid-grammar}. 

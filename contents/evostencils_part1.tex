@@ -395,7 +395,7 @@ Furthermore, in order to correctly store \emph{Type} objects in a dictionary, we
 Based on this tailored type representation, we can now implement a data structure in form of the \emph{Types} class that incorporates the corresponding type for each variable defined on a given level of Table~\ref{table:multigrid-grammar}, which is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
   	\inputminted[linenos]{python}{evostencils/grammar/types.py}
-  	\caption{Types on each level}
+  	\caption{Data Structure for Variable Types}
   	\label{code:grammar:types}
 \end{listing}
 %TODO include line numbers at the respective text positions
@@ -410,6 +410,11 @@ Furthermore, in addition to the types that need to be defined for each level, bo
 With the implementation of a type system that allows us to express the productions of a multigrid grammar as a set of typed primitives we are now finally at the point where we can bring everything together.
 Similar to the example shown in Listing~\ref{code:grammar:pset-example}, we first have to create a \emph{PrimitiveSetTyped} to which we can then add the respective \emph{Terminal} and \emph{Primitive} objects in an iterative manner.
 The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/init_grammar.py}
+	\caption{Primitive Set Initialization}
+	\label{code:grammar:init-grammar}
+\end{listing}
 Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given distretization hierarchy.
 Based on these data structures we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state in form of a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object, and a number of level-independent terminals.
 All other \emph{Terminal} and \emph{Primitive} objects are then added using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
@@ -424,7 +429,17 @@ As each derivation of our grammar ends with the generation of the initial state 
 For this purpose, we set the output type of the respective \emph{Terminal} object in line 12 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
 We then define all remaining productions in such a way that all possible derivations include the function \emph{correct\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
 Listing~\ref{code:grammar:add-level} shows how this can be achieved for each level within a discretization hierarchies of arbitrary depth.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
+	\caption{Terminal and Primitive Generation per Level}
+	\label{code:grammar:add-level}
+\end{listing}
 As a first step within this function, we utilize the function \emph{add\_terminals} in line 2, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to add all terminals that are required on the respective level to the given primitive set.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/grammar/add_terminals.py}
+	\caption{Terminal Generation per Level}
+	\label{code:grammar:add-terminals}
+\end{listing}
 Next, to facilitate the process of primitive generation, we implement the helper function \emph{add\_primitive}.
 This function has the purpose of generating the same primitive multiple times using different input and output types. 
 We, therefore, utilize this function to include each primitive with a guarded and unguarded version of the same type.
@@ -438,27 +453,16 @@ Note that we only want to add this production on the coarsest level, where it re
 We, therefore, have to check whether the current level represents the coarsest within the given discretization hierarchy, which is performed in line 15 of Listing~\ref{code:grammar:add-level}.
 Furthermore, note that as the same production is also applicable for the respective guarded types, the coarse-grid solver, together with all other productions can also be applied multiple times within each derivation.
 
-
-%TODO describe generation of complete grammar in generate_grammar function
-\begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/init_grammar.py}
-	\caption{}
-	\label{code:grammar:init-grammar}
-\end{listing}
-\begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
-	\caption{}
-	\label{code:grammar:add-level}
-\end{listing}
-\begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/add_terminals.py}
-	\caption{}
-	\label{code:grammar:add-terminals}
-\end{listing}
+Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, as defined in Listing~\ref{code:grammar:init-grammar} and~\ref{code:grammar:add-level}, respectively, we can implement a Python function \emph{generate\_grammar} for generating the primitive set of arbitrary multigrid grammars, which is shown in Listing~\ref{code:grammar:generate-grammar}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/generate_grammar.py}
-	\caption{}
+	\caption{Grammar Generation}
 	\label{code:grammar:generate-grammar}
 \end{listing}
+%TODO maybe clarify the meaning of max_level in comparison to earlier sections
+Here, we first construct a \emph{PrimitiveSetTyped} object while adding all required terminals and primitives on the finest level using the previously defined function \emph{init\_grammar}, which is applied in line 6.
+In case the given discretization hierarchies comprises at least three levels, we iteratively extend our primitive set with respect to each level using the \emph{add\_level} function.
+For this purpose, similar to the finest level, we only have to create the respective \emph{Terminals} and \emph{Types} object, as shown in line 10--20, which can then be passed to the aforementioned function in order to include all required \emph{Primitive} and \emph{Terminal}.
+After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations. 
 
-
+\section{Evolutionary Search Method}
