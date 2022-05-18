@@ -1,15 +1,19 @@
-def init_grammar(approximation, rhs, max_level, samples, coarsest=False):
-    operator = get_operator(max_level)
+import numpy as np
+from evostencils.ir import partitioning
+from evostencils.grammar.gp import PrimitiveSetTyped
+
+def init_grammar(x_h, b_h, max_level, samples, coarsest=False):
+    A_h = get_operator(max_level)
     restriction_operators, prolongation_operators = get_inter_grid_operators(max_level, max_level - 1)
-    coarse_operator = get_operator(max_level - 1)
-    partitionings = [part.RedBlack]
-    coarse_grid_solver = base.CoarseGridSolver("Coarse-Grid Solver", coarse_operator)
+    A_2h = get_operator(max_level - 1)
+    partitionings = [partitioning.RedBlack]
+    CGS_2h = CoarseGridSolver("CGS", A_2h)
 
     relaxation_factor_interval = np.linspace(0.1, 1.9, samples)
-    terminals = Terminals(approximation, operator, coarse_operator, restriction_operators, prolongation_operators, coarse_grid_solver, relaxation_factor_interval, partitionings)
+    terminals = Terminals(x_h, A_h, A_2h, restriction_operators, prolongation_operators, CGS_2h, relaxation_factor_interval, partitionings)
     types = Types(0)
     pset = PrimitiveSetTyped("main", [], types.S_h)
-    pset.addTerminal((approximation, rhs), types.S_guard_h, 'initial_state')
+    pset.addTerminal((x_h, b_h), types.S_guard_h, 'initial_state')
 
     pset.addTerminal(terminals.no_partitioning, types.Partitioning, terminals.no_partitioning.get_name())
     for p in terminals.partitionings:

@@ -391,6 +391,8 @@ To achieve type equivalence checking in an automatic manner, we provide a custom
 First of all, since we also want to be able the compare a given \emph{Type} object to other Python objects, we check whether the other object is also an instance of the \emph{Type} class.
 If this condition is fulfilled, we proceed checking whether both the \emph{identifier} and \emph{guard} attributes are equal.
 Furthermore, in order to correctly store \emph{Type} objects in a dictionary, we implement the \emph{\_\_hash\_\_} method, where we utilize Python's builtin \emph{hash} function to generate a unique value based on the two attributes of the class. 
+To ensure that type checking is done correctly, we adapt the original implementation of \emph{PrimitiveSetTyped} such that \emph{Type} objects are compared using the equality operator instead of Python's builtin \emph{issubclass} function.
+The resulting adapted implementation of the \emph{\_add} method within \emph{PrimitiveSetTyped} can be found in Section~\ref{appendix:gp} of the appendix.
 
 Based on this tailored type representation, we can now implement a data structure in form of the \emph{Types} class that incorporates the corresponding type for each variable defined on a given level of Table~\ref{table:multigrid-grammar}, which is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
@@ -417,8 +419,11 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 \end{listing}
 Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given distretization hierarchy.
 Based on these data structures we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state in form of a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object, and a number of level-independent terminals.
+For the sake of simplicity, we assume that it is possible to generate all required operators using the predefined functions \emph{get\_operator} and \emph{get\_inter\_grid\_operators}.
+However, note that in the actual implementation of \emph{EvoStencils} this information is retrieved from a domain specific representation, which involves the parsing and symbolic interpretation of the respective entities, operators and equations.  
 All other \emph{Terminal} and \emph{Primitive} objects are then added using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
-To understand the functioning of this method we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
+
+At this point we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
 The purpose of this attribute is to enforce additional constraints within the grammar, that are not present in the general structure of Table~\ref{table:grammar-semantics}.
 While our grammar enables the generation of multigrid methods that employ an arbitrary sequence of operations on each level, for the sake of simplicity, we have not yet applied any requirements on a method's structure.
 As a consequence, none of the productions must necessarily be included into a given derivation tree.
