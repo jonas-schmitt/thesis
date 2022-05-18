@@ -482,5 +482,13 @@ To resolve this issue, we, therefore, need to adapt DEAP's implementation of the
 For this purpose, as in the original implementation, as long as the length of the current branch does not exceed the specified limit, we are always allowed to choose randomly from the combined set of terminals and primitives.
 However, as soon as the condition is violated, we need to choose exclusively from the set of available terminals. 
 In order to circumvent cases where this constraint can not be satisfied, which means we are supposed to extend the tree with a terminal while for the given type none is available, we proceed by ignoring it for the current step, which means that we simply extend the given node by choosing randomly from the set of available primitives.
-The resulting adapted implementation of the \emph{genGrow} function is shown in Section~\ref{appendix:gp} of the appendix.   
+The resulting adapted implementation of the \emph{genGrow} function is shown in Section~\ref{appendix:gp} of the appendix.
+\subsection{Genetic Operators}
+Based on our implementation of the \emph{grow} operator and DEAP's builtin functionality, we can now define all remaining components of a  GGGP-based search method.
+In order to facilitate the application of different operator choices within the context of an evolutionary search method, DEAP provides the \emph{toolbox} container for the creation of unified interfaces.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
+	\caption{Toolbox initialization}
+	\label{code:gp:toolbox}
+\end{listing}
 
