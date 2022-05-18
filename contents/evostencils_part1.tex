@@ -471,3 +471,8 @@ For this purpose, similar to the finest level, we only have to create the respec
 After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations. 
 
 \section{Evolutionary Search Method}
+After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system in order to construct a \emph{PrimitiveSetTyped}, we can now utilize the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
+Therefore, the first step within our implementation of an evolutionary search method for the grammar-guided optimization of multigrid methods is the randomized creation of an initial population.
+As we have already discussed in Section~\ref{sec:gggp-initialization}, the \emph{full} initialization operator~\cite{koza1994genetic,poli2008field} is only applicable in cases, where the grammar enable the termination of unfinished branches at any given point in the derivation through, by invoking a terminal production.
+However, as it can be seen in Table~\ref{table:multigrid-grammar}, not all variables of our grammar fulfill this condition.
+In contrast, the \emph{grow} operator is a suitable initialization operator for the given case, as it supports the creation of trees with branches of different length. 
