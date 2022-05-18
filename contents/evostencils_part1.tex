@@ -476,3 +476,11 @@ Therefore, the first step within our implementation of an evolutionary search me
 As we have already discussed in Section~\ref{sec:gggp-initialization}, the \emph{full} initialization operator~\cite{koza1994genetic,poli2008field} is only applicable in cases, where the grammar enable the termination of unfinished branches at any given point in the derivation through, by invoking a terminal production.
 However, as it can be seen in Table~\ref{table:multigrid-grammar}, not all variables of our grammar fulfill this condition.
 In contrast, the \emph{grow} operator is a suitable initialization operator for the given case, as it supports the creation of trees with branches of different length. 
+The DEAP framework provides an implementation of this operator in form of the \emph{genGrow} function, which generates a random tree based on a given primitive set while enforcing that the length of each of its branches satisfies a certain depth limit, chosen randomly from an interval defined by the parameters \emph{min\_height} and \emph{max\_height}.
+Unfortunately, as the framework assumes the availability of at least one \emph{Terminal} object for each type, the function strictly applies the specified depth limit and, thus, fails in case it erroneously expects a terminal to be available for a certain type.
+To resolve this issue, we, therefore, need to adapt DEAP's implementation of the \emph{genGrow} function, such that the specified limit is only applied whenever possible.
+For this purpose, as in the original implementation, as long as the length of the current branch does not exceed the specified limit, we are always allowed to choose randomly from the combined set of terminals and primitives.
+However, as soon as the condition is violated, we need to choose exclusively from the set of available terminals. 
+In order to circumvent cases where this constraint can not be satisfied, which means we are supposed to extend the tree with a terminal while for the given type none is available, we proceed by ignoring it for the current step, which means that we simply extend the given node by choosing randomly from the set of available primitives.
+The resulting adapted implementation of the \emph{genGrow} function is shown in Section~\ref{appendix:gp} of the appendix.   
+
