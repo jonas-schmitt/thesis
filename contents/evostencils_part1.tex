@@ -131,7 +131,7 @@ Furthermore, in certain cases it is possible to construct the higher-dimensional
 Therefore, instead of storing a unique stencil for each individual operator instance, we can instead parametrize its generation based on the features of the applied discretization, by including a reference to the respective generator function.
 Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \emph{shape} attribute.
 For this purpose, the class \emph{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \emph{Operator} class with the required functionality.
-For the sake of brevity, the implementation of this class and the respective \emph{Restriction} and \emph{Prolongation} subclasses can be found in the appendix.
+For the sake of brevity, the implementation of this class and the respective \emph{Restriction} and \emph{Prolongation} subclasses can be found in Section~\ref{appendix:ir} of the appendix.
 
 After discussing the implementation of the different entities based on which a multigrid method is built, we next shift our attention to the implementation of those IR classes that let us represent the expressions that correspond to the actual computations performed within its application. 
 For this purpose we, first provide general classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
@@ -148,7 +148,7 @@ For this purpose we, first provide general classes for representing unary and bi
 In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
 However, as in case of a binary expression the shape of the result depends on the type of operation, we raise an error if this method is not implemented in one of the derived classes. 
 While we will later see that there exist certain expressions that do not fall into these categories the majority of multigrid operations can be already expressed based on these two classes.
-Again we have included a number of specific examples in the appendix.
+Again we have included a number of specific examples in Section~\ref{appendix:ir} of the appendix.
 As it has been discussed in Section~\ref{sec:grammar-based-algorithm-generation}, we aim to represent the computational structure of a given multigrid method in form of a redundancy-free directed graph. 
 While the previously defined base classes allow us to represent the arithmetic expressions that occur within the correction terms of a multigrid method, there are two operations that require a special treatment.
 As we have already seen in Figure~\ref{fig:example-three-grid-method-computational-graph} it is necessary to access previously computed intermediate results at multiple occasions within a multigrid method.
@@ -210,7 +210,7 @@ For this purpose, we first need to generate the set of terminals that is defined
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
 First of all, as, at least in the applications considered in this work, each smoother is derived directly from the system operator, it does not need to be provided explicitly, but instead can be generated automatically within the grammar.
 Also, while so far we have abstractly represented the application of the coarse-grid solver in form of a multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, to be provided by the user.
-The implementation of this class can again be found in the appendix.
+The implementation of this class can also be found in Section~\ref{appendix:ir} of the appendix.
 Note that the coarse-grid solver may additionally contain an expression, again given in form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for those methods whose coarsest grid corresponds to its topmost level.
 
@@ -490,5 +490,10 @@ In order to facilitate the application of different operator choices within the 
 	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
 	\caption{Toolbox initialization}
 	\label{code:gp:toolbox}
+\end{listing}
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
+	\caption{Evolutionary Search Method}
+	\label{code:gp:evolutionary_search}
 \end{listing}
 

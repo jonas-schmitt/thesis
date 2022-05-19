@@ -1,15 +1,22 @@
 import random
 from inspect import isclass
 
-def generate(pset, min_height, max_height, condition, type_=None):
-    if type_ is None:
+def generate(pset, min_height, max_height, condition, return_type=None, subtree=None):
+    if return_type is None:
         type_ = pset.ret
+    else:
+        type_ = return_type
     expression = []
     height = random.randint(min_height, max_height)
     stack = [(0, type_)]
     max_depth = 0
+    subtree_inserted = False
     while len(stack) != 0:
         depth, type_ = stack.pop()
+        if not subtree_inserted and type_ == return_type and len(expression) > 0:
+            expression.extend(subtree)
+            subtree_inserted = True
+            continue
         max_depth = max(max_depth, depth)
         if max_depth > 90:
             return None
