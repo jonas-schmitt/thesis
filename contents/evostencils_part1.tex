@@ -529,6 +529,8 @@ The resulting implementation of the function \emph{mutateSubtree} is shown in Li
 \end{listing}
 Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the newly generated subtree is chosen.
 To avoid that the size of the inserted subtree exceeds the size of the original tree, compared to the \emph{genGrow} function, usually a smaller interval is chosen, for instance, with only half the size.
+Now before we can implement the actual evolutionary search procedure, we need to address the problem selecting promising individuals for recombination and mutation.
+Based on this we first need to find a way to accurately evaluate a multigrid method's performance characteristics in an automatic manner.
 
 \subsection{Fitness Evaluation and Selection}
 
