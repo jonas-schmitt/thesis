@@ -11,6 +11,8 @@ def generate(pset, min_height, max_height, condition, return_type=None, subtree=
     stack = [(0, type_)]
     max_depth = 0
     subtree_inserted = False
+    if subtree is None:
+        subtree_inserted = True
     while len(stack) != 0:
         depth, type_ = stack.pop()
         if not subtree_inserted and type_ == return_type and len(expression) > 0:
