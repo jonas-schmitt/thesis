@@ -491,11 +491,24 @@ However, as soon as the condition is violated, we need to choose exclusively fro
 In order to circumvent cases where this constraint can not be satisfied, which means we are supposed to extend the tree with a terminal while for the given type none is available, we proceed by ignoring it for the current step, which means that we simply extend the given node by choosing randomly from the set of available primitives.
 Additionally, we also include the option to insert an existing branch into the generated tree, such that we can utilize this function for the implementation of the mutation operators introduced in Section~\ref{sec:gggp-mutation-and-recombination}.
 Based on the \emph{generate} function, we can then finally implement the \emph{grow} operator in form of the function \emph{genGrow}, which chooses the maximum depth of a tree randomly from an interval defined by the parameters \emph{min\_height} and \emph{max\_height}.
-The resulting implementation of both functions is shown in Section~\ref{appendix:gp} of the appendix.
+The resulting implementation is shown in Listing~\ref{code:gp:grow}, while the \emph{generate} function can be found in Section~\ref{appendix:gp} of the appendix.
+\begin{listing}[!htb]
+	\inputminted{python}{evostencils/gp/grow.py}
+	\caption{GP: Grow operator}
+	\label{code:gp:grow}
+\end{listing}
+In order to prevent the random generation of excessively large expressions the \emph{genGrow} function additionally enforces a size limit, which, by default, is set to 150.
+Therefore, if a generated tree does not fulfill this constraint we simply repeat this process until a suitable individual is obtained.
+
 \subsection{Evolutionary Operators}
-Based on our implementation of the \emph{grow} operator and DEAP's builtin functionality, we can now define all remaining components of a  GGGP-based search method.
+Based on our implementation of the \emph{generate} function and DEAP's builtin functionality, we can now define all remaining components of a  GGGP-based search method.
 In order to facilitate the application of different operator choices within the context of an evolutionary search method, DEAP provides the \emph{Toolbox} container for the creation of unified interfaces.
 Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for the given case.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
+	\caption{GP: Toolbox initialization}
+	\label{code:gp:toolbox}
+\end{listing}
 First of all, we define a data structure for the fitness of each individual based on DEAP's builtin \emph{Fitness} class.
 Here, the \emph{weights} attribute determines the number of objectives while a negative value means that the respective objective is to be minimized.
 We will later come back to the choice of the optimization objectives and at this point the reader can just assume that either a single or a multi-objective minimization can be performed.
@@ -508,17 +521,20 @@ We can, then, generate a complete population by utilizing DEAP's \emph{initItera
 Next we can implement suitable crossover and mutation operators for our GGGP method, as defined in Section~\ref{sec:gggp-mutation-and-recombination}.
 For the former we apply subtree crossover for which an implementation is already available in form of the function \emph{cxOnePoint} of DEAP's GP module.
 To implement subtree replacement and insertion within a single function, we, again, utilize our custom \emph{generate} function, which already provides the necessary functionality.
-The resulting implementation  
-
-
-\begin{listing}
-	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
-	\caption{Toolbox initialization}
-	\label{code:gp:toolbox}
+The resulting implementation of the function \emph{mutateSubtree} is shown in Listing~\ref{code:gp:mutate}.
+\begin{listing}[!htb]
+	\inputminted{python}{evostencils/gp/mutate.py}
+	\caption{GP: Subtree mutation operator}
+	\label{code:gp:mutate}
 \end{listing}
+Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the newly generated subtree is chosen.
+To avoid that the size of the inserted subtree exceeds the size of the original tree, compared to the \emph{genGrow} function, usually a smaller interval is chosen, for instance, with only half the size.
+
+\subsection{Fitness Evaluation and Selection}
+
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
-	\caption{Evolutionary Search Method}
+	\caption{GP: Evolutionary Search Method}
 	\label{code:gp:evolutionary_search}
 \end{listing}
 

@@ -18,7 +18,6 @@ def init_toolbox(pset, min_height, max_height, multiobjective=True):
 
     # Crossover and Mutation
     toolbox.register("mate", gp.cxOnePoint)
-    toolbox.register("mutate", mutInsert, pset_=pset, min_height=1, max_height=max_height/2)
-
+    toolbox.register("mutate", mutateSubtree, pset_=pset, min_height=1, max_height=max_height/2)
 
     return toolbox
