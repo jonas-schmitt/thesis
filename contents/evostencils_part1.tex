@@ -1,5 +1,6 @@
 \usemintedstyle{tango}
 \setminted[python]{fontsize=\footnotesize, breaklines}
+%\setminted[scala]{fontsize=\footnotesize, breaklines}
 In the first part of this thesis we have established a theoretical basis about multigrid methods, formal languages and genetic programming.
 In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
 While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet prove its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
@@ -579,22 +580,33 @@ While we have now discussed how to assess the quality of an iterative method, th
 Here the main challenge is to achieve \emph{generalization}, which means that our goal is to find multigrid methods that are robust in solving problems with similar characteristics.
 Theoretically, we could simply execute a solver on each individual problem instance in order to measure its solving time.
 However, due to the high computational demands of solving PDEs in many domains, this approach is not feasible in practice.
-As a remedy, we can try to estimate the quality of a given solver by measuring its characteristics on a number of \emph{proxy} problems.
-A second possibility is the application of \emph{predictive models} to obtain an estimation without the need to actual execute the solver on any problem.
+
+One way to mitigate this issue is the application of \emph{predictive models} to obtain an estimation without the need to actual execute the solver on any problem.
 While the latter approach is usually faster to execute, its application to non-standard multigrid cycles, as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is not well-researched.
 Even though, in principle, one could imagine deriving a unified model for estimating the quality of a multigrid method, due to the entirely different nature of the two performance-guiding metrics $t$ and $\rho$, we consider them separately.
-First of all, note that the execution time $t$ of each step of an iterative method entirely depends on the amount of performed computations and their execution efficiency on a modern compute platform.
+First of all, note that the execution time $t$ of each step of an iterative method entirely depends on the amount of computations and their execution efficiency on a modern compute platform.
 In contrast, the convergence factor $\rho$ is directly linked to the mathematical properties of the solver, for instance, its capability to efficiently reduce certain error components in each iteration, as we have discussed in Section~\ref{sec:multigrid-methods}. 
 While the availability of performance models for modern computer architectures, as the roofline~\cite{williams2009roofline} and execution-cache memory model~\cite{hager2016exploring}, enable predictions in an automated and deterministic manner, analyzing the mathematical properties of a solver in a reliable manner is often difficult.
 Local Fourier analysis (LFA)~\cite{wienands2004practical} represents a promising alternative for analyzing the mathematical properties of a solver in a resolution-independent manner.
 Even though LFA has already been applied successfully to numerous applications~\cite{rodrigo2017validity}, only recently freely-available software tools have become available that automate its execution~\cite{rittich2018extending,kahl2020automated}.
-To test the applicability of these tools, called LFA Lab~\footnote{LFA Lab: \url{https://github.com/hrittich/lfa-lab}} for the automated convergence estimation of grammar-generated multigrid methods, we have already performed a number of experiments in~\cite{schmitt2020constructing}.
+To test the applicability of the library LFA Lab~\footnote{LFA Lab: \url{https://github.com/hrittich/lfa-lab}} for the automated convergence estimation of grammar-generated multigrid methods, we have already performed a number of experiments in~\cite{schmitt2020constructing,hoefer2020comparing}.
 While LFA Lab yields reliable predictions for many model problems and common multigrid cycles, unfortunately, we could not obtain the same degree of accuracy for many non-standard cycles and more complicated problems, such as systems of PDEs.
-%TODO include Daniel Höfer master thesis ref
- 
- 
 
-%TODO derive formula for number of iterations based on \rho and \varepsilon!
+A second option to lower evaluation cost is to estimate the quality of a given solver by measuring its characteristics on a number of \emph{proxy} problems, that are faster to solve than the original problem but which still possess similar mathematical properties.
+One of the main features of multigrid is that, if properly constructed, these methods can achieve $h$-independent convergence, which means that we can apply the same solver to a larger instance of the same problem without slowing down its convergence~\cite{trottenberg2000multigrid}.
+Therefore, in case our goal is to solve a certain PDE discretized on a grid with step size $h$, we can instead consider an instance of the same PDE on a similar grid with lower resolution and, thus, a larger spacing of the grid points.
+Hence, if a given multigrid method is able to achieve $h$-independent convergence on a sequence of increasingly finer resolved instances of the same PDE, there is a high probability that the method also generalizes to other problem instances.
+However, the application of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics for each proxy problem.
+For this purpose, we must be able to automate the process of generating a solver implementation based on its algorithmic representation.
+Recently, code generation techniques, that enable us to achieve this goal, have become available~\cite{kostler2020code,schmitt2018automating}.
+ExaStencils~\cite{lengauer2014exastencils,lengauer2020exastencils} is a code generation framework that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware.
+It enables the formulation of multigrid methods in a level-independent domain specific language (DSL), called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems}, which is almost indistinguishable from the textbook-like description of an algorithm, as shown in Algorithm~\ref{alg:example-three-grid-method}.
+\begin{listing}
+	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/three_grid_example.exa3}
+	\caption{Three grid example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
+	\label{code:exaslang-example}
+\end{listing}
+
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
 	\caption{GP: Evolutionary Search Method}
