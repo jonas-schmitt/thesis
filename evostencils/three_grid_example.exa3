@@ -1,13 +1,17 @@
-Function VCycle@finest{
+Function VCycle@finest {
   r = b - A * x
   x@coarser = 0.0
+  // Restriction
   b@coarser = R * r
   r@coarser = b@coarser - A@coarser * x@coarser
-  x@(coarser+1) = 0.0
-  b@(coarser+1) = R@coarser * r@coarser
-  VCycle@(coarser+1)
-  x@coarser += P@(coarser+1) * x@(coarser+1)
+  x@(coarser-1) = 0.0
+  b@(coarser-1) = R@coarser * r@coarser
+  // Apply the Coarse-Grid Solver
+  VCycle@(coarser-1)
+  x@coarser += P@(coarser-1) * x@(coarser-1)
+  // Smoothing with damped Jacobi
   x@coarser += 0.6 * diag_inv(A@coarser) * ( b@coarser - A@coarser * x@coarser )
+  // Prolongation and Coarse-Grid Correction
   x += P@coarser * x@coarser
 }
 

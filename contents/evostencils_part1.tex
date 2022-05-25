@@ -599,14 +599,20 @@ Hence, if a given multigrid method is able to achieve $h$-independent convergenc
 However, the application of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics for each proxy problem.
 For this purpose, we must be able to automate the process of generating a solver implementation based on its algorithmic representation.
 Recently, code generation techniques, that enable us to achieve this goal, have become available~\cite{kostler2020code,schmitt2018automating}.
-ExaStencils~\cite{lengauer2014exastencils,lengauer2020exastencils} is a code generation framework that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware.
-It enables the formulation of multigrid methods in a level-independent domain specific language (DSL), called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems}, which is almost indistinguishable from the textbook-like description of an algorithm, as shown in Algorithm~\ref{alg:example-three-grid-method}.
+ExaStencils~\cite{lengauer2014exastencils,lengauer2020exastencils} is a code generation framework, implemented in the Scala programming language, that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware.
+It enables the formulation of multigrid methods in a level-independent domain specific language (DSL), called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems}, which is almost indistinguishable from the textbook-like description of an algorithm.
+Based on this DSL specification, the framework is able to generate highly-optimized C++ code for different problem sizes and computer architectures.
+To illustrate this approach, Listing~\ref{code:exaslang-example} shows an ExaSlang implementation of the three-grid method formulated in Algorithm~\ref{alg:example-three-grid-method}.
 \begin{listing}
 	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/three_grid_example.exa3}
 	\caption{Three grid example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
 	\label{code:exaslang-example}
 \end{listing}
-
+As this example demonstrates ExaSlang enables the formulation of the same operations on different levels of a discretization hierarchy based on so-balled \emph{level declarations}\footnote{In case no level declaration is provided, ExaStencils assumes that the operation is applied on the current level.}.
+Similar to the specification of the grid spacing as a subscript in Algorithm~\ref{alg:example-three-grid-method}, we can utilize this notation to formulate each operation within a multigrid method relative to the \emph{finest} level.
+Since the ExaSlang specification of a multigrid method is, thus, independent of the actual discretization width, the ExaStencils compiler is able to generate implementations of the same solver for different grid sizes.
+Furthermore, as ExaSlang supports the formulation of each multigrid operation in a high-level mathematics-like syntax, we can also apply the same solver to different problems, only by changing the definitions of the individual operators, such as the system, prolongation and restriction operator.
+Therefore, ExaStencils is ideally-suited for the automatic generation and evaluations of multigrid methods within our evolutionary optimization.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
 	\caption{GP: Evolutionary Search Method}
