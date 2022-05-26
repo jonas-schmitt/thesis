@@ -532,6 +532,8 @@ Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interva
 To avoid that the size of the inserted subtree exceeds the size of the original tree, compared to the \emph{genGrow} function, usually a smaller interval is chosen, for instance, with only half the size.
 Now before we can implement the actual evolutionary search procedure, we need to address the problem selecting promising individuals for recombination and mutation.
 Based on this we first need to find a way to accurately evaluate the quality of a multigrid method in an automatic manner.
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within the \emph{ProgramOptimizer} class.
+Internally, this class stores the generated \emph{PrimitiveSetTyped} together with all necessary information about the discretized PDE that the generated solvers aim to solve.
 
 \subsection{Fitness Evaluation and Selection}
 In Section~\ref{sec:grammar-based-algorithm-generation} we have already demonstrated how it is possible to construct the algorithmic representations of a multigrid method based on a computational graph with the structure shown in Figure~\ref{fig:example-three-grid-method-computational-graph}.
@@ -615,6 +617,7 @@ Furthermore, as ExaSlang supports the formulation of each multigrid operation in
 Therefore, ExaStencils is ideally-suited for the automatic generation and evaluations of multigrid methods within our evolutionary optimization.
 While ExaStencils is implemented in the Scala programming language and can, thus, not be accessed directly within Python code it provides simply configuration files, which allow us to adapt the certain problem characteristics, such as the grid spacing and number of coarsening steps.
 In addition, certain code generation options, such as compiler-based performance optimizations, can be en- or disabled.
+
 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
