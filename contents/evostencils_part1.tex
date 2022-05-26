@@ -613,6 +613,9 @@ Similar to the specification of the grid spacing as a subscript in Algorithm~\re
 Since the ExaSlang specification of a multigrid method is, thus, independent of the actual discretization width, the ExaStencils compiler is able to generate implementations of the same solver for different grid sizes.
 Furthermore, as ExaSlang supports the formulation of each multigrid operation in a high-level mathematics-like syntax, we can also apply the same solver to different problems, only by changing the definitions of the individual operators, such as the system, prolongation and restriction operator.
 Therefore, ExaStencils is ideally-suited for the automatic generation and evaluations of multigrid methods within our evolutionary optimization.
+While ExaStencils is implemented in the Scala programming language and can, thus, not be accessed directly within Python code it provides simply configuration files, which allow us to adapt the certain problem characteristics, such as the grid spacing and number of coarsening steps.
+In addition, certain code generation options, such as compiler-based performance optimizations, can be en- or disabled.
+
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
 	\caption{GP: Evolutionary Search Method}
