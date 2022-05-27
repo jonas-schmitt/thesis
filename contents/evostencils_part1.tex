@@ -469,7 +469,9 @@ Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, as defi
 Here, we first construct a \emph{PrimitiveSetTyped} object while adding all required terminals and primitives on the finest level using the previously defined function \emph{init\_grammar}, which is applied in line 6.
 In case the given discretization hierarchies comprises at least three levels, we iteratively extend our primitive set with respect to each level using the \emph{add\_level} function.
 For this purpose, similar to the finest level, we only have to create the respective \emph{Terminals} and \emph{Types} object, as shown in line 10--20, which can then be passed to the aforementioned function in order to include all required \emph{Primitive} and \emph{Terminal}.
-After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations. 
+After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within an \emph{Optimizer} class.
+Internally, this class stores the generated \emph{PrimitiveSetTyped} together with all necessary information about the discretized PDE that the generated solvers aim to solve. 
 
 \section{Evolutionary Search Method}
 After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system in order to construct a \emph{PrimitiveSetTyped}, we can now utilize the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
@@ -532,8 +534,6 @@ Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interva
 To avoid that the size of the inserted subtree exceeds the size of the original tree, compared to the \emph{genGrow} function, usually a smaller interval is chosen, for instance, with only half the size.
 Now before we can implement the actual evolutionary search procedure, we need to address the problem selecting promising individuals for recombination and mutation.
 Based on this we first need to find a way to accurately evaluate the quality of a multigrid method in an automatic manner.
-In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within the \emph{ProgramOptimizer} class.
-Internally, this class stores the generated \emph{PrimitiveSetTyped} together with all necessary information about the discretized PDE that the generated solvers aim to solve.
 
 \subsection{Fitness Evaluation and Selection}
 In Section~\ref{sec:grammar-based-algorithm-generation} we have already demonstrated how it is possible to construct the algorithmic representations of a multigrid method based on a computational graph with the structure shown in Figure~\ref{fig:example-three-grid-method-computational-graph}.
@@ -601,12 +601,12 @@ Hence, if a given multigrid method is able to achieve $h$-independent convergenc
 However, the application of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics for each proxy problem.
 For this purpose, we must be able to automate the process of generating a solver implementation based on its algorithmic representation.
 Recently, code generation techniques, that enable us to achieve this goal, have become available~\cite{kostler2020code,schmitt2018automating}.
-ExaStencils~\cite{lengauer2014exastencils,lengauer2020exastencils} is a code generation framework, implemented in the Scala programming language, that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware.
+ExaStencils\footnote{ExaStencils: \url{https://www.exastencils.fau.de}} is a code generation framework, implemented in the Scala programming language, that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware~\cite{lengauer2014exastencils,lengauer2020exastencils}.
 It enables the formulation of multigrid methods in a level-independent domain specific language (DSL), called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems}, which is almost indistinguishable from the textbook-like description of an algorithm.
 Based on this DSL specification, the framework is able to generate highly-optimized C++ code for different problem sizes and computer architectures.
 To illustrate this approach, Listing~\ref{code:exaslang-example} shows an ExaSlang implementation of the three-grid method formulated in Algorithm~\ref{alg:example-three-grid-method}.
 \begin{listing}
-	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/three_grid_example.exa3}
+	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/code_generation/three_grid_example.exa3}
 	\caption{Three grid example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
 	\label{code:exaslang-example}
 \end{listing}
@@ -617,11 +617,58 @@ Furthermore, as ExaSlang supports the formulation of each multigrid operation in
 Therefore, ExaStencils is ideally-suited for the automatic generation and evaluations of multigrid methods within our evolutionary optimization.
 While ExaStencils is implemented in the Scala programming language and can, thus, not be accessed directly within Python code it provides simply configuration files, which allow us to adapt the certain problem characteristics, such as the grid spacing and number of coarsening steps.
 In addition, certain code generation options, such as compiler-based performance optimizations, can be en- or disabled.
+To encapsulate the usage of the ExaStencils compiler, EvoStencils provides the \emph{ProgramGenerator} class.
+In addition to the automatic adaption of the respective configuration files and the actual execution of the code generation process, this class also includes functionality for extracting all information about a given problem based on an existing ExaSlang specification. 
+Therefore, in case this specification contains all necessary informations for the generation of the respective multigrid grammar, this allows us integrate EvoStencils directly into ExaStencils' solver generation workflow.
+It, furthermore, enables the application of our optimization approach to many of the problems that are already available within ExaStencils.
+Based on the functionality provided by the \emph{ProgramOptimizer} class, we can then implement an evaluation function in form of the \emph{evaluate} method of previously mentioned \emph{Optimizer} class, as shown in Listing~\ref{code:optimization:evaluate}.
+\begin{listing}
+	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/optimization/evaluate.py}
+	\caption{}
+	\label{code:optimization:evaluate}
+\end{listing}
+This method then provides a high-level interface to the evaluation of an arbitrary individual that has been generated based on a given \emph{PrimitiveSetTyped} object.
+First of all, in order to prevent the repeated evaluation of structurally-equal individuals, the \emph{Optimizer} class implements a caching mechanism, that keeps track of all previously evaluated individuals.
+Therefore, we first check whether the given individual has been already evaluated before, in which case we simply return the cached value.
+Otherwise, we utilize the \emph{generate\_and\_evaluate} method of the \emph{ProgramGenerator} class to generate a C++ implementation for the corresponding solver, using the ExaStencils compiler, which is then executed on the current proxy problem.
+As a result, we obtain three metrics, the total solving time $T_\varepsilon$, the convergence factor $\rho$ and the number of iterations $n_\varepsilon$, whereby the desired error reduction $\varepsilon$ is usually determined by the given ExaStencils specification of the problem.
+As in general, the solution of the given PDE is not known in advance, we approximate the convergence factor using the formula
+\begin{equation}\label{eq:asymptotic_convergence_factor}
+	\rho \approx \left(\prod_{i=1}^{n}\tilde{\rho}_i \right)^{1/n},
+\end{equation} where $n$ is the number of iterations until convergence and
+\begin{equation*}
+	\tilde{\rho}_{i} = \frac{\norm{b_h - A_h x_{h}^i }}{\norm{b_h - A_h x^{i-1}_{h}}}
+\end{equation*}
+is the L2-norm of the residual reduction in every iteration of the solver~\cite{trottenberg2000multigrid}.
+Furthermore, to compute the solver's execution time per iteration $t$, we simply divide the total solving time by the number of iterations.
+To reduce potential hardware-based variations in the execution of each solver, $T_\varepsilon$ is obtained as an average over multiple evaluations of the same individual.
+Note that, at this point, we assume that a multi-objective optimization is performed, as the returned \emph{Fitness} object includes two objectives.
+However, it is also possible to implement a similar function that returns a single-objective fitness value, for instance, in form of the total solving time.
+Finally, the method enables the adaption of certain parameters of the underlying PDE for the current evaluation.
+For this purpose, a mapping from each parameter to the respective value can be provided in the form of a Python dictionary.
 
+After successfully obtaining a \emph{Fitness} object for each individual, we complete our toolbox of evolutionary operators with the definition of suitable selection and elitism operators.
+As we have discussed in Section~\ref{sec:gggp-evaluation-and-selection}, in contrast to initialization, mutation and crossover, the selection of individuals within an evolutionary algorithm is independent of their underlying representation, but solely depends on their fitness attribute.
+Therefore, different selection operators have been proposed for single and multi-objective evolutionary algorithms, of which many are already available within the DEAP framework.  
+Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object, by using its \emph{register} method.
+Listing~\ref{code:optimization:selection} shows the example initialization of a \emph{Toolbox} object using the popular NSGA-II selection operator~\cite{deb2002fast}. 
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/optimization/selection.py}
+	\caption{Example for Multi-Objective Selection}
+	\label{code:optimization:selection}
+\end{listing}
+In a similar manner, we can initialize a \emph{Toolbox} object with arbitrary different single- and multi-objective selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
 
+Finally, we have assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
+Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator, as a method of the \emph{Optimizer} class. 
+The resulting implementation of the \emph{evolutionary\_search} method is shown in Listing~\ref{code:optimization:evolutionary_search}. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
-	\caption{GP: Evolutionary Search Method}
-	\label{code:gp:evolutionary_search}
+	\caption{Evolutionary Search Method}
+	\label{code:optimization:evolutionary_search}
 \end{listing}
+Note that each part of this function corresponds to a particular step in our general description of a GP-based search method in Algorithm~\ref{alg:genetic-programming}.
+In accordance with the common notation to describe evolutionary algorithms based on two parameters $\mu$ and $\lambda$, this function implements a $\left(\mu + \lambda \right)$ strategy.
+Therefore, in each generation $\lambda$ new individuals are created based on $\mu$ parent individuals using either mutation and crossover, while the new population is then selected from the combined set of parent and child individuals using the defined elitism operator. 
+
 
