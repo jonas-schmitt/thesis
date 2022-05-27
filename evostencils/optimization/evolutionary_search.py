@@ -1,6 +1,6 @@
 import random
 
-def evolutionary_search(self, initial_population_size, generations, mu_, lambda_, crossover_probability, mutation_probability, use_random_search=False):
+def evolutionary_search(self, initial_population_size, generations, mu_, lambda_, crossover_probability, use_random_search=False):
     # Generate and evaluate initial population
     population = self.toolbox.population(n=initial_population_size)
     invalid_ind = [ind for ind in population]
@@ -22,12 +22,9 @@ def evolutionary_search(self, initial_population_size, generations, mu_, lambda_
                 operator_choice = random.random()
                 if operator_choice < crossover_probability:
                     child1, child2 = self.toolbox.mate(ind1, ind2)
-                elif operator_choice < crossover_probability + mutation_probability + self.epsilon:
+                else:
                     child1, = self.toolbox.mutate(ind1)
                     child2, = self.toolbox.mutate(ind2)
-                else:
-                    child1 = ind1
-                    child2 = ind2
                 del child1.fitness.values, child2.fitness.values
                 offspring.extend([child1, child2])
         # Evaluate new individuals

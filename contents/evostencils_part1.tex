@@ -647,7 +647,7 @@ However, it is also possible to implement a similar function that returns a sing
 Finally, the method enables the adaption of certain parameters of the underlying PDE for the current evaluation.
 For this purpose, a mapping from each parameter to the respective value can be provided in the form of a Python dictionary.
 
-After successfully obtaining a \emph{Fitness} object for each individual, we complete our toolbox of evolutionary operators with the definition of suitable selection and elitism operators.
+After successfully obtaining a \emph{Fitness} object for each individual, we can complete our collection of evolutionary operators with the definition of suitable selection and elitism operations.
 As we have discussed in Section~\ref{sec:gggp-evaluation-and-selection}, in contrast to initialization, mutation and crossover, the selection of individuals within an evolutionary algorithm is independent of their underlying representation, but solely depends on their fitness attribute.
 Therefore, different selection operators have been proposed for single and multi-objective evolutionary algorithms, of which many are already available within the DEAP framework.  
 Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object, by using its \emph{register} method.
@@ -660,15 +660,23 @@ Listing~\ref{code:optimization:selection} shows the example initialization of a 
 In a similar manner, we can initialize a \emph{Toolbox} object with arbitrary different single- and multi-objective selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
 
 Finally, we have assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
-Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator, as a method of the \emph{Optimizer} class. 
-The resulting implementation of the \emph{evolutionary\_search} method is shown in Listing~\ref{code:optimization:evolutionary_search}. 
+Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator as a method of the \emph{Optimizer} class. 
+For this purpose, we store the previously assembled \emph{Toolbox} object within the \emph{toolbox} attribute of this class.
+The resulting implementation of the \emph{evolutionary\_search} method is then shown in Listing~\ref{code:optimization:evolutionary_search}. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
 	\caption{Evolutionary Search Method}
 	\label{code:optimization:evolutionary_search}
 \end{listing}
 Note that each part of this function corresponds to a particular step in our general description of a GP-based search method in Algorithm~\ref{alg:genetic-programming}.
-In accordance with the common notation to describe evolutionary algorithms based on two parameters $\mu$ and $\lambda$, this function implements a $\left(\mu + \lambda \right)$ strategy.
+In accordance with the common notation to describe evolutionary algorithms~\cite{back1997handbook} based on two parameters $\mu$ and $\lambda$, this function implements a $\left(\mu + \lambda \right)$ strategy.
 Therefore, in each generation $\lambda$ new individuals are created based on $\mu$ parent individuals using either mutation and crossover, while the new population is then selected from the combined set of parent and child individuals using the defined elitism operator. 
-
+In order to initiate the search with a sufficiently diverse population, the number of initially-generated individuals can be set higher than $\mu$, which is controlled by the parameter \emph{initial\_population\_size}.
+In Line 11, $\mu$ individuals are then selected for the first generation, using the registered \emph{elitism} operator.
+The actual search is then performed for a predefined number of generations.
+As a fallback solution, we additionally implement a simple random search, whereby in each generation we randomly generate $\lambda$ individuals, which can be seen in Line 15 of Listing~\ref{code:optimization:evolutionary_search}.
+In contrast, within the evolutionary algorithm, we first select $\lambda$ individuals for crossover and mutation, using the registered \emph{select} operator, as shown in Line 18.
+As mutation represents a modifying operation, we first generate an identical copy of each selected parent individual, based on which then either crossover or mutation is applied, depending on a predefined probability.
+Finally, in Line 34--40 the resulting newly created individuals are evaluated and a new elitist population of size $\mu$ is obtained from the combined set of parent and child individuals.
+Note that this step is identical for the random search variant of our implementation.
 
