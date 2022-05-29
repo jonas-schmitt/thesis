@@ -20,6 +20,6 @@ def generate_grammar(x_h, rhs, max_level, depth, samples=37):
         terminals = Terminals(x_h, A_h, A_2h, restriction_operators, prolongation_operators, CGS_2h, relaxation_factor_interval, partitionings)
         previous_types = types
         types = Types(i, previous_types)
-        add_level(pset, terminals, types, max_level, i, samples, coarsest=coarsest)
+        add_level(pset, terminals, types, i, samples, coarsest=coarsest)
 
     return pset
