@@ -687,3 +687,8 @@ As mutation represents a modifying operation, we first generate an identical cop
 Finally, in Line 34--40 the resulting newly created individuals are evaluated and a new elitist population of size $\mu$ is obtained from the combined set of parent and child individuals.
 Note that this step is identical for the random search variant of our implementation.
 
+With the implementation of this method, we have now assembled all components required to search for efficient multigrid methods for solving PDE-based problems.
+However, before we evaluate the effectiveness of our approach on a number of benchmark problems, in the next chapter, we will discuss a few important extensions of the basic implementation presented in this chapter.
+In particular, we will present an extension of the evolutionary search procedure shown in Listing~\ref{code:optimization:evolutionary_search}, that enables the systematic generalization of a population of multigrid methods to a sequence of increasingly-difficult instances of the same problem.
+Furthermore, in order to accelerate the evaluation of the large number of individuals required to obtain competitive solvers for many PDEs, we will demonstrate how our implementation can be parallelized on multi-node systems using the message passing interface (MPI).   
+Finally, we will also briefly discuss how the intermediate representation presented in Section~\ref{sec:intermediate-representation} can be extended to support the generation of multigrid methods for systems of PDEs.
