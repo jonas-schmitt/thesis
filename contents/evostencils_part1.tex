@@ -420,8 +420,7 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 \end{listing}
 Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given distretization hierarchy.
 Based on these data structures we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state in form of a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object, and a number of level-independent terminals.
-For the sake of simplicity, we assume that it is possible to generate all required operators using the predefined functions \emph{get\_operator} and \emph{get\_inter\_grid\_operators}.
-However, note that in the actual implementation of \emph{EvoStencils} this information is retrieved from a domain specific representation, which involves the parsing and symbolic interpretation of the respective entities, operators and equations.  
+For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves this information from a domain specific representation.
 All other \emph{Terminal} and \emph{Primitive} objects are then added using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
 
 At this point we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
@@ -470,11 +469,18 @@ Here, we first construct a \emph{PrimitiveSetTyped} object while adding all requ
 In case the given discretization hierarchies comprises at least three levels, we iteratively extend our primitive set with respect to each level using the \emph{add\_level} function.
 For this purpose, similar to the finest level, we only have to create the respective \emph{Terminals} and \emph{Types} object, as shown in line 10--20, which can then be passed to the aforementioned function in order to include all required \emph{Primitive} and \emph{Terminal}.
 After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
-In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within an \emph{Optimizer} class.
-Internally, this class stores the generated \emph{PrimitiveSetTyped} together with all necessary information about the discretized PDE that the generated solvers aim to solve. 
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within an \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
+	\caption{Optimizer class}
+	\label{code:optimization:optimizer}
+\end{listing}
+In addition to the generated primitive set, this class relies on two main components, a \emph{Toolbox} object for the execution of the GGGP-based evolutionary search procedure, and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the given PDE-based problem, for instance, in form of the respective operators.
+Based on the functionality of these two components, which, in the following, will be described in detail, we can implement a \emph{run} method, which first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs a grammar-guided evolutionary search in order to find a population of individuals that represent efficient multigrid methods for the given problem.
+Note that within this search procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
 
 \section{Evolutionary Search Method}
-After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system in order to construct a \emph{PrimitiveSetTyped}, we can now utilize the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
+After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system, we can now utilize the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
 However, before we can define each operator, we first need to implement a data structure for storing each derivation tree generated by applying the rules of our grammar.
 For this purpose, DEAP provides the \emph{PrimitiveTree} class, which represents each tree as a list of primitives and terminals stored in depth-first order.
 Each \emph{Primitive} and \emph{Terminal} object in this list, thus, represents the choice of a certain production within the grammar, while its type corresponds to the respective variable at the left side of the production.
@@ -621,7 +627,7 @@ To encapsulate the usage of the ExaStencils compiler, EvoStencils provides the \
 In addition to the automatic adaption of the respective configuration files and the actual execution of the code generation process, this class also includes functionality for extracting all information about a given problem based on an existing ExaSlang specification. 
 Therefore, in case this specification contains all necessary informations for the generation of the respective multigrid grammar, this allows us integrate EvoStencils directly into ExaStencils' solver generation workflow.
 It, furthermore, enables the application of our optimization approach to many of the problems that are already available within ExaStencils.
-Based on the functionality provided by the \emph{ProgramOptimizer} class, we can then implement an evaluation function in form of the \emph{evaluate} method of previously mentioned \emph{Optimizer} class, as shown in Listing~\ref{code:optimization:evaluate}.
+Based on the functionality provided by the \emph{ProgramGenerator} class, we can then implement an evaluation function in form of the \emph{evaluate} method of previously mentioned \emph{Optimizer} class, as shown in Listing~\ref{code:optimization:evaluate}.
 \begin{listing}
 	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/optimization/evaluate.py}
 	\caption{}
@@ -659,6 +665,7 @@ Listing~\ref{code:optimization:selection} shows the example initialization of a 
 \end{listing}
 In a similar manner, we can initialize a \emph{Toolbox} object with arbitrary different single- and multi-objective selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
 
+\subsection{Search Algorithm}
 Finally, we have assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
 Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator as a method of the \emph{Optimizer} class. 
 For this purpose, we store the previously assembled \emph{Toolbox} object within the \emph{toolbox} attribute of this class.

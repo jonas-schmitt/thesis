@@ -1,9 +1,9 @@
 from deap import base, gp, creator
 from evostencils.gp import genGrow, mutInsert
 
-def init_toolbox(self, pset, min_height, max_height, multiobjective=True):
+def init_toolbox(self, pset, min_height, max_height, multi_objective=True):
     # Define an Individual together with its Fitness
-    if multiobjective:
+    if multi_objective:
         creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
     else:
         creator.create("Fitness", base.Fitness, weights=(-1.0,))

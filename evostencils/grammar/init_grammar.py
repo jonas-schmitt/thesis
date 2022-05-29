@@ -2,10 +2,10 @@ import numpy as np
 from evostencils.ir import partitioning
 from evostencils.grammar.gp import PrimitiveSetTyped
 
-def init_grammar(x_h, b_h, max_level, samples, coarsest=False):
-    A_h = get_operator(max_level)
-    restriction_operators, prolongation_operators = get_inter_grid_operators(max_level, max_level - 1)
-    A_2h = get_operator(max_level - 1)
+def init_grammar(generator, x_h, b_h, max_level, samples, coarsest=False):
+    A_h = generator.get_operator(max_level)
+    restriction_operators, prolongation_operators = generator.get_inter_grid_operators(max_level, max_level - 1)
+    A_2h = generator.get_operator(max_level - 1)
     partitionings = [partitioning.RedBlack]
     CGS_2h = CoarseGridSolver("CGS", A_2h)
 
