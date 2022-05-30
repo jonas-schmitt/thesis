@@ -1,4 +1,53 @@
-\section{Block Smoothers}
-\section{Systems of Partial Differential Equations}
 \section{Generalization}
+The first crucial extension of our grammar-based evolutionary search method is the systematic generalization of an evolved population of multigrid methods to different instances of a PDE. 
+As we have already briefly mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, if properly constructed, the convergence of a multigrid method is independent of the discretization width $h$, which is usually described with the term $h$-independent convergence.
+Therefore, the same method can often be successfully applied to different systems that arise from similar discretizations of the same PDE.
+In Section~\ref{sec:fitness-evaluation-and-selection}, we have already introduced the idea of evaluating each multigrid solver on a number of proxy problems that possess similar properties as the problem that we are actually interested to solve.
+The motivation for this idea is that, while we are usually interested in solving a problem instance of specific size, the evaluation of each solver on this instance requires too many computational resources.
+As a remedy, in many cases, it is possible to construct such a set of proxy problems, by discretizing the same PDE on the given domain with a varying step size $h$.
+The consequence of the $h$-independent convergence of multigrid method is that, if a functioning multigrid solver is available, it is expected to solve the problem using the same minimum number of operations per grid point.
+However, as in practice, we usually do not know what the minimum number of operations per grid point is, we are instead interested in finding the multigrid method that leads to the fastest solving time $T_\varepsilon$ for the target problem with a discretization width of $h$.
+The main challenge to achieve generalizations is then to identify this method among the set of candidates found within the search whereby we evaluate each candidate exclusively on instances of the same problem with a discretization width $H > h$ and, thus, smaller size.
+Note that, since evolutionary algorithms are usually not guaranteed to find the global optimum, we restrict ourselves to identifying the optimum within the space of individuals sampled throughout the search.
+First of all, recall that our evolutionary algorithm, whose implementation is shown in Listing~\ref{code:optimization:evolutionary_search}, performs a search by evolving a population of individuals for a specified number of generations.
+In each generation, new individuals are created, by means of mutation and crossover.
+However, only a limited number of individuals, chosen from the combined set of child and parent individuals, are allowed to enter the new population.
+Whether an individuals is accepted for the next generation within this process solely depends on its fitness, as defined by one or multiple optimization objectives.
+To achieve generalization, it is, therefore, crucial that we define the fitness of an individual in a way that maximizes the probability that the optimum, according to our criterion $T_{\varepsilon}$, is contained in the final population.
+On the downside, this means that we have to prevent this individual from getting evicted from the population at any point within the search.
+As we have shown in Section~\ref{sec:fitness-evaluation-and-selection} the solving time $T_{\varepsilon}$ is given by the formula
+\begin{equation*}
+	T_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho},
+\end{equation*}
+where $t$ is the execution time per iteration and $\rho$ the (asymptotic) convergence factor of the solver.
+Therefore, based on this formulate, there are two ways to define the fitness of an individual:
+\begin{enumerate}
+	\item Single-objective: $T_{\varepsilon}$
+	\item Multi-objective:  $t$ and $\rho$
+\end{enumerate}
+The main difference between these two formulations is that while a single-objective evaluation always returns a single individual as the optimum, a multi-objective evaluation instead identifies a set of Pareto-optimal individual, i.e. those individuals which do not \emph{dominate} each other.
+Hereby, domination is defined as the ability to achieve a better value in both objectives.
+Consequently, since in the given case an improvement in each of the two objectives, $t$ and $\rho$, necessarily also leads to a faster solving time $T_{\varepsilon}$, the single-objective optimum is always contained in the Pareto-front obtained from a multi-objective evaluation of the same individuals.
+
+The important question regarding generalization now is, whether the individual with the fastest solving time $T_{\varepsilon}$ will also be consistently selected as an optimum based on its evaluation on each problem instance considered within the search.
+Here first the question arises whether the solving time $T_{\varepsilon}$, as a single-objective, leads to the same ordering of individual for each problem instance.
+While in case of $h$-independent convergence, the convergence factor $\rho$ is expected to be constant, the execution time per iteration $t$ is drastically affected by hardware effects.
+For instance, in case the memory requirement for a certain problem size exceeds the capacity of the cache, the execution time is expected to increase substantially compared to a problem instances that still fits into the cache\footnote{Note that this is only true for memory-bound computations. A property that is, however, fulfilled for the majority of stencil operations.}.
+As a consequence, the execution time per iteration of a multigrid method that achieves the fastest solving time for a small problem might drastically increase for a larger problem instance, which means that the solver might no longer be optimal for that problem size.
+On the downside, if we consider the solver that achieves the fastest solving time for a certain problem instance.
+While this method might no longer be optimal with respect to its solving time for problems of smaller size, there is a high probability that it is still contained in the Pareto-front obtained through a multi-objective evaluation.
+In general, faster convergence is either achieved by applying a higher number of smoothing or coarse-grid correction steps.
+Now consider the following example of two different non-dominating multigrid V-cycles.
+The first one achieves a convergence factor of $0.15$ and an execution time per iteration of one millisecond using a total number of two smoothing steps per level on a grid with step size $h$, while the other one achieves a convergence factor of $0.1$ and an execution time of 1.5 milliseconds using three smoothing steps per level.
+If we now consider both methods on a smaller grid with step size $2h$, it is very unlikely that the first method achieves a faster convergence than the second one.
+On the other hand, three smoothing steps per level will also lead to a larger execution time per iteration for a smaller problem.
+As a consequence, the dominance relation between both methods is preserved.
+In contrast, assuming that the second method achieves a slightly faster solving time on the larger grid, it is impossible to predict whether this is still the case for a smaller grid.  
+While considering the search for a generalizable multigrid method as a multi-objective optimization problem increases the probability that the final population contains the method with the fastest solving time for our target problem instance, this approach still has certain limitations.
+If we consider different choices for each smoothing and coarse-grid correction, our assumption that a certain sequence of operations also leads to a faster execution time for a smaller problem is no longer true for each case, as certain operations might have a lower complexity and, thus, might lead to a smaller decrease in the execution time on a smaller grid.
+One possibility, that has been already mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, is to overcome these limitations by incorporating performance models into the evaluation, which allow to obtain a prediction for a method's execution time on a larger grid.
+However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
+
+
 \section{Distributed Parallelization}
+\section{Systems of Partial Differential Equations}
