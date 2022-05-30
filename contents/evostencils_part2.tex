@@ -37,6 +37,7 @@ As a consequence, the execution time per iteration of a multigrid method that ac
 On the downside, if we consider the solver that achieves the fastest solving time for a certain problem instance.
 While this method might no longer be optimal with respect to its solving time for problems of smaller size, there is a high probability that it is still contained in the Pareto-front obtained through a multi-objective evaluation.
 In general, faster convergence is either achieved by applying a higher number of smoothing or coarse-grid correction steps.
+
 Now consider the following example of two different non-dominating multigrid V-cycles.
 The first one achieves a convergence factor of $0.15$ and an execution time per iteration of one millisecond using a total number of two smoothing steps per level on a grid with step size $h$, while the other one achieves a convergence factor of $0.1$ and an execution time of 1.5 milliseconds using three smoothing steps per level.
 If we now consider both methods on a smaller grid with step size $2h$, it is very unlikely that the first method achieves a faster convergence than the second one.
@@ -46,7 +47,54 @@ In contrast, assuming that the second method achieves a slightly faster solving 
 While considering the search for a generalizable multigrid method as a multi-objective optimization problem increases the probability that the final population contains the method with the fastest solving time for our target problem instance, this approach still has certain limitations.
 If we consider different choices for each smoothing and coarse-grid correction, our assumption that a certain sequence of operations also leads to a faster execution time for a smaller problem is no longer true for each case, as certain operations might have a lower complexity and, thus, might lead to a smaller decrease in the execution time on a smaller grid.
 One possibility, that has been already mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, is to overcome these limitations by incorporating performance models into the evaluation, which allow to obtain a prediction for a method's execution time on a larger grid.
-However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
+However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time per iteration measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
+
+Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:evolutionary-search}.
+\begin{algorithm}
+	\caption{Generalization Procedure}
+	\label{alg:evolutionary-search}
+	\begin{algorithmic} % The number tells where the line numbering should start
+		\State \textbf{Construct} the grammar $G_0$ for the initial problem
+		\State \textbf{Initialize} the population $P_0$ based on $G_0$
+		\State \textbf{Evaluate} $P_0$ on the initial problem
+		\For{$i := 0, \dots, n$}
+		\If{$i > 0$ and $i \mod m = 0$}
+		\State $j := i / m$ 
+		\State Increase the problem size
+		\State \textbf{Construct} the corresponding grammar $G_j$
+		\State  \textbf{Adapt} the current population $P_i$ to $G_j$
+		\State \textbf{Evaluate} $P_i$ on the new problem
+		\EndIf
+		\State \textbf{Generate} new solutions $C_i$ based on $P_i$ and $G_j$
+		\State \textbf{Evaluate} $C_i$ on the current problem
+		\State \textbf{Select} $P_{i+1}$ from $C_i \cup P_i$
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
+Within this procedure, the search is initiated by choosing an initial problem size.
+Since at the beginning, the majority of the individuals in the population, which are generated through random initialization, are expected to represent inefficient multigrid methods, the choice of a small problem size enables the fast evaluation of a large number of individuals.
+However, as the search progresses and the average quality of the individuals in the population improves, the problem size can then be iteratively increased towards the target size.
+While each problem size adaption increases the required time to evaluate each method found within the search, it also increases the accuracy of evaluation with respect to both objectives.
+In particular, we can only reliably test the $h$-independent convergence of a given method by evaluating it on a sequence of increasingly-larger instances of the same problem.
+Furthermore, as the difference between the execution times per iteration of different non-dominating solving becomes decreases, even slight hardware-based fluctuations in the measurements might affect the outcome of an evaluation.
+This effect can again be reduced by considering a larger instance of the same problem, as, consequently, the relative magnitude of these fluctuations decreases compared to the overall evaluation time.
+At the end of Algorithm~\ref{alg:evolutionary-search} we then obtain a population that contains a set of non-dominated individuals according to the largest problem size considered within the search.
+Therefore, as discussed above, we can identify the fastest solver for our target problem instance, by only considering those individuals contained in the first non-dominated front, i.e. the population subset in which none of the individuals is dominated by any of those encountered within the search.
+
+Finally, note that so far we have only considered increasing the problem size within the search.
+However, in certain cases, a PDE contains additional parameters, which need to be adapted accordingly.
+One prominent example, which we consider in this work is the indefinite Helmholtz equation, as given by
+\begin{equation}
+	-(\nabla^{2} + k^{2})u = f,
+	\label{eq:helmholtz}
+\end{equation}
+where $\nabla^{2}$ is the Laplace operator, $k$ the \emph{wavenumber} and $f$ the source term.
+In general, the difficulty for solving this problem increases with the value of the wavenumber $k$ .
+However, many applications, for instance, require the discretization width $h$ to fulfill an accuracy requirement of $h k \leq 0.625$. 
+As a consequence, in order to solve this problem on a smaller grid, we also need to adapt the wavenumber accordingly, which results in a sequence of problem instances that do not only increase in size but also in difficulty.
+In Chapter~\ref{chapter:experiments}, we will then demonstrate that our generalization procedure is capable of evolving efficient multigrid methods for Helmholtz problems of varying size and difficulty.
+
+
 
 
 \section{Distributed Parallelization}
