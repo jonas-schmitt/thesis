@@ -49,26 +49,29 @@ If we consider different choices for each smoothing and coarse-grid correction, 
 One possibility, that has been already mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, is to overcome these limitations by incorporating performance models into the evaluation, which allow to obtain a prediction for a method's execution time on a larger grid.
 However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time per iteration measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
 
-Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:evolutionary-search}.
+Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:generalization-procedure}.
 \begin{algorithm}
 	\caption{Generalization Procedure}
-	\label{alg:evolutionary-search}
-	\begin{algorithmic} % The number tells where the line numbering should start
+	\label{alg:generalization-procedure}
+	\begin{algorithmic}[1] % The number tells where the line numbering should start
 		\State \textbf{Construct} the grammar $G_0$ for the initial problem
 		\State \textbf{Initialize} the population $P_0$ based on $G_0$
-		\State \textbf{Evaluate} $P_0$ on the initial problem
-		\For{$i := 0, \dots, n$}
+		\State \textbf{Evaluate} $P_0$ on the initial problem with respect to $t$ and $\rho$
+		\For{$i := 0, \dots, n-1$}
 		\If{$i > 0$ and $i \mod m = 0$}
 		\State $j := i / m$ 
 		\State Increase the problem size
 		\State \textbf{Construct} the corresponding grammar $G_j$
 		\State  \textbf{Adapt} the current population $P_i$ to $G_j$
-		\State \textbf{Evaluate} $P_i$ on the new problem
+		\State \textbf{Evaluate} $P_i$ on the new problem with respect to $t$ and $\rho$
 		\EndIf
 		\State \textbf{Generate} new solutions $C_i$ based on $P_i$ and $G_j$
-		\State \textbf{Evaluate} $C_i$ on the current problem
+		\State \textbf{Evaluate} $C_i$ on the current problem with respect to $t$ and $\rho$
 		\State \textbf{Select} $P_{i+1}$ from $C_i \cup P_i$
 		\EndFor
+		\State \textbf{Construct} the grammar $G$ for the target problem
+		\State  \textbf{Adapt} the current population $P_n$ to $G$
+		\State \textbf{Identify the best solver} by evaluating $P_{n}$ on the target problem
 	\end{algorithmic}
 \end{algorithm}
 Within this procedure, the search is initiated by choosing an initial problem size.
@@ -76,9 +79,9 @@ Since at the beginning, the majority of the individuals in the population, which
 However, as the search progresses and the average quality of the individuals in the population improves, the problem size can then be iteratively increased towards the target size.
 While each problem size adaption increases the required time to evaluate each method found within the search, it also increases the accuracy of evaluation with respect to both objectives.
 In particular, we can only reliably test the $h$-independent convergence of a given method by evaluating it on a sequence of increasingly-larger instances of the same problem.
-Furthermore, as the difference between the execution times per iteration of different non-dominating solving becomes decreases, even slight hardware-based fluctuations in the measurements might affect the outcome of an evaluation.
+Furthermore, as the difference between the execution times per iteration of different non-dominating solvers decreases, even slight hardware-based fluctuations in the measurements might perturb the outcome of an evaluation.
 This effect can again be reduced by considering a larger instance of the same problem, as, consequently, the relative magnitude of these fluctuations decreases compared to the overall evaluation time.
-At the end of Algorithm~\ref{alg:evolutionary-search} we then obtain a population that contains a set of non-dominated individuals according to the largest problem size considered within the search.
+At the end of Algorithm~\ref{alg:generalization-procedure} we then obtain a population that contains a set of non-dominated individuals according to the largest problem size considered within the search.
 Therefore, as discussed above, we can identify the fastest solver for our target problem instance, by only considering those individuals contained in the first non-dominated front, i.e. the population subset in which none of the individuals is dominated by any of those encountered within the search.
 
 Finally, note that so far we have only considered increasing the problem size within the search.
@@ -93,6 +96,36 @@ In general, the difficulty for solving this problem increases with the value of 
 However, many applications, for instance, require the discretization width $h$ to fulfill an accuracy requirement of $h k \leq 0.625$. 
 As a consequence, in order to solve this problem on a smaller grid, we also need to adapt the wavenumber accordingly, which results in a sequence of problem instances that do not only increase in size but also in difficulty.
 In Chapter~\ref{chapter:experiments}, we will then demonstrate that our generalization procedure is capable of evolving efficient multigrid methods for Helmholtz problems of varying size and difficulty.
+
+\subsection{Implementation}
+After we have now both motivated and formally described a procedure for the grammar-based evolution of generalizazible multigrid methods, the remaining step represents its successful implementation within the EvoStencils framework, as described in the last chapter.
+First of all, note that the individual evolutionary operations performed within the search, i.e. initialization, mutation, crossover and selection, are all a function of the created primitive set, which means that they can be utilized in a similar way independent of the underlying problem size by registering them to the respective \emph{Toolbox} object, as shown in Listing~\ref{code:gp:toolbox}.
+Furthermore, we can easily generate a grammar for different problem sizes but with a discretization hierarchy of similar depth by utilizing the \emph{generate\_grammar} function, as shown in Listing~\ref{code:grammar:generate-grammar}, while providing a different value for the argument \emph{max\_level}.
+However, the essential question that has not been answered yet is how we adapt the current population to the new grammar which has been generated by increasing the problem size, as it is formulated in Line 9 of Algorithm~\ref{alg:generalization-procedure}.
+To address this issue, we need to return to the original formulation of our multigrid grammar, as shown in Table~\ref{table:multigrid-grammar}.
+Here note that while the level of each variable and certain terminal symbols is denoted by its subscript, each of these terms is an expression whose value depends on the discretization width $h$ on the finest level.
+In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with step size $h$ and fixed depth to a different hierarchy of similar depth but with a step size of $H$, we only have to substitute the value of both step sizes in each subscript.
+Now recall that in our implementation each derivation tree is represented by a \emph{PrimitiveTree} object of DEAP's GP module, which internally stores a list of each of its nodes in depth-first order.
+Listing~\ref{code:gp:primitive} shows a reduced implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
+\begin{listing}
+	\inputminted[linenos]{python}{evostencils/gp/primitive.py}
+	\caption{GP: Primitive and Terminal class}
+	\label{code:gp:primitive}
+\end{listing}
+The important insight that we gain from this implementation is that each \emph{Primitive} and \emph{Terminal} object is identified by the three attributes, its input types, return type and name, whereby the latter does not possess any input types.\footnote{Note that if the second argument for the initialization of a \emph{Terminal} object is provided as a string, the \emph{terminal} and \emph{name} attributes are identical.}
+Therefore, a \emph{PrimitiveTree} does not contain the complete information required for its compilation to executable Python code, but instead in addition we need to provide the respective \emph{PrimitiveSetTyped}, which then allows to construct a sequence of function applications according to the order of primitives and terminals within the tree.  
+As a consequence, in case two different \emph{PrimitiveSetTyped} objects are structurally equal and employ the same name string for each of their primitives and terminals, both can be used to compile the same \emph{PrimitiveTree} object.
+Now note that in Listing~\ref{code:grammar:add-terminals}, and ~\ref{code:grammar:add-level}, we generate the name string for each \emph{Primitive} and \emph{Terminal} using the problem-independent naming convention together with a subscript that corresponds to its depth in the discretization hierarchy.
+As the latter is independent of the actual discretization width, each \emph{PrimitiveTree} generated based on a \emph{PrimitiveSetTyped} object returned by our \emph{generate\_grammar} function can be compiled with any other of those constructed with this function using the same value for the \emph{depth} argument\footnote{Note that the structural equality of both objects also requires us to provide the same value for the \emph{samples} argument}.
+However, while we answered the questions whether we can compile a given \emph{PrimitiveTree} using a structurally-equal but different primitive set, we have not addressed the issue of generating new individuals based on existing ones using the previously defined mutation and crossover operators.
+In case of both operators, the construction of new individuals is subject to the type constraints defined within each of its \emph{Primitive} and \emph{Terminal} object.
+Therefore, if we aim to construct new individuals based existing ones, that have been generated using a different \emph{PrimitiveSetTyped} object, the types of each \emph{Terminal} and \emph{Primitive} object need to match.
+However, if we consider the initialization of each type in the respective method of the \emph{Types} class, as shown in Listing~\ref{code:grammar:types}, we can see that this condition is fulfilled, as all types are created as a function of the \emph{depth} argument and are, hence, independent of the details of the discretization hierarchy based on which the respective primitive set is constructed.
+We can, therefore, summarize the previous discussion with the observation that while each individual contains the computational structure of the corresponding multigrid method, all required information to apply this individual to a certain discretization hierarchy is contained in the respective \emph{PrimitiveSetTyped} object.
+
+ 
+ 
+ 
 
 
 
