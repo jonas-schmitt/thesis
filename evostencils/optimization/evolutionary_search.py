@@ -1,26 +1,26 @@
 import random
 
-def evolutionary_search(self, initial_population_size, generations, mu_, lambda_, crossover_probability, use_random_search=False):
+def evolutionary_search(self, params, use_random_search=False):
     # Generate and evaluate initial population
-    population = self.toolbox.population(n=initial_population_size)
+    population = self.toolbox.population(n=params.initial_population_size)
     invalid_ind = [ind for ind in population]
     fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
     # Select mu individuals from the initial population
-    population = self.toolbox.select(population, mu_)
-    for gen in range(1, generations + 1):
+    population = self.toolbox.select(population, params.mu_)
+    for gen in range(1, params.generations + 1):
         if use_random_search:
             # For random search simply generate individuals randomly
-            offspring = self.toolbox.population(n=lambda_)
+            offspring = self.toolbox.population(n=params.lambda_)
         else:
             # Select lambda parents for mutation and crossover
-            selected = self.toolbox.select(population, lambda_)
+            selected = self.toolbox.select(population, params.lambda_)
             parents = [self.toolbox.clone(ind) for ind in selected]
             offspring = []
             for ind1, ind2 in zip(parents[::2], parents[1::2]):
                 operator_choice = random.random()
-                if operator_choice < crossover_probability:
+                if operator_choice < params.crossover_probability:
                     child1, child2 = self.toolbox.mate(ind1, ind2)
                 else:
                     child1, = self.toolbox.mutate(ind1)
@@ -34,6 +34,6 @@ def evolutionary_search(self, initial_population_size, generations, mu_, lambda_
             ind.fitness.values = fit
         # Select new population from the combined set of parents
         # and offspring (elitism)
-        population = self.toolbox.elitism(population + offspring, mu_)
+        population = self.toolbox.elitism(population + offspring, params.mu_)
 
     return population
