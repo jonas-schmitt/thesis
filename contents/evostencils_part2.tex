@@ -137,7 +137,7 @@ As we have already discussed in Section~\ref{sec:search-space-estimation}, the s
 However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of individuals that need to be evaluated, we still have to execute each solver obtained within the search on a number of different problem instances, as described in the last section.
 Furthermore, to evaluate each of these solvers, we utilize ExaStencils' capabilities to first generate a C++ implementation, which then, in a second steps needs to be compiled to an executable program.
 Both steps incur a significant overhead and, hence, further increase the time required for the evaluation of each individual.
-A common approach to accelerate the computationally intensive evaluation of a large number of individuals within an evolutionary algorithm, is to distribute its execution to several compute nodes, such that the evaluation of multiple individuals can be performed in parallel.
+A common approach to accelerate the computationally intensive parts of an evolutionary algorithm, is to distribute their execution to several compute nodes, such that each computational step can be performed in parallel.
 An overview of different approaches for the distributed parallelization of evolutionary algorithms can be found in~\cite{gong2015distributed}.
 In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the methods scalability.
 Unfortunately, in general, the question which approach leads to the best outcome can not be answered easily.
@@ -152,15 +152,18 @@ For instance, if we are able parallelize 90 \% of the computations of a given pr
 \begin{equation}
 	\lim\limits_{n \to  \infty} S(n) = \frac{1}{0.1 + 0.9 / n} = \frac{1}{0.1} = 10.
 \end{equation}
-According to Algorithm~\ref{alg:genetic-programming}, each generation of a GP-based evolutionary search method in principle consists of the four following steps:
+According to Algorithm~\ref{alg:genetic-programming}, each generation of our evolutionary search method in principle consists of the following four steps:
 \begin{enumerate}
-	\item Selection
-	\item Crossover and Mutation
-	\item Evaluation
-	\item Elitist selection
-\end{enumerate} 
-Therefore, in order to predict the speedup of a particular parallelization according to Amdahl's law, we first need to determine the fraction each of these steps contributes to the total amount of work in each generation.
-For this purpose, we can simply measure the time spent in each of the four steps within a single sequential run of our evolutionary search method.
+	\item Parent selection
+	\item Mutation and crossover
+	\item Child evaluation
+	\item Elitist selection of the new population
+\end{enumerate}
+First of all, note that the amount of time required for the evaluation of each individual depends on the difficulty and size of the problem.
+In contrast, the complexity of the other three steps is a function of the population size.
+However, as a first step within each evaluation, we always have to invoke the ExaStencils compiler to generate a parallel C++ implementation.
+As this step mainly depends on the number of expressions contained in each derivation tree, we can easily obtain a lower bound by considering common multigrid cycles.
+
 
 
 
