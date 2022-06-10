@@ -137,5 +137,34 @@ As we have already discussed in Section~\ref{sec:search-space-estimation}, the s
 However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of individuals that need to be evaluated, we still have to execute each solver obtained within the search on a number of different problem instances, as described in the last section.
 Furthermore, to evaluate each of these solvers, we utilize ExaStencils' capabilities to first generate a C++ implementation, which then, in a second steps needs to be compiled to an executable program.
 Both steps incur a significant overhead and, hence, further increase the time required for the evaluation of each individual.
-A common approach to accelerate the computationally expensive evaluation of a large number of individuals within an evolutionary algorithm, is to distribute its execution to several compute nodes, such that the evaluation of multiple individuals can be performed in parallel.
+A common approach to accelerate the computationally intensive evaluation of a large number of individuals within an evolutionary algorithm, is to distribute its execution to several compute nodes, such that the evaluation of multiple individuals can be performed in parallel.
+An overview of different approaches for the distributed parallelization of evolutionary algorithms can be found in~\cite{gong2015distributed}.
+In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the methods scalability.
+Unfortunately, in general, the question which approach leads to the best outcome can not be answered easily.
+However, before we decide upon a specific parallelization method, it is first important to investigate which parts of our evolutionary search method need to be parallelized in order to achieve good scalability.
+For this purpose, we consider the maximum achievable speedup based on the fraction of computational work that can be parallelized on the given system, which is given by the formula
+\begin{equation}
+	S(n) = \frac{1}{1 - p + p / n},
+\end{equation}
+where $p$ is the parallelizable fraction of the total amount of work and $n$ is the number of processors employed\footnote{In order to pay respect to its inventor, Gene Amdahl, this formula is usually named Amdahl's law~\cite{amdahl1967validity}.}.
+In order to estimate an upper bound for the achievable speedup, we can, therefore, compute the limit of $S(n)$ with respect to $n$ for a given value of $p$.
+For instance, if we are able parallelize 90 \% of the computations of a given program, the maximum achievable speedup is 
+\begin{equation}
+	\lim\limits_{n \to  \infty} S(n) = \frac{1}{0.1 + 0.9 / n} = \frac{1}{0.1} = 10.
+\end{equation}
+According to Algorithm~\ref{alg:genetic-programming}, each generation of a GP-based evolutionary search method in principle consists of the four following steps:
+\begin{enumerate}
+	\item Selection
+	\item Crossover and Mutation
+	\item Evaluation
+	\item Elitist selection
+\end{enumerate} 
+Therefore, in order to predict the speedup of a particular parallelization according to Amdahl's law, we first need to determine the fraction each of these steps contributes to the total amount of work in each generation.
+For this purpose, we can simply measure the time spent in each of the four steps within a single sequential run of our evolutionary search method.
+
+
+
+  
+
+
 \section{Systems of Partial Differential Equations}
