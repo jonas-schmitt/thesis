@@ -129,12 +129,13 @@ We can implement the resulting steps in the following method of the \emph{Optimi
 	\caption{Adapt problem size during evolution}
 	\label{code:optimization:adapt-problem-size}
 \end{listing}
- 
- 
- 
-
-
-
+What now remains is the integration of this method into the implementation of our evolutionary search method, as shown in Listing~\ref{code:optimization:evolutionary_search}.
+However, for the sake of simplicity, we postpone this step until we have described the next major extension of our basic implementation, which is the distributed parallelization of our approach using the message passing interface (MPI).
 
 \section{Distributed Parallelization}
+As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our multigrid grammar already rules out the possibility to evaluate all possible solvers that can be generated based on its productions.
+However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of individuals that need to be evaluated, we still have to execute each solver obtained within the search on a number of different problem instances, as described in the last section.
+Furthermore, to evaluate each of these solvers, we utilize ExaStencils' capabilities to first generate a C++ implementation, which then, in a second steps needs to be compiled to an executable program.
+Both steps incur a significant overhead and, hence, further increase the time required for the evaluation of each individual.
+A common approach to accelerate the computationally expensive evaluation of a large number of individuals within an evolutionary algorithm, is to distribute its execution to several compute nodes, such that the evaluation of multiple individuals can be performed in parallel.
 \section{Systems of Partial Differential Equations}

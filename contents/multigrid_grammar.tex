@@ -675,6 +675,7 @@ Since the EvoStencils framework builds substantially on the evolutionary optimiz
 For this purpose, we aim to estimate the size of the search space that is created by the grammar formulated in Table~\ref{table:multigrid-grammar}, i.e. the number of different individuals that can be generated based on its productions.
 
 \subsection{Search Space Estimation}
+\label{sec:search-space-estimation}
 If we treat the grammar-based optimization of multigrid method as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
 In practice, in case of a small search space it can be feasible to simply enumerate and evaluate all possible solutions of the given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, is, in general, not guaranteed to find the same solution in each of its executions.
 For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Table~\ref{table:multigrid-grammar}. 
