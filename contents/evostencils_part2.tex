@@ -142,32 +142,54 @@ An overview of different approaches for the distributed parallelization of evolu
 In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the methods scalability.
 Unfortunately, in general, the question which approach leads to the best outcome can not be answered easily.
 However, before we decide upon a specific parallelization method, it is first important to investigate which parts of our evolutionary search method need to be parallelized in order to achieve good scalability.
-For this purpose, we consider the maximum achievable speedup based on the fraction of computational work that can be parallelized on the given system, which is given by the formula
-\begin{equation}
-	S(n) = \frac{1}{1 - p + p / n},
-\end{equation}
-where $p$ is the parallelizable fraction of the total amount of work and $n$ is the number of processors employed\footnote{In order to pay respect to its inventor, Gene Amdahl, this formula is usually named Amdahl's law~\cite{amdahl1967validity}.}.
-In order to estimate an upper bound for the achievable speedup, we can, therefore, compute the limit of $S(n)$ with respect to $n$ for a given value of $p$.
-For instance, if we are able parallelize 90 \% of the computations of a given program, the maximum achievable speedup is 
-\begin{equation}
-	\lim\limits_{n \to  \infty} S(n) = \frac{1}{0.1 + 0.9 / n} = \frac{1}{0.1} = 10.
-\end{equation}
 According to Algorithm~\ref{alg:genetic-programming}, each generation of our evolutionary search method in principle consists of the following four steps:
 \begin{enumerate}
-	\item Parent selection
-	\item Mutation and crossover
-	\item Child evaluation
-	\item Elitist selection of the new population
+	\item Parent Selection
+	\item Child Creation
+	\item Child Evaluation
+	\item Population Selection
 \end{enumerate}
-First of all, note that the amount of time required for the evaluation of each individual depends on the difficulty and size of the problem.
-In contrast, the complexity of the other three steps is a function of the population size.
-However, as a first step within each evaluation, we always have to invoke the ExaStencils compiler to generate a parallel C++ implementation.
-As this step mainly depends on the number of expressions contained in each derivation tree, we can easily obtain a lower bound by considering common multigrid cycles.
+In order to estimate the expected speedup of a parallel implementation of each of these operations, we first determine the fraction of time each of them occupies within our evolutionary search method.
+For this purpose, as a representative test problem, we consider Poisson's equation on the unit square $\left[0,1\right]^2$ discretized on a uniform grid with step size $h = 1/2^{10}$ using the common five-point stencil
+\begin{equation*}
+	\nabla^2_h = 
+	\frac{1}{h^2} \begin{bmatrix}
+		& -1 & \\
+		-1 & 4 & -1 \\
+		& -1 &  
+	\end{bmatrix},
+\end{equation*}
+and Dirichlet boundary conditions, which leads to a system of linear equations with 1046529 unknowns.
+For the sake of simplicity, we omit the complete specification of this test problem at this point, as it will be presented in the next chapter and can be also found in~\cite{schmitt2021evostencils}.
+In order to obtain representative measurements for each of the four steps of our search method, we sequentially execute our evolutionary search method for a total number 250 generations on a single socket of the Meggie compute cluster of the Erlangen Regional Computing Center\footnote{As an exception, the child evaluation step is performed in parallel on multiple sockets of the same type. Since the order of evaluation does not change the behavior of our algorithm, this decision does not affect our measurements.}.
+In each generation we select $\lambda = 256$ individuals from the current population based on which we create $\lambda$ children.
+Finally, we select $\mu = 256$ individuals as a new population for the next generation from the combined set of $512$ individuals using the NSGA-II non-dominated sorting procedure described in~\cite{deb2002fast}.
+We then measure the average time required for each of the four steps over all generations, which is shown in Table~\ref{table:evolutionary-search-profiling}.
+\begin{table}
+	\caption{Average time required for each step performed within one generation of an evolutionary search for the test problem.}
+	\label{table:evolutionary-search-profiling}
+	\centering
+	\begin{tabular}{l c}
+		\toprule
+		Step & Average Time \\
+		\midrule
+		Parent Selection & 0.68 ms \\
+		\midrule
+		Child Creation  & 0.32 s \\
+		\midrule
+		Child Evaluation  & 3.31 h \\
+		\midrule
+		Population Selection  & 0.20 s \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+As it can be seen in this table, the overall execution time of our evolutionary search method is heavily dominated by the evaluation step, which is reflected in the fact that the combined execution times of all other steps do not even account for one percent of the overall time.
+Consequently, we can drastically reduce the execution time of our evolutionary search method by performing the evaluation of multiple individuals in parallel, while the parallelization of any other step will only result in a negligible speedup. 
+However, as we have to evaluate at least a single individual per compute node, the maximum achievable speedup is equal to $\lambda$, i.e., the number of children created in each generation of the search.
+Finally, note that the two-dimensional Poisson equation represents a common test problem that is well known to be efficiently solvable by multigrid.
+Therefore, for the majority of other PDE-based problems of similar size, we can expect a further increase in the execution time and, thus, the relative time consumption of the evaluation step.
 
-
-
-
-  
-
+Based on the previous discussion, we can now derive a suitable parallelization scheme for our algorithm.
+However, while we have already estimated the impact of a parallel execution of each of the four steps of our method, we have not yet discussed how we can parallelize its individual operations. 
 
 \section{Systems of Partial Differential Equations}
