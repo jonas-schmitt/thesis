@@ -195,13 +195,23 @@ In general, if each operation within a sequence of computations is independent, 
 As this condition is fulfilled for step 2-3 of our evolutionary algorithm, these steps can be performed in a fully parallel manner.
 In contrast, both selection steps in our evolutionary search method need to access the complete population from each processing elements.
 As a consequence, we can distinguish two different options to parallelize these steps on a multi-processor system:
-\begin{itemize}
+\begin{enumerate}
 	\item Duplicate the population on each processing element.
 	\item Split the population into subpopulations and perform the selection on each subpopulation independently, while allowing the periodic migration between certain subpopulations. This approach is usually summarized under the term island-based evolutionary algorithm.
-\end{itemize}   
-The first approach achieves behavioral equivalence to a sequential evolutionary search at the cost that both the memory and computational requirements of the resulting program increases with the population size $\mu_$, which restricts its applicability to only medium-sized populations.
+\end{enumerate}   
+The first approach achieves behavioral equivalence to a sequential evolutionary search at the cost that both the memory and computational requirements of the resulting program increases with the population size $\mu$, which restricts its applicability to only medium-sized populations.
 In contrast, depending on the amount of migration between the individual subpopulations, which require a certain amount of communication, island-based models are, in principle able to achieve unlimited scalability, as all operations are performed on completely independent subpopulations.
 On the downside, since only individuals in the respective subpopulation are considered for selection, an island-based approach comprises the risk of selecting a higher percentage of inferior individuals, which might lead to slower convergence compared to its sequential counterpart.
-Considering the relative low cost of selection even compared to the evaluation of a single individual\footnote{If we divide the total evaluation time per generation in Table~\ref{table:evolutionary-search-profiling} by the number of children, we obtain an average evaluation time of 47 seconds per individual.}, as demonstrated for the given test problem, we can deduce that a duplication of the whole population is feasible for most experiments performed on small to medium-sized clusters.
+Considering the relative low cost of selection even compared to the evaluation of a single individual\footnote{If we divide the total evaluation time per generation in Table~\ref{table:evolutionary-search-profiling} by the number of children, we obtain an average evaluation time of 47 seconds per individual.}, as demonstrated for the given test problem with a population size of $\mu = 256$, we can deduce that a duplication of the whole population is feasible for most experiments performed on small to medium-sized clusters.
 However, in case extremely-large populations are needed, an island-based approach offers the additional possibility to scale our evolutionary search methods to large scale systems, such as supercomputers.
+
+To parallelize our evolutionary search method on a multi-node system, such that the evaluation of each individual can be performed on a single multi-core compute node, we utilize the message passing library (MPI), which is available in form of the MPI for Python (mpi4py) package.
+While MPI only defines interfaces for the C and Fortran programming languages, mpi4py provides an additional layer of abstractions which enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
+Pickle provides a unified way to serialize and deserialize objects using a portable binary format, which can then be transmitted using the core functionality provided by MPI.
+Since MPI represents the de facto standard for distributed computing and is, thus, supported on the majority of high-performance computing systems, its use facilitates the portability of our implementation.
+Furthermore, the availability of highly-optimized MPI implementations, which are often developed in cooperation with hardware manufacturers\footnote{For instance Intel MPI is available on most systems using Intel CPUs.}, enables the communication between different processors in an highly-efficient manner.
+As a first step to parallelize our evolutionary search method using mpi4py, we extend the previously defined \emph{Optimizer} class as shown in Listing~\ref{code:optimization:optimizer} to provide an interface to all required MPI operations. 
+
+
+
 \section{Systems of Partial Differential Equations}
