@@ -10,6 +10,7 @@ class Parameters:
         self.relaxation_factor_samples = 37
         self.tree_min_height = 10
         self.tree_max_height = 50
+        self.multi_objective = True
 
 class Optimizer:
     def __init__(self, program_generator):
@@ -19,13 +20,13 @@ class Optimizer:
         self.params = None
         self.individual_cache = {}
 
-    def run(self, params, use_random_search=False, multi_objective=True):
+    def run(self, params, use_random_search=False):
         self.params = params
         self.pset = generate_grammar(self.program_generator, params.max_level, params.depth, params.relaxation_factor_samples)
         min_level = params.max_level - params.depth
         self.program_generator.initialize_code_generation(min_level, params.max_level)
-        self.init_toolbox(self.pset, params.tree_min_height, params.tree_max_height, multi_objective)
-        if multi_objective:
+        self.init_toolbox(self.pset, params.tree_min_height, params.tree_max_height, params.multi_objective)
+        if params.multi_objective:
             self.init_multi_objective_selection(self.pset, self.evaluate)
         else:
             self.init_single_objective_selection(self.pset, self.evaluate)

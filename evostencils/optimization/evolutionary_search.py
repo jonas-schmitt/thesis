@@ -1,12 +1,28 @@
 import random
 
+def evaluate_individuals(self, invalid_ind):
+    fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
+    for ind, fit in zip(invalid_ind, fitnesses):
+        ind.fitness.values = fit
+
+def create_offspring(self, parents, crossover_probability):
+    offspring = []
+    for ind1, ind2 in zip(parents[::2], parents[1::2]):
+        operator_choice = random.random()
+        if operator_choice < crossover_probability:
+            child1, child2 = self.toolbox.mate(ind1, ind2)
+        else:
+            child1, = self.toolbox.mutate(ind1)
+            child2, = self.toolbox.mutate(ind2)
+        del child1.fitness.values, child2.fitness.values
+        offspring.extend([child1, child2])
+    return offspring
+
 def evolutionary_search(self, params, use_random_search=False):
     # Generate and evaluate initial population
     population = self.toolbox.population(n=params.initial_population_size)
     invalid_ind = [ind for ind in population]
-    fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = fit
+    self.evaluate_individuals(invalid_ind)
     # Select mu individuals from the initial population
     population = self.toolbox.select(population, params.mu_)
     for gen in range(1, params.generations + 1):
@@ -17,21 +33,10 @@ def evolutionary_search(self, params, use_random_search=False):
             # Select lambda parents for mutation and crossover
             selected = self.toolbox.select(population, params.lambda_)
             parents = [self.toolbox.clone(ind) for ind in selected]
-            offspring = []
-            for ind1, ind2 in zip(parents[::2], parents[1::2]):
-                operator_choice = random.random()
-                if operator_choice < params.crossover_probability:
-                    child1, child2 = self.toolbox.mate(ind1, ind2)
-                else:
-                    child1, = self.toolbox.mutate(ind1)
-                    child2, = self.toolbox.mutate(ind2)
-                del child1.fitness.values, child2.fitness.values
-                offspring.extend([child1, child2])
+            offspring = self.create_offspring(parents, params.crossover_probability)
         # Evaluate new individuals
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        self.evaluate_individuals(invalid_ind)
         # Select new population from the combined set of parents
         # and offspring (elitism)
         population = self.toolbox.elitism(population + offspring, params.mu_)

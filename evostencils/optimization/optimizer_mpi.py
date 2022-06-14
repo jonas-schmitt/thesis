@@ -1,5 +1,3 @@
-from mpi4py import MPI
-
 def merge_lists(lst):
     return [item for sublist in lst for item in sublist]
 
