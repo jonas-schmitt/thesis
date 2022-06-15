@@ -254,7 +254,7 @@ In a similar fashion, each process generates its fraction of the offspring by fi
 Again, after each process has finished the evaluation of its local individuals the combined offspring is obtained using the \emph{allgather} method in line 35.
 Since each process then has an exact copy of all newly-created individuals, the following elitist selection in line 38 consistently leads to the same population, based on which the search is then proceeded until the maximum number of generations has been reached.
 
-With the implementation of a scalable evolutionary search method that is able to utilize the compute capabilities of current multi-node systems, we can now evaluate the effectiveness of our grammar-based approach for the construction of multigrid methods in a number of experiments, where we consider three common PDE-based model problems, the two- and three-dimensional Poisson equation and a two-dimensional linear elastic boundary value problem.
+With the implementation of a scalable evolutionary search method that is able to utilize the compute capabilities of current multi-node systems, we can now evaluate the effectiveness of our grammar-based approach for the construction of multigrid methods in a number of experiments, where we consider two common PDE-based model problems, Poisson's equation and a linear elastic boundary value problem.
 Furthermore, as a final evaluation step, we assess the efficiency and generalizability of the solvers evolved within the generalization procedure described in Algorithm~\ref{alg:generalization-procedure} on a difficult benchmark problem, the indefinite Helmholtz equation with increasingly-large wavenumbers.
 
 
