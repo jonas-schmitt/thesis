@@ -1,5 +1,10 @@
+In the following, we will discuss two extensions of the basic implementation of our grammar-based evolutionary search method described in the last chapter, that are crucial for the effective application of our approach to many applications: \emph{Generalization} and \emph{parallelization}.  
+First of all, our goal is the systematic generalization of an evolved population of multigrid methods to different instances of a PDE.
+For this purpose, we will, therefore, derive an adapted version of our original search method, that utilizes the special properties of multigrid methods.
+However, since the successful application of this method requires the code generation-based evaluation of a large number of individuals, we, furthermore, present a distributed parallelization scheme, which allows us to execute our implementation on current multi-node systems.
+In the final chapter of this thesis, we will then demonstrate how the resulting implementation can be successfully applied to different PDEs, yielding multigrid-based solvers that are competitive with hand-optimized methods. 
+
 \section{Generalization}
-The first crucial extension of our grammar-based evolutionary search method is the systematic generalization of an evolved population of multigrid methods to different instances of a PDE. 
 As we have already briefly mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, if properly constructed, the convergence of a multigrid method is independent of the discretization width $h$, which is usually described with the term $h$-independent convergence.
 Therefore, the same method can often be successfully applied to different systems that arise from similar discretizations of the same PDE.
 In Section~\ref{sec:fitness-evaluation-and-selection}, we have already introduced the idea of evaluating each multigrid solver on a number of proxy problems that possess similar properties as the problem that we are actually interested to solve.
@@ -15,6 +20,7 @@ However, only a limited number of individuals, chosen from the combined set of c
 Whether an individuals is accepted for the next generation within this process solely depends on its fitness, as defined by one or multiple optimization objectives.
 To achieve generalization, it is, therefore, crucial that we define the fitness of an individual in a way that maximizes the probability that the optimum, according to our criterion $T_{\varepsilon}$, is contained in the final population.
 On the downside, this means that we have to prevent this individual from getting evicted from the population at any point within the search.
+\subsection{Objective Function Definition}
 As we have shown in Section~\ref{sec:fitness-evaluation-and-selection} the solving time $T_{\varepsilon}$ is given by the formula
 \begin{equation*}
 	T_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho},
@@ -49,6 +55,7 @@ If we consider different choices for each smoothing and coarse-grid correction, 
 One possibility, that has been already mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, is to overcome these limitations by incorporating performance models into the evaluation, which allow to obtain a prediction for a method's execution time on a larger grid.
 However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time per iteration measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
 
+\subsection{Generalization Procedure}
 Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:generalization-procedure}.
 \begin{algorithm}
 	\caption{Generalization Procedure}
@@ -142,6 +149,8 @@ An overview of different approaches for the distributed parallelization of evolu
 In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the methods scalability.
 Unfortunately, in general, the question which approach leads to the best outcome can not be answered easily.
 However, before we decide upon a specific parallelization method, it is first important to investigate which parts of our evolutionary search method need to be parallelized in order to achieve good scalability.
+
+\subsection{Empirical Execution Time Analysis}
 According to Algorithm~\ref{alg:genetic-programming}, each generation of our evolutionary search method in principle consists of the following four steps:
 \begin{enumerate}
 	\item Parent Selection
@@ -187,8 +196,9 @@ As it can be seen in this table, the overall execution time of our evolutionary 
 Consequently, we can drastically reduce the execution time of our evolutionary search method by performing the evaluation of multiple individuals in parallel, while the parallelization of any other step will only result in a negligible speedup. 
 However, as we have to evaluate at least a single individual per compute node, the maximum achievable speedup is equal to $\lambda$, i.e., the number of children created in each generation of the search.
 Finally, note that the two-dimensional Poisson equation represents a common test problem that is well known to be efficiently solvable by multigrid.
-Therefore, for the majority of other PDE-based problems of similar size, we can expect a further increase in the execution time and, thus, the relative time consumption of the evaluation step.
+Therefore, for the majority of other PDE-based problems of similar size, we can expect a further increase in the execution time and, hence, in the relative time consumption of the evaluation step.
 
+\subsection{Parallelization Method}
 Based on the previous discussion, we can now derive a suitable parallelization scheme for our algorithm.
 However, while we have already estimated the impact of a parallel execution of each of the four steps of our method, we have not yet discussed how we can parallelize its individual operations. 
 In general, if each operation within a sequence of computations is independent, which means that it is not affected by the result of any other operation in the sequence, the sequence is trivially parallelizable and can, thus, be executed completely in parallel without affecting the outcome.
@@ -207,6 +217,7 @@ It is, therefore, the chosen method of parallelization within our implementation
 While this decision theoretically limits its scalability, for all experiments considered in this work, which do not employ populations larger than 256 individuals, a duplication of the complete population is always feasible.
 However, an island-based parallelization can be considered a viable future extension for potential applications that require us to perform an evolutionary search with significantly larger population sizes.
 
+\subsection{Implementation}
 After deciding upon a parallelization approach we can now describe its implementation as an extension of our previously defined \emph{Optimizer} class based on the message passing interace (MPI), which is available in form of the MPI for Python (mpi4py) package.
 While MPI only defines interfaces for the C and Fortran programming languages, mpi4py provides an additional layer of abstractions which enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
 Pickle provides a unified way to serialize and deserialize objects using a portable binary format, which can then be transmitted using the core functionality provided by MPI.
@@ -238,10 +249,14 @@ Finally, in order to parallelize the individual steps of our evolutionary search
 According to the MPI programming model, in case the number of processes is larger than one, each process executes its own instance of the same program.
 As a consequence, we only have to implement the required synchronization points between the process.
 Similar to our original implementation, the first step within our evolutionary search is the generation and evaluation of an initial population.
-Therefore, as a first step, which is shown in line 7--12, each process generates and evaluates its respective fraction of the initial population, which is then combined and distributed using the \emph{allgather} method in line 13.
-In a similar fashion, each process generates its fraction of the offspring by first selecting the respective number of parents based on which new individuals are created using either crossover or mutation, as shown in line 22--34.
-Again, after each process has finished the evaluation of its local individuals the combined offspring is obtained using the \emph{allgather} method.
-Since each process then has an exact copy of all newly-created individuals, the following selection step in line 43 consistently leads to the same population, based on which the search is then proceeded until the maximum number of generations has been reached.
-%TODO fix reevaluation of individuals in adapt problem size
+Therefore, as a first step, which is shown in line 7--10, each process generates and evaluates its respective fraction of the initial population, which is then combined and distributed using the \emph{allgather} method in line 11.
+In a similar fashion, each process generates its fraction of the offspring by first selecting the respective number of parents based on which new individuals are created using crossover and mutation, as shown in line 29--31.
+Again, after each process has finished the evaluation of its local individuals the combined offspring is obtained using the \emph{allgather} method in line 35.
+Since each process then has an exact copy of all newly-created individuals, the following elitist selection in line 38 consistently leads to the same population, based on which the search is then proceeded until the maximum number of generations has been reached.
 
-\section{Systems of Partial Differential Equations}
+With the implementation of a scalable evolutionary search method that is able to utilize the compute capabilities of current multi-node systems, we can now evaluate the effectiveness of our grammar-based approach for the construction of multigrid methods in a number of experiments, where we consider three common PDE-based model problems, the two- and three-dimensional Poisson equation and a two-dimensional linear elastic boundary value problem.
+Furthermore, as a final evaluation step, we assess the efficiency and generalizability of the solvers evolved within the generalization procedure described in Algorithm~\ref{alg:generalization-procedure} on a difficult benchmark problem, the indefinite Helmholtz equation with increasingly-large wavenumbers.
+
+
+% TODO Maybe include this section again
+%\section{Systems of Partial Differential Equations}

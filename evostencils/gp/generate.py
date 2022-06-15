@@ -20,9 +20,6 @@ def generate(pset, min_height, max_height, condition, return_type=None, subtree=
             subtree_inserted = True
             continue
         max_depth = max(max_depth, depth)
-        # Maximum expression depth supported by the Python parser
-        if max_depth > 90:
-            return None
         terminals_available = len(pset.terminals[type_]) > 0
         if condition(height, depth):
             nodes = pset.terminals[type_] + pset.primitives[type_]

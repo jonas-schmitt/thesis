@@ -1,23 +1,3 @@
-import random
-
-def evaluate_individuals(self, invalid_ind):
-    fitnesses = self.toolbox.map(self.toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = fit
-
-def create_offspring(self, parents, crossover_probability):
-    offspring = []
-    for ind1, ind2 in zip(parents[::2], parents[1::2]):
-        operator_choice = random.random()
-        if operator_choice < crossover_probability:
-            child1, child2 = self.toolbox.mate(ind1, ind2)
-        else:
-            child1, = self.toolbox.mutate(ind1)
-            child2, = self.toolbox.mutate(ind2)
-        del child1.fitness.values, child2.fitness.values
-        offspring.extend([child1, child2])
-    return offspring
-
 def evolutionary_search(self, params, use_random_search=False):
     # Generate and evaluate initial population
     population = self.toolbox.population(n=params.initial_population_size)

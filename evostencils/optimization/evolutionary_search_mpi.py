@@ -14,6 +14,7 @@ def evolutionary_search(self, params, use_random_search=False, generalization_in
     max_level = params.max_level
     for gen in range(1, params.generations + 1):
         if gen > 1 and gen % generalization_interval == 0:
+            # Increase the problem size
             max_level += 1
             self.adapt_problem_size(max_level, params, params.multi_objective)
             # Reevaluate individuals
