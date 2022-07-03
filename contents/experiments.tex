@@ -148,7 +148,8 @@ Similar to the above case, we employ a uniform cartesian grid of size $h = 1/l_{
 \subsection{Multigrid Configuration}
 To design a multigrid method, we consider each of the given problems a grid hierarchy consisting of five discretization levels $l \in \left[l_{max} - 4, l_{max}\right]$, where the grid spacing on each level is given by the formula $h = 1/2^l$.
 We then obtain the respective operator on each level by applying the same discretization method as described above.
-Furthermore, we consider the following components within the respective step of each method:
+Therefore, the resulting grammar is structurally similar to the one in shown Table~\ref{table:multigrid-grammar}.
+Within each grammar production rule, we then consider the following components:
 \begin{description}
 	\item[\textbf{Smoothers}:] Decoupled / Collective Jacobi and red-black Gauss-Seidel, block Jacobi with rectangular blocks up to a maximum number of 6 terms.
 	\item[\textbf{Restriction}:] Full-weighting restriction.
@@ -165,10 +166,59 @@ Here, we generate block Jacobi smoothers by defining a splitting $A = L + D + U$
 \end{equation*}
 where each matrix $A_{ij}$ corresponds to a set of adjacent grid points contained in the respective rectangular block, as it has been discussed in Section~\ref{subsec:block-smoothing}.
 A more detailed treatment of block relaxation methods, can be found in~\cite{trottenberg2000multigrid}.
-Finall, the relaxation factor $\omega$ for each smoothing and coarse-grid correction step is chosen from the above sequence.
+For each of smoothing and coarse-grid correction step the relaxation factor $\omega$ is chosen from the above sequence.
 As a baseline for assessing the efficiency and generalizability of the evolved multigrid solvers, we consider a number of common multigrid cycles with red-black Gauss-Seidel smoothing and optimized relaxation factors.
 We, therefore, formulate these methods on the same five-grid hierarchy, whereby we also utilize the same restriction, prolongation operators and coarse-grid solver, as described above.
 \subsection{Optimization Settings}
+After specifying the operator and parameter choices considered within the construction of each multigrid solver, we next describe the settings under which we perform each GP-optimization run.
+Here, Table~\ref{table:gp-parameters} gives an overview about the configuration of our implementation of grammar-guided genetic programming, as described in Chapter~\ref{chapter:evostencils-1} and~\ref{chapter:evostencils-2}, used within each experiment.
+\begin{table}
+	\centering
+	\begin{tabular}{l c}
+		\toprule
+		Parameter & Value \\
+		\midrule 
+		Evolutionary algorithm type & $(\mu + \lambda)$ \\
+		\midrule
+		Genetic programming variant & Tree-based \\
+		\midrule
+		Number of objectives & 2 \\
+		\midrule
+		Number of generations & 250 \\
+		\midrule
+		Initial population size & 2048 \\
+		\midrule
+		$\lambda$ & 256 \\
+		\midrule
+		$\mu$ & 256 \\
+		\midrule
+		Number of MPI processes & 64 \\
+		\midrule
+		Non-dominated sorting procedure & \cite{deb2002fast} \\ 
+		\midrule
+		Selection operator & \cite{deb2000fast} \\ 
+		\midrule
+		Crossover operator & Single-point crossover \\
+		\midrule
+		Crossover probability & $2/3$ \\
+		\midrule
+		Mutation operator & Random subtree replacement \\
+		\midrule 
+		Probability to mutate a terminal symbol & $1/3$ \\
+		\bottomrule
+	\end{tabular}
+	\caption{Summary of GGGP configuration parameters.}
+	\label{table:gp-parameters}
+\end{table}
+Within each run, starting with a randomly generated population of 2048 individuals, we perform an evolutionary search for 250 generations.
+In each generation, we create new individuals by first selecting $\lambda = 256$ candidates from the current population.
+We then apply mutation and crossover to each pair of selected candidates to create two child individuals, whereby the crossover probability is set to $2/3$ and in case of mutation we choose terminal symbol with a probability of $1/3$.
+The resulting individuals are then evaluated according to the two objectives by generating a parallel C++ solver implementation using the ExaStencils framework, which is then applied to the respective problem specified above.
+%TODO briefly mentioned objectives
+Hereby we distribute the evaluation of all 256 individuals to 64 MPI processes, such that each process is responsible for the evaluation of exactly four individuals.
+The resulting fitness values are then distributed to all 64 processes, such that each of them possesses an identical copy of each child individual together with its fitness value, as it has been described in Chapter~\ref{sec:distributed-parallelization}.
+Finally, we select $\mu = 256$ individuals as a population for the next generation from the combined set of parent and child individuals using the NSGA-II non-dominated sorting procedure~\cite{deb2002fast}.
+
 
 \section{Evolving Generalizable Multigrid Preconditioners}
 \subsection{The Indefinite Helmholtz Equation}

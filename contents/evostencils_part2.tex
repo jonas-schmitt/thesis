@@ -140,6 +140,7 @@ What now remains is the integration of this method into the implementation of ou
 However, for the sake of simplicity, we postpone this step until we have described the next major extension of our basic implementation, which is the distributed parallelization of our approach using the message passing interface (MPI).
 
 \section{Distributed Parallelization}
+\label{sec:distributed-parallelization}
 As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our multigrid grammar already rules out the possibility to evaluate all possible solvers that can be generated based on its productions.
 However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of individuals that need to be evaluated, we still have to execute each solver obtained within the search on a number of different problem instances, as described in the last section.
 Furthermore, to evaluate each of these solvers, we utilize ExaStencils' capabilities to first generate a C++ implementation, which then, in a second steps needs to be compiled to an executable program.
