@@ -6,7 +6,9 @@ In addition, by considering both two and three-dimensional problems as well as a
 As it has been mentioned above, the goal of this section is to evaluate the effectiveness of our evolutionary search method in evolving multigrid methods that can be used as a standalone method for the numerical solution of a given PDE.
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
 This is reflected in the fact that common multigrid cycles, as described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
-We begin this section by introducing the considered problem instances and their mathematical formulation. 
+We begin this section by introducing the considered problem instances and their mathematical formulation.
+At this point we want to emphasize that all results presented in this section have been originally published as part of the paper~\cite{schmitt2021evostencils}.
+However, this thesis complements this work with an additional analysis of the multigrid solvers obtained with out evolutionary search method.
 \subsection{Poisson's Equation}
 \label{sec:poisson-equation}
 Poisson's equation is an elliptic PDE that occurs in the study of many physical phenomena~\cite{folland2020introduction} and is defined as
@@ -70,7 +72,7 @@ We choose a maximum level of $l_{max} = 11$ in 2D and $l_{max} = 7$ in 3D, which
 
 \subsection{Linear Elasticity}
 Linear elasticity is a fundamental branch of solid mechanics with numerous applications in engineering and material science~\cite{holzapfel2001nonlinear}.
-It simplifies the more general theory of nonlinear continuum mechanics by assuming a linear relationship between stress and strain during elastic deformation.
+It is derived from the more general theory of nonlinear continuum mechanics by assuming a linear relationship between stress and strain during elastic deformation.
 We consider a two-dimensional linear elastic boundary value problem given by the system of PDEs
 \begin{equation}
 	\begin{split}
@@ -148,7 +150,7 @@ Similar to the above case, we employ a uniform cartesian grid of size $h = 1/l_{
 \subsection{Multigrid Configuration}
 To design a multigrid method, we consider each of the given problems a grid hierarchy consisting of five discretization levels $l \in \left[l_{max} - 4, l_{max}\right]$, where the grid spacing on each level is given by the formula $h = 1/2^l$.
 We then obtain the respective operator on each level by applying the same discretization method as described above.
-Therefore, the resulting grammar is structurally similar to the one in shown Table~\ref{table:multigrid-grammar}.
+Therefore, the resulting grammar is structurally similar to the one shown in Table~\ref{table:multigrid-grammar}.
 Within each grammar production rule, we then consider the following components:
 \begin{description}
 	\item[\textbf{Smoothers}:] Decoupled / Collective Jacobi and red-black Gauss-Seidel, block Jacobi with rectangular blocks up to a maximum number of 6 terms.
@@ -165,14 +167,15 @@ Here, we generate block Jacobi smoothers by defining a splitting $A = L + D + U$
 			\vdots &\vdots &\ddots &\vdots \\0&0&\cdots &A_{mm}\end{pmatrix},
 \end{equation*}
 where each matrix $A_{ij}$ corresponds to a set of adjacent grid points contained in the respective rectangular block, as it has been discussed in Section~\ref{subsec:block-smoothing}.
-A more detailed treatment of block relaxation methods, can be found in~\cite{trottenberg2000multigrid}.
+A more detailed treatment of block relaxation methods can be found in~\cite{trottenberg2000multigrid}.
 For each of smoothing and coarse-grid correction step the relaxation factor $\omega$ is chosen from the above sequence.
 As a baseline for assessing the efficiency and generalizability of the evolved multigrid solvers, we consider a number of common multigrid cycles with red-black Gauss-Seidel smoothing and optimized relaxation factors.
 We, therefore, formulate these methods on the same five-grid hierarchy, whereby we also utilize the same restriction, prolongation operators and coarse-grid solver, as described above.
+In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
 \subsection{Optimization Settings and Evaluation Platform}
 After specifying the operator and parameter choices considered within the construction of each multigrid solver, we next describe the settings under which we perform each GP-based optimization run.
 Here, we utilize the EvoStencils framework, whose implementation has been described in detail in Chapter~\ref{chapter:evostencils-1} and~\ref{chapter:evostencils-2}.
-The goal of each optimization run is then to evolve the set of non-dominated according to the two objectives convergence factor and execution time per iteration, as described in Section~\ref{sec:fitness-evaluation-and-selection}, which are evaluated by applying each multigrid method as an iterative solver to the respective test problem.
+The goal of each optimization run is then to evolve the set of non-dominated according to the two objectives convergence factor $\rho$ and execution time per iteration $t$, as described in Section~\ref{sec:fitness-evaluation-and-selection}, which are evaluated by applying each multigrid method as an iterative solver to the respective test problem.
 The resulting individuals are then subject to a subsequent evaluation and comparison with the available reference methods. 
 Table~\ref{table:gp-parameters} gives an overview about the configuration of the EvoStencils framework used within each experiment.
 \begin{table}
@@ -221,7 +224,12 @@ Finally, we select $\mu = 256$ individuals as a population for the next generati
 
 As an evaluation platform for running each experiment, we employ 32 nodes of the Meggie compute cluster of the Erlangen National High Performance Computing Center (NHR), where each node of the system consists of two sockets, each with ten physical CPU cores.
 Therefore, each process is pinned and executed on a dedicated socket, while for the evaluation of each solver we employ a thread-based parallelization using ten OpenMP threads, where each tread is pinned to a distinct physical compute core on the respective socket.
+Here, to generate a thread-parallel executable for each solver, we employ GCC 9.3.0 with the -O3 optimization level.
+Finally, we execute each solver three times and then compute the average for both objectives to reduce statistical variations between individual evaluation runs.
 
-
+\section{Algorithm Behavior Analysis}
+As a first step towards a quantitative evaluation of our evolutionary search method, we assess whether our algorithm is able to effectively find good solutions with respect to our two optimization objectives.
+For this purpose, we measure the minimum of each objectives within the population throughout each of the ten optimization runs for each of the three test problems.
+  
 \section{Evolving Generalizable Multigrid Preconditioners}
 \subsection{The Indefinite Helmholtz Equation}
