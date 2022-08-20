@@ -1194,6 +1194,28 @@
   copyright	= {arXiv.org perpetual, non-exclusive license}
 }
 
+@inproceedings{liu2022evolvability,
+	author = {Liu, Dazhuang and Virgolin, Marco and Alderliesten, Tanja and Bosman, Peter A. N.},
+	title = {Evolvability Degeneration in Multi-Objective Genetic Programming for Symbolic Regression},
+	year = {2022},
+	isbn = {9781450392372},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/3512290.3528787},
+	doi = {10.1145/3512290.3528787},
+	abstract = {Genetic programming (GP) is one of the best approaches today to discover symbolic regression models. To find models that trade off accuracy and complexity, the non-dominated sorting genetic algorithm II (NSGA-II) is widely used. Unfortunately, it has been shown that NSGA-II can be inefficient: in early generations, low-complexity models over-replicate and take over most of the population. Consequently, studies have proposed different approaches to promote diversity. Here, we study the root of this problem, in order to design a superior approach. We find that the over-replication of low complexity-models is due to a lack of evolvability, i.e., the inability to produce offspring with improved accuracy. We therefore extend NSGA-II to track, over time, the evolvability of models of different levels of complexity. With this information, we limit how many models of each complexity level are allowed to survive the generation. We compare this new version of NSGA-II, evoNSGA-II, with the use of seven existing multi-objective GP approaches on ten widely-used data sets, and find that evoNSGA-II is equal or superior to using these approaches in almost all comparisons. Furthermore, our results confirm that evoNSGA-II behaves as intended: models that are more evolvable form the majority of the population. Code: https://github.com/dzhliu/evoNSGA-II},
+	booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
+	pages = {973–981},
+	numpages = {9},
+	keywords = {genetic programming, multi-objective optimization, evolvability, symbolic regression},
+	location = {Boston, Massachusetts},
+	series = {GECCO '22}
+}
+
+
+
+
+
 @Book{		  linz2006introduction,
   title		= {An Introduction to Formal Languages and Automata},
   author	= {Linz, Peter and Rodger, Susan H.},

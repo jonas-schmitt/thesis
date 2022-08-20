@@ -227,7 +227,7 @@ Therefore, each process is pinned and executed on a dedicated socket, while for 
 Here, to generate a thread-parallel executable for each solver, we employ GCC 9.3.0 with the -O3 optimization level.
 Finally, we execute each solver three times and then compute the average for both objectives to reduce statistical variations between individual evaluation runs.
 
-\section{Algorithm Behavior Analysis}
+\subsection{Algorithm Behavior Analysis}
 As a first step towards a quantitative evaluation of our evolutionary search method, we assess whether our algorithm is able to effectively find good solutions with respect to our two optimization objectives.
 For this purpose, we measure the minimum of each of the two objectives within the population throughout each of the ten optimization runs for all three test problems.
 As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D-minimum-objectives} and~\ref{fig:linear-elasticity-2D-minimum-objectives} shows the mean and standard deviation of the current optimum of both objectives over each of the ten optimization runs.
@@ -287,13 +287,45 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 \end{figure}
 First of all, in general we can assess that in all three cases our algorithm is able to quickly reduce the minimum value of both objectives within the population.
 However, if we compare the slope of the two objectives for the three different problems, we can see that in case of the first objective $\rho$ significantly more generations are required to achieve the same degree of reduction as for the second objective $t$.
-In particular for the two dimensional Poisson equation and the linear elastic boundary value problem the algorithm still significantly improves upon the current minimum convergence factor after 50 generations, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor} and~\ref{fig:linear-elasticity-2D-minimum-convergence-factor}, while even after 200 generations further reductions occur.
-In contrast for the second objective $t$, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}, the majority of improvement happens within the first 50--70 generations.
-At this point it is also important to consider that while the convergence factor is constant for each execution of the same solver, the second objective is obtained by measuring its execution time on the respective compute node.
+In all three cases, the algorithm still significantly improves upon the current minimum of $\rho$ beyond the first 50 generations, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor},~\ref{fig:poisson-3D-minimum-convergence-factor} and~\ref{fig:linear-elasticity-2D-minimum-convergence-factor}.
+In contrast, for the second objective $t$, the majority of improvement happens within the first 50--70 generations, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}.
+At this point it is also important to consider that while the convergence factor is constant for each execution of the same solver, $t$ is obtained by measuring its execution time on the respective compute node.
 Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive optimization runs.
-Consequently, even though the algorithm is more effective in reducing the second objective, this results in a larger deviations between individual optimizations runs and, thus, a overall higher value for the standard deviations at the end of each run.
- 
- 
-  
+Consequently, even though the algorithm is more effective in quickly reducing the second objective, this results in a larger deviations between individual optimizations runs and, thus, a overall higher standard deviation.
+
+Second, by considering the absolute value of the minimum convergence factor attained in each of the three different cases, we can assess the difficulty of the underlying problem.
+While the execution time per iteration, as a second objective, is solely determined by the computational complexity of each solver and the properties of the given computer architecture it is executed on, a smaller convergence factor indicates that the underlying problem is easier to solve.
+Poisson's equation represents an often-studied model problem, whose strong ellipticity enables its effective solution using multigrid methods~\cite{trottenberg2000multigrid}.
+As a consequence, our algorithm is able to consistently evolve multigrid methods that achieve fast convergence, with minimum convergence factors of less than 0.005, in solving both the two and three dimensional instances of this equation, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor} and~\ref{fig:poisson-3D-minimum-convergence-factor}.
+In case of the linear elastic boundary value problem, both the mean and standard deviation remain higher for the first objective throughout the optimization.
+However, on average our algorithm is still able to evolve multigrid methods that achieve a convergence factor of 0.01 of less and, therefore, outstandingly fast convergence.
+In summary, we can conclude that our search method is able to consistently find satisfactory minima for both objectives in all three test cases considered.
+
+To further analyze the behavior of our multi-objective evolutionary algorithm, we consider the distribution of non-dominated individuals at the end of all optimization runs, which is shown in Figure~\ref{fig:pareto-front-2D-poisson},~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity}.
+\begin{figure}
+	\includegraphics[width=\columnwidth]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
+	\caption{2D Poisson - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\label{fig:pareto-front-2D-poisson}
+\end{figure}
+\begin{figure}
+	\includegraphics[width=\columnwidth]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
+	\caption{3D Poisson - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\label{fig:pareto-front-3D-poisson}
+\end{figure}
+\begin{figure}
+	\includegraphics[width=\columnwidth]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
+	\caption{2D Linear Elasticity - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\label{fig:pareto-front-2D-linear-elasticity}
+\end{figure}
+Here the red line denotes the combined front while the color density of the distribution indicates where the majority of solutions is located at the end of all experiments. 
+In all three cases, the majority of non-dominated solutions evolved within each experiment can be found close to the combined front.
+While in Figure~\ref{fig:pareto-front-2D-poisson} the number of solutions that are distinctly located outside of the front is slightly higher than in the other two cases, their distance to the next point on this front is still comparably small compared to the complete objective space.
+Again we can attribute part of this effect to measurement variations in the solver execution time on different compute nodes.
+Furthermore, note that for the most part and especially the center of the objective space, the solutions are evenly distributed alongside the front.
+Here only the left-upper part of Figure~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity} represents a noteworthy exception, where the algorithm struggles to find the same solutions within each run.
+This effect can be mainly attributed to the fact that the solutions located at this part of the space are characterized by an extremely fast convergence.
+Since the convergence of a multigrid method can be first and foremost accelerated with the addition of smoothing and coarse-grid correction steps, finding the same non-dominated solutions with fast convergence requires us to evolve increasingly large expression of the same structure in individual experiments.
+Recently, the limited capabilities of NSGA-II to evolve large non-dominated expressions have been demonstrated in~\cite{liu2022evolvability}, which, therefore, similarly offers an explanation for the impaired evolution of fast-converging solutions in the given case.
+
 \section{Evolving Generalizable Multigrid Preconditioners}
 \subsection{The Indefinite Helmholtz Equation}
