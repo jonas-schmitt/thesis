@@ -331,7 +331,7 @@ Recently, the limited capabilities of NSGA-II to evolve large non-dominated expr
 \begin{figure}
 	%2D Poisson
 		\begin{subfigure}[t]{\columnwidth}
-		\resizebox{\columnwidth}{!}{%
+			\scalebox{0.75}{%
 			\begin{tikzpicture}
 				\node   (h) at (-0.75, 4){$h$};
 				\node   (2h) at (-0.75, 3){$2h$};
@@ -390,7 +390,7 @@ Recently, the limited capabilities of NSGA-II to evolve large non-dominated expr
 	\caption{2D Poisson}
 	\end{subfigure}
 	\begin{subfigure}[t]{\columnwidth}
-	\resizebox{\columnwidth}{!}{%
+	\scalebox{0.75}{%
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -407,15 +407,15 @@ Recently, the limited capabilities of NSGA-II to evolve large non-dominated expr
 			\node	(h) at (4,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 1.5};
 			\node	(i) at (5,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.85};
 			\node	(j) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.75};
-			\node	(j) at (7,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 0.60};
-			\node	(k) at (8,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
-			\node	(l) at (8.5,1) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
-			\node	(m) at (9,0) [draw, circle,fill=black,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
-			\node	(n) at (9.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
-			\node	(o) at (10,2) [draw, circle,  fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.55};
-			\node	(p) at (10.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.30};
-			\node	(q) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
-			\node	(r) at (12,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.25};
+			\node	(k) at (7,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 0.60};
+			\node	(l) at (8,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
+			\node	(m) at (8.5,1) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
+			\node	(n) at (9,0) [draw, circle,fill=black,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(o) at (9.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(p) at (10,2) [draw, circle,  fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.55};
+			\node	(q) at (10.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.30};
+			\node	(r) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+			\node	(s) at (12,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.25};
 			\draw 
 			(a) edge[->] (b) 
 			(b) edge[->] (c)
@@ -429,11 +429,12 @@ Recently, the limited capabilities of NSGA-II to evolve large non-dominated expr
 			(j) edge[->] (k)
 			(k) edge[->] (l)
 			(l) edge[->] (m)   
-			(m) edge[->] node[near end,left] {\scriptsize 0.85}(n)
-			(n) edge[->] node[near end,left] {\scriptsize 1.00}(o)
-			(o) edge[->] node[near end,left] {\scriptsize 1.30}(p)
-			(p) edge[->] node[near end,left] {\scriptsize 0.90}(q)
-			(q) edge[->] (r)
+			(m) edge[->] (n)
+			(n) edge[->] node[near end,left] {\scriptsize 0.85}(o)
+			(o) edge[->] node[near end,left] {\scriptsize 1.00}(p)
+			(p) edge[->] node[near end,left] {\scriptsize 1.30}(q)
+			(q) edge[->] node[near end,left] {\scriptsize 0.90}(r)
+			(r) edge[->] (s)
 			;
 		\end{tikzpicture}
 	}
