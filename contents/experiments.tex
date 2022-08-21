@@ -326,6 +326,121 @@ Here only the left-upper part of Figure~\ref{fig:pareto-front-3D-poisson} and~\r
 This effect can be mainly attributed to the fact that the solutions located at this part of the space are characterized by an extremely fast convergence.
 Since the convergence of a multigrid method can be first and foremost accelerated with the addition of smoothing and coarse-grid correction steps, finding the same non-dominated solutions with fast convergence requires us to evolve increasingly large expression of the same structure in individual experiments.
 Recently, the limited capabilities of NSGA-II to evolve large non-dominated expressions have been demonstrated in~\cite{liu2022evolvability}, which, therefore, similarly offers an explanation for the impaired evolution of fast-converging solutions in the given case.
+\subsection{Comparison with Reference Methods}
+
+\begin{figure}
+	%2D Poisson
+		\begin{subfigure}[t]{\columnwidth}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tikzpicture}
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, fill=lightred, circle,inner sep=0pt,minimum size=5mm] {\scriptsize 1.15};
+				\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+				\node	(c) at (1,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.80};
+				\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+				\node	(f) at (2.5,1) [draw, circle,  fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.90};
+				\node	(g) at (3,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.40};
+				\node	(h) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.65};
+				\node	(i) at (5,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.45};
+				\node	(j) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+				\node	(k) at (6.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.30};
+				\node	(l) at (7.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.55};
+				\node	(m) at (8,4) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+				\node	(n) at (9,4) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+				\node	(o) at (9.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+				\node	(p) at (10,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+				\node	(q) at (10.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 0.90};
+				\node	(r) at (11.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.40};
+				\node	(s) at (12,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 0.95};
+				\node	(t) at (13,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.25};
+				\node	(u) at (14,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+				\node	(v) at (14.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.00};
+				\node	(w) at (15,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\scriptsize 0.80} (f)
+				(f) edge[->] node[near end,left] {\scriptsize 1.20} (g)
+				(g) edge[->] (h)
+				(h) edge[->] (i)
+				(i) edge[->] (j) 
+				(j) edge[->] node[near end,left] {\scriptsize 0.90} (k)
+				(k) edge[->] (l)
+				(l) edge[->] node[near end,left] {\scriptsize 1.15} (m)   
+				(m) edge[->] (n)
+				(n) edge[->] (o)
+				(o) edge[->] (p)
+				(p) edge[->] (q)
+				(q) edge[->] (r)
+				(r) edge[->] node[near end,left] {\scriptsize 1.20} (s)
+				(s) edge[->] (t)
+				(t) edge[->] (u)
+				(u) edge[->] node[near end,left] {\scriptsize 0.90} (v)
+				(v) edge[->] node[near end,left] {\scriptsize 1.30} (w)
+				;
+			\end{tikzpicture}
+		}
+	\caption{2D Poisson}
+	\end{subfigure}
+	\begin{subfigure}[t]{\columnwidth}
+	\resizebox{\columnwidth}{!}{%
+		\begin{tikzpicture}
+			\node   (h) at (-0.75, 4){$h$};
+			\node   (2h) at (-0.75, 3){$2h$};
+			\node   (4h) at (-0.75, 2){$4h$};
+			\node   (8h) at (-0.75, 1){$8h$};
+			\node   (16h) at (-0.75, 0){$16h$};
+			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(b) at (0.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.30};
+			\node	(c) at (1,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(d) at (1.5,1) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
+			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(g) at (3,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 1.00}; %TODO add block info
+			\node	(h) at (4,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 1.5};
+			\node	(i) at (5,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 1.85};
+			\node	(j) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.75};
+			\node	(j) at (7,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\scriptsize 0.60};
+			\node	(k) at (8,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
+			\node	(l) at (8.5,1) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\scriptsize 0.85};
+			\node	(m) at (9,0) [draw, circle,fill=black,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(n) at (9.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\scriptsize 1.00}};
+			\node	(o) at (10,2) [draw, circle,  fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.55};
+			\node	(p) at (10.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.30};
+			\node	(q) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.05};
+			\node	(r) at (12,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\scriptsize 1.25};
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] node[near end,left] {\scriptsize 0.80} (f)
+			(f) edge[->] node[near end,left] {\scriptsize 1.20} (g)
+			(g) edge[->] (h)
+			(h) edge[->] (i)
+			(i) edge[->] (j) 
+			(j) edge[->] (k)
+			(k) edge[->] (l)
+			(l) edge[->] (m)   
+			(m) edge[->] node[near end,left] {\scriptsize 0.85}(n)
+			(n) edge[->] node[near end,left] {\scriptsize 1.00}(o)
+			(o) edge[->] node[near end,left] {\scriptsize 1.30}(p)
+			(p) edge[->] node[near end,left] {\scriptsize 0.90}(q)
+			(q) edge[->] (r)
+			;
+		\end{tikzpicture}
+	}
+	\caption{3D Poisson}
+	\end{subfigure}
+	\caption{Computational structure of the evolved multigrid solver. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
+\end{figure}
 
 \section{Evolving Generalizable Multigrid Preconditioners}
 \subsection{The Indefinite Helmholtz Equation}
