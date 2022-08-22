@@ -173,6 +173,7 @@ As a baseline for assessing the efficiency and generalizability of the evolved m
 We, therefore, formulate these methods on the same five-grid hierarchy, whereby we also utilize the same restriction, prolongation operators and coarse-grid solver, as described above.
 In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
 \subsection{Optimization Settings and Evaluation Platform}
+\label{sec:optimization-settings}
 After specifying the operator and parameter choices considered within the construction of each multigrid solver, we next describe the settings under which we perform each GP-based optimization run.
 Here, we utilize the EvoStencils framework, whose implementation has been described in detail in Chapter~\ref{chapter:evostencils-1} and~\ref{chapter:evostencils-2}.
 The goal of each optimization run is then to evolve the set of non-dominated according to the two objectives convergence factor $\rho$ and execution time per iteration $t$, as described in Section~\ref{sec:fitness-evaluation-and-selection}, which are evaluated by applying each multigrid method as an iterative solver to the respective test problem.
@@ -224,7 +225,8 @@ Finally, we select $\mu = 256$ individuals as a population for the next generati
 
 As an evaluation platform for running each experiment, we employ 32 nodes of the Meggie compute cluster of the Erlangen National High Performance Computing Center (NHR), where each node of the system consists of two sockets, each with ten physical CPU cores.
 Therefore, each process is pinned and executed on a dedicated socket, while for the evaluation of each solver we employ a thread-based parallelization using ten OpenMP threads, where each tread is pinned to a distinct physical compute core on the respective socket.
-Here, to generate a thread-parallel executable for each solver, we employ GCC 9.3.0 with the -O3 optimization level.
+For the parallelization of each nested loop, we employ a static scheduling based on the outer loop, such that each threads processes a consecutive chunk of iterations.
+To generate a thread-parallel executable for each solver, we employ GCC 9.3.0 with the -O3 optimization level.
 Finally, we execute each solver three times and then compute the average for both objectives to reduce statistical variations between individual evaluation runs.
 
 \subsection{Algorithm Behavior Analysis}
@@ -327,7 +329,9 @@ This effect can be mainly attributed to the fact that the solutions located at t
 Since the convergence of a multigrid method can be first and foremost accelerated with the addition of smoothing and coarse-grid correction steps, finding the same non-dominated solutions with fast convergence requires us to evolve increasingly large expression of the same structure in individual experiments.
 Recently, the limited capabilities of NSGA-II to evolve large non-dominated expressions have been demonstrated in~\cite{liu2022evolvability}, which, therefore, similarly offers an explanation for the impaired evolution of fast-converging solutions in the given case.
 \subsection{Comparison with Reference Methods}
-
+Finally, in order to investigate whether our approach yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different recent multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
+In both cases, a compute node possesses a cache-coherent NUMA architecture consisting of sockets with 20 physical CPU cores.
+Each solver is then executed on a dedicated node using a thread-based parallelization with 20 OpenMP threads, whereby we pin each thread to a unique physical core and employ the same parallelization approach as described in Section~\ref{sec:optimization-settings}.
 \begin{table}
 	\caption{2D Poisson - Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-reference-methods}
