@@ -1023,7 +1023,7 @@
   \RequirePackage{textcomp} % 2020/02/02 v2.0n
   \RequirePackage{ebgaramond} % 2020/04/12
   %TODO outcommented because extremely ugly
-  %\RequirePackage[ebgaramond]{newtxmath} % 2020/05/02 v1.626
+  \RequirePackage[ebgaramond]{newtxmath} % 2020/05/02 v1.626
 
 \fi
 
