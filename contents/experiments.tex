@@ -330,8 +330,18 @@ Since the convergence of a multigrid method can be first and foremost accelerate
 Recently, the limited capabilities of NSGA-II to evolve large non-dominated expressions have been demonstrated in~\cite{liu2022evolvability}, which, therefore, similarly offers an explanation for the impaired evolution of fast-converging solutions in the given case.
 \subsection{Comparison with Reference Methods}
 Finally, in order to investigate whether our approach yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different recent multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
-In both cases, a compute node possesses a cache-coherent NUMA architecture consisting of sockets with 20 physical CPU cores.
+In both cases, each compute node consists of two sockets with 20 physical CPU cores and a cache-coherent NUMA architecture.
 Each solver is then executed on a dedicated node using a thread-based parallelization with 20 OpenMP threads, whereby we pin each thread to a unique physical core and employ the same parallelization approach as described in Section~\ref{sec:optimization-settings}.
+In order to assess the solving speed of the methods evolved, we consider two different problem sizes for each of the three test cases.
+While in the first case a problem size identical to the one employed within the optimization is chosen, in the second case we obtain a larger one by doubling number of grid points in each dimension.
+Even though the evaluation of our methods generalizability is not the focus of this section, it is still worthwhile to investigate whether the methods evolved with our approach also are capable of solving larger instances of the same problem.
+For comparison we consider a number of different V-cycles with at most four red-black Gauss-Seidel pre and post-smoothing steps, as these methods are known to lead to the fastest multigrid-based solvers for Poisson's equation according to the classical formulation of multigrid shown in Algorithm~\ref{alg:multigrid-cycle}~\cite{trottenberg2000multigrid}.
+As we have already investigated in~\cite{schmitt2020constructing}, the same is true for the linear elastic boundary value problem considered here.
+To achieve a fair comparison, we empirically choose the optimum relaxation factor $\omega$ for each test case from the same interval considered within the optimization, which leads to $\omega = 1.15$ for the two-dimensional Poisson equation and $\omega = 1.25$ both for the three-dimensional Poisson equation and the linear elastic boundary value problem.
+Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-methods} and~\ref{table:linear-elasticity-2D-reference-methods} contains the resulting solving times and number of iterations to achieve the required defect reduction for the respective test case.
+Here, for instance, the abbreviation V(2, 1) denotes a V-cycle with two pre and one post-smoothing step with red-black Gauss-Seidel.
+First of all, as we can expect from a functioning multigrid method, the number of iterations stays constant for both problem sizes, only with the exception of the V(1,0)-cycle, where we can observe a slight increase for the linear elastic boundary value problem.
+Overall, we can conclude that while the V(2,2)-cycle represents the fastest solver for both cases of Poisson's equation, the V(3,3) cycle leads to the fastest solving time in case of the linear elastic boundary value problem.
 \begin{table}
 	\caption{2D Poisson - Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-reference-methods}
@@ -359,6 +369,7 @@ Each solver is then executed on a dedicated node using a thread-based paralleliz
 		V(4, 4) & 6 & 6 & 448 & 1449 & 383 & 1409\\
 		\bottomrule
 	\end{tabular}
+	%FMG for max_level = 12: 530.3038500000001 ms, 3 Iterations
 \end{table}
 \begin{table}
 	\caption{3D Poisson - Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
