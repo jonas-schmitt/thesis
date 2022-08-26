@@ -428,6 +428,17 @@ Overall, we can conclude that while the V(2,2)-cycle represents the fastest solv
 	\end{tabular}
 \end{table}
 
+Finally, we can then evaluate the multigrid methods obtained with our grammar-guided search method in each of the ten experiments under the same conditions.
+As the number of non-dominated individuals within the population at the end of each run is unrestricted and can, therefore, be too high for a direct evaluation, we heuristically identify the 50 most promising individuals by sorting them according to the metric
+\begin{equation}
+	T_{\varepsilon} = \frac{\log(\varepsilon)}{\log(\rho)} \cdot t,
+\end{equation}
+where $\varepsilon = 10^{-12}$ is the desired defect reduction factor and $\rho$ and $t$ the objective function values obtained within the optimization.
+Each of the resulting methods is then executed as a solver for the respective test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores, whereby we employ the same problem size as within the optimization.
+Note that while the problem size and computer architecture is identical to the one used within the optimization, increasing the number of CPU cores leads to a higher degree of parallelism and, thus, smaller execution time per iteration, which necessitates the reevaluation of each method.
+After we have identified the method that leads to the fastest solver in each experiment, we execute it on both problem sizes and evaluation platforms, as described above.
+Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contains the resulting measured solving times for each case.
+
 \begin{table}
 	\caption{2D Poisson - Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-evolved-methods}
