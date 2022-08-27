@@ -437,8 +437,7 @@ where $\varepsilon = 10^{-12}$ is the desired defect reduction factor and $\rho$
 Each of the resulting methods is then executed as a solver for the respective test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores, whereby we employ the same problem size as within the optimization.
 Note that while the problem size and computer architecture is identical to the one used within the optimization, increasing the number of CPU cores leads to a higher degree of parallelism and, thus, smaller execution time per iteration, which necessitates the reevaluation of each method.
 After we have identified the method that leads to the fastest solver in each experiment, we execute it on both problem sizes and evaluation platforms, as described above.
-Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contains the resulting measured solving times for each case.
-
+Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contain the resulting measured solving times for each case.
 \begin{table}
 	\caption{2D Poisson - Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-evolved-methods}
@@ -535,7 +534,19 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 		\bottomrule
 	\end{tabular}
 \end{table}
-
+In general, we can conclude that in all three cases our evolutionary search method was able to consistently find well-functioning multigrid methods, which lead to fast solving times for both problem sizes in each of the three cases considered.
+Furthermore, in case of the two-dimensional Poisson equation and linear elasticity our method is able to discover multigrid methods that achieve an even higher degree of efficiency in reducing a given error than the best known reference cycle.
+Here, the fastest evolved method for the two-dimensional Poisson equation, ES-10, leads to a $9 \%$ solving time improvement compared to the V(2,2)-cycle on both architectures, while for linear elasticity the ES-2 method achieves an even larger speedup of 17--27 \% compared to the V(3,3)-cycle.
+Interestingly, in contrast to the other two cases, for the two-dimensional Poisson equation all solvers achieve faster execution times on the older Ivy Bridge computer architecture.
+However, further investigating this phenomenon would require us to perform an in depth analysis of the generated code, which is out of the scope of this work as our focus is a comparison of the relative performance of different multigrid methods on the same architecture.
+While in case of the three-dimensional Poisson, the methods evolved with our approach are all able to achieve competitive solving times, compared to the other two cases, not the same degree of efficiency can be achieved for both problem sizes.
+In particular, with the exception of the evolved methods ES-8 and ES9, we observe a slight increase in the number of iterations for the larger instance of this problem, which leads to a stronger increase of the solving times compared to the reference method.
+This effect indicates that not all multigrid methods evolved for a particular instance of this test problem can be generalized to larger problem instances without further adaption.
+In Section~\ref{sec:generalization}, we have already presented an adapted version of our multi-objective evolutionary algorithm that aims to overcome these limitations by iteratively increasing the problem size during the search.
+In the next section of this chapter, we will, thus, investigate the effectiveness of this approach on the indefinite Helmholtz equation, a problem of substantially higher difficulty than those considered within this section.
+However, as a final step of our experimental analysis, our representation of each multigrid method in the form of a symbolically-manipulable formal language allows us to investigate their computational structure.
+For this purpose, the Figures~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} each contain a graphical representation of the multigrid method that achieves the fastest solving times for the larger problem instance of two and three-dimensional Poisson equation, respectively.
+As in case of the linear elastic boundary value problem, the evolved methods are substantially more complicated, with a significantly higher number of smoothing and coarse-grid correction steps, for the sake of simplicity, we do not include a graphical representation of their structure here.
 
 \begin{figure}
 	%2D Poisson
@@ -596,7 +607,8 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 				;
 			\end{tikzpicture}
 		}
-	\caption{2D Poisson}
+	\caption{2D Poisson: ES-10}
+	\label{fig:evolved-methods-graphical-representation:3D}
 	\end{subfigure}
 	\begin{subfigure}[t]{\columnwidth}
 	\scalebox{0.75}{%
@@ -647,10 +659,11 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 			;
 		\end{tikzpicture}
 	}
-	\caption{3D Poisson}
+	\caption{3D Poisson: ES-9}
+	\label{fig:evolved-methods-graphical-representation:3D}
 	\end{subfigure}
 	\caption{Computational structure of the evolved multigrid solver. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
+	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
-
 \section{Evolving Generalizable Multigrid Preconditioners}
 \subsection{The Indefinite Helmholtz Equation}

@@ -5,6 +5,7 @@ However, since the successful application of this method requires the code gener
 In the final chapter of this thesis, we will then demonstrate how the resulting implementation can be successfully applied to different PDEs, yielding multigrid-based solvers that are competitive with hand-optimized methods. 
 
 \section{Generalization}
+\label{sec:generalization}
 As we have already briefly mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, if properly constructed, the convergence of a multigrid method is independent of the discretization width $h$, which is usually described with the term $h$-independent convergence.
 Therefore, the same method can often be successfully applied to different systems that arise from similar discretizations of the same PDE.
 In Section~\ref{sec:fitness-evaluation-and-selection}, we have already introduced the idea of evaluating each multigrid solver on a number of proxy problems that possess similar properties as the problem that we are actually interested to solve.
@@ -56,6 +57,7 @@ One possibility, that has been already mentioned in Section~\ref{sec:fitness-eva
 However, as in this thesis we only consider operations whose complexity is independent of the grid size on which they are applied, the execution time per iteration measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
 
 \subsection{Generalization Procedure}
+\label{sec:generalization-procedure}
 Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:generalization-procedure}.
 \begin{algorithm}
 	\caption{Generalization Procedure}
