@@ -1,15 +1,16 @@
 As a first step in the evaluation of our grammar-guided evolutionary search method, we consider two PDE-based model problems, Poisson's equation and a linear elastic boundary value problem, which can already be solved efficiently through iterative application of common multigrid cycles .
-Here, our goal is, first of all, to demonstrate that our approach is able to reliably find functioning multigrid solvers in a number of randomized independent experiments.
+Here, our goal is, first of all, to demonstrate that our approach is able to reliably find functioning multigrid cycles in a number of randomized independent experiments.
 Furthermore, since the known multigrid cycles already provide a strong baseline for these problems, we can investigate whether the methods evolved by our approach are able to achieve a similarly high degree of efficiency.
-In addition, by considering both two and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different type.
-\section{Evolving Monolithic Multigrid Solvers}
-As it has been mentioned above, the goal of this section is to evaluate the effectiveness of our evolutionary search method in evolving multigrid methods that can be used as a standalone method for the numerical solution of a given PDE.
+In addition, by considering both two- and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different type.
+\section{Evolving Multigrid Cycles for Common PDEs}
+As it has been mentioned above, the goal of this section is to evaluate the effectiveness of our evolutionary search method in evolving multigrid cycles that are able to quickly reduce the error of a given discretized PDE.
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
 This is reflected in the fact that common multigrid cycles, as described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
 We begin this section by introducing the considered problem instances and their mathematical formulation.
 At this point we want to emphasize that all results presented in this section have been originally published as part of the paper~\cite{schmitt2021evostencils}.
 However, this thesis complements this work with an additional analysis of the multigrid solvers obtained with out evolutionary search method.
-\subsection{Poisson's Equation}
+\subsection{Problem Formulation}
+\subsubsection{Poisson's Equation}
 \label{sec:poisson-equation}
 Poisson's equation is an elliptic PDE that occurs in the study of many physical phenomena~\cite{folland2020introduction} and is defined as
 \begin{equation}
@@ -70,7 +71,7 @@ in two dimensions and the seven point stencil
 \end{equation*} in three dimensions.
 We choose a maximum level of $l_{max} = 11$ in 2D and $l_{max} = 7$ in 3D, which yields systems of linear equations consisting of $4\,190\,209$ and $2\,048\,383$ unknowns, respectively.
 
-\subsection{Linear Elasticity}
+\subsubsection{Linear Elasticity}
 Linear elasticity is a fundamental branch of solid mechanics with numerous applications in engineering and material science~\cite{holzapfel2001nonlinear}.
 It is derived from the more general theory of nonlinear continuum mechanics by assuming a linear relationship between stress and strain during elastic deformation.
 We consider a two-dimensional linear elastic boundary value problem given by the system of PDEs
@@ -542,19 +543,11 @@ However, further investigating this phenomenon would require us to perform an in
 While in case of the three-dimensional Poisson, the methods evolved with our approach are all able to achieve competitive solving times, compared to the other two cases, not the same degree of efficiency can be achieved for both problem sizes.
 In particular, with the exception of the evolved methods ES-8 and ES9, we observe a slight increase in the number of iterations for the larger instance of this problem, which leads to a stronger increase of the solving times compared to the reference method.
 This effect indicates that not all multigrid methods evolved for a particular instance of this test problem can be generalized to larger problem instances without further adaption.
-In Section~\ref{sec:generalization}, we have already presented an adapted version of our multi-objective evolutionary algorithm that aims to overcome these limitations by iteratively increasing the problem size during the search.
-In the next section of this chapter, we will, thus, investigate the effectiveness of this approach on the indefinite Helmholtz equation, a problem of substantially higher difficulty than those considered within this section.
+In Section~\ref{sec:generalization}, we have already addressed this problem by proposing a multigrid-specific generalization scheme, whose effectiveness will be investigated in the next section of this chapter.   
+%we have already presented an adapted version of our multi-objective evolutionary algorithm that aims to overcome these limitations by iteratively increasing the problem size during the search.
+%In the next section of this chapter, we will, thus, investigate the effectiveness of this approach on the indefinite Helmholtz equation, a problem of substantially higher difficulty than those considered within this section.
 
-As a final step of our experimental analysis, our representation of each multigrid method in the form of a symbolic formal language allows us to investigate their computational structure.
-For this purpose, the Figures~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} each contain a graphical representation of the multigrid method that achieves the fastest solving times for the larger problem instance of two and three-dimensional Poisson equation, respectively. 
-The first observation that can be made from investigating the structure of both methods, is that none of them can be easily characterized as a V-, F- or W-cycle, as presented in Section~\ref{sec:multigrid-cycles}.
-It is, therefore, impossible to formulate them in the framework of classical multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
-While, for instance, the first part of Figure~\ref{fig:evolved-methods-graphical-representation:2D} can be characterized as a V-cycle, the method then proceeds with an additional coarse-grid correction step that is based on a purely smoothing-based error reduction on the coarser levels.
-Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts of in a similar fashion, but then applies an additional three-grid V-cycle on the second-coarsest level, before it transfers back the computed correction to the finest level.
-%TODO continue
-
-In case of the linear elastic boundary value problem the evolved methods are substantially more complicated, with a significantly higher number of smoothing and coarse-grid correction steps.
-Therefore, for the sake of simplicity, we do not directly include a graphical representation of their structure here.
+To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} contains a graphical representation of the evolved multigrid method that achieves the fastest solving time for the larger problem instance of two and three-dimensional Poisson equation, respectively. 
 \begin{figure}
 	%2D Poisson
 		\begin{subfigure}[t]{\columnwidth}
@@ -672,5 +665,16 @@ Therefore, for the sake of simplicity, we do not directly include a graphical re
 	\caption{Computational structure of the evolved multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers the dimension of the block is specified on top of the respective node. If no block size is specified, a pointwise smoothing is applied.}
 	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
-\section{Evolving Generalizable Multigrid Preconditioners}
+The first observation that can be made from investigating the computational structure of these methods, is that none of them can be easily characterized as a V-, F- or W-cycle.
+It is, therefore, impossible to formulate within the framework of classical multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
+While, for instance, the first part of Figure~\ref{fig:evolved-methods-graphical-representation:2D} can be characterized as a V-cycle, the method then proceeds with an additional coarse-grid correction step that is based on a purely smoothing-based error reduction on the coarser levels.
+Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts of in a similar fashion, but then applies an additional three-grid V-cycle on the third-finest level with a step size of $4h$, before it transfers the computed correction back to the finest level.
+Furthermore, both evolved multigrid methods employ a different number of smoothings steps on each level using a wide range of different relaxation factors, whereby, in general, on certain levels significantly more smoothing is performed than on others.
+In particular, in both cases, smoothing on the third-finest level seems to be exceptionally effective in reducing the most significant error components, and, hence, the number of smoothing steps on this level is higher than on any other level within both methods.
+While both methods predominantly employ red-black Gauss-Seidel as a smoother, Figure~\ref{fig:evolved-methods-graphical-representation:3D} also includes individual pointwise and block Jacobi steps.
+Finally, the complicated computational structure of the methods evolved for the linear elastic boundary prevents us from including their graphical representations similarly to Figure~\ref{fig:evolved-methods-graphical-representation}.
+However, if we consider the evolved method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the methods shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
+In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle, but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
+Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively red-black Gauss-Seidel smoothing.
+\section{Evolving Generalizable Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
 \subsection{The Indefinite Helmholtz Equation}
