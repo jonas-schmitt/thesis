@@ -672,9 +672,47 @@ Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts of in a simi
 Furthermore, both evolved multigrid methods employ a different number of smoothings steps on each level using a wide range of different relaxation factors, whereby, in general, on certain levels significantly more smoothing is performed than on others.
 In particular, in both cases, smoothing on the third-finest level seems to be exceptionally effective in reducing the most significant error components, and, hence, the number of smoothing steps on this level is higher than on any other level within both methods.
 While both methods predominantly employ red-black Gauss-Seidel as a smoother, Figure~\ref{fig:evolved-methods-graphical-representation:3D} also includes individual pointwise and block Jacobi steps.
-Finally, the complicated computational structure of the methods evolved for the linear elastic boundary prevents us from including their graphical representations similarly to Figure~\ref{fig:evolved-methods-graphical-representation}.
+Finally, the complicated computational structure of the methods evolved for the linear elastic boundary prevents us from including their graphical representations similar to Figure~\ref{fig:evolved-methods-graphical-representation}.
 However, if we consider the evolved method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the methods shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
 In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle, but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively red-black Gauss-Seidel smoothing.
 \section{Evolving Generalizable Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
-\subsection{The Indefinite Helmholtz Equation}
+While within the last section, we could already demonstrate that our grammar-based approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered is particularly challenging to solve.   
+Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in case of such a PDE, we consider the indefinite Helmholtz equation.
+The indefinite Helmholtz equation, whose basic form is given as 
+\begin{equation}
+	-\nabla ^{2}u - k^{2}u = f,
+	\label{eq:helmholtz}
+\end{equation} 
+is a famously-difficult test problem for the application of numerical methods, as the system of linear equations resulting from a discretization of this equation becomes highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
+If we, for instance, assume the use of ten grid points per wavelength, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
+Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
+\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{figures/cond.pdf}
+		\caption{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$}
+		\label{fig:condition-number-helmholtz}
+\end{figure}
+The condition number gives us a notion of how much an initial approximation error is magnified by the application of the operator $A$.
+As we can see in Figure~\ref{fig:condition-number-helmholtz} for larger values of $k$ the condition number of $A$ increases dramatically, which results in an extreme accumulation of numerical errors. 
+Therefore, the necessity to handle these errors makes the design of an efficient or even functioning numerical method for the indefinite Helmholtz equation outstandingly difficult.
+In particular, without any modification classical multigrid methods can not effectively be applied as a numerical solver for indefinite Helmholtz problems~\cite{ernst2012difficult}.
+One multigrid-based approach that mitigates this problem is the application of multigrid as a preconditioner instead of applying it to the discretized Helmholtz system directly.
+In general, preconditioning has the purpose of modifying a given system of linear equations, by applying a so-called preconditioning matrix $M$ in order to obtain a new system that is then easier to solve.
+For instance, right-preconditioning the system $A x = b$ with the matrix $M$ results in
+\begin{equation}
+	A M^{-1} y = b,
+	\label{eq:right-preconditioning}
+\end{equation}
+with $M x = y$. 
+The main consequence of this formulation is that, we now have to solve an additional system of linear equations of the form of $M x = y$, whenever the operator $A$ is applied within our original solution method.
+If we consider the choice of $M = A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $y = b$, however with the consequence that now the system $M x = y$ is just as ill-conditioned as the original system.
+Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ to effectively improve its condition number and the ease of solveability of $M x = y$~\cite{benzi2002preconditioning}.
+In the recent decades the choice of $M$ as a complex-shifted version of the original operator, has proven its effectiveness for indefinite Helmholtz problems~\cite{erlangga2004preconditioner,erlangga2008advances,cocquet2017shift}, which leads to
+\begin{equation*}
+	M = -\nabla ^{2} - (k^{2} + i \varepsilon).
+\end{equation*}
+%TODO include all suitable citations
+As it has been shown in~\cite{cocquet2017shift}, a shift $\varepsilon \in \mathcal{O}(k^2)$ enables the efficient inversion of $M$ with multigrid, whereas the choice of a smaller shift increases the preconditioning effectiveness.
+Since the resulting linear system $A M^{-1} y = b$ is complex-symmetric but non-hermitian, it is then commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGStab~\cite{saad2003iterative}.
+\subsection{Problem Formulation}
