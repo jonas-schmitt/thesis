@@ -676,16 +676,17 @@ Finally, the complicated computational structure of the methods evolved for the 
 However, if we consider the evolved method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the methods shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
 In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle, but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively red-black Gauss-Seidel smoothing.
-\section{Evolving Generalizable Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
+\section{Evolving Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
 While within the last section, we could already demonstrate that our grammar-based approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in case of such a PDE, we consider the indefinite Helmholtz equation.
-The indefinite Helmholtz equation, whose basic form is given as 
+The Helmholtz equation, whose basic form is given as 
 \begin{equation}
 	-\nabla ^{2}u - k^{2}u = f,
 	\label{eq:helmholtz}
 \end{equation} 
-is a famously-difficult test problem for the application of numerical methods, as the system of linear equations resulting from a discretization of this equation becomes highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
-If we, for instance, assume the use of ten grid points per wavelength, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
+is a famously-difficult test problem for the application of numerical methods, that also has practical relevance for many real-world applications, such as~\cite{versteeg1994marmousi,martin2006marmousi2,billette20052004,gray1995migration}.
+The main difficulty in solving this equation is that the system of linear equations resulting from its discretization becomes highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
+If we, for instance, assume the use of ten grid points per wavelength~\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = \frac{2 \pi}{\lambda}$ }, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
 Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
 \begin{figure}
 		\centering
@@ -701,18 +702,98 @@ One multigrid-based approach that mitigates this problem is the application of m
 In general, preconditioning has the purpose of modifying a given system of linear equations, by applying a so-called preconditioning matrix $M$ in order to obtain a new system that is then easier to solve.
 For instance, right-preconditioning the system $A x = b$ with the matrix $M$ results in
 \begin{equation}
-	A M^{-1} y = b,
+	A M^{-1} \bm{y} = \bm{b},
 	\label{eq:right-preconditioning}
 \end{equation}
-with $M x = y$. 
-The main consequence of this formulation is that, we now have to solve an additional system of linear equations of the form of $M x = y$, whenever the operator $A$ is applied within our original solution method.
-If we consider the choice of $M = A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $y = b$, however with the consequence that now the system $M x = y$ is just as ill-conditioned as the original system.
-Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ to effectively improve its condition number and the ease of solveability of $M x = y$~\cite{benzi2002preconditioning}.
+with $M \bm{x} = \bm{y}$. 
+The main consequence of this formulation is that, we now have to solve an additional system of linear equations of the form of $M \bm{x} = \bm{y}$, whenever the operator $A$ is applied within our original solution method.
+If we consider the extreme choice of $M$ as the original operator $A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $I \bm{y} = \bm{b}$, however with the consequence that the system $M \bm{x} = \bm{y}$ becomes just as ill-conditioned as the original one.
+Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ to effectively improve its condition number and the ease of solveability of $M \bm{x} = \bm{y}$~\cite{benzi2002preconditioning}.
 In the recent decades the choice of $M$ as a complex-shifted version of the original operator, has proven its effectiveness for indefinite Helmholtz problems~\cite{erlangga2004preconditioner,erlangga2008advances,cocquet2017shift}, which leads to
 \begin{equation*}
 	M = -\nabla ^{2} - (k^{2} + i \varepsilon).
 \end{equation*}
 %TODO include all suitable citations
-As it has been shown in~\cite{cocquet2017shift}, a shift $\varepsilon \in \mathcal{O}(k^2)$ enables the efficient inversion of $M$ with multigrid, whereas the choice of a smaller shift increases the preconditioning effectiveness.
-Since the resulting linear system $A M^{-1} y = b$ is complex-symmetric but non-hermitian, it is then commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGStab~\cite{saad2003iterative}.
+As it has been shown in~\cite{cocquet2017shift}, a shift $\varepsilon \approx \mathcal{O}(k^2)$ enables the efficient inversion of $M$ by multigrid, whereas the choice of a smaller shift increases the preconditioning effectiveness.
+Since the resulting linear system $A M^{-1} \bm{y} = \bm{b}$ is complex-symmetric but non-hermitian, it is then commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGSTAB~\cite{saad2003iterative}.
 \subsection{Problem Formulation}
+After introducing the indefinite Helmholtz equation and the difficulties its solution comprises in general manner, we can now proceed by defining a representative instance of this equation for the evaluation of our grammar-based approach for multigrid method design.
+For this purpose, we consider the two-dimensional Helmholtz equation on a unit square with Dirichlet boundary conditions at the top and bottom, and Robin radiation conditions at the left and right, as given by
+\begin{equation}
+	\label{eq:helmholtz-test-problem}
+	\begin{split}
+		(-\nabla ^{2} - k^{2}) u & = f \quad \text{in} \; \left( 0, 1 \right)^2 \\
+		u & = 0 \quad \text{on} \; \left( 0, 1 \right) \times \{0\}, \left( 0, 1 \right) \times \{1\} \\
+		\partial_{\mathbf{n}} u - iku & = 0 \quad \text{on} \; \{0\} \times \left( 0, 1 \right), \{1\} \times \left( 0, 1 \right) \\
+		f(x, y) & = \delta(x - 0.5, y - 0.5),
+	\end{split}
+\end{equation}
+where $\delta(\bm{x})$ is the Dirac delta function.
+We discretize this equation on a uniform Cartesian grid using the classical five-point stencil
+\begin{equation*}
+	A_h = \frac{1}{h^2} \begin{bmatrix}
+		& -1 & \\
+		-1 & 4 - (k h)^2 & -1 \\
+		& -1 &  
+	\end{bmatrix}.
+\end{equation*}
+In addition, $\delta(\bm{x})$ is approximated with a second-order Zenger correction~\cite{koestler2004extrapolation}.
+The spacing $h$ of the grid is chosen to fulfill the second-order accuracy requirement $h k = 0.625$ as described above.
+Finally, the shifted-Laplacian
+\begin{equation*}
+	M = -\nabla^{2} - (k^{2} + 0.5 i k^{2}),
+\end{equation*}
+which is discretized similar to the original operator using the five-point stencil
+\begin{equation*}
+	M_h = \frac{1}{h^2} \begin{bmatrix}
+		& -1 & \\
+		-1 & 4 - (1.0 + 0.5i)(k h)^2 & -1 \\
+		& -1 &  
+	\end{bmatrix}.
+\end{equation*}
+\subsection{Solver Configuration}
+As a result of the above formulation of our test problem, we obtain two systems of linear equations
+\begin{equation}
+	A_h M_h^{-1} \bm{y}_h = \bm{b}_h,
+	\label{eq:helmholtz-test-problem-discretized-and-preconditioned}
+\end{equation}
+where $\bm{b}_h$ contains the values of $\delta(\bm{x})$ at each grid point, and
+\begin{equation}
+	M_h \bm{x}_h = \bm{y}_h,
+	\label{eq:helmholtz-test-problem-preconditioning}
+\end{equation}
+where $\bm{x}$ represents the approximate solution of Equation~\eqref{eq:helmholtz-test-problem}.
+While for each of these two systems of linear equations, a functioning solver is needed, the focus of our experimental evaluation is the design of an efficient multigrid method for the approximate solution of Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
+Here, to limit the cost of preconditioning, we assume that the application of a single multigrid cycle is sufficient to compute a reasonable approximation for $M_{h}^{-1}$.
+After obtaining a suitable multigrid-based preconditioner, Equation~\ref{eq:helmholtz-test-problem-discretized-and-preconditioned} is then solved using the a biconjugate gradient stabilized method (BiCGSTAB)~\cite{saad2003iterative}.
+The resulting iterative solution scheme is shown in Algorithm~\ref{alg:preconditioned-bicgstab}, in which, for the sake of simplicity, omit the grid spacing $h$.
+\begin{algorithm}[t]
+	\caption{Right-Preconditioned BiCGSTAB}
+	\label{alg:preconditioned-bicgstab}
+	\begin{algorithmic}[1] % The number tells where the line numbering should start
+			\State $\bm{r}^0 = \bm{b} - A \bm{x}^0$
+			\State $\bm{\hat{r}}^0 = \bm{r}^0$
+			\State $\alpha_0 = \beta_0 = \rho_0 = \omega_0 = 1$
+			\State $\bm{p}^0 = \bm{q}^0 = \bm{0}$
+			\For{$i := 1, \dots, n$}
+			\State $\rho_i = \bm{\hat{r}}^{i-1} \cdot \bm{r}^{i-1}$
+			\State $\beta_i = \frac{\rho_i }{\rho_{i-1} }\frac{\alpha_{i-1}}{ \omega_{i-1}}$
+			\State $\bm{p}^i = \bm{r}^{i-1} + \beta_i (\bm{p}^{i-1} - \omega_{i-1} \bm{q}^{i-1})$
+			\State Solve $M \bm{x}^i = \bm{p}^i$
+			\State $\bm{q}^i = A \bm{x}^i$
+			\State $\alpha_i = \rho_i / (\bm{\hat{r}}^{i-1} \cdot \bm{q}^i)$
+			\State $\bm{h}^i = \bm{x}^{i-1} + \alpha_i \bm{x}^i$	
+			\State $\bm{s}^i = \bm{r}^{i-1} - \alpha_i \bm{r}^i$
+			\State Solve $M \bm{x}^i = \bm{s}^i$
+			\State $\bm{t}^i = A \bm{x}^i$
+			\State $\omega_i = (\bm{t}^i \cdot \bm{s}^i) / (\bm{t}^i \cdot \bm{t}^i)$
+			\State $\bm{x}^i = \bm{h}^i + \omega_i \bm{x}^i$
+			\State $\bm{r}^i = \bm{s}^i - \omega_i \bm{t}^i$
+			\If{$\norm{\bm{r}^i}/\norm{\bm{r}^0} < \epsilon$}
+			\Return $\bm{x}^i$
+			\EndIf
+			\EndFor
+		\end{algorithmic}
+\end{algorithm}
+In each step of this iterative scheme, it is necessary to compute an approximate solution for two systems of linear equations of the form $M \bm{x}^i = \bm{y}^i$, %, in line 9 and 14, 
+each of which is achieved through the application of a single multigrid iteration.
