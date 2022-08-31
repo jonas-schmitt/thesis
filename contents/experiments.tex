@@ -3,6 +3,7 @@ Here, our goal is, first of all, to demonstrate that our approach is able to rel
 Furthermore, since the known multigrid cycles already provide a strong baseline for these problems, we can investigate whether the methods evolved by our approach are able to achieve a similarly high degree of efficiency.
 In addition, by considering both two- and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different type.
 \section{Evolving Multigrid Cycles for Common PDEs}
+\label{sec:experiments-part1}
 As it has been mentioned above, the goal of this section is to evaluate the effectiveness of our evolutionary search method in evolving multigrid cycles that are able to quickly reduce the error of a given discretized PDE.
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
 This is reflected in the fact that common multigrid cycles, as described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
@@ -796,4 +797,14 @@ The resulting iterative solution scheme is shown in Algorithm~\ref{alg:precondit
 		\end{algorithmic}
 \end{algorithm}
 In each step of this iterative scheme, it is necessary to compute an approximate solution for two systems of linear equations of the form $M \bm{x}^i = \bm{y}^i$, %, in line 9 and 14, 
-each of which is achieved through the application of a single multigrid iteration.
+each of which is then achieved through the application of a single multigrid cycle.
+To construct an efficient method for this purpose, we consider the set of five-grid methods that are defined on a hierarchy of discretization with $h = 1/2^{l}$ on each level $l \in \left[l_{max} - 4,l_{max}\right]$. 
+Similar to Section~\ref{sec:experiments-part1}, we then consider the following components within each step of the method:
+\begin{description}
+	\item[\textbf{Smoothers}:] Pointwise and block Jacobi with rectangular blocks up to a maximum number of six terms, red-black Gauss-Seidel
+	\item[\textbf{Restriction}:] Full-weighting restriction
+	\item[\textbf{Prolongation}:] Bilinear interpolation
+	\item[\textbf{Relaxation factors}:] $\left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots, 1.9 \right)$
+	\item[\textbf{Coarse-grid solver}:] BiCGSTAB for $l = l_{max} - 4$
+\end{description}
+Note that the resulting grammar is similar to the multigrid grammar shown in Figure~\ref{table:multigrid-grammar}, however, with the modification that each occurrence of an operator $A_H$ and right-hand side $\ps{b_H}$ is replaced by a preconditioning matrix $M_H$ and right-hand side $\ps{y_H}$.
