@@ -43,13 +43,11 @@
     % both (= true, all, default)
     % onlyhorizontal (= novertical)
     % onlyvertical (= nohorizontal)
-  %TODO fix faupress bibliography
-  bibliography = false,
+  bibliography = split,
     % none (= false)
     % split (= true, default)
     % combined
-  %TODO fix faupress bibliography
-  bibliographypart = false,
+  bibliographypart = all,
     % none (= false)
     % all (= true, default)
     % onlymain
@@ -114,7 +112,7 @@
 % author
 \firstname{Jonas}
 \lastname{Schmitt}
-\degree{M.Sc.}
+%\degree{M.Sc.}
 \origin{Forchheim}
 
 % publication identifiers
@@ -231,11 +229,6 @@
 % start the backmatter (arabic page numbering [continued],
 % no sectioning numbering, header)
 \backmatter
-  \bibliographystyle{abbrv}
-  %TODO fix faupress bibliography
-  % typeset the bibliography, settings can be
-  % tweaked via the class option bibliography
-  % \faupressprintbibliography
-  \bibliography{bibliography}
+  \faupressprintbibliography
 
 \end{document}
