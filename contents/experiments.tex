@@ -150,6 +150,7 @@ whereby the differential operators $\nabla^2$, $\frac{\partial^2}{\partial x^2}$
 \end{equation*}
 Similar to the above case, we employ a uniform cartesian grid of size $h = 1/l_{max}$ with $l_{max} = 10$, such that the resulting system of linear equations contains $2\,093\,058$ unknowns.
 \subsection{Multigrid Configuration}
+\label{sec:experiments1-multigrid-configuration}
 To design a multigrid method, we consider each of the given problems a grid hierarchy consisting of five discretization levels $l \in \left[l_{max} - 4, l_{max}\right]$, where the grid spacing on each level is given by the formula $h = 1/2^l$.
 We then obtain the respective operator on each level by applying the same discretization method as described above.
 Therefore, the resulting grammar is structurally similar to the one shown in Table~\ref{table:multigrid-grammar}.
@@ -680,6 +681,7 @@ Furthermore, with the exception of a single Jacobi step on the second-coarsest l
 \section{Evolving Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
 While within the last section, we could already demonstrate that our grammar-based approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in case of such a PDE, we consider the indefinite Helmholtz equation.
+At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.
 The Helmholtz equation, whose basic form is given as 
 \begin{equation}
 	-\nabla ^{2}u - k^{2}u = f,
@@ -807,4 +809,20 @@ Similar to Section~\ref{sec:experiments-part1}, we then consider the following c
 	\item[\textbf{Relaxation factors}:] $\left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots, 1.9 \right)$
 	\item[\textbf{Coarse-grid solver}:] BiCGSTAB for $l = l_{max} - 4$
 \end{description}
-Note that the resulting grammar is similar to the multigrid grammar shown in Figure~\ref{table:multigrid-grammar}, however, with the modification that each occurrence of an operator $A_H$ and right-hand side $\ps{b_H}$ is replaced by a preconditioning matrix $M_H$ and right-hand side $\ps{y_H}$.
+The resulting grammar is similar to the multigrid grammar shown in Figure~\ref{table:multigrid-grammar}, however, with the modification that each occurrence of a system matrix $A_H$ and right-hand side $\ps{b_H}$ is replaced by the respective preconditioning matrix $M_H$ and right-hand side $\ps{y_H}$.
+Similar to Section~\ref{sec:experiments1-multigrid-configuration}, block Jacobi smoothers are generated based on rectangular blocks of grid points, while the relaxation factor $\omega$ of each smoothing and coarse-grid correction step is chosen from the above interval.
+To assess the efficiency and generalizability of the multigrid preconditioners evolved with our approach, we consider the set of possible multigrid cycles that can be constructed based on the classical formulation of these methods, using the same components as described above, for comparison.
+In order to ensure, that these methods represent the state of the art we ensure to pick the optimal smoother and relaxation factor for the given case, which is determined by evaluating each possible combination from the available set of options on the largest problem size for which we convergence can be achieved.
+Due to the ill-conditioning of the indefinite Helmholtz equation, we consider an approximate solution to be sufficient, when the initial residual has been reduced by a factor of $10^{-7}$ for $k \leq 160$ and $10^{-6}$ for all larger wavenumbers.
+
+\section{Optimization Settings and Evaluation Platform}
+In Section~\ref{sec:experiments-part1}, the relative simplicity of the problems considered along with the fact that our main focus has been to gain an understanding of the general behavior of our evolutionary algorithm, motivates use to keep the problem size constant during each optimization run.
+However, in the given case this strategy is infeasible due to a number of reasons.
+First of all, doubling the wavenumber requires us to use twice as many grid points in each dimension because of the requirement $kh = 0.625$, which means that we end up with a system of linear equations that is not only significantly worse conditioned, but also has four times the number of unknowns.
+As a consequence, solving Helmholtz problems with large wavenumber becomes tremendously expensive, which makes the evaluation of a large number of different preconditioners infeasible.
+Furthermore, in practice, our goal is to evolve multigrid methods that can be applied to a wide range of different problem instances and, thus, generalizability is one of our main concerns.
+In Section~\ref{sec:generalization-procedure}, we have already proposed a systematic procedure for the generalization of a population of individuals to a set of instances of the same problem.
+This method aims to evolve a population of generalizable multigrid methods by iteratively increasing the size of the test problem considered within the evaluation of each solver after a certain number of generations $m$.
+While the formulation of our problem based on the wavenumber-dependent grid spacing $h$ allows us to construct problem instances of larger size and difficulty in a straightforward manner, it is unclear after how many generations this operation should be performed.
+However, in the experiments performed in Section~\ref{sec:experiments-part1} we could observe that the majority of improvement in both objectives is achieved within the first 50 generations of each optimization run.
+Therefore, choosing $m = 50$ represents a reasonable compromise between allowing the population to adapt to modified conditions and preventing it from overfitting to the characteristics of a particular problem instance.
