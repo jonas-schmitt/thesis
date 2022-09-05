@@ -212,7 +212,7 @@ Table~\ref{table:gp-parameters} gives an overview about the configuration of the
 		\midrule
 		Crossover probability & $2/3$ \\
 		\midrule
-		Mutation operator & Random subtree insertion and replacement \\
+		Mutation operator & Random subtree insertion \\
 		\midrule 
 		Probability to mutate a terminal symbol & $1/3$ \\
 		\bottomrule
@@ -830,17 +830,7 @@ Therefore, setting the generalization interval $m$ to 50 represents a reasonable
 To initiate each optimization run, we choose $k = 80$ as a problem instance, which leads to a maximum level $l_{max} = 7$ and a system of linear equations consisting of 16129 unknowns and. 
 Therefore, the cost of evaluation at the beginning of the search is drastically reduced compared to later generations.
 We then execute Algorithm~\ref{alg:generalization-procedure} with a population size of 128 and a total number of 150 generations, whereby after 50 and 100 generations we increase the value of wavenumber to 160 and 320, respectively.
-Here, the initial population is selected from a randomly-generated set of 1024 individuals through non-dominated sorting.
-In order to evaluate each multigrid method, we measure the number of iterations $n$ Algorithm~\ref{alg:preconditioned-bicgstab} requires to achieve the desired defect reduction for Equation~\ref{eq:helmholtz-test-problem-discretized-and-preconditioned} together with its execution time per iteration $t$.
-These two metrics then serve as the two objectives for our multi-objective evolutionary algorithm.
-Note that in previous formulations of our method, we have employed the solver's convergence factor $\rho$ as a first objective.
-However, as the average number of iterations required to solve the given system with a preconditioned iterative method is significantly higher than for the three PDEs considered in Section~\ref{sec:experiments-part1}, even small changes in the effectiveness of preconditioning have a measurable effect on this metric. 
-In contrast, the potentially small relative difference in the number of iterations between two preconditioners, means that the absolute values of their convergence factors are hardly distinguishable~\footnote{Note that the convergence factor is estimated by computing the n-th root of the product of the measured defect reductions in each iteration, as given by Equation~\eqref{eq:asymptotic_convergence_factor}}, which has the potential to lead to the accumulation of numerical errors in the computation of population-density metrics, such as the crowding distance~\cite{deb2002fast}.
-Similar to Section~\ref{sec:experiments-part1} we perform a total number of ten experiments, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
-Even though the population size as well as the number of generations is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost of each optimization run.
-To parallelize our evolutionary search method, we employ a MPI-based described in Section~\ref{sec:distributed-parallelization} using 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
-Therefore, each process creates and evaluates two new individuals per generation, which are then executed on the respective island using on OpenMP-based shared-memory parallelization with 12 threads.
-Finally, Table~\ref{table:gp-parameters-helmholtz} shows a summary of the settings used to perform each run  of our evolutionary search method.
+Table~\ref{table:gp-parameters-helmholtz} gives an overview about the algorithmic parameters used for each experiment, which are mostly similar to the ones employed in Section~\ref{sec:experiments-part1}.
 \begin{table}
 	\centering
 	\caption{Summary of GGGP configuration parameters.}
@@ -855,7 +845,7 @@ Finally, Table~\ref{table:gp-parameters-helmholtz} shows a summary of the settin
 		\midrule
 		Number of generations & 150 \\
 		\midrule
-		Wavenumbers & 80, 160, 320 \\
+		$k$ & 80, 160, 320 \\
 		\midrule
 		Generalization interval & 50 \\
 		\midrule
@@ -875,9 +865,28 @@ Finally, Table~\ref{table:gp-parameters-helmholtz} shows a summary of the settin
 		\midrule
 		Crossover probability & $2/3$ \\
 		\midrule
-		Mutation operator & Random subtree insertion and replacement \\
+		Mutation operator & Random subtree insertion \\
 		\midrule 
 		Probability to mutate a terminal symbol & $1/3$ \\
 		\bottomrule
 	\end{tabular}
 \end{table}
+In order to evaluate each multigrid method, we measure the number of iterations $n$ Algorithm~\ref{alg:preconditioned-bicgstab} requires to achieve the desired defect reduction for Equation~\ref{eq:helmholtz-test-problem-discretized-and-preconditioned} together with its execution time per iteration $t$.
+These two metrics then serve as the two objectives for our multi-objective evolutionary algorithm.
+Note that in previous formulations of our method, we have employed the solver's convergence factor $\rho$ as a first objective.
+However, as the average number of iterations required to solve the given system with a preconditioned iterative method is significantly higher than for the three PDEs considered in Section~\ref{sec:experiments-part1}, even small changes in the effectiveness of preconditioning have a measurable effect on this metric. 
+In contrast, the potentially small relative difference in the number of iterations between two preconditioners, means that the absolute values of their convergence factors are hardly distinguishable~\footnote{Note that the convergence factor is estimated by computing the n-th root of the product of the measured defect reductions in each iteration, as given by Equation~\eqref{eq:asymptotic_convergence_factor}}, which has the potential to lead to the accumulation of numerical errors in the computation of population-density metrics, such as the crowding distance~\cite{deb2002fast}.
+Individuals are then selected using a binary tournament selection based on their dominance-relation and crowding distance.
+New individuals are either created using single-point crossover with a probability of 2/3 or random subtree insertion with a probability of 1/3, whereby in the latter case we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
+
+Similar to Section~\ref{sec:experiments-part1} we perform a total number of ten experiments, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
+Even though the population size as well as the number of generations is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost of each optimization run.
+To parallelize our evolutionary search method, we employ a MPI-based described in Section~\ref{sec:distributed-parallelization} using 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
+Therefore, each process creates and evaluates two new individuals per generation, which are then executed on the respective island using on OpenMP-based shared-memory parallelization with 12 threads.
+
+\subsection{Reference Methods}
+To assess whether our evolutionary algorithm is able to evolve generalizable and efficient multigrid preconditioners for the indefinite Helmholtz equation, we first need to investigate what degree of efficiency that can be achieved with classical multigrid methods.
+In general, the time required to achieve a certain error reduction can be considered as a metric for the efficiency of a solver.
+Since in the given case, we employ the same iterative solver but instead vary the multigrid cycle used for preconditioning, the choice of the latter directly affects the efficiency of the complete method.
+For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which might come at the prize of a higher computational cost.
+However, while in Section~
