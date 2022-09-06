@@ -156,7 +156,7 @@ We then obtain the respective operator on each level by applying the same discre
 Therefore, the resulting grammar is structurally similar to the one shown in Table~\ref{table:multigrid-grammar}.
 Within each grammar production rule, we then consider the following components:
 \begin{description}
-	\item[\textbf{Smoothers}:] Decoupled / Collective Jacobi and red-black Gauss-Seidel, block Jacobi with rectangular blocks up to a maximum number of 6 terms.
+	\item[\textbf{Smoothers}:] Decoupled / Collective Jacobi and red-black Gauss-Seidel (RB-GS), block Jacobi with rectangular blocks up to a maximum number of 6 terms.
 	\item[\textbf{Restriction}:] Full-weighting restriction.
 	\item[\textbf{Prolongation}:] Bilinear interpolation.
 	\item[\textbf{Relaxation factors}:] $\omega \in \left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots 1.9 \right)$
@@ -172,7 +172,7 @@ Here, we generate block Jacobi smoothers by defining a splitting $A = L + D + U$
 where each matrix $A_{ij}$ corresponds to a set of adjacent grid points contained in the respective rectangular block, as it has been discussed in Section~\ref{subsec:block-smoothing}.
 A more detailed treatment of block relaxation methods can be found in~\cite{trottenberg2000multigrid}.
 For each of smoothing and coarse-grid correction step the relaxation factor $\omega$ is chosen from the above sequence.
-As a baseline for assessing the efficiency and generalizability of the evolved multigrid solvers, we consider a number of common multigrid cycles with red-black Gauss-Seidel smoothing and optimized relaxation factors.
+As a baseline for assessing the efficiency and generalizability of the evolved multigrid solvers, we consider a number of common multigrid cycles with RB-GS smoothing and optimized relaxation factors.
 We, therefore, formulate these methods on the same five-grid hierarchy, whereby we also utilize the same restriction, prolongation operators and coarse-grid solver, as described above.
 In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
 \subsection{Optimization Settings and Evaluation Platform}
@@ -339,11 +339,11 @@ Each solver is then executed on a dedicated node using a thread-based paralleliz
 In order to assess the solving speed of the methods evolved, we consider two different problem sizes for each of the three test cases.
 While in the first case a problem size identical to the one employed within the optimization is chosen, in the second case we obtain a larger one by doubling number of grid points in each dimension.
 Even though the evaluation of our methods generalizability is not the focus of this section, it is still worthwhile to investigate whether the methods evolved with our approach also are capable of solving larger instances of the same problem.
-For comparison we consider a number of different V-cycles with at most four red-black Gauss-Seidel pre and post-smoothing steps, as these methods are known to lead to the fastest multigrid-based solvers for Poisson's equation according to the classical formulation of multigrid shown in Algorithm~\ref{alg:multigrid-cycle}~\cite{trottenberg2000multigrid}.
+For comparison we consider a number of different V-cycles with at most four RB-GS pre and post-smoothing steps, as these methods are known to lead to the fastest multigrid-based solvers for Poisson's equation according to the classical formulation of multigrid shown in Algorithm~\ref{alg:multigrid-cycle}~\cite{trottenberg2000multigrid}.
 As we have already investigated in~\cite{schmitt2020constructing}, the same is true for the linear elastic boundary value problem considered here.
 To achieve a fair comparison, we empirically choose the optimum relaxation factor $\omega$ for each test case from the same interval considered within the optimization, which leads to $\omega = 1.15$ for the two-dimensional Poisson equation and $\omega = 1.25$ both for the three-dimensional Poisson equation and the linear elastic boundary value problem.
 Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-methods} and~\ref{table:linear-elasticity-2D-reference-methods} contains the resulting solving times and number of iterations to achieve the required defect reduction for the respective test case.
-Here, for instance, the abbreviation V(2, 1) denotes a V-cycle with two pre and one post-smoothing step with red-black Gauss-Seidel.
+Here, for instance, the abbreviation V(2, 1) denotes a V-cycle with two pre and one post-smoothing step with RB-GS.
 First of all, as we can expect from a functioning multigrid method, the number of iterations stays constant for both problem sizes, only with the exception of the V(1,0)-cycle, where we can observe a slight increase for the linear elastic boundary value problem.
 Overall, we can conclude that while the V(2,2)-cycle represents the fastest solver for both cases of Poisson's equation, the V(3,3) cycle leads to the fastest solving time in case of the linear elastic boundary value problem.
 \begin{table}
@@ -674,11 +674,11 @@ While, for instance, the first part of Figure~\ref{fig:evolved-methods-graphical
 Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts of in a similar fashion, but then applies an additional three-grid V-cycle on the third-finest level with a step size of $4h$, before it transfers the computed correction back to the finest level.
 Furthermore, both evolved multigrid methods employ a different number of smoothings steps on each level using a wide range of different relaxation factors, whereby, in general, on certain levels significantly more smoothing is performed than on others.
 In particular, in both cases, smoothing on the third-finest level seems to be exceptionally effective in reducing the most significant error components, and, hence, the number of smoothing steps on this level is higher than on any other level within both methods.
-While both methods predominantly employ red-black Gauss-Seidel as a smoother, Figure~\ref{fig:evolved-methods-graphical-representation:3D} also includes individual pointwise and block Jacobi steps.
+While both methods predominantly employ RB-GS as a smoother, Figure~\ref{fig:evolved-methods-graphical-representation:3D} also includes individual pointwise and block Jacobi steps.
 Finally, the complicated computational structure of the methods evolved for the linear elastic boundary prevents us from including their graphical representations similar to Figure~\ref{fig:evolved-methods-graphical-representation}.
 However, if we consider the evolved method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the methods shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
 In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle, but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
-Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively red-black Gauss-Seidel smoothing.
+Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively RB-GS smoothing.
 \section{Evolving Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
 While within the last section, we could already demonstrate that our grammar-based approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in case of such a PDE, we consider the indefinite Helmholtz equation.
@@ -756,6 +756,7 @@ which is discretized similar to the original operator using the five-point stenc
 	\end{bmatrix}.
 \end{equation*}
 \subsection{Solver Configuration}
+\label{sec:solver-configuration-helmholtz}
 As a result of the above formulation of our test problem, we obtain two systems of linear equations
 \begin{equation}
 	A_h M_h^{-1} \bm{y}_h = \bm{b}_h,
@@ -804,7 +805,7 @@ each of which is then achieved through the application of a single multigrid cyc
 To construct an efficient method for this purpose, we consider the set of five-grid methods that are defined on a hierarchy of discretization with $h = 1/2^{l}$ on each level $l \in \left[l_{max} - 4,l_{max}\right]$. 
 Similar to Section~\ref{sec:experiments-part1}, we then consider the following components within each step of the method:
 \begin{description}
-	\item[\textbf{Smoothers}:] Pointwise and block Jacobi with rectangular blocks up to a maximum number of six terms, red-black Gauss-Seidel
+	\item[\textbf{Smoothers}:] Pointwise and block Jacobi with rectangular blocks up to a maximum number of six terms, red-black Gauss-Seidel (RB-GS)
 	\item[\textbf{Restriction}:] Full-weighting restriction
 	\item[\textbf{Prolongation}:] Bilinear interpolation
 	\item[\textbf{Relaxation factors}:] $\left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots, 1.9 \right)$
@@ -885,8 +886,62 @@ To parallelize our evolutionary search method, we employ a MPI-based described i
 Therefore, each process creates and evaluates two new individuals per generation, which are then executed on the respective island using on OpenMP-based shared-memory parallelization with 12 threads.
 
 \subsection{Reference Methods}
-To assess whether our evolutionary algorithm is able to evolve generalizable and efficient multigrid preconditioners for the indefinite Helmholtz equation, we first need to investigate what degree of efficiency that can be achieved with classical multigrid methods.
-In general, the time required to achieve a certain error reduction can be considered as a metric for the efficiency of a solver.
-Since in the given case, we employ the same iterative solver but instead vary the multigrid cycle used for preconditioning, the choice of the latter directly affects the efficiency of the complete method.
-For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which might come at the prize of a higher computational cost.
-However, while in Section~
+To assess whether our evolutionary algorithm is able to evolve generalizable and efficient multigrid preconditioners for the indefinite Helmholtz equation, we first need to investigate what degree of efficiency that can be achieved with known multigrid cycles.
+As in previous evaluations, we consider the time required to achieve a certain error reduction as a measure of the efficiency of a solver.
+However, since in the given case, we apply the same iterative solver to each problem instance but vary the multigrid cycle used for preconditioning, this metric instead relates to the efficiency of the latter.
+For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which, however, might come at the prize of a higher computational cost.
+The second quality metric that we aim to investigate in this section, is the capability of each multigrid preconditioner to generalize to different instances of the same problem.
+Therefore, we consider three different wavenumbers $k = 160, 320 and 640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
+As a multigrid-based preconditioner, we then consider different V, W and F-cycles with up to five pre and post-smoothing steps based on the configuration space in Section~\ref{sec:solver-configuration-helmholtz}.
+Note as proposed by the authors of~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, which all use their classical formulation of multigrid methods to construct a multigrid-based preconditioner for the indefinite Helmholtz equation, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
+To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and, hence, worst conditioned problem with $k = 640$.
+However, since none of the available configuration options led to a converging solver for this case, we instead employ the next smaller problem size with a wavenumber of $k = 320$ to find out which pair of smoother and relaxation factor leads to fastest solving time for each multigrid cycle.
+In general, according to our experimental evaluation RB-GS represents the single most efficient smoother for the given case, while Jacobi-type smoothers only lead to a converging solver for wavenumbers of at most $k = 160$, with, however, less efficiency in all cases than the former.
+Therefore, Table~\ref{table:reference-methods-helmholtz} shows the resulting average solving times for each multigrid cycle with RB-GS smoothing and an optimum relaxation factor for $k = 320$, where the omission of a number means that convergence could not be achieved within 20,000 iterations. 
+Since the use of more than three pre- and post-smoothing steps does not yield any additional benefit for this smoother, we omit all multigrid cycles with a higher number of smoothing steps.
+\begin{table}
+	\caption{Reference methods - Optimum relaxation factors $\omega$ for $k = 320$, number of iterations and average time required for solving a problem with the particular wavenumber.}
+	\label{table:reference-methods-helmholtz}
+	\centering
+	\begin{tabular}{l l l l l l}
+		\toprule
+		& $\omega$ & \multicolumn{2}{c}{Iterations} & \multicolumn{2}{c}{Solving Time (s)} \\
+		\cmidrule(r){3-4} \cmidrule(r){5-6}
+		$k$ & & $160$ & $320$ & $160$ & $320$ \\
+		\midrule
+		V(0, 1) & $1.25$ & $2078$ & $6297$ & $6.38$ & $35.11$ \\
+		\midrule
+		V(1, 1) & $0.6$ & $1880$ & $6297$ & $7.66$ & $44.27$ \\
+		\midrule
+		V(2, 1) & $0.6$ & $-$ & $5532$ & $-$ & $47.0$ \\
+		\midrule
+		V(2, 2) & $0.5$ & $1627$ & $5115$ & $9.93$ & $50.54$  \\
+		\midrule
+		V(3, 3) & $0.4$ & $1753$ & $5168$ & $13.97$ & $76.00$ \\
+		\midrule
+		F(0, 1) & $1.15$ & $1467$ & $4028$ & $8.15$ & $42.87$  \\
+		\midrule
+		F(1, 1) & $0.75$ & $1546$ & $3988$ & $11.21$ & $54.51$ \\
+		\midrule
+		F(2, 1) & $0.55$ & $1146$ & $3934$ & $10.87$ & $67.62$ \\
+		\midrule
+		F(2, 2) & $0.65$ & $1060$ & $3213$ & $13.92$ & $65.06$ \\
+		\midrule
+		F(3, 3) & $0.45$ & $1085$ & $3464$ & $18.88$ & $92.97$ \\
+		\midrule
+		W(0, 1) & $0.75$ & $1265$ & $4215$ & $8.67$ & $72.08$ \\
+		\midrule
+		W(1, 1) & $0.8$ & $1208$ & $3570$ & $13.08$ & $76.22$ \\
+		\midrule
+		W(2, 1) & $0.6$ & $1313$ & $3074$ & $17.71$ & $79.67$ \\
+		\midrule
+		W(2, 2) & $0.5$ & $1069$ & $3376$ & $17.14$ & $101.6$ \\
+		\midrule
+		W(3, 3) & $0.45$ & $942$ & $2976$ & $19.65$ & $117.8$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+To eliminate the variability between individual measurements, each value contained in the table represents the average of 50 solver executions.
+As expected, a higher number of smoothing steps and coarse-grid corrections increases the efficiency the preconditioner and, thus, leads to a lower number of iterations to achieve convergence.
+However, if we consider the configuration that leads to the fastest solving time, which is the V(0,1), we can see that a single coarse-grid correction followed by a single step of RB-GS smoothing actually seams to be the most efficient choice for all wavenumbers considered.
+After determining the best possible configuration for each known multigrid cycle, we can finally investigate whether the multigrid methods obtained with our grammar-guided evolutionary search method are able to achieve the same degree of efficiency and generalizability in preconditioning indefinite Helmholtz problems.
