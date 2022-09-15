@@ -949,9 +949,9 @@ After determining the best possible configuration for each known multigrid cycle
 First, in order to identify the most promising multigrid-based preconditioners for our final evaluation, we sort the population at the end of each experiment according to the product of both objectives.
 Note that while this metric corresponds to the solving time achieved on a single island, we intend to execute each method on a full node of the system, which can lead to a different outcome.
 We then evaluate the ten best multigrid methods according to this metric by employing them as a preconditioner for Equation~\eqref{eq:helmholtz-test-problem-preconditioning} with $k = 640$.
-In case none of the methods considered leads to a converging solver for this system, we instead repeat this evaluation for $k = 320$.
+In case none of the methods considered is able to reduce the initial residual by a factor of $10^{-6}$ within 20,000 iterations, we repeat the evaluation with the next smaller wavenumber $k = 320$.
 The best-performing method is then evaluated on the full set of wavenumbers, i.e. $k = 160, 320, 640$.
-Table~\ref{table:evolved-solvers} shows the required number of iterations and solving time of Algorithm~\ref{alg:preconditioned-bicgstab} preconditioned with the respective multigrid method for each wavenumber.
+Table~\ref{table:evolved-solvers} shows the required number of iterations and time to achieve the desired residual reduction when using the resulting multigrid method as a preconditioner for Algorithm~\ref{alg:preconditioned-bicgstab}.
 \begin{table}
 	\caption{Best preconditioners according to the product of both objectives - Number of iterations and average time required for solving a problem with the particular wavenumber.}
 	\label{table:evolved-solvers}
@@ -984,3 +984,14 @@ Table~\ref{table:evolved-solvers} shows the required number of iterations and so
 		\bottomrule
 	\end{tabular}
 \end{table}
+With the exception of $EP-4$, the multigrid-based preconditioner obtained with our evolutionary search method lead to a faster solver compared to the best reference method V(0,1) for $k = 320$, while, in the majority of cases, the same methods also achieve competitive solving times for $k = 160$.
+Furthermore, in six out of ten experiments, our evolutionary search method can find multigrid-based preconditioners that lead to a converging solver for a wavenumber of $k = 640$, for which all reference methods fail.
+Figure~\ref{fig:helmholtz-solving-time-comparison} shows a direct comparison of the preconditioners from both categories that lead to the fastest solving time for $k = 640$.
+\begin{figure}
+	\includegraphics[scale=0.52]{figures/solving-time.pdf}
+	\caption{Solving time comparison of the best preconditioners according to the product of both objectives for different wavenumbers ($k$).}
+	\label{fig:helmholtz-solving-time-comparison}
+\end{figure} 
+For a better interpretability of the results, we have normalized each solving time by the number of grid points.
+While during the the optimization both evolved methods have not been evaluated on wavenumbers larger than $320$, they also function as effective preconditioners for a larger wavenumber.
+
