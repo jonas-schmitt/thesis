@@ -880,7 +880,7 @@ In contrast, the potentially small relative difference in the number of iteratio
 Individuals are then selected using a binary tournament selection based on their dominance-relation and crowding distance.
 New individuals are either created using single-point crossover with a probability of 2/3 or random subtree insertion with a probability of 1/3, whereby in the latter case we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
 
-Similar to Section~\ref{sec:experiments-part1} we perform a total number of ten experiments, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
+Similar to Section~\ref{sec:experiments-part1} we perform a total number of ten experiments with random initialization, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
 Even though the population size as well as the number of generations is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost of each optimization run.
 To parallelize our evolutionary search method, we employ a MPI-based described in Section~\ref{sec:distributed-parallelization} using 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
 Therefore, each process creates and evaluates two new individuals per generation, which are then executed on the respective island using on OpenMP-based shared-memory parallelization with 12 threads.
@@ -891,7 +891,7 @@ As in previous evaluations, we consider the time required to achieve a certain e
 However, since in the given case, we apply the same iterative solver to each problem instance but vary the multigrid cycle used for preconditioning, this metric instead relates to the efficiency of the latter.
 For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which, however, might come at the prize of a higher computational cost.
 The second quality metric that we aim to investigate in this section, is the capability of each multigrid preconditioner to generalize to different instances of the same problem.
-Therefore, we consider three different wavenumbers $k = 160, 320 and 640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
+Therefore, we consider three different wavenumbers $k = 160, 320$ and $640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
 As a multigrid-based preconditioner, we then consider different V, W and F-cycles with up to five pre and post-smoothing steps based on the configuration space in Section~\ref{sec:solver-configuration-helmholtz}.
 Note as proposed by the authors of~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, which all use their classical formulation of multigrid methods to construct a multigrid-based preconditioner for the indefinite Helmholtz equation, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
 To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and, hence, worst conditioned problem with $k = 640$.
@@ -945,3 +945,42 @@ To eliminate the variability between individual measurements, each value contain
 As expected, a higher number of smoothing steps and coarse-grid corrections increases the efficiency the preconditioner and, thus, leads to a lower number of iterations to achieve convergence.
 However, if we consider the configuration that leads to the fastest solving time, which is the V(0,1), we can see that a single coarse-grid correction followed by a single step of RB-GS smoothing actually seams to be the most efficient choice for all wavenumbers considered.
 After determining the best possible configuration for each known multigrid cycle, we can finally investigate whether the multigrid methods obtained with our grammar-guided evolutionary search method are able to achieve the same degree of efficiency and generalizability in preconditioning indefinite Helmholtz problems.
+\subsection{Evaluation of the Evolved Multigrid Methods}
+First, in order to identify the most promising multigrid-based preconditioners for our final evaluation, we sort the population at the end of each experiment according to the product of both objectives.
+Note that while this metric corresponds to the solving time achieved on a single island, we intend to execute each method on a full node of the system, which can lead to a different outcome.
+We then evaluate the ten best multigrid methods according to this metric by employing them as a preconditioner for Equation~\eqref{eq:helmholtz-test-problem-preconditioning} with $k = 640$.
+In case none of the methods considered leads to a converging solver for this system, we instead repeat this evaluation for $k = 320$.
+The best-performing method is then evaluated on the full set of wavenumbers, i.e. $k = 160, 320, 640$.
+Table~\ref{table:evolved-solvers} shows the required number of iterations and solving time of Algorithm~\ref{alg:preconditioned-bicgstab} preconditioned with the respective multigrid method for each wavenumber.
+\begin{table}
+	\caption{Best preconditioners according to the product of both objectives - Number of iterations and average time required for solving a problem with the particular wavenumber.}
+	\label{table:evolved-solvers}
+	\centering
+	\begin{tabular}{l l l l l l l }
+		\toprule
+		& \multicolumn{3}{c}{Iterations} & \multicolumn{3}{c}{Solving Time (s)} \\
+		\cmidrule(l){2-4} \cmidrule(l){5-7}
+		$k$ & $160$ & $320$ & $640$ & $160$ & $320$ & $640$ \\
+		\midrule
+		EP-1 & $1178$ & $3399$ & $-$ & $6.29$ & $28.07$ & $-$ \\
+		\midrule
+		EP-2 & $795$ & $2160$ & $8449$ & $7.86$ & $29.89$ & $241.7$\\
+		\midrule
+		EP-3 & $933$ & $2827$ & $11143$ & $6.08$ & $27.58$ & $257.8$ \\
+		\midrule
+		EP-4 & $637$ & $2509$ & $7901$ & $7.17$& $41.04$ & $268.2$ \\
+		\midrule
+		EP-5 & $539$ & $1838$ & $7765$ & $5.01$ & $28.39$ & $227.7$ \\
+		\midrule
+		EP-6 & $941$ & $2103$ & $-$ & $9.58$ & $30.76$ & $-$ \\
+		\midrule
+		EP-7 & $955$ & $2701$ & $-$  & $6.45$& $27.84$ & $-$ \\
+		\midrule
+		EP-8 & $945$ & $2870$ & $10839$ & $7.24$ & $33.02$ & $276.9$ \\
+		\midrule
+		EP-9 & $3436$ & $3872$ & $-$  & $15.15$ & $27.51$ & $-$ \\
+		\midrule
+		EP-10 & $586$ & $1881$ & $8855$ & $6.70$ & $31.39$ & $246.1$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
