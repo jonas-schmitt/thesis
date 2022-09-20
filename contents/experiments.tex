@@ -985,9 +985,9 @@ Table~\ref{table:evolved-solvers} shows the required number of iterations and ti
 		\bottomrule
 	\end{tabular}
 \end{table}
-With the exception of $EP-4$, the multigrid-based preconditioner obtained with our evolutionary search method all achieve faster solving times than the best reference method V(0,1) for $k = 320$, while, in the majority of cases, the same methods also works efficiently for $k = 160$.
+With the exception of EP-4, the multigrid-based preconditioner obtained with our evolutionary search method all achieve faster solving times than the best reference method V(0,1) for $k = 320$, while, in the majority of cases, the same methods also works efficiently for $k = 160$.
 If we consider the required number of iterations as a second metric, we can see that the methods evolved with our approach achieve at least a similar degree of preconditioning effectiveness as most W-cycles, however, with a significantly higher degree of computational efficiency.
-Furthermore, even though the largest wavenumber considered within the evolutionary search is $320$, in six out of ten experiments, our method can find multigrid-based preconditioners that lead to a converging solver for $k = 640$, while all available reference methods fail to achieve convergence in this case.  
+Furthermore, even though the largest wavenumber considered within the evolutionary search is $320$, in six out of ten experiments, our method can find multigrid-based preconditioners that lead to a converging solver for $k = 640$, while all available reference methods fail to achieve convergence in this case.
 Figure~\ref{fig:helmholtz-solving-time-comparison} shows a direct comparison of the preconditioners from both categories that lead to the fastest solving time for large wavenumbers.
 \begin{figure}
 	\includegraphics[width=\textwidth]{figures/solving-time.pdf}
@@ -1125,9 +1125,9 @@ For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a 
 	\label{fig:structure-evolved-preconditioners}
 \end{figure}
 First of all, both multigrid methods employ a unique sequence of operations that does not resemble any known multigrid cycle.
-While they both initially apply the coarse-grid solver exactly once and, thus, resemble a V-cycle, they incorporate additional smoothing-based coarse-grid correction steps.
+While both methods initially apply the coarse-grid solver exactly once and, thus, resemble a V-cycle, they incorporate additional smoothing-based coarse-grid correction steps.
 Furthermore, our grammar-based representation enables the combination of different smoothers or even the complete omission of smoothing on certain levels.
-While both methods employ predominantly red-black Gauss-Seidel smoothing, especially EP-2 also incorporates intermediate Jacobi steps.
+While both methods employ predominantly red-black Gauss-Seidel smoothing, especially EP-2 also incorporates multiple intermediate Jacobi steps.
 With respect to the number of smoothing steps, similar to the most efficient reference methods, V(0,1), V(1,1) and F(0,1), smoothing on the finest level is reduced to a bare minimum, in the form of one or two red-black Gauss-Seidel steps.
 However, this is augmented with a significantly larger number of smoothing and coarse-grid correction steps on subsequent levels, which is in contrast to the uniform structure of classical multigrid cycles.
 In general, the computational structure of EP-2 comprises a higher degree of regularity, as the same sequence of operations is repeated three times at the end of its computation.
@@ -1150,11 +1150,14 @@ For this purpose, we again consider the space of non-dominated solutions at the 
 First of all, note that the number of non-dominated solution is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
 However, this is clearly expected due to the smaller population size, which is only half as large as in our previous experiments.
 Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty to evolve the same number of non-dominated individuals. 
-However, despite this fact, our evolutionary search method achieves a high degree of consistency in finding individuals that are located on the right half of the objective space.
-In contrast, in the left part of the space, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each run. 
-Note that all multigrid-based preconditioners considered in our final evaluation shown in Table~\ref{table:evolved-solvers} correspond to individuals located in this space.
-The larger distance of certain individuals located in this part of the objective space, therefore, explains why we could not achieve the same degree of efficiency in each run.
-As we have already discussed in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, this effect can be mainly traced back to the problem of evolvability degeneration~\cite{liu2022evolvability}.
+However, despite this fact, our evolutionary search method achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
+In contrast, in the left half of Figure~\ref{fig:pareto-front-helmholtz}, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each run. 
+Note that all multigrid-based preconditioners considered in our final evaluation shown in Table~\ref{table:evolved-solvers} correspond to individuals located here.
+The larger distance of certain individuals in Figure~\ref{fig:pareto-front-helmholtz} to the combined front, therefore, explains why we could not achieve the same degree of efficiency in each run.
+To reduce the number of iterations until convergence through preconditioning, we need to improve the accuracy of the approximate solution computed for Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
+Since this require us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
+In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our evolutionary algorithm.
+As we have already investigated in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, NSGA-II struggles to achieve this goal consistently~\cite{liu2022evolvability}, which, in certain experiments, leads to a suboptimal outcome in the leftmost part of the objective function space.
 
 
 
