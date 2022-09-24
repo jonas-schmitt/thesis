@@ -3,7 +3,12 @@ Furthermore, by applying the generalization procedure presented in  Section~\ref
 However, since the application of artificial intelligence based methods to the solution of PDEs, it is important to categorize the approach presented in this thesis within this new and quickly growing field.
 In principle, we can classify AI-based methods for solving PDEs according to different criteria.
 First of all, we can distinguish methods that aim to solve a PDE directly in the continuous domain and, those that require it to be formulated as a discrete problem, usually obtained by applying a specific discretization method.
-Many popular machine learning-based methods, such as physics-informed neural networks and neural operators fall into the former category.
-This class of methods aim to learn the function that represents solution or the operator of a given PDE by utilizing the fact that neural networks can act as universal function approximators, when given enough data.
+The currently most popular machine  learning-based methods, physics-informed neural networks~\cite{karniadakis2021physics,raissi2019physics,kharazmi2019variational,kharazmi2021hp} and neural operators~\cite{li2020fourier,guibas2021efficient,lu2021learning,li2021physics}, fall into the former category.
+This class of methods aims to learn the function that represents solution or the operator of a given PDE by utilizing the fact that neural networks can act as universal function approximators when given enough data~\cite{hornik1989multilayer}.
 Physics-informed methods try to improve upon purely data-driven methods by directly incorporating the physical constraints of the given PDE into the learning process.
-%TODO include refs
+Neural operators aim to achieve a higher degree of generalization by learning a representation of the operator of a PDE instead of approximating its solution.
+Recently, the usability of machine learning-based methods has been tremendously improved through the availability of easy-to-use and well-maintained implementations, such as DeepXDE~\cite{lu2021deepxde} and NVIDIA Modulus~\cite{hennigh2021nvidia}. 
+Instead of directly targeting a PDE in the continuous domain, the second branch of AI-based methods operate on its discrete version obtained after applying a suitable discretization method.
+Therefore, these methods can either act as a direct replacement for classical numerical solvers, operate in combination with them or replace a specific solver component.
+An example for the former are early artificial neural network-based approaches~\cite{lagaris1998artificial} but also more recent  ones based on convolutional~\cite{thuerey2020deep} and graph neural networks~\cite{pfaff2020learning}. 
+%TODO include refsi
