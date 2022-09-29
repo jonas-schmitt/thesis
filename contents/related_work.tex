@@ -13,10 +13,22 @@ Therefore, these methods can either act as a direct replacement for classical nu
 An early example for the former is the neural network-based PDE solvers proposed by Lagaris et al.~\cite{lagaris1998artificial} but also more recent approaches based on convolutional~\cite{thuerey2020deep} and graph neural networks~\cite{pfaff2020learning} fall into this category.
 In contrast, AI-based methods that work in combination with existing solvers do not try to replace the method as a whole but rather aim to enhance it, for instance, by adding or replacing certain steps of the method or by finding an optimal configuration for each of its parameters and design options.
 Multigrid methods are an often-considered target since these methods have the potential to achieve an optimal asymptotic complexity while possessing a large number of configuration options and complex interactions between each of its components.
-A first towards the design of an optimal multigrid method has been the work by Oosterlee and Wienands~\cite{oosterlee2003genetic}, which uses a genetic algorithm to optimize the choice of each multigrid component.
-Similarly, Thekale et al.~\cite{thekale2010optimizing} try to optimize the number of multigrid cycles within a full-multigrid method.
-%TODO continue next sentence
-~\ref{hsieh2019learning} a neural network is combined with an existing iterative solver in order to improve the approximation in each step of the method.
-Finally, 
- 
+A first towards the automated design of an optimal multigrid method has been the work by Oosterlee and Wienands~\cite{oosterlee2003genetic}, which uses a genetic algorithm to optimize the choice of each multigrid component.
+Similarly, Thekale et al.~\cite{thekale2010optimizing} aim to optimize the number of multigrid cycles within a full-multigrid method using a branch-and-bound approach, while Brown et al.~\cite{brown2021tuning} optimize the algorithmic parameters of a two-grid method by solving a minimax problem obtained from a LFA-based analysis.
+All these works have in common that they are based on the classical formulation of multigrid methods, as shown in Algorithm~\ref{alg:multigrid-cycle}.
+As their optimization capabilities are still restricted to a set of global algorithmic parameters, they can be classified as top-down algorithm design methods.
+In contrast, as we have shown in this work, expressing each possible computational step of multigrid method as a separate production rule of a context-free grammar allows us to treat the task of designing an optimal multigrid method as a program synthesis.
+Therefore, according to our classification of algorithm design methods in Chapter~%TODO insert ref her
+our work can be considered as the first implementation of a bottom-up approach for automated multigrid design.
+However, while our approach offers the flexibility to construct arbitrary sequences of multigrid operations on a given hierarchy of discretizations, similar to~\cite{oosterlee2003genetic,thekale2010optimizing,brown2021tuning} we consider the internal structure of each individual operation as immutable.
+Recently, ML-based methods have been utilized to enhance or replace certain operations within a multigrid method.
+A first example are the works by Katrutsa et al.~\cite{katrutsa2020black}, Greenfeld et al.~\cite{greenfeld2019learning} and Luz et at.~\cite{luz2020learning} which utilizes ML-methods to learn optimized prolongation operators.
+Huang et al.~\cite{huang2021learning} and Fanaskov~\cite{fanaskov2021neural} apply a similar approach to the optimization of smoothers.
+The work by Taghibakhshi et al.~\cite{taghibakhshi2021optimization} goes even one step further and replaces the coarsening step within an algebraic multigrid method altogether by a machine learning system.
+Finally, Hsieh et al.~\ref{hsieh2019learning} take a different direction by enhancing the approximation obtained in each step of an iterative solver in an additional neural network-based correction phase.
+Since these ML-based methods all focus on the optimization of the individual components of a multigrid method but consider the methods algorithmic structure as immutable, they can be considered as a complementary approach to the algorithm design methods discussed earlier in this section.
+However, a combination of both paradigms has not yet been considered and could be a promising research direction for the future.
+One possibility to achieve this goal would be to incorporate learned operators or even ML-based methods that act as a replacement for certain solver components into the search space of top-down or bottom-up algorithm design method.
+Here, the recent study by Markidis~\cite{markidis2021old} represents in interesting, where the author proposes to combine physics-informed neural network with multigrid methods. 
+
 %TODO include refs
