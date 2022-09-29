@@ -1,0 +1,4 @@
+%TODO The following is about general algorithm design
+In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and, thus, might affect multiple computational steps simultaneously. 
+For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and, thus, leads to a globally different type of multigrid cycle.
+In contrast, a bottom-up approach is characterized by the ability to change each computational step within an algorithm without affecting the behavior of any other.
