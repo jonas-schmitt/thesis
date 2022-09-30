@@ -1,0 +1,47 @@
+digraph G {  
+  ordering=in ;
+  A[texlbl="AI-Based Solvers"];
+  A -> B
+  A -> C
+  B[texlbl="Continuous"];
+  C[texlbl="Discrete"];
+  B -> B1 
+  B -> B2
+  B1[texlbl="Physics-Informed"];
+  B2[texlbl="Neural Operators"];
+  B1 -> B11
+  B1 -> B12
+  B2 -> B12
+  B2 -> B21
+  B2 -> B22
+  B11[texlbl="PINN"];
+  B21[texlbl="FNO"];
+  B22[texlbl="DeepONet"];
+  B12[texlbl="PINO"];
+  C -> D
+  C -> E
+  D[texlbl="ML-Based"];
+  D -> D1
+  D -> D2
+  D1[texlbl="Standalone"];
+  D1 -> D11
+  D1 -> D12
+  D11[texlbl="CNN"];
+  D12[texlbl="GNN"];
+  D2[texlbl="Hybrid"];
+  D2 -> D21
+  D21[texlbl="MG-Based"];
+  D21 -> D211
+  D21 -> D212
+  D211[texlbl="Prolongation"];
+  D212[texlbl="Smoothing"];
+  E[texlbl="Algorithm Design"];
+  E -> E1
+  E -> E2
+  E1[texlbl="Top-Down"];
+  E2[texlbl="Bottom-Up"];
+  E1 -> E11
+  E2 -> E21
+  E11[texlbl="Combinatorial"];
+  E21[texlbl="Grammar-Based"];
+}
