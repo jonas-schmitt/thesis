@@ -1,5 +1,5 @@
 \section{Discretization of Partial Differential Equations}\label{sec:discretization}
-Many problems in science and engineering can be modeled as partial differential equations (PDEs). %TODO insert references
+Many problems in science and engineering can be modeled as partial differential equations (PDEs)~\cite{folland2020introduction,evans2010partial}.
 A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
 Consider, for instance, the equation
 \begin{equation}
@@ -8,30 +8,29 @@ Consider, for instance, the equation
 \end{equation}
 where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^d$.
 Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source $f$.
-Since Equation~\eqref{eq:heat-equation} is only satisfied in the interior of the domain $\Omega$, we, additionally need to define a set of conditions at its boundaries.
-These so-called \emph{boundary conditions} (BCs) can be usually classified in four different types:
+Since Equation~\eqref{eq:heat-equation} is only satisfied in the interior of the domain $\Omega$, we, additionally, need to define a set of conditions at its boundaries.
+These so-called \emph{boundary conditions} (BCs) can usually be classified in four different types:
 \begin{description}
 	\item[Dirichlet] $u(\bm{x}) = g(\bm{x})$
 	\item[Neumann] $\frac{\partial}{\partial \vec{n}} u(\bm{x}) = 0$
 	\item[Robin] $a u(\bm{x}) + b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = g(\bm{x})$
 	\item[Cauchy] $a u(\bm{x}) = g(\bm{x}), \; b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = h(\bm{x})$
 \end{description}
-Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to outwards-directed normal vector of the boundary.
-Note that the difference between Robin and Cauchy BCs is that in the former case one condition is formulated as a weighted average of $u$ and its derivative in normal direction, while for the latter two conditions must be met individually.
-While depending on the boundary conditions an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs such a solution has not been discovered or its computation is unfeasible.
-A remedy is the application of so-called numerical methods, that are based on approximating the solution of a given PDE on a discrete set of grid points. 
+Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
+The difference between Robin and Cauchy BCs is that in the former case, one condition is formulated as a weighted average of $u$ and its derivative in the normal direction, while in the latter, two conditions must be met individually.
+While depending on the boundary conditions, an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs, such a solution has not been discovered, or its computation is unfeasible.
+A remedy is the application of so-called numerical methods that are based on approximating the solution of a given PDE on a discrete set of grid points. 
 \subsection{Grid Creation}
 Before computing a numerical approximation of the solution of a given PDE, we need to define a set of discrete points within the domain $\Omega$ at which we aim to obtain the solution.
-Usually, these points are defined on a grid or mesh with certain structure.
+Usually, these points are defined on a grid or mesh with a particular structure.
 In general, a distinction is made between structured (or regular) and unstructured grids.
 A structured grid is characterized by the uniform neighborhood of its grid points, which means that the number of neighbors is typically the same for each grid point.
 In contrast, each point within an unstructured grid can have a varying number of neighbors.
-Computations are usually easier to implement and more efficient on structured grids, due to their regularity.
-However, structured grids are often difficult to create on complicated and irregular domains.
-On the other hand, unstructured grids offer a higher degree of flexibility and are, therefore, also well-suited for the previously mentioned cases. %TODO include references
-This thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids. 
-In the following, we, therefore, focus on this particular grid type.
-One possibility to approximate a given PDE on a structured set of grid points is to compute the Taylor series expansion around each of them points, which leads to the so-called \emph{finite difference method} (FDM).
+Computations are usually easier to implement and more efficient on structured grids due to their regularity.
+However, structured grids are often challenging to create on complicated and irregular domains.
+On the other hand, unstructured grids offer a higher degree of flexibility and are also well-suited for the previously mentioned cases~\cite{knupp2020fundamentals}.
+This thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids, and, in the following, we restrict ourselves to this particular grid type.
+One possibility to approximate a given PDE on a structured set of grid points is to compute the Taylor series expansion around each point, leading to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
@@ -57,10 +56,10 @@ Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward}
 \begin{equation}
 	 \dv[2]{x} u(x) \approx \frac{u(x + h) + u(x - h) - 2u(x)}{h^2}.
 \end{equation}
-Using the same technique similar approximation terms can be obtained for higher-dimensional functions and higher-order derivatives. %TODO Referenz einfügen
-While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together more complicated approaches such as the finite volume (FVM) and finite element method (FEM) together with the use of semi- or unstructured grids.
+Using the same technique similar approximation terms can be obtained for higher-dimensional functions and higher-order derivatives~\cite{strikwerda2004finite}.
+While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together with more complicated discretization approaches such as the finite volume (FVM) and finite element method (FEM) together with the use of semi-structured or unstructured grids.
 For an in-depth introduction to these methods, the reader is referred to one of the following references:
-%TODO insert references about FVM and FEM
+\cite{versteeg2007introduction,zienkiewicz2005finite}
 \subsection{Model Problem}
 To illustrate the previous two sections, we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
 \begin{equation}
