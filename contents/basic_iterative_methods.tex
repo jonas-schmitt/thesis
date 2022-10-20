@@ -1,19 +1,20 @@
 \section{Basic Iterative Methods}~\label{sec:basic-iterative-methods}
-In general, the methods for solving systems of linear equations can be assigned to two categories: Direct and iterative methods.
+In general, methods for solving systems of linear equations fall into two categories: Direct and iterative methods.
 Direct methods are characterized by the fact that they are able to compute the exact solution of a linear system in a finite number of steps.
-In contrast, iterative methods are based on computing a series of approximations for the solution of the linear system.
+In contrast, iterative methods compute a series of approximations for the solution of the linear system.
 Even though this series often converges to the exact solution, there is usually no guarantee that the approximations will ever reach the accuracy of a solution computed by a direct method.
-Unfortunately, for many problems applying direct methods infeasible, due to their high computational complexity and memory storage requirements.
+Unfortunately, for many problems applying direct methods is infeasible, due to their high computational complexity and memory storage requirements.
 For instance, Gaussian elimination, in general, requires $\mathcal O(n^3)$ operations for solving a system of linear equations with $n$ unknowns.
-Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, it based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
-In contrast, many iterative methods are exclusively based on the computation of matrix-vector products and, hence, do not require to manipulate the input matrix directly.
+Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, it is based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
+In contrast, many iterative methods only require the computation of matrix-vector products and do not manipulate the input matrix directly.
+
 As we have shown in Section~\ref{subsec:stencil-codes}, the discretization of many partial differential equations enables the representation of matrix-vector products as the application of a stencil code, whereas each stencil is directly derived from the discretization of a continuous differential operator.
 If we assume that each stencil includes only a finite number of entries and that we need to store at most one stencil per grid point, we can reduce the storage requirements to $\mathcal{O}(n)$, where $n$ is the total number of grid points.
-In case the same stencil applies to the whole domain, we even only need to store a single stencil, whose memory requirements are negligible compared to those for storing each grid point.
+In case the same stencil applies to the whole domain, we even only need to store a single stencil, whose memory requirements are negligible compared to those for storing the grid.
 Furthermore, due to the approximation of real numbers by floating-point numbers on a computer, even the solution of a direct method is prone to numerical errors.
-As a consequence, in practice, the exactness of direct methods is often undermined by these effects and, hence, the approximations computed by an iterative method can achieve the same degree of numerical accuracy.%TODO include ref
-Furthermore, assuming that we can compute an acceptable approximation using only a finite number of $m$ matrix-vector multiplications, the application of an iterative method reduces the computational complexity for solving a system of linear equations to $O(mn)$.
-In the following, we first introduce basic iterative methods, as the Jacobi and Gauss-Seidel method, and then derive fundamental statements about their convergence. 
+As a consequence, the exactness of direct methods can be undermined by these effects, and the approximations computed by an iterative method do not necessarily achieve a lower degree of numerical accuracy~\cite{higham2002accuracy}.
+Assuming that we can compute an acceptable approximation using only a finite number of $m$ matrix-vector multiplications, the application of an iterative method reduces the computational complexity of solving a system of linear equations to $O(mn)$.
+In the following, we first introduce basic iterative methods, such as the Jacobi and Gauss-Seidel method, and then derive fundamental statements about their convergence. 
 %Finally, as multigrid methods represent the fundamental basis for this work, we discuss these methods in greater detail.   
 \subsection{Jacobi and Gauss-Seidel} 
 We begin our introduction of basic iterative methods by considering the general system of linear equations
@@ -29,10 +30,10 @@ We begin our introduction of basic iterative methods by considering the general 
 	\label{eq:general-system-of-linear-equations}
 \end{equation}
 where $A \in \mathbb{C}^{n \times n}$ is the coefficient matrix, $\bm x \in \mathbb{C}^n$ the vector of unknowns and $\bm b \in \mathbb{C}^n$ the right-hand side.
-At this point we do not specify whether $A$ is represented as a dense/sparse matrix or a stencil, as long as all the operations employed within the subsequent methods are well-defined for a mathematical object of this type.
+At this point, we do not specify whether $A$ is represented as a dense/sparse matrix or a stencil, as long as all the operations employed within subsequent steps are well-defined for a mathematical object of this type.
 We can now rewrite Equation~\eqref{eq:general-system-of-linear-equations} to obtain
 \begin{equation}
-	\bm{x} = \bm{x} + \bm b - A \bm{x}.
+	\bm{x} = \bm{x} + \bm{b} - A \bm{x}.
 	\label{eq:general-fixed-point}
 \end{equation}
 Which can be considered a fixed point of the form
@@ -52,9 +53,9 @@ Next, we consider
 	\label{eq:general-preconditioned-system-of-linear-equations}
 \end{equation}
 which represents a modified version of Equation~\eqref{eq:general-system-of-linear-equations}, that is obtained by multiplying each side of the equation by the inverse of a matrix $M$.
-By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and therefore has the same solution.
-However, it can be also considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as preconditioner.
-By, again, considering the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} we obtain the iteration
+By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and, therefore, has the same solution.
+However, it can be also considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as a preconditioner.
+By again considering the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} we obtain the iteration
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:general-stationary-iterative-method}
@@ -70,16 +71,17 @@ which leads to
 \begin{equation}
 	\bm{x}^{(k+1)} = A^{-1}\bm b.
 \end{equation}
-The result of this iteration $x^{(k+1)}$ is hence independent of the choice of $x^{(k)}$ and if we insert $A^{-1}\bm b$ Equation~\eqref{eq:general-system-of-linear-equations} it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
-Since the computation of the inverse of a general matrix $A$, in general, is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is impracticle.
-However, with it we can already provide an intuition about the choice of $M$.
-The closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method will usually be.
-In contrast, the choice of a matrix $M$ that is easy to invert, where the Richardson iteration represents a extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute, but potentially suffers from slow convergence.
-Before we introduce some basic iterative methods that fall into this framework, note that we can reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
+The result of this iteration $\bm{x}^{(k+1)}$ is, thus, independent of the choice of $\bm{x}^{(k)}$. 
+If we insert $\bm{x} = A^{-1}\bm b$ into Equation~\eqref{eq:general-system-of-linear-equations}, it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
+Since the computation of the inverse of a general matrix $A$ is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is, of course, impractical.
+However, this derivation already provides us with an intuition about the choice of $M$.
+In fact, the closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method can be expected to be.
+In contrast, the choice of a matrix $M$ that is easy to invert, with the Richardson iteration representing the extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute but that potentially suffers from slow convergence.
+Before we introduce some basic iterative methods that fall into the framework of Equation~\eqref{eq:general-stationary-iterative-method}, note that a reformulation of this equation yields
 \begin{equation}
 	M (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)}. 
 \end{equation}
-Moreover, by defining $\bm{c}^{(k+1)}$ as the correction term
+By then defining $\bm{c}^{(k+1)}$ as the correction term
 \begin{equation}
 	\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)},
 \end{equation}
@@ -92,7 +94,7 @@ The solution of this system $\bm{c}^{(k+1)}$ then provides us with the approxima
 \begin{equation}
 	\bm{x}^{(k+1)} =  \bm{x}^{(k)} + \bm{c}^{(k+1)}.
 \end{equation}
-To obtain a new approximate solution in every iteration, we can, therefore, solve the system of linear equations denoted by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}, instead of computing the inverse of $M$.
+To obtain a new approximate solution in every iteration, we can, therefore, solve the system of linear equations represented by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}, instead of computing the inverse of $M$.
 
 Since, as we have already mentioned, it is desirable to choose $M \approx A$, we define the splitting
 \begin{equation}
