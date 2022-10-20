@@ -19,9 +19,9 @@ These so-called \emph{boundary conditions} (BCs) can usually be classified in fo
 Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
 The difference between Robin and Cauchy BCs is that in the former case, one condition is formulated as a weighted average of $u$ and its derivative in the normal direction, while in the latter, two conditions must be met individually.
 While depending on the boundary conditions, an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs, such a solution has not been discovered, or its computation is unfeasible.
-A remedy is the application of so-called numerical methods that are based on approximating the solution of a given PDE on a discrete set of grid points. 
-\subsection{Grid Creation}
-Before computing a numerical approximation of the solution of a given PDE, we need to define a set of discrete points within the domain $\Omega$ at which we aim to obtain the solution.
+A remedy is the application of so-called numerical methods that are based on approximating the solution of a given PDE on a discrete set of points. 
+%\subsection{Grid Creation}
+%Before computing a numerical approximation of the solution of a given PDE, we need to define a set of discrete points within the domain $\Omega$ at which we aim to obtain the solution.
 Usually, these points are defined on a grid or mesh with a particular structure.
 In general, a distinction is made between structured (or regular) and unstructured grids.
 A structured grid is characterized by the uniform neighborhood of its grid points, which means that the number of neighbors is typically the same for each grid point.
@@ -57,15 +57,13 @@ Adding Equation~\eqref{eq:taylor-backward} to Equation~\eqref{eq:taylor-forward}
 	 \dv[2]{x} u(x) \approx \frac{u(x + h) + u(x - h) - 2u(x)}{h^2}.
 \end{equation}
 Using the same technique similar approximation terms can be obtained for higher-dimensional functions and higher-order derivatives~\cite{strikwerda2004finite}.
-While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together with more complicated discretization approaches such as the finite volume (FVM) and finite element method (FEM) together with the use of semi-structured or unstructured grids.
-For an in-depth introduction to these methods, the reader is referred to one of the following references:
-\cite{versteeg2007introduction,zienkiewicz2005finite}
+While finite differences offer a simple and straightforward way to approximate a given PDE on a set of structured grid points, in many cases the underlying physical requirements and complex geometries necessitate the use of semi-structured or even unstructured grids together with more complicated discretization approaches such as the finite volume (FVM) and finite element method (FEM)~\cite{versteeg2007introduction,zienkiewicz2005finite}
 \subsection{Model Problem}
-To illustrate the previous two sections, we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
+To illustrate the approach described in the previous section, we consider the following model problem, which represents a two-dimensional version of Poisson's equation:
 \begin{equation}
 	\begin{split}
-		-\frac{\partial^2}{\partial x^2} u(x,y) - \frac{\partial^2}{\partial y^2} u(x,y) & = f(x, y) \quad \forall x, y \in (0, 1) \\
-		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) & = 0 \quad \forall x, y \in (0, 1)
+		-\frac{\partial^2}{\partial x^2} u(x,y) - \frac{\partial^2}{\partial y^2} u(x,y) = f(x, y) \quad & \forall x, y \in (0, 1) \\
+		u(0, y) = u(x, 0) = u(1, y) = u(x, 1) = 0 \quad & \forall x, y \in (0, 1)
 	\end{split}
 	\label{eq:2D-poisson-model}
 \end{equation}
@@ -73,14 +71,14 @@ Note that this equation corresponds to the two-dimensional steady-state heat equ
 We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences and a uniform step size $h$, which yields
 \begin{equation}
 	\begin{split}
-		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) & = f_{i, j} \quad \forall i, j \in \{1, 2, \dots n\} \\
-		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} & = 0 \quad \forall i, j \in \{1, 2, \dots n\}
+		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) = f_{i, j} \quad & \forall i, j \in \{1, 2, \dots, n\} \\
+		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} = 0 \quad & \forall i, j \in \{1, 2, \dots, n\}
 	\end{split} 
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
 with $u_{i,j} = u(ih, jh)$, $f_{i,j} = f(ih, jh)$ and $n = 1/h - 1$.
-By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be transformed to a system of linear equation of type $A \bm{u} = \bm{f}$. 
-For instance, setting $h = 0.25$, results in $n = 3$ and, hence, a total number of nine grid points.
+By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be formulated as a system of linear equation of type $A \bm{u} = \bm{f}$. 
+For instance, setting $h = 0.25$, results in $n = 3$ and a total number of nine grid points.
 %TODO draw grid
 Assuming a natural ordering of grid points, we can represent the resulting system of linear equations as follows
 \begin{equation}
@@ -93,7 +91,7 @@ Assuming a natural ordering of grid points, we can represent the resulting syste
 \end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f
 \label{eq:2D-poisson-assembled-matrix}
 \end{equation}
-with a right-hand side $\bm f$, which can be further reduced with respect to the given boundary conditions that assume a constant value of zero at all boundary points:
+with a right-hand side $\bm f$. This system can be further reduced by incorporating the given Dirichlet BCs, which assume a constant value of zero at all boundary points:
 \begin{equation}
 \bm f = \begin{pmatrix}
 		f_{11} + \frac{1}{h^2} (u_{10} + u_{01}) \\f_{12} + \frac{1}{h^2} u_{02} \\ f_{13} + \frac{1}{h^2} (u_{03} + u_{14})  \\ f_{21} + \frac{1}{h^2} u_{20} \\ f_{22} \\ f_{23} + \frac{1}{h^2} u_{24} \\ f_{31} + \frac{1}{h^2} (u_{30} + u_{41}) \\ f_{32} + \frac{1}{h^2} u_{42} \\ f_{33} + \frac{1}{h^2} (u_{34} + u_{43})
@@ -111,17 +109,18 @@ f_{33}
 \label{eq:2D-poisson-assembled-rhs}
 \end{equation}
 Note that $A$ represents a sparse matrix, which means that only a minority of its entries are nonzero.
-Moreover, since we already represent the solution of Equation~\ref{eq:2D-poisson-model-discrete} on a regular grid, storing the resulting linear system in a matrix-vector format is inefficient.
-If we assume that each operation required for solving a system of linear equations can be formulated in form of a matrix-vector or vector-vector operation, it is unnecessary to store the corresponding matrix explicitly.
+Moreover, since we already represent the solution of Equation~\eqref{eq:2D-poisson-model-discrete} on a regular grid, storing the resulting linear system in a matrix-vector format is inefficient.
+If we assume that each operation required for solving a system of linear equations can be formulated as a matrix-vector or vector-vector operation, it is unnecessary to store the corresponding matrix explicitly.
 Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
-On regular grids, each of such pattern can be represented as a so-called stencil code.
+On regular grids, each such pattern can be represented as a so-called \emph{stencil code}.
+
 \subsection{Stencil Codes}
 \label{subsec:stencil-codes}
-In the previous section, we have already introduced to notion of a so-called regular grid, which can be defined more formally as
+In the previous section, we have already introduced the notion of a regular grid, which can be defined more formally as
 \begin{equation}
 	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \circ \bm{h}, \bm{i} \in \mathbb{N}^d \right\},
 \end{equation}
-where $d \in \mathbb{N}$ is the dimensionality of the problem and $\circ$ represents the Hadamard-product between two vectors.\footnote{Even though when used as an subscript the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
+where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\circ$ represents the Hadamard product between two vectors.\footnote{Even though when used as a subscript the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
 A grid function or variable $u_h$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
@@ -137,18 +136,18 @@ As in the previous section one often makes use of the simplified notation
 		& u_{i,j,k} = u_{h_x, h_y, h_z}(i h_x, j h_y, k h_z).
 	\end{split}
 \end{equation}
-More formally we can define the general stencil $S_h$ as a finite set of $m$ tuples of the following form:
+We then define the general stencil $S_h$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
 	\begin{split}
-			& S_h = \{(\bm{a}_k, b_k) \}_{k=1, h}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots (\bm{a}_m, b_m)\}_h, m \in \mathbb{N}
+			& S_h = \{(\bm{a}_k, b_k) \}_{h,k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots, (\bm{a}_m, b_m)\}_h, m \in \mathbb{N}
 	\\ & \forall \, i, j, k \in \{1, 2, \dots, m \}: \,
-	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{with} \; i \neq j, \; b_k \in \mathbb{C}.
+	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{if} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \label{eq:stencil-definition}
 \end{equation}
 Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
-For one- and two-dimensional problems, it is often more convenient to use the alternative notation 
+For one- and two-dimensional problems, it is often more convenient to use the alternative notations 
 \begin{equation}
 	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
@@ -164,7 +163,7 @@ and
 		& \vdots & \vdots & \vdots &
 	\end{bmatrix}_{h_x, h_y}.
 \end{equation}
-We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two dimensional stencil, such that
+We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two-dimensional stencil, such that
 \begin{equation}
 	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
@@ -192,11 +191,11 @@ For $d = 3$, we can formulate the application of a three-dimensional stencil $S_
 	\begin{bmatrix}
 	\vdots \\ u_{i,j,k-1} \\ u_{i,j,k} \\ u_{i,j,k+1} \\ \vdots 
 	\end{bmatrix} \\
-	& = \dots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \dots .
+	& = \cdots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \cdots .
 	\end{split}
 \end{equation}
 
-As a two-dimensional example we consider the following five-point stencil defined on a two-dimensional regular grid with uniform step size $h_x = h_y = h$:
+As an example, we consider the following five-point stencil defined on a two-dimensional regular grid with uniform step size $h_x = h_y = h$:
 \begin{equation}
 	\begin{split}
 		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}_{h,h}.
@@ -208,16 +207,16 @@ Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields
 	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
-From this example it becomes evident that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can be always considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
+From this example, it becomes evident that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can always be considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
 Therefore, in case it is possible to define each computational step for solving a given discretized PDE on a regular grid by means of a stencil application, we only need to obtain the respective stencil entries instead of assembling or even storing a complete matrix.
-Furthermore, many operators defined for matrices can be easily transferred into the domain of stencil codes.
+Furthermore, many operators defined for matrices can similarly be formulated as a stencil operation.
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
 	\alpha S_h = \{(\bm{a}_k, \alpha b_k) \}_{k=1, h}^m, m \in \mathbb{N}
 \end{equation}
 
-Next, we can define certain binary operations such as the addition, subtraction and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
+Next, we can formulate certain binary operations such as the addition, subtraction, and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
 Equation~\eqref{eq:stencil-addsub} contains a recursive definition of stencil addition and subtraction.
 Here, we simply add the weights of each entry with the same offset contained in both $A_h$ and $B_h$.
 In case an offset is not contained in both stencils the respective tuple is included unmodified.  
@@ -242,29 +241,28 @@ In case an offset is not contained in both stencils the respective tuple is incl
 	\end{cases}
 \label{eq:stencil-addsub}
 \end{equation}
-Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definition of the multiplication of two stencils $A_h$ and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
+Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definition for the multiplication of two stencils $A_h$ and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
 % Stencil multiplication
 \begin{equation}
 	A_h \cdot B_h = 
 	\begin{cases}
-		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} +  \{(\bm{a}, b ) \} \cdot \tilde{B}_h + \tilde{A}_h \cdot B_h & \text{if} \; A_h = \{(\bm{a}, b ) \} \cup \tilde{A}_h \\
-		&
-		\text{and} \; B_h = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B}_h \\
+		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} \; + & \text{if} \; A_h = \{(\bm{a}, b ) \} \cup \tilde{A}_h \\
+		\{(\bm{a}, b ) \} \cdot \tilde{B}_h + \tilde{A}_h \cdot B_h & 
+		\text{and} \; B_h = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B}_h \\ & \\
 		\emptyset & \text{if} \; A_h = \emptyset \vee B_h = \emptyset
 	\end{cases}
 \label{eq:stencil-mult}
 \end{equation}
-Here, to compute the stencil product $A_h \cdot B_h$, for each pair of entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
-To define this computation recursively, we first pick random entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combine them as described above.
+To compute the stencil product $A_h \cdot B_h$, for each pair of entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
+To define this computation recursively, we first pick two entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combine them as described above.
 We then multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A_h$ with the remainder stencil $\tilde{B}_h = B_h \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B_h$.
 Finally, the process is continued recursively by computing the product of the remainder $\tilde{A}_h = A_h \setminus \{(\bm{a}, b ) \}$, with the original stencil $B_h$.
-Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to sum up the corresponding weights and combine them in a single tuple.
-For this purpose, we employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}, to sum up all tuples with matching offset obtained within each recursive subcomputation.
-%TODO introduce array stencil notation for 1D and 2D
+Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to accumulate the corresponding weights and combine them in a single tuple.
+To add up all tuples with matching offset obtained within each recursive sub-computation, we, therefore, employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}.
 \subsection{Systems of Partial Differential Equations}
 \label{subsec:systems-of-pdes}
-While so far we have only considered problems formulated in form of a single partial differential equation, many phenomena can only be modeled in form of a system of PDEs.
-One of the most simple systems of PDEs is the so-called biharmonic equation
+While so far we have only considered a single partial differential equation, many phenomena can only be modeled in the form of a system of PDEs.
+One of the most simplest examples for such a system is the so-called biharmonic equation
 \begin{equation}
 	\begin{split}
 		\nabla^2 u & = v  \\
@@ -272,11 +270,11 @@ One of the most simple systems of PDEs is the so-called biharmonic equation
 	\end{split}
 \label{eq:biharmonic-system}
 \end{equation}
-As a remark, note that this system is mathematically equivalent to the scalar equation 
+Note that this system is mathematically equivalent to the scalar equation 
 \begin{equation}
 	\nabla^4 u = f.
 \end{equation}
-We can reformulate Equation~\eqref{eq:biharmonic-system} to obtain
+By utilizing matrix-vector notation, we can reformulate Equation~\eqref{eq:biharmonic-system} as
 \begin{equation}
 	\underbrace{
 	\begin{pmatrix}
@@ -321,12 +319,13 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 \forall i,j \in \{1, 2, \dots n\},
 	\label{eq:2D-biharmonic-system-stencil}
 \end{equation}
-where $\Delta_h^{(5)}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
-Equation~\eqref{eq:2D-biharmonic-system-stencil} then represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
-If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations is obtained whose solution corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
+where $\Delta_{h,h}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
+Equation~\eqref{eq:2D-biharmonic-system-stencil} represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
+If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations which corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
+
 Before we conclude this section, it is important to mention that we have not yet discussed how each variable, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
-While it is tempting to always place each variable at the same position within a grid, in many applications this leads to undesirable numerical properties.%TODO insert reference
-As a consequence, often more complex grid placing strategies are used in practice, for instance so-called staggered grids, which we, for the sake of brevity, do not discuss here.
+While it is tempting to always place each variable at the same position within a grid, in many applications, this leads to undesirable numerical properties.%TODO insert reference
+As a consequence, often more complex grid placing strategies are used in practice, for instance, so-called staggered grids, which we, for the sake of brevity, do not discuss here.
 For a detailed treatment of these techniques, the reader is referred to %TODO insert suitable reference
 .
 Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
