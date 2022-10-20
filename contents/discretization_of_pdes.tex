@@ -9,7 +9,7 @@ Consider, for instance, the equation
 where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^d$.
 Equation~\eqref{eq:heat-equation} describes the temperature distribution inside a medium whose thermal conductivity is determined by the coefficient $\alpha$ and which contains a heat source $f$.
 Since Equation~\eqref{eq:heat-equation} is only satisfied in the interior of the domain $\Omega$, we, additionally, need to define a set of conditions at its boundaries.
-These so-called \emph{boundary conditions} (BCs) can usually be classified in four different types:
+These so-called \emph{boundary conditions} (BCs) can usually be classified into four different types:
 \begin{description}
 	\item[Dirichlet] $u(\bm{x}) = g(\bm{x})$
 	\item[Neumann] $\frac{\partial}{\partial \vec{n}} u(\bm{x}) = 0$
@@ -30,7 +30,9 @@ Computations are usually easier to implement and more efficient on structured gr
 However, structured grids are often challenging to create on complicated and irregular domains.
 On the other hand, unstructured grids offer a higher degree of flexibility and are also well-suited for the previously mentioned cases~\cite{knupp2020fundamentals}.
 This thesis focuses on numerical methods that can be formulated on a hierarchy of structured grids, and, in the following, we restrict ourselves to this particular grid type.
-One possibility to approximate a given PDE on a structured set of grid points is to compute the Taylor series expansion around each point, leading to the so-called \emph{finite difference method} (FDM).
+Furthermore, while there exists a wide range of different PDEs, of which many also describe time-dependent phenomena, we only discuss discretization methods that can be applied in the spatial domain.
+However, note that the techniques described in this thesis can, in principle, also be utilized for the numerical solution of time-dependent PDEs, for instance, by applying them within an implicit time-stepping scheme~\cite{ames2014numerical}.
+One possibility to approximate a certain (time-independent) PDE on a structured grid is to compute the Taylor series expansion around each grid point, leading to the so-called \emph{finite difference method} (FDM).
 \subsection{Finite Difference Method}
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
@@ -294,7 +296,7 @@ By utilizing matrix-vector notation, we can reformulate Equation~\eqref{eq:bihar
 }_{\bm{f}}.
 \label{eq:biharmonic-system-matrix-formulation}
 \end{equation}
-While in contrast to our previous examples Equation~\eqref{eq:biharmonic-system-matrix-formulation} includes partial derivatives of multiple variables, we can employ the same techniques to discretize each individual operator and obtain a corresponding system of linear equations. 
+Even though Equation~\eqref{eq:biharmonic-system-matrix-formulation} now includes partial derivatives of multiple variables, we can employ the same techniques to discretize each individual operator and obtain a corresponding system of linear equations. 
 Consider the two-dimensional biharmonic system
 \begin{equation}
 	\begin{split}
@@ -322,16 +324,12 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 where $\Delta_{h,h}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
 Equation~\eqref{eq:2D-biharmonic-system-stencil} represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
 If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations which corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
-
 Before we conclude this section, it is important to mention that we have not yet discussed how each variable, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
-While it is tempting to always place each variable at the same position within a grid, in many applications, this leads to undesirable numerical properties.%TODO insert reference
-As a consequence, often more complex grid placing strategies are used in practice, for instance, so-called staggered grids, which we, for the sake of brevity, do not discuss here.
-For a detailed treatment of these techniques, the reader is referred to %TODO insert suitable reference
-.
-Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
-These boundary conditions can be of the same type as described above.
-Again, for a more detailed treatment of boundary conditions for systems of PDEs, the reader is referred to %TODO insert suitable reference
-.
- 
+While it is tempting to always place each variable at the same position within a grid, in certain applications, such as the incompressible Navier-Stokes equation, this can lead to adverse numerical properties.
+As a consequence, often more complex grid placing strategies, such as so-called staggered discretizations, need to be used in practice~\cite{trottenberg2000multigrid}, which we, for the sake of brevity, do not further discuss here.
+After introducing suitable numerical discretization methods that allow us to transfer a given system of PDEs into a system of linear equations, we can next direct our attention to the efficient solution of these systems.
+%Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
+%These boundary conditions can be of the same type as described above.
+%Again, for a more detailed treatment of boundary conditions for systems of PDEs, the reader is referred to %TODO insert suitable reference. 
 
 
