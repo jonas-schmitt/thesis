@@ -75,9 +75,9 @@ The result of this iteration $\bm{x}^{(k+1)}$ is, thus, independent of the choic
 If we insert $\bm{x} = A^{-1}\bm b$ into Equation~\eqref{eq:general-system-of-linear-equations}, it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
 Since the computation of the inverse of a general matrix $A$ is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is, of course, impractical.
 However, this derivation already provides us with an intuition about the choice of $M$.
-In fact, the closer $M^{-1}$ is to the actual inverse of $A$, the faster the convergence of the respective stationary iterative method can be expected to be.
-In contrast, the choice of a matrix $M$ that is easy to invert, with the Richardson iteration representing the extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute but that potentially suffers from slow convergence.
-Before we introduce some basic iterative methods that fall into the framework of Equation~\eqref{eq:general-stationary-iterative-method}, note that a reformulation of this equation yields
+In fact, the closer $M^{-1}$ is to the actual inverse of $A$, the faster we can expect the convergence of the respective stationary iterative method to be.
+In contrast, the choice of a matrix $M$ that is easy to invert, with Richardson's iteration representing the extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute but that potentially suffers from slow convergence.
+Before we introduce some basic iterative methods that fall into the framework of Equation~\eqref{eq:general-stationary-iterative-method}, note that it can be reformulated as
 \begin{equation}
 	M (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)}. 
 \end{equation}
@@ -94,23 +94,23 @@ The solution of this system $\bm{c}^{(k+1)}$ then provides us with the approxima
 \begin{equation}
 	\bm{x}^{(k+1)} =  \bm{x}^{(k)} + \bm{c}^{(k+1)}.
 \end{equation}
-To obtain a new approximate solution in every iteration, we can, therefore, solve the system of linear equations represented by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}, instead of computing the inverse of $M$.
+Instead of computing the inverse of $M$ in each iteration, we can, therefore, solve the system of linear equations represented by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}.
 
-Since, as we have already mentioned, it is desirable to choose $M \approx A$, we define the splitting
+To derive a suitable choice for $M$ that leads to a faster convergence than Richardson's iteration, we define the splitting
 \begin{equation}
 	A = D - L - U,
 \end{equation} 
-where $D$ is the lower diagonal, $-L$ the lower triangular and $-U$ the upper triangular part of $A$, respectively.
-Both the Jacobi as well as the Gauss-Seidel method are defined based on this splitting.
+where $D$ is the lower diagonal, $-L$ the lower triangular, and $-U$ the upper triangular part of $A$, respectively.
+Both the Jacobi and the Gauss-Seidel method is defined based on this splitting.
 First of all, setting $M = D$, yields the Jacobi method
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + D^{-1}(\bm b - A \bm{x}^{(k)}).
 	\label{eq:jacobi-method}
 \end{equation}
-Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all its diagonal entries.
-Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ with the diagonal matrix $D^{-1}$.
-To define the Jacobi method in the domain of stencil codes with respect to our derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$.
-As an offset of zero in each dimension always refers to the grid point on which the stencil is applied and therefore to the diagonal entry in each line of the corresponding matrix.
+Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all of its diagonal entries.
+Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ by the diagonal matrix $D^{-1}$.
+To define the Jacobi method as a series of stencil operations, according to the derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$.
+Since a stencil entry with an offset of zero always refers to the current grid point, its value is equal to the corresponding diagonal entry of the matrix $A$.
 We can therefore define the diagonal of $S$ as
 \begin{equation}
 	\text{diag}(S_h) = \begin{cases}
@@ -119,7 +119,7 @@ We can therefore define the diagonal of $S$ as
 	\end{cases}
 	\label{eq:stencil-diag}
 \end{equation}
-Based on this definition, we can also specify the inverse diagonal of a stencil as
+Based on this definition, we can also derive the inverse diagonal of a stencil as
 \begin{equation}
 	\text{diag-inv}(S_h) = \begin{cases}
 		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S_h \\
@@ -133,40 +133,40 @@ Because the Jacobi method, as defined in Equation~\eqref{eq:jacobi-method}, does
 	\label{eq:weighted-jacobi-method}
 \end{equation}
 where $\omega$ is chosen from the interval $\left(0, 2\right)$.
-Here, a value of $\omega$ smaller than one is usually called underrelaxation, while for a value greater than one the term overrelaxation is used.
+Here, employing a value $\omega$ smaller than one is called underrelaxation and larger than one overrelaxation.
 Note that $\omega = 1$ leads to the original Jacobi method without any relaxation.
 
-Next, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
+As a second variant of Equation~\eqref{eq:general-stationary-iterative-method}, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
 \begin{equation}
 	(D - L) \bm{c}^{(k+1)} = \bm{b} - A \bm{x}^{(k)}, 
 	\label{eq:gauss-seidel-method}
 \end{equation}
-where, again, $\bm{c}^{(k+1)}$ is the correction term $\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)}$.
-Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily obtain its inverse, but instead solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
-As $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back substitution. 
-To apply the Gauss-Seidel method within the domain of stencil codes, we also need to define a function that extracts the lower triangle of a given stencil.
-As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by only including all entry with an offset lower than zero.
+where $\bm{c}^{(k+1)}$ is again the correction term $\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)}$.
+Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily compute its inverse, but instead need to solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
+However, since $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back-substitution~\cite{saad2003iterative}. 
+To formulate the Gauss-Seidel method as a sequence of stencil operations, we now additionally need to define a function that extracts the lower triangle of a given stencil.
+As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by only including all entries with an offset lower than zero.
 The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 \begin{equation}
 	\text{lower}(S_h) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-lower}
 \end{equation}
 
-Similarly, we can also provide a definition for obtaining the upper triangle of a given stencil, which is formulated in Equation~\eqref{eq:stencil-upper}.
+Similarly, we can also extract the upper triangle of a given stencil, which is formulated in Equation~\eqref{eq:stencil-upper}.
 \begin{equation}
 	\text{upper}(S_h) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \; \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
+		\text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
 		\emptyset & \text{else}.
 	\end{cases}
 	\label{eq:stencil-upper}
 \end{equation}
-While there are many more iterative methods that can be formulated in the form of Equation~\eqref{eq:general-stationary-iterative-method}, the goal of this section is to introduce only those concepts necessary for a basic understanding of these method's functioning.
-Therefore, we postpone the treatment of other and more advanced variants of the methods presented here to later chapters of this thesis. 
+While there are many more iterative methods that can fit into the framework of Equation~\eqref{eq:general-stationary-iterative-method}, the goal of this section is to introduce only those concepts necessary for a basic understanding of their functioning.
+Therefore, we postpone the treatment of other and more advanced variants of the methods presented here to later chapters of this thesis.
 
 \subsection{Convergence}
 In contrast to direct methods, which compute the solution of a given system of linear equations in a fixed number of computational steps, iterative methods compute a series of approximations.
