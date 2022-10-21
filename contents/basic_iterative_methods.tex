@@ -170,32 +170,30 @@ Therefore, we postpone the treatment of other and more advanced variants of the 
 
 \subsection{Convergence}
 In contrast to direct methods, which compute the solution of a given system of linear equations in a fixed number of computational steps, iterative methods compute a series of approximations.
-The method is then said to convergence when the difference between the actual solution and subsequent approximations approaches zero.
-To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained through a specific iterative method.
-First of all, we can define the error in iteration $k$ as
+This series is said to converge when the difference between the actual solution and subsequent approximations approaches zero.
+To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained with a specific iterative method.
+First of all, assuming $\bm{x}^{(k)}$ is the $k$th approximation and $\bm{x}^{*}$ the correct solution of the system, we can define the error in iteration $k$ as
 \begin{equation*}
-	\bm{e}^{(k)} = \bm{x}^{(k)} - \bm{x}^{*},
+	\bm{e}^{(k)} = \bm{x}^{(k)} - \bm{x}^{*}.
 \end{equation*}
-where $\bm{x}^{(k)}$ is the $k$th approximation and $\bm{x}^{*}$ the correct solution of the system.
-While the error gives as an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations and therefore are not able to compute this metric.
-As a remedy, we can instead consider the residual
+While the error gives us an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations.
+As a remedy, we instead consider the residual
 \begin{equation*}
 	\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)},
 \end{equation*}
-which can be always computed irrespective of whether the solution of the system is known.
-Note that the residual will be always zero in case the error is zero.
-We then reconsider that the iterative methods introduced in the last section can be all considered a fixed-point iteration of the form
+which can always be computed irrespective of whether we know $\bm{x}^{*}$.
+Note that for an error of zero, the residual vanishes as well.
+Remember that the iterative methods introduced in the last section can all be considered as a fixed-point iteration of the form
 \begin{equation}
-	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}),
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}).
 \end{equation}
-and assume that $\bm{e}^{(k)} = \bm{0}$.
-Hence, we have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
+Assuming that $\bm{e}^{(k)} = \bm{0}$, we, thus, have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{*}.
 \end{equation}
 The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method.
-However, note that this represents a necessary and not a sufficient condition. 
-We, therefore, consider an arbitrary fixed-point of Equation~\eqref{eq:general-stationary-iterative-method}
+However, note that this represents a necessary and not sufficient condition. 
+Consider an arbitrary fixed-point of Equation~\eqref{eq:general-stationary-iterative-method}
 \begin{equation*}
 	\bm{x} = \bm{x} + M^{-1}(\bm b - A \bm{x}).
 \end{equation*}
