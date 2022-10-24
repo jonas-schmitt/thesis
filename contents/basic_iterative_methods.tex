@@ -202,15 +202,14 @@ Transforming this equation again into a system of linear equations yields
 	M^{-1} A \bm{x} = M^{-1}\bm b,
 \end{equation*}
 which means that each fixed-point $\bm{x}$ represents a solution of the preconditioned linear system~\eqref{eq:general-preconditioned-system-of-linear-equations} and, hence, also of the original system~\eqref{eq:general-system-of-linear-equations}.
-If we assume that $A$ is a square, nonsingular matrix, the solution of each system of linear equations with $A$ as its coefficient matrix is unique and, therefore, it must be true that $\bm{x} = \bm{x}^{*}$.
-After we have ensured that in case a stationary iterative method has converged to a fixed-point $\bm{x}$, it is equal to the correct solution of the linear system the method aims to solve.
-However, the question remains to be answered under which conditions a sequence of the form of Equation~\eqref{eq:general-stationary-iterative-method} converges to a fixed point and how many iteration must be performed to achieve this goal.
-For this purpose, we, again, reformulate Equation~\eqref{eq:general-stationary-iterative-method} to obtain
+If we assume that $A$ is a square, nonsingular matrix, the solution of each system of linear equations with $A$ as its coefficient matrix is unique. 
+Therefore, it must be true that $\bm{x} = \bm{x}^{*}$, which means that the computed fixed point is equal to the correct solution of the linear system the method aims to solve.
+However, the question remains to be answered under which conditions a sequence of the form of Equation~\eqref{eq:general-stationary-iterative-method} converges to a fixed point and how many iterations must be performed to achieve this goal.
+For this purpose, we rewrite Equation~\eqref{eq:general-stationary-iterative-method} again to obtain
 \begin{equation}
-	\bm{x}^{(k+1)} = (I - M^{-1} A) \bm{x}^{(k)} + M^{-1}\bm b,
+	\bm{x}^{(k+1)} = (I - M^{-1} A) \bm{x}^{(k)} + M^{-1}\bm b.
 \end{equation}
-as an alternative formulation.
-Within this equation can now set $\bm{x}^{i} = \bm{x}^{0}$ 
+Within this equation we can now set $\bm{x}^{i} = \bm{x}^{0}$ 
 \begin{equation}
 	\bm{x}^{(1)} = (I - M^{-1} A) \bm{x}^{(0)} + M^{-1}\bm b,
 \end{equation}
@@ -224,27 +223,26 @@ By continuing this recursively for an arbitrary number of $k$ times, we see that
 	\label{eq:stationary-iterative-method-series}
 \end{equation}
 which means that we can always separate the term $N^{(k)}\bm{b}$ from the rest of the equation.
-Note that here the superscript $G^k$ means that we have the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(k)}$.
-Since we have obtained Equation~\eqref{eq:stationary-iterative-method-series} from our original formulation it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
+Note that here the superscript $G^k$ denotes the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(k)}$.
+Since we have derived Equation~\eqref{eq:stationary-iterative-method-series} from Equation~\eqref{eq:general-stationary-iterative-method}, it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
 \begin{equation}
 	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
 	\label{eq:iteration-matrix-sequence}
 \end{equation}
-Here, $G = I - M^{-1} A$ is the so-called \emph{iteration matrix} of the given stationary iterative method.
-Before we reason about convergence of this sequence, we introduce the spectral radius 
+Here, $G = I - M^{-1} A$ is the so-called \emph{iteration matrix} of the considered stationary iterative method.
+To reason about the convergence of this sequence, we introduce the spectral radius 
 \begin{equation}
 	\rho (A)=\max \limits_{1 \leq k \leq n} |\lambda _{k}|,
 \end{equation}
 where $A$ is a matrix of rank $n$ with the eigenvalues $\lambda_{1}, \dots, \lambda_{n}$.
 Based on this definition we can then state the following theorem:
 \begin{theorem}
-$\lim \limits_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$.
+$\lim \limits_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$~\cite{varga1962iterative,saad2003iterative}.
 \label{theorem:general-convergence-result}
 \end{theorem}
-%TODO potentially prove theorem
 
 While Theorem~\ref{theorem:general-convergence-result} provides an answer whether the sequence~\eqref{eq:iteration-matrix-sequence} converges to zero, we still do not have any knowledge about the speed of this process.
-For this purpose, we introduce the general \emph{convergence factor} $\rho$ of a sequence of the form of Equation~\eqref{eq:iteration-matrix-sequence} as
+For this purpose, we introduce the general \emph{convergence factor} $\rho$ of a sequence in the form of Equation~\eqref{eq:iteration-matrix-sequence} as
 \begin{equation}
 	\rho = \lim \limits_{k \to  \infty} \left( \max \limits_{x^{(0)} \in \mathbb{R}^{n}} \frac{\norm{\bm{x}^{(k)} - \bm{x}^{*}}}{\norm{\bm{x}^{(0)} - \bm{x}^{*}}} \right)^{\frac{1}{k}}.
 \end{equation} 
@@ -252,17 +250,15 @@ Furthermore, the \emph{convergence rate} $\tau$ is defined as the natural logari
 \begin{equation}
 	\tau = -\ln \rho
 \end{equation}
+We can now establish a link between the spectral radius of the iteration matrix and the convergence factor of the corresponding stationary iterative method by considering the following theorem:  
 \begin{theorem}
-	$\rho = \rho(G)$.
+	$\rho = \rho(G)$~\cite{varga1962iterative,saad2003iterative}.
 	\label{theorem:convergence-factor}
 \end{theorem}
-%TODO potentially prove theorem
-\begin{proof}
-	For a proof of Theorem~\ref{theorem:general-convergence-result} and~\ref{theorem:convergence-factor} the reader is referred to ~\cite{varga1962iterative,saad2003iterative}.
-\end{proof}
-As a result of Theorem~\ref{theorem:convergence-factor} we can state that the spectral radius $\rho(G)$ gives a lower limit for the speed of convergence of every stationary iterative method with an iteration matrix $G = I - M^{-1} A$ that is independent of the choice of the initial vector $\bm{x}^{(0)}$.
-Since stationary iterative methods are all based on the simple formulation in Equation~\eqref{eq:general-stationary-iterative-method}, they are both easy to implement and analyze.
-The application of these methods alone, however, leads to slow convergence in solving many PDE-based problems~\cite{briggs2000multigrid}.
-While many other iterative methods for solving the systems of linear equations arising from the discretization of PDEs have been formulated~\cite{saad2003iterative}, the main focus of this thesis is on multigrid method, which will be discussed in the following section.
+
+As a result of Theorem~\ref{theorem:convergence-factor}, the spectral radius $\rho(G)$ gives a lower limit for the speed of convergence of every stationary iterative method with an iteration matrix $G = I - M^{-1} A$ that is independent of the choice of the initial vector $\bm{x}^{(0)}$.
+Since all basic stationary iterative methods presented in this section are based on Equation~\eqref{eq:general-stationary-iterative-method}, these methods are easy to implement and analyze.
+However, the application of these methods alone usually leads to slow convergence for many PDE-based problems~\cite{briggs2000multigrid}.
+While a large number of different iterative methods for solving PDEs numerically have been proposed~\cite{saad2003iterative}, the main focus of this thesis is on multigrid methods, which will be discussed in the following section.
 
 
