@@ -277,16 +277,16 @@ Finally, alternatively, it is also possible to define overlapping block smoother
 
 \subsection{The Coarse-Grid Correction Scheme}
 The core idea behind multigrid methods is to reduce the oscillatory components of an error by obtaining an approximation of the same problem on a coarser grid.
-As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using similar relaxation techniques that are effective to reduce oscillatory components on the finer grid.
-Before defining this procedure, observe that our original system
+As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using the same smoothing techniques employed on the fine grid.
+Before we can define this approach algorithmically, note that our original system
 \begin{equation}
 	A_h \bm{x}_h = \bm{b}_h
 \end{equation}
 is equivalent to the error equation
 \begin{equation}
-	A_h \left(\bm{x}_h - \bm {x}^{(0)_h}\right) = \bm{b}_h - A_h \bm{x}^{(0)}_h
+	A_h \left(\bm{x}_h - \bm {x}^{(0)}_h\right) = \bm{b}_h - A_h \bm{x}^{(0)}_h
 \end{equation}
-with an arbitrary initial guess $\bm{x}^{(0)}_h$.
+with the arbitrary-chosen initial guess $\bm{x}^{(0)}_h$.
 The subscripts $A_h$ and $\bm{x}_h$ indicate a discretization with step size $\bm{h}$.
 Therefore, each entry of the vector $\bm{x}_h$ represents a grid function value $u_h(\bm{i} \cdot \bm{h})$ at the respective position within the grid.
 We can further introduce the error $\bm{e}_h = \bm{x}_h - \bm {x}^{(0)}_h$ to obtain the equation
@@ -294,21 +294,20 @@ We can further introduce the error $\bm{e}_h = \bm{x}_h - \bm {x}^{(0)}_h$ to ob
 	A \bm{e} = \bm{b} - A \bm{x}^{(0)}.
 	\label{eq:linear-system-error-equation}
 \end{equation}
-The solution $\bm{e}_h$ of this system, which depends on the initial solution $\bm{x}^{(0)}_h$, can then be employed to obtain the solution of the original system by computing
+Based on the solution $\bm{e}_h$ of this system, which depends on the initial solution $\bm{x}^{(0)}_h$, we can, again, obtain the solution of the original system by computing
 \begin{equation}
 	\bm{x}_h = \bm{x}^{(0)}_h + \bm{e}_h.
 \end{equation}
-Consequently, each approximate solution computed for Equation~\eqref{eq:linear-system-error-equation} can be used to obtain an approximation for the solution of the original system of linear equations.
-Now, assume there exists the prolongation and restriction operators, $I_h^{2h}$ and $I_{2h}^h$, that enable us to obtain an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
+Now, assume there exists both a prolongation and restriction operator, $I_h^{2h}$ and $I_{2h}^h$, that enables us to compute an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
 \begin{equation}
 	\bm{x}_{2h} \approx I_h^{2h} \bm{x}_{h}, \;
 	\bm{x}_{h} \approx I_{2h}^{h} \bm{x}_{2h}. 
 \end{equation}
 In general, this approximation can obviously never be exact.
-However, we have already observed that a certain error only consists of smooth components, we can approximate the same components on a coarser grid without a significant loss of accuracy.
-This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, where two error components with different frequency are discretized on a one-dimensional hierarchy of grids with decreasing steps size.
+However, we have already observed that if a certain error exclusively consists of smooth components, we can approximate them on a coarser grid without a significant loss of accuracy.
+This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, which shows the discretization of two error components with different frequencies on one-dimensional uniform grids with decreasing step size.
 Here, the first error component, which possesses a higher frequency, can not be accurately represented on the coarsest grid with step size $h = 2^{-5}$.
-In contrast, the characteristics of the second error component, which is relatively smooth, is still clearly visible on the same grid. 
+In contrast, the course of the second error component, which is relatively smooth, is still clearly visible on the same grid. 
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
@@ -348,18 +347,17 @@ Assuming that the error $\bm{e}_{2h}$ on the coarse grid consists exclusively of
 \begin{equation}
 	\bm{x}^{k+1}_h = \bm{x}^{k}_h + I_{2h}^h \bm{e}_{2h}.
 \end{equation} 
-Now the question remains to be answered how we can compute the error $\bm{e}_{2h}$ on the coarse grid.
-As we have shown Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
-Therefore, we can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2\bm{h}$
+Now the question remains to be answered how we can compute an approximation for the error $\bm{e}_{2h}$ on the coarse grid.
+As we have pointed out above, Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
+We can, therefore, can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2\bm{h}$
 \begin{equation}
 	\underbrace{I_{h}^{2h} A_h I_{2h}^h}_{A_{2h}} \bm{e}_{2h} = I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
 	\label{eq:coarse-grid-error-equation}
 \end{equation}
-Note that we have again made use of the fact that $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$ is a reasonably accurate approximation in case $\bm{e}_{2h}$ is smooth.
-Note that in Equation~\eqref{eq:coarse-grid-error-equation} the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$. 
-This process is usually called \emph{Galerkin coarsening}.
-However, in cases where the operator $A_h$ can be directly discretized on a coarser grid with step size $2h$, it is often also possible to use the resulting operator $A_{2h}$ instead.
-We can therefore derive a two-level-method which is summarized in Algorithm~\ref{alg:two-grid-method}.
+Note that we have again made use of the fact that in case $\bm{e}_{2h}$ is smooth, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$ is a reasonably accurate approximation.
+Note that in Equation~\eqref{eq:coarse-grid-error-equation} the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$, which is called \emph{Galerkin coarsening}.
+However, in cases where the operator $A_h$ can be directly discretized on a coarser grid with step size $2\bm{h}$, it is often also possible to use the resulting operator $A_{2h}$ instead.
+By bringing all these components together, we can formulate the two-level-method shown in Algorithm~\ref{alg:two-grid-method}.
 \begin{algorithm}
 	\caption{Two-Grid Method}
 	\label{alg:two-grid-method}
@@ -373,10 +371,10 @@ We can therefore derive a two-level-method which is summarized in Algorithm~\ref
 		\State{Relax again $A_h \bm{x}_h = \bm{b}_h$ with an initial guess of $\tilde{\bm{x}}_h$}
 	\end{algorithmic}
 \end{algorithm}
-Note that even though we are actually solving Equation~\eqref{eq:coarse-grid-error-equation} on the coarse grid, we have now redefined it as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
-Based on this notation, we could similarly define a two-level method starting from a grid with step size $2h$.
-However, we have not covered the question which initial guess should then be used for the error equation on the coarser level.
-For this purpose, note that one step of smoothing on Equation~\eqref{eq:coarse-grid-error-equation} with an initial guess of zero corresponds to
+Note that while on the coarse grid we are actually solving the error equation, it has been redefined as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
+Based on this notation, we could similarly define a two-level method starting from a grid with step size $2\bm{h}$.
+However, to put this approach into practice, we need to choose an initial guess for the error equation on this level.
+For this purpose, note that one step of smoothing applied to Equation~\eqref{eq:coarse-grid-error-equation} with an initial guess of zero corresponds to
 \begin{equation}
 	\bm{e}_{2h}^{(1)} = M_{2h}^{-1} I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
 	\label{eq:initial-coarse-grid-relaxation}
@@ -385,16 +383,16 @@ Since the error $\bm{e}_{2h}^{(k+1)}$ in step $k+1$ is defined as
 \begin{equation*}
 	\bm{e}_{2h}^{(k+1)} = \bm{x}_{2h}^{(k+1)} - \bm{x}_{2h}^{(k)},
 \end{equation*}
-and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose an initial guess of $\bm{x}_{2h}^{(0)} = I_{2h}^{h} \bm{x}_{h}^{(0)}$ and, hence, obtain the iteration
+and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose $\bm{x}_{2h}^{(0)} = I_{2h}^{h} \bm{x}_{h}^{(0)}$ and, hence, obtain the iteration
 \begin{equation}
 	\bm{x}_{2h}^{(1)} = I_{h}^{2h} \bm{x}_{h}^{(0)} + M_{2h}^{-1} ( I_{h}^{2h} \bm{b}_h - \underbrace{I_{h}^{2h} A_h I_{2h}^{h}}_{A_{2h}} I_{h}^{2h} \bm{x}_{h}^{(0)} ).
 \end{equation}
-Consequently, performing one step of relaxation with a zero initial guess on the coarse-grid error equation corresponds to one step of relaxation on the equation
+Performing one smoothing step with an initial guess of zero on the coarse-grid error equation, therefore, corresponds to one smoothing step applied to the equation
 \begin{equation}
 	I_{h}^{2h} A_h I_{2h}^h \bm{x}_{2h} = I_{h}^{2h} \bm{b}_h,
 \end{equation}
 with an initial guess of $\bm{x}_{2h}^{(0)} = I_{h}^{2h} \bm{x}_{h}^{(0)}$.
-Because smoothing aims to remove the remaining oscillatory components of the error obtained from the fine grid, performing a relaxation of the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
+Because smoothing aims to remove the remaining oscillatory components of the error that have been transferred from the fine grid, applying it in the form of Equation~\eqref{eq:initial-coarse-grid-relaxation} precisely serves this purpose.
 
 \subsection{Restriction and Prolongation}
 \label{subsec:restriction-and-prolongation}
