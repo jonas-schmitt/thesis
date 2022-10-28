@@ -1,22 +1,23 @@
 \section{Evolutionary Program Synthesis}
 \label{sec:gggp}
 %TODO introduce the term evolutionary program synthesis
-\emph{Genetic Programming} (GP) is a class of search algorithms for finding optimal programs based on the principle of natural evolution first proposed by John Koza~\cite{koza1994genetic}.
+Evolutionary program synthesis can be described as the automation of program generation by the use of evolutionary algorithms, which is a class of search algorithms for solving optimization problems based on the principle of natural evolution.
+The class of evolutionary algorithms that is concerned with finding optimal programs is often summarized under the term \emph{Genetic Programming} (GP), which was first proposed by John Koza~\cite{koza1994genetic}.
 In general, a program $p$ can be considered as a mapping from the set of inputs $\mathcal{I}$ to the corresponding set of outputs $\mathcal{O}$
 \begin{equation}
 	p : \mathcal{I} \to \mathcal{O}.
 	\label{eq:gp-program}
 \end{equation}
-However, since not all input-output pairs are known in advance, this mapping is usually given in form of a finite set of training cases.
+However, since not all input-output pairs are known in advance, this mapping is usually given in the form of a finite set of training cases.
 The goal of GP is then to find a program that correctly computes the correct output for each input contained in the training set.
 Since there is often not a unique program that satisfies this condition, usually a number of additional constraints are applied to assess the quality of each correct program.
-For instance, in practice one is often interested in finding the shortest or fastest program that is able to pass all training cases.
+For instance, in practice, one is often interested in finding the shortest or fastest program that is able to pass all training cases.
 Based on a program's effectiveness in solving all training cases under the given constraints, GP then assigns a \emph{fitness} value to each program, which is then treated as an \emph{individual} within a \emph{population} of programs.
 In evolutionary computation, the population is a set of individuals currently considered within the search and, therefore, spans a subspace within the space of solutions for the given search problem.
 Each subsequent step of the search is then performed by generating a new population based on the previous one through \emph{mutation} or recombination (often called \emph{crossover}) of the individuals contained in the current one.
-Usually, the candidates for mutation and crossover are sampled from the current population based on the fitness value computed for each individual.
-If we repeat this procedure for a number of $n$ steps, we arrive at a final population $P_n$, which can then additionally be evaluated on a test set, to obtain the best overall program.
-The resulting search method is summarized in Algorithm~\ref{alg:genetic-programming}. 
+Usually, the candidates for mutation and crossover are sampled from the current population based on the fitness of each individual.
+If we repeat this procedure for a number of $n$ steps, we arrive at a final population $P_n$, which can then, for instance, additionally be evaluated on a test set.
+The resulting search method is summarized in Algorithm~\ref{alg:genetic-programming}, which gives an overview of the general structure of a GP method.
 \begin{algorithm}[t]
 	\caption{Genetic Programming}
 	\label{alg:genetic-programming}
@@ -32,13 +33,13 @@ The resulting search method is summarized in Algorithm~\ref{alg:genetic-programm
 		\State \textbf{Evaluate} the final population $P_{n}$ on a \textbf{test set}  to obtain the best overall program
 	\end{algorithmic}
 \end{algorithm}
-While Algorithm~\ref{alg:genetic-programming} gives an overview of the general structure of a GP method, we have not yet considered how the individual operations such as the generation of an initial population and the creation of new individuals through mutation and crossover can be performed.
-Since all these operations are based on manipulating the internal structure of a given program, the first step in the implementation of a GP method choosing a suitable program representation.
+However, we have yet to define the individual operations, such as the generation of an initial population and the creation of new individuals through mutation and crossover.
+Since all these operations are based on manipulating the internal structure of a given program, the first step towards the implementation of a GP method is the choice of a suitable program representation.
 Note that this representation does not necessarily need to be equal to the target language in which the actual program is supposed to be implemented but rather needs to define a unique mapping that enables its automatic generation.
-This process is usually called \emph{genotype} to \emph{phenotype} mapping, where the genotype refers to the internal representation used within GP while the phenotype then represents the actual program implemented on the target machine.
-One of the most widely used genotype representations is tree-based GP, where each program is internally represented as a tree of expressions, which was also initially proposed by John Koza~\cite{koza1994genetic}.
+This process is usually called \emph{genotype} to \emph{phenotype} mapping, where the genotype refers to the internal representation used within the GP method while the phenotype then represents the actual program implemented on the target machine.
+One of the most widely used genotype representations is tree-based GP, where each program is internally represented as a tree of expressions~\cite{koza1994genetic,poli2008field}.
 \subsection{Representation}\label{sec:gggp-representation}
-In contrast to other evolutionary algorithms algorithms, which usually represent the solution to an optimization problem as an array of discrete or continuous numbers~\cite{back1997handbook}, GP deals with the optimization of programs and, hence, each solution corresponds to an executable program.
+In contrast to other evolutionary algorithms, which represent the solution to an optimization problem as an array of discrete or continuous numbers~\cite{back1997handbook}, in evolutionary program synthesis, we are concerned with the automated discovery of programs. Therefore, each discovered solution corresponds to an executable program.
 %Before we consider these operations in detail, we first need to define a procedure to generate program expression trees in a structured way. 
 To illustrate this, we consider the following example grammar $G$ with the productions
 \begin{equation}
@@ -51,10 +52,11 @@ To illustrate this, we consider the following example grammar $G$ with the produ
 	\end{split}
 \label{eq:gp-example-grammar}
 \end{equation}
-where $V = \{\ps S, \ps E, \ps A, \ps B\}$ is the set of variables, $S = \ps S$ the start variable, and the symbols $x$, $y$ represent numbers while the symbols $u$, $v$ correspond to boolean values, i.e. $\top$ or $\bot$.
-Note that $G$ is context-free, since the left side of each production exclusively consists of a single variable.
-If we treat $x$, $y$, $u$ and $v$ as an input, each expression generated by $G$ can be considered a quaternary function $f(x,y,u,v) \in L_{G}$, where $L_G$ is the language generated by $G$ according to Definition~\ref{def:language}.
-For example the functions
+where $V = \{\ps S, \ps E, \ps A, \ps B\}$ is the set of variables and $S = \ps S$ the start variable.
+Semantically the symbols $x$, $y$ represent numbers while the symbols $u$, $v$ correspond to boolean values, i.e. $\top$ or $\bot$.
+Note that $G$ is context-free since the left-hand side of each production exclusively consists of a single variable.
+If we treat $x$, $y$, $u$ and $v$ as an input, each expression generated by $G$ can be considered as a quaternary function $f(x,y,u,v) \in L_{G}$, where $L_G$ is the language generated by $G$ according to Definition~\ref{def:language}.
+For example, the functions
 \begin{equation}
 	\begin{split}
 		f_1(x,y,u,v) & = \text{if} \; (\neg u \wedge v) \; \text{then} \; (x \cdot x) \; \text{else} \; (x / y) \\
@@ -65,10 +67,10 @@ For example the functions
 By applying the rules of arithmetic and boolean algebra, we can compute the result of each such function based on a given set of inputs.
 Therefore, assuming both $x$ and $y$ represent real-valued numbers, we can evaluate the correctness of the mapping $f : x, y, u, v \to \mathbb{R}$ for an arbitrary number of test cases.
 Next, to define suitable operations for generating arbitrary functions $f \in L_G$, we need to choose a suitable data structure for its representation.
-While a program's structure depends on the programming language it is formulated in, in many cases it is possible to formulate it as a tree of program expressions, which is especially true for languages from the Lisp-family, that have been originally employed in John Koza's work~\cite{koza1994genetic}.
-In tree-based GP all operations are performed on program expression trees and, thus, both mutation and crossover must be designed with respect to this representation.
+While a program's structure depends on the programming language it is formulated in, in many cases, it is possible to formulate it as a tree of program expressions, which is especially true for languages from the Lisp family that have been originally employed in John Koza's work~\cite{koza1994genetic}.
+In tree-based GP, all operations are performed on program expression trees and, thus, both mutation and crossover must be designed with respect to this representation.
 Expression trees can be created in a straightforward way after rewriting each expression in postfix notation. 
-To obtain the corresponding tree, the expressions is traversed sequentially by putting each operand that either represents a terminal symbol or has been already transformed on a stack and then retrieving those operands from the top of the stack for each new operator encountered.
+To obtain the corresponding tree, the expression is traversed sequentially by putting each operand, which either represents a terminal symbol or has already been transformed, on a stack and then retrieving those operands from the top of the stack for each new operator encountered.
 Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression trees for $f_1$ and $f_2$.
 \begin{figure}
 	\begin{subfigure}{0.59\textwidth}
@@ -80,19 +82,19 @@ Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression 
  \caption{Expression trees for $f_1$ and $f_2$, where we have simplified the if-then-else construct to a single ternary operator.}
  \label{fig:gp-expression-tree-examples}
 \end{figure}
-On the other hand, given a certain expression tree, we can easily restore the original expression by traversing the tree recursively in a top-down manner while generating the corresponding expression for each node as soon as each of its operands has been recursively processed or in case it is available as a terminal symbol.
-While expression trees can be both easily generated from a given program, as well as offering an efficient way to evaluate it, they possess an inherent limitation, which is the absence of type information.
-For a better understanding of this, we reconsider the context-free grammar formulated in Equation~\eqref{eq:gp-example-grammar}.
-Therein all productions on the variable $\ps B$ only result in the generation of boolean expressions, while all productions starting from $\ps A$ exclusively lead to arithmetic expressions.
+On the other hand, given a certain expression tree, we can easily restore the original expression by traversing the tree recursively in a top-down manner while generating the corresponding expression for each node as soon as each of its operands has been recursively processed or if it is available as a terminal symbol.
+While expression trees can be easily generated from a given program while offering an efficient way to evaluate it, they possess an inherent limitation, which is the absence of type information.
+For a better understanding of this limitation, we again consider the context-free grammar formulated in Equation~\eqref{eq:gp-example-grammar}.
+Here, all productions on the variable $\ps B$ only result in the generation of boolean expressions, while all productions starting from $\ps A$ exclusively lead to arithmetic expressions.
 As a consequence, we are not allowed to intermix expressions that are derived from $\ps A$ and $\ps B$.
-However, this information is not contained in any of the expressions generated by $G$ and, hence, also missing in the corresponding tree.
-As the generation of each new expression can be performed based on the productions of $G$, it is guaranteed to be valid.
-However, the main step of GP is the creation of new individuals based on the existing ones in the population either through recombination of two individuals (crossover) or by altering certain parts of a given individual (mutation). 
-Both operations require us to investigate which nodes and subtrees of a given expression trees can be safely replaced by an alternative branch without violating the type constraints imposed within the productions of our grammar.
-While it is possible to deal with this problem by simply evicting those individuals that violate any type constraints from the population, depending on the number of constraints, this will be the case for a high percentage of individuals, leading to a highly inefficient method.
+However, this information is not contained in any of the expressions generated by $G$ and is, thus, also missing in the corresponding tree.
+As the generation of each new expression is performed based on the productions of $G$, it is guaranteed to be valid.
+However, the main step of GP is the creation of new individuals based on the ones contained in the population, either through the recombination of two individuals (crossover) or by altering certain parts of an individual (mutation). 
+Both operations require us to investigate which nodes and subtrees of an expression tree can be safely replaced by an alternative branch without violating the type constraints imposed by productions of our grammar.
+While it is possible to deal with this problem by simply evicting those individuals that violate the type constraints from the population, depending on the number of constraints, this will be the case for a high percentage of individuals, rendering this method extremely inefficient.
 A different and usually more efficient approach is to annotate each node within an expression tree with additional type information, which leads to the concept of strongly-typed GP, first proposed by David Montana~\cite{montana1995strongly}.
 Strongly-typed GP represents a viable solution to the problem of retaining type correctness, but it requires us to transform the implicit type information contained within the productions of our grammar into explicit type annotations at the nodes of each expression tree.
-As an alternative we can instead utilize the information encoded in the productions of a grammar $G$ by considering the \emph{derivations} of an expression $e \in L_G$, as defined by
+As an alternative, we can instead utilize the information encoded in the productions of a grammar $G$ by considering the \emph{derivations} of an expression $e \in L_G$, as defined by
 \begin{equation}
 	S \Rightarrow e_1 \Rightarrow e_2 \Rightarrow \dots \Rightarrow e_n \Rightarrow e.
 \end{equation}
@@ -152,20 +154,20 @@ Note that multiple derivations can refer to the same tree, as the order in which
 Again, as an example, the derivation trees for $f_1$ and $f_2$ are shown in Figure~\ref{fig:gp-derivation-tree-examples}.
 \begin{figure}
 	\begin{subfigure}{0.6\textwidth}
-	\includegraphics[scale=0.525]{figures/trees/gp_derivation_tree1.pdf}
+	\includegraphics[scale=0.51]{figures/trees/gp_derivation_tree1.pdf}
 	\end{subfigure}
 	\begin{subfigure}{0.39\textwidth}
-	\includegraphics[scale=0.525]{figures/trees/gp_derivation_tree2.pdf}
+	\includegraphics[scale=0.51]{figures/trees/gp_derivation_tree2.pdf}
 	\end{subfigure}
 	\caption{Derivation trees for $f_1$ and $f_2$.}
 	\label{fig:gp-derivation-tree-examples}
 \end{figure}
-By investigating the structure of these trees, the advantage of this representation becomes obvious.
-In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree stores the variable at the left-hand side of each production used for generating a certain subtree as a parent.
+If we consider the structure of these trees, the advantage of this representation becomes obvious.
+In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree stores the variable at the left-hand side of each production used for generating a certain subtree as its parent node.
 Each variable encodes which production can be applied at a particular point within a derivation.
 Consequently, by only allowing the replacement of a certain subtree by those productions whose left-hand side matches with its parent node, we can ensure that the resulting tree will always correspond to an expression contained in $L_G$. 
 However, while derivation trees contain additional information, they are still structurally close to the expression trees originally introduced in this section, which means that a certain structural change within a derivation tree will have a comparably strong effect on the corresponding phenotypic expression.
-In the GP literature this property is usually summarized under the term \emph{locality}.
+In the theory of evolutionary computation, this property is summariz under the term \emph{locality}.
 %In fact, we can easily obtain the corresponding expression tree by applying a bottom-up replacement of each variable node by a vertex that represents a combination of its direct leafs.
 To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar,whigham1995grammatically}.
 Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with high locality between genotype and phenotype, it represents a widely used GP paradigms~\cite{mckay2010grammar}.
