@@ -167,15 +167,15 @@ In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree s
 Each variable encodes which production can be applied at a particular point within a derivation.
 Consequently, by only allowing the replacement of a certain subtree by those productions whose left-hand side matches with its parent node, we can ensure that the resulting tree will always correspond to an expression contained in $L_G$. 
 However, while derivation trees contain additional information, they are still structurally close to the expression trees originally introduced in this section, which means that a certain structural change within a derivation tree will have a comparably strong effect on the corresponding phenotypic expression.
-In the theory of evolutionary computation, this property is summariz under the term \emph{locality}.
+In the theory of evolutionary computation, this property is referred to as \emph{locality}.
 %In fact, we can easily obtain the corresponding expression tree by applying a bottom-up replacement of each variable node by a vertex that represents a combination of its direct leafs.
-To describe the use of derivation trees as a genotype representation within genetic programming the term tree-based \emph{grammar-guided genetic-programming} (GGGP) has been introduced~\cite{mckay2010grammar,whigham1995grammatically}.
-Since tree-based GGGP combines the advantage of ensuring automatic type correctness for all individuals generated with high locality between genotype and phenotype, it represents a widely used GP paradigms~\cite{mckay2010grammar}.
-However, within the last decades \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotpye is instead encoded as a dynamically sized array of integers, where each entry corresponds to the choice of a particular production within the derivation.
-With this approach GE offers the advantage of a simpler type-safe genotype representation, which however requires additional steps for being mapped to a phenotype.
-Furthermore, a small change in the genotype of a GE program does not necessarily correspond in a small change in the phenotype, since the interpretation of each entry in the array usually depends on its predecessors.
-As a consequence, changing a single value within the genotype can potentially affect the interpretation of all following values.
-For instance, consider the following encoding of our example grammar
+To describe the use of derivation trees as a genotype representation within GP, the term tree-based \emph{grammar-guided genetic-programming} (G3P) has been introduced~\cite{mckay2010grammar,whigham1995grammatically}.
+Since tree-based G3P combines the advantage of ensuring automatic type correctness for all individuals generated with high locality between genotype and phenotype, it represents a widely used GP paradigms~\cite{mckay2010grammar}.
+Furthermore, within the last decades, \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotype is encoded as a dynamically-sized array of integers, where each entry corresponds to the choice of a particular production.
+With this approach, GE offers the advantage of a simpler typesafe genotype representation, which, however, comes at the price of requiring additional steps for the genotype-to-phenotype mapping.
+Furthermore, a small change in the genotype of a GE program does not necessarily result in a small phenotypic change since the interpretation of each array entry depends on its predecessors.
+Therefore, changing a single value within the genotype can affect the interpretation of all subsequent ones.
+For instance, consider the encoding
 \begin{equation*}
 	\begin{split}
 		\ps S \; \; \bnfpo & \; \; \underbrace{\ps E}_{0} \\
@@ -186,14 +186,14 @@ For instance, consider the following encoding of our example grammar
 	\end{split}
 	\label{eq:gp-example-grammar-ge-encoding}
 \end{equation*}
-based on which we can encode $f_1$ with an array consisting of the following integers:
+of our example grammar, based on which we can represent $f_1$ as an array consisting of the following integers:
 \begin{equation*}
 	\left[ 0, 0, 1, 0, 3, 4, 1, 3, 6, 7, 1, 4, 6, 7 \right].
 \end{equation*}
 Since we are always transforming the leftmost variable first, each array entry corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
-While in this case, we have chosen each number from the available range of productions, in practice, we can always map an arbitrary non-negative integer to this range by applying a module $n$ operation, where $n$ is the number of available productions for each variable.
-As a consequence, changing a single entry within this array will always affect the interpretation of all subsequent ones.
-For instance, changing the second entry to one results in the choice of the production 
+While in this case, we have chosen each number from the available range of productions, in practice, we can always map any non-negative integer to this range of values by applying a module $n$ operation, where $n$ is the number of available productions for each variable.
+We can now investigate how changing a single array entry will affect the interpretation of all subsequent ones.
+For instance, changing the second entry to a value of one, results in the choice of the production 
 \begin{equation*}
 	\ps E \Rightarrow \ps A,
 \end{equation*}
@@ -202,11 +202,10 @@ instead of
 	\ps E \Rightarrow \text{if} \; (\ps B \wedge \ps B) \; \text{then} \; \ps E \; \text{else} \; \ps E,
 \end{equation*}
 which means that all subsequent entries are exclusively interpreted as productions starting from $\ps A$.
-Therefore, even slight changes in the genotype of a GE representation can have a dramatic effect on the phenotype expression.
-
-As both tree-based GGGP and GE both represent a trade-off between the simplicity of their genotype representation and high locality with respect to the phenotype, it is usually impossible to predict which variant will lead to a better outcome in practice.
+This example, thus, clearly illustrates that even slight changes in the genotype of a GE representation can have a dramatic effect on the phenotype expression.
+Since tree-based G3P and GE both represent a different trade-off between the simplicity and locality of their genotype representation, in general, it is impossible to predict which variant will lead to a better outcome.
 Furthermore, we have to mention that, in addition to tree-based GP and GE, numerous other variants have been proposed since the original invention of GP~\cite{poli2008field}, the most prominent ones being linear GP~\cite{brameier2007linear} and cartesian GP~\cite{miller2008cartesian}. 
-However, since we have chosen to use tree-based GGGP in our implementation, we will exclusively focus on this variant in our subsequent treatment of mutation, crossover and fitness evaluation.
+However, since the implementation presented in this thesis uses tree-based G3P, we will exclusively focus on this variant in our subsequent treatment of mutation, crossover, and fitness evaluation.
 %TODO Probably too much, since GE is not considered further
 %Furthermore, if at a certain position within the array the corresponding sequential form contains already no more variables, the remainder is usually ignored or removed.
 %Now we can investigate the effect of changing a single number within this array on the resulting derivation.
@@ -225,22 +224,21 @@ However, since we have chosen to use tree-based GGGP in our implementation, we w
 %		\dots & 
 %	\end{aligned}
 %\end{equation}
-
 \subsection{Initialization}
 \label{sec:gggp-initialization}
-After choosing a suitable genotype representation, the next ingredients of a GP method is the definition of suitable operators for the creation of new individuals, either from scratch or based on an existing population.
-Due to the stochastic nature of evolutionary algorithms these operations are usually performed using a certain degree of randomness.
-As shown in Algorithm~\ref{alg:genetic-programming}, the first step within each GP-based search method is the initialization of the population. 
-While in some cases it is possible choose a certain proportion of the initial population from a set of promising individuals, either generated in previous optimization runs on a similar problem or hand-picked by a human domain expert, which is called \emph{seeding}.
-However, seeding the population with too many individuals may introduce an excessive bias into the search and, thus, as a result, the descendants of the seeded individuals quickly take over the population~\cite{poli2008field}.
-This risk can be mitigated by including a sufficiently high number of randomly generated individuals into the initial population. 
-In tree-based GGGP each individual is represented by a grammar derivation tree.
-Therefore, to generate an individual from scratch, starting with $S$ as a root node one, we can grow a tree by choosing a production for each variable present in the tree until all leafs consist exclusively of terminal symbols.
+After choosing a suitable genotype representation, the next ingredient of an evolutionary program synthesis approach is the definition of suitable operators for the creation of new programs, either from scratch or based on an existing population.
+Due to the stochastic nature of evolutionary algorithms, these operations are usually performed with a certain degree of randomness.
+As shown in Algorithm~\ref{alg:genetic-programming}, the first step within each evolutionary search method is the initialization of the population. 
+In some cases, it is possible to choose a certain proportion of the initial population from a set of promising individuals, either generated in the previous optimization runs on a similar problem or hand-picked by a human domain expert, which is called \emph{seeding}.
+However, seeding the population with too many individuals may introduce an excessive bias into the search and, as a result, the descendants of the seeded individuals might quickly take over the population~\cite{poli2008field}.
+This risk can be mitigated by including a sufficiently high number of randomly-generated individuals in the initial population. 
+In tree-based G3P, each individual is represented by a grammar derivation tree.
+Therefore, to generate an individual from scratch, starting with $S$ as a root node, we can successive extend a tree by choosing a production for each variable present in the tree until all leaves consist exclusively of terminal symbols.
 Note that within each choice of a production, one has to decide between growing the tree further, which correspond to applying a production that contains at least one variable, or between cutting the current branch of by choosing one that generates exclusively terminal symbols only.
 Consider for instance the tree shown in Figure~\ref{fig:gp-tree-growing-options}, which has been generated by the example grammar formulated in Equation~\eqref{eq:gp-example-grammar} and includes an unfinished branch with the variable $\ps{A}$.
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.4]{figures/trees/gp_grow_tree_options.pdf}
+	\includegraphics[scale=0.5]{figures/trees/gp_grow_tree_options.pdf}
 	\caption{Different options of extending a derivation tree - An unfinished branch consisting of a variable can either be extended by applying a production that includes at least one variable (lower-right tree) or it is ended by inserting a terminal symbol as a leaf (upper-right tree).}
 	\label{fig:gp-tree-growing-options}
 \end{figure}
@@ -306,7 +304,7 @@ The most commonly used GP mutation operator is \emph{subtree replacement}, in wh
 The resulting mutation operator is illustrated in Figure~\ref{fig:gp-replacement-mutation}, again based on derivation trees generated by the example grammar formulated in Equation~\eqref{eq:gp-example-grammar}.
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.4]{figures/trees/subtree_mutation.pdf}
+	\includegraphics[scale=0.5]{figures/trees/subtree_mutation.pdf}
 	\caption{Illustration of subtree replacement within a derivation tree.}
 	\label{fig:gp-replacement-mutation}
 \end{figure}
@@ -315,7 +313,7 @@ Furthermore, a second mutation operator, which can be directly derived from subt
 While in the former the original branch is replaced and, hence, completely evicted from the original tree, insertion only creates a partial subtree at whose end the original subtree is then attached again, which is illustrated in Figure~\ref{fig:gp-insertion-mutation}.
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.4]{figures/trees/subtree_insertion_mutation.pdf}
+	\includegraphics[scale=0.5]{figures/trees/subtree_insertion_mutation.pdf}
 	\caption{Illustration of subtree insertion within a derivation tree.}
 	\label{fig:gp-insertion-mutation}
 \end{figure}
@@ -334,7 +332,7 @@ The resulting operation is illustrated in Figure~\ref{fig:gp-subtree-crossover}.
 %TODO include figure
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.4]{figures/trees/subtree_crossover.pdf}
+	\includegraphics[scale=0.5]{figures/trees/subtree_crossover.pdf}
 	\caption{Illustration of subtree crossover within a derivation tree.}
 	\label{fig:gp-subtree-crossover}
 \end{figure}
@@ -356,4 +354,3 @@ Therefore, many evolutionary algorithms employ \emph{elitism}, which means that 
 While the application of elitism prevents the occurrence of fitness regressions from one generation to the next, it comprises the danger of getting stuck in local optima.
 For this purpose, the amount of elitism always represents a compromise between the loss of promising individuals and the danger of premature convergence to local optima.
 Options to mitigate this risk and prevent locally-optimal individuals from quickly overtaking the population are, for instance, to restrict the amount of elitism to only a subset of the population and to introduce additional niching or diversity criteria into to process of selecting individuals for the next population, which is especially common in multi-objective evolutionary algorithms~\cite{coello2007evolutionary}.
-
