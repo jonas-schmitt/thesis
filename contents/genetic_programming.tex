@@ -262,95 +262,98 @@ These operators aim to exploit the structure of a given grammar, for instance, i
 
 \subsection{Fitness Evaluation and Selection}
 \label{sec:gggp-evaluation-and-selection}
-Since GGGP is a program optimization technique, each individual corresponds to a program of the form of Equation~\eqref{eq:gp-program}.
-However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, which corresponds to a program in the target language.
-In many GGGP program synthesis tasks, the grammar employed within the search is either equivalent or represents a subset of that of the target programming language.
-While in such cases a direct correspondence between the derivation and expression tree of the target programming language exists, there is also the possibility to employ multiple layers of intermediate representations before an actual program is generated, which necessitates the implementation of multiple code generation steps.
-After an executable program is available in the target language, the final step within fitness evaluation is then to measure its performance in a number of test cases, which is then condensed to one or multiple measure of an individuals fitness, usually each in form of a single numerical value.
+Since G3P is a program optimization technique, each individual corresponds to a program in the form of Equation~\eqref{eq:gp-program}.
+However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, i.e., a program in the target language.
+In many program synthesis tasks, the grammar employed within the search is either equivalent or represents a subset of that of the target programming language.
+While in such cases, a direct correspondence between the derivation and expression tree of the target programming language exists, there is also the possibility to employ multiple layers of intermediate representations before an actual program is generated, which necessitates the use of multiple code generation steps.
+After an executable program is available in the target language, the final step within fitness evaluation is to measure its performance in a number of test cases, which is then condensed to one or multiple measures of an individual's fitness, usually each in the form of a single numerical value.
 For instance, one simple way to assess a program's quality in solving a number of test cases is to represent its performance in each individual test case as a separate optimization objective.
-An alternative possibility is to represent different aspects of a program's quality in form of distinct objectives, each of which is determined from a combination of its performance in multiple or even the complete test cases.
+An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all test cases.
 With respect to fitness evaluation, GP algorithms can be categorized into single and multi-objective variants.
-Similar to other evolutionary algorithms, GP treats fitness evaluation as a block box, which means that its inner workings are independent of the computational details of fitness evaluation, but instead the search is performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
+Similar to other evolutionary algorithms, GP treats fitness evaluation as a block box, which means that its inner workings are independent of the computational details of fitness evaluation.
+The search is then performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
 However, as fitness evaluation often represents the computationally most expensive part of an evolutionary algorithm, it drastically impacts to what extent the given search space can be explored.
-Since each individual represents a distinct program that can be executed on a unique set of test instances, each evaluation can be performed independently which facilitates its concurrent execution on a multi-processor system.
-For this purpose, parallel~\cite{sudholt2015parallel} and distributed~\cite{gong2015distributed} evolutionary algorithm variants have been proposed, that can be executed on recent manycore architectures and computer clusters.
-Due to the inherent similarity of the internal structure of Algorithm~\ref{alg:genetic-programming} to other evolutionary algorithms, these approaches are equally applicable to GP-based search methods. 
+Since each individual represents a distinct program that can be executed on a unique set of test instances, each evaluation can be performed independently, which facilitates its concurrent execution on a multi-processor system.
+For this purpose, parallel~\cite{sudholt2015parallel} and distributed~\cite{gong2015distributed} evolutionary algorithm variants, which can be executed on recent manycore architectures and computer clusters, have been proposed.
+Due to the inherent similarity of the internal structure of Algorithm~\ref{alg:genetic-programming} to other evolutionary algorithms, these approaches are equally applicable to GP-based search methods.
 
-After a single or multi-objective fitness value has been assigned to each individual, obtained, the questions remains how the search should be progressed by selecting a number of individuals for the application of the two main evolutionary operators, recombination and mutation.
+After a single or multi-objective fitness value has been assigned to each individual, the question remains how the search should be progressed by selecting a number of individuals for the application of the two main evolutionary operators, recombination and mutation.
 While initialization aims to generate a population that is evenly spread over the whole search space, the purpose of mutation and recombination is to create novel individuals based on an existing population that are located in a more promising subspace.  
-For this purpose, evolutionary algorithms usually employ an additional selection phase to identify promising candidates in the current population based on which these operations are performed, as it outlined in line 4 of Algorithm~\ref{alg:genetic-programming}.
-Note that within this process certain individuals can be selected multiple times.
-Common operators represent fitness proportionate selection, where individuals are randomly chosen according to a probability equal to their relative fitness value~\cite{lipowski2012roulette}, and tournament selection, where individuals are compared in a tournament-like fashion to identify the fittest among them~\cite{fang2010review}.
-In general, selection is independent of the genotype representation of an individual, but depends solely on the objective function of the target optimization problem. 
+For this purpose, evolutionary algorithms usually employ an additional selection phase to identify promising candidates in the current population based on which these operations are performed.
+Note that within this process, certain individuals can be selected multiple times.
+Common operators are fitness proportionate selection, where individuals are randomly chosen according to a probability equal to their relative fitness value~\cite{lipowski2012roulette}, and tournament selection, where individuals are compared in a tournament-like fashion to identify the fittest among them~\cite{fang2010review}.
+In general, selection is independent of the genotype representation of an individual but depends solely on the objective function of the target optimization problem.
 Consequently, a selection operator is agnostic of the type of evolutionary algorithm it is applied to. 
-For this reason, we only briefly discuss selection here and for a more complete treatment of this operation, the reader is referred to one of the following publications:~\cite{back1997handbook,beyer2002evolution,goldberg1991comparative}.
+For this reason, we only briefly discuss selection here, and for a more complete treatment of this operation, the reader is referred to one of the following publications:~\cite{back1997handbook,beyer2002evolution,goldberg1991comparative}.
 To deal with multi-objective optimization problems, several selection operators have been proposed, about which an overview can be found in~\cite{coello2007evolutionary,deb2011multi,deb2015multi}.
-Many of these operators are based on idea of identifying a domination hierarchy between the individuals of the population, whereby an individual is said to dominate another one if it possesses a superior fitness in all of the objectives.
-One way to identify such a hierarchy is to employ a non-dominated sorting procedure, which has been, for instance, proposed in~\cite{deb2002fast,deb2013evolutionary}.
-The actual selection can then be performed using a dominance-based tournament selection, while additional diversity metrics can be incorporated to decide between non-dominating individuals~\cite{coello2007evolutionary}.
-Another recently proposed multi-objective selection operator that is especially geared towards GP problems where the fitness evaluation is performed on multiple test cases, is lexicase selection.
-In lexicase selection individuals are selected according their performance in a randomly chosen ordering of the test cases, whereby a decreasing precedence is assigned to each subsequent case. 
+Many of these operators are based on the idea of establishing a domination hierarchy between the individuals of the population, whereby an individual is said to dominate another one if it possesses superior fitness in all objectives.
+One way to determine the dominance relation between all individuals in the population is to employ a non-dominated sorting procedure, which has been, for instance, proposed in~\cite{deb2002fast,deb2013evolutionary}.
+The actual selection is then performed using a dominance-based tournament selection, while additional diversity metrics can be incorporated to decide between non-dominating individuals~\cite{coello2007evolutionary}.
+Another recently proposed multi-objective selection operator that is especially geared towards GP problems where the fitness evaluation is performed on multiple test cases is lexicase selection.
+In lexicase selection, individuals are selected according to their performance in a randomly chosen ordering of the test cases, whereby decreasing precedence is given to each subsequent case. 
 For a more detailed description of this operator, the reader is referred to~\cite{helmuth2014solving,la2016epsilon}.
  
 \subsection{Mutation and Recombination}
 \label{sec:gggp-mutation-and-recombination}
-After selecting a number of candidate individuals from the population, mutation and recombination represent two complementary options to extend the current population towards more promising regions of the search space.
+After selecting a number of candidate individuals from the population, mutation and recombination represent two complementary options to extend the current population toward more promising regions of the search space.
 \paragraph{Mutation}
-The term mutation is usually referred to as the process of altering the genotype of a given individual, usually in a randomized way, with the purpose of creating an individual that, in the best case, has a higher fitness than its predecessor.
+The term mutation is usually referred to as the process of altering the genotype of a given individual, usually in a randomized way, with the purpose of creating an individual that, hopefully, has higher fitness than its predecessor.
 Therefore, mutation is usually applied to one individual at a time.
-Since the possibilities of alternating an individual depends on its genotype representation, mutation operators need to be customized to the type of evolutionary algorithm employed.
-For this purpose, different mutation operators have been proposed for tree-based genotype representations used within GP~\cite{poli2008field,koza1994genetic}.
-The most commonly used GP mutation operator is \emph{subtree replacement}, in which a certain branch of an individual is replaced by a randomly generated subtree, which can, for instance, be created using a similar tree-generation operator as within the population initialization~\cite{poli2008field}.
-The resulting mutation operator is illustrated in Figure~\ref{fig:gp-replacement-mutation}, again based on derivation trees generated by the example grammar formulated in Equation~\eqref{eq:gp-example-grammar}.
+Since the possibilities of altering an individual depend on its genotype representation, mutation operators need to be customized to the type of evolutionary algorithm employed.
+For this purpose, different mutation operators have been proposed for tree-based genotype representations~\cite{poli2008field,koza1994genetic}.
+The most commonly used tree-mutation operator is \emph{subtree replacement}, which replaces a certain branch with a randomly generated subtree.
+This subtree can, for instance, be created using a similar tree-generation operator as within the population initialization~\cite{poli2008field}.
+The resulting mutation operator is illustrated in Figure~\ref{fig:gp-replacement-mutation}, where it is again applied to a derivation tree generated by the example grammar formulated in Equation~\eqref{eq:gp-example-grammar}.
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.5]{figures/trees/subtree_mutation.pdf}
 	\caption{Illustration of subtree replacement within a derivation tree.}
 	\label{fig:gp-replacement-mutation}
 \end{figure}
-While subtree replacement has originally been defined for classical GP, it can be easily adapted to GGGP by introducing the additional constraint that branches with a certain variable as their root node can only be replaced by a subtree generated starting from the exact same variable. 
+While subtree replacement has originally been defined for classical GP, it can be easily adapted to G3P by introducing the additional constraint that branches with a certain variable as their root node can only be replaced by a subtree with the same root node. 
 Furthermore, a second mutation operator, which can be directly derived from subtree replacement, is \emph{insertion}.
-While in the former the original branch is replaced and, hence, completely evicted from the original tree, insertion only creates a partial subtree at whose end the original subtree is then attached again, which is illustrated in Figure~\ref{fig:gp-insertion-mutation}.
+While in the former, the original branch is replaced and, hence, completely evicted from the original tree, insertion only creates a partial subtree at whose end the original subtree is attached.
+This operation is illustrated in Figure~\ref{fig:gp-insertion-mutation}.
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.5]{figures/trees/subtree_insertion_mutation.pdf}
 	\caption{Illustration of subtree insertion within a derivation tree.}
 	\label{fig:gp-insertion-mutation}
 \end{figure}
-In contrast to subtree replacement, whose applicability in the context of GGGP is independent of the grammar, insertion requires the generation of a subtree that includes the root node of the original branch as a child node at which the latter can then be attached.
-While both subtree replacement and insertion, depending on the size of the randomly generated subtree, have the potential to drastically change the structure of the original tree, another possibility to alter a given tree is to replace only a single node with one of the same arity, which is called point mutation.
-In the context of GGGP, this operation corresponds to exchanging a certain production with a different one that is available for the same variable.
-However, for being valid, the newly inserted production needs to generate a sequence of child nodes in which the same variables occur as in the original sequence.
-As a consequence, point mutation can only be applied to the subset of productions that fulfills this conditions, which limits its applicability within GGGP-based search algorithms.
+In contrast to subtree replacement, whose applicability in the context of G3P is independent of the grammar, insertion requires the generation of a subtree that includes the root node of the original branch as a child node.
+While both subtree replacement and insertion have the potential to induce drastic changes in the structure of the original tree, a less intrusive way to alter a given tree is to replace only a single node with one of the same arity, which is called \emph{point mutation}.
+In the context of G3P, this operation corresponds to replacing a certain production with a different one that is available for the same variable.
+However, to be valid, the newly inserted production needs to generate a sequence of child nodes in which the same variables occur as in the original sequence.
+As a consequence, point mutation can only be applied to the subset of productions that fulfills this condition, which limits its applicability within G3P-based search algorithms.
 
 \paragraph{Recombination}
-While the goal of mutation is to introduce new genetic information into the population, recombination, often also called crossover, aims to combine the genotypes of existing individuals in novel ways, resulting in an individual with improved fitness compared to its predecessors.
-In general, recombination operators can be classified into \emph{homologous} and non-homologous ones, whereby those from the former category preserve the position of the individual elements of the genome.
-A straightforward way to perform recombination in tree-based GP is to exchange subtrees between two individuals at a certain (crossover) point within both trees, which is called \emph{subtree crossover}.
-Again, to apply this operator within GGGP, the crossover point must be chosen in a way that the root nodes of the exchanged trees correspond to the same variable.
+While the goal of mutation is to introduce new genetic information into the population, recombination, often also called crossover, aims to combine the genotypes of existing individuals in novel ways to obtain individuals with improved fitness compared to their predecessors.
+In general, recombination operators can be classified into \emph{homologous} and \emph{non-homologous} ones, whereby those from the former category preserve the position of the individual elements of the genome.
+A straightforward way to perform recombination in tree-based GP is to exchange subtrees between two individuals at a certain crossover point, which is called \emph{subtree crossover}.
+Again, to apply this operator within G3P, the crossover point must be chosen in a way that the root nodes of the exchanged branches correspond to the same variable.
 The resulting operation is illustrated in Figure~\ref{fig:gp-subtree-crossover}.  
-%TODO include figure
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.5]{figures/trees/subtree_crossover.pdf}
 	\caption{Illustration of subtree crossover within a derivation tree.}
 	\label{fig:gp-subtree-crossover}
 \end{figure}
-As subtree crossover permits the exchange of arbitrary subtrees with matching root nodes between two individuals, this operator is non-homologous.
-To obtain a similarly functioning homologous recombination operator, one-point crossover has been proposed~\cite{poli1998schema}.
+As subtree crossover permits the exchange of arbitrary branches with matching root nodes between two individuals, this operator is non-homologous.
+To obtain a similarly functioning homologous recombination operator, the one-point crossover operator has been proposed~\cite{poli1998schema}.
 One-point crossover first aligns both trees by traversing them recursively until there occurs a mismatch between the arity of two non-terminal nodes of both trees at the same position.
-The crossover point is then chosen from all positions in both trees where such a mismatch occurs and the subtree exchange is performed in a similar way as in subtree crossover.
+The crossover point is then chosen from all positions in both trees where such a mismatch occurs while the subtree exchange is performed in a similar way as in subtree crossover.
 While this operator preserves the relative position of each node within both trees, only a limited number of crossover points can be selected.
 For instance, the subtree exchange shown in Figure~\ref{fig:gp-subtree-crossover} is not a valid single-point crossover operation, as the first arity mismatch already occurs above the chosen crossover point within the respective branches of both trees.
-In general, the applicability of single-point crossover within a GGGP system depends on the amount of productions available for each variable within the grammar.
-In particular, if the majority of productions generates only a single variable, the average derivation tree possesses a small branching factor and, therefore, the number of possible crossover points for performing single-point crossover is low.
-Finally, it must be mentioned that, besides the ones discussed here, a variety of different mutation and crossover operators have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
-Furthermore, since these operators are designed for general tree-based GP systems and, hence, when applied in a GGGP setting do not take the underlying grammatical representation into account, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored towards GGGP have been proposed. 
+In general, the applicability of single-point crossover within an evolutionary program synthesis task depends on the number of productions available for each variable.
+In particular, if most productions generate only a single variable, the average derivation tree possesses a small branching factor, and thus, there is only a limited number of possible crossover points.
+Finally, it must be mentioned that, besides the mutation and crossover operators discussed here, a variety of alternative ones have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
+Furthermore, these operators are designed for general tree-based GP systems and, hence, do not take the underlying grammatical representation into account. 
+As a remedy, in~\cite{couchet2007crossover} mutation and crossover operators that are tailored toward grammar-based representations have been proposed.
 
-After creating a number of novel individuals by means of mutation and crossover, the remaining questions that needs to be addressed is how the search should be progressed by assembling a new population from the combined set of the newly created ones and those from the previous generation, as illustrated in line 7 Algorithm~\ref{alg:genetic-programming}.
-Here one possibility is to completely replace the previous generation by the individual created by the mentioned genetic operators.
-However, this approach incurs the danger of evicting individuals that are located in promising areas the search space, which then need to be rediscovered later in order to continue the search at this point.
-Therefore, many evolutionary algorithms employ \emph{elitism}, which means that individuals from the previous population are allowed to pass over to the next one in case their fitness is not surpassed by enough newly created individuals.
+After creating a number of novel individuals by means of mutation and crossover, the remaining question that needs to be addressed is how the search should be progressed by forming a new population based on the previous one and the individuals created through mutation and crossover, as it is shown in line 7 of Algorithm~\ref{alg:genetic-programming}.
+Here one possibility is to completely replace the previous generation by the new individuals.
+However, this approach incurs the danger of evicting individuals that are located in promising areas of the search space and, thus, inhibiting the performance of the evolutionary search.
+As a remedy, many evolutionary algorithms employ \emph{elitism}, which means that individuals from the previous population are allowed to pass over to the next one in case their fitness is not surpassed by enough newly created individuals.
 While the application of elitism prevents the occurrence of fitness regressions from one generation to the next, it comprises the danger of getting stuck in local optima.
-For this purpose, the amount of elitism always represents a compromise between the loss of promising individuals and the danger of premature convergence to local optima.
-Options to mitigate this risk and prevent locally-optimal individuals from quickly overtaking the population are, for instance, to restrict the amount of elitism to only a subset of the population and to introduce additional niching or diversity criteria into to process of selecting individuals for the next population, which is especially common in multi-objective evolutionary algorithms~\cite{coello2007evolutionary}.
+Therefore,the amount of elitism always represents a compromise between the loss of promising individuals and the danger of premature convergence to local optima.
+Options to mitigate this risk and prevent locally-optimal individuals from quickly overtaking the population are, for instance, restricting elitism to only a subset of the population or the introduction of additional niching or diversity criteria into to process of selecting individuals for the next population, which is especially common in multi-objective evolutionary algorithms~\cite{coello2007evolutionary}.
