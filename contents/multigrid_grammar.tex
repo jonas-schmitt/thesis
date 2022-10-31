@@ -1,10 +1,10 @@
-After establishing a theoretical foundation both about multigrid methods and evolutionary grammar-based optimization techniques, the first primary goal of this thesis is to develop a formal language for expressing arbitrarily structured multigrid solvers in a generalized way.
-For this purpose, first observe that the multigrid solvers described Section~\ref{sec:multigrid-cycles} can be all classified by their \emph{cycle type}.
-Each such cycle possesses a distinct computational pattern which stems from the number of recursive descents performed on each level of the method.
-For instance a V-cycle is characterized by exactly one recursive descent per level.
-All these classically considered multigrid cycles employ a fixed uniform number of recursive descents and smoothing steps per discretization level, which is determined by the parameters $\gamma$, $\nu_1$ and $\nu_2$ in Algorithm~\ref{alg:multigrid-cycle}.
-While the representation of a multigrid method as a recursive cycle yields a formally simple and easily parameterizable algorithmic formulation it also enforces unnecessary restrictions on its structure.
-Consider for instance the multigrid method depicted in Figure~\ref{fig:non-traditional-multigrid-cycle}.
+After establishing a theoretical foundation on both multigrid and evolutionary program synthesis methods, our first goal is to develop a formal language for expressing arbitrarily-structured multigrid solvers in a generalized way.
+As we have seen in Section~\ref{sec:multigrid-cycles}, according to the classical formulation of multigrid, each of these methods belongs to a particular class of \emph{cycles}.
+Each of these cycles possesses a distinct computational pattern that stems from the number of recursive descents performed on each level of the method, as determined by the parameter $\gamma$ in Algorithm~\ref{alg:multigrid-cycle}.
+For instance, a V-cycle is characterized by exactly one recursive descent per level.
+Furthermore, each classical multigrid cycle employs a fixed number of smoothing steps per discretization level, which is determined by the parameters $\nu_1$ and $\nu_2$.
+While the representation of a multigrid method as a recursive cycle yields a formally simple and easily parameterizable algorithmic formulation, it also enforces unnecessary restrictions on its structure.
+Consider, for instance, the multigrid method depicted in Figure~\ref{fig:non-traditional-multigrid-cycle}.
 \begin{figure}
 	\begin{subfigure}{0.1\textwidth}
 		\begin{tikzpicture}
