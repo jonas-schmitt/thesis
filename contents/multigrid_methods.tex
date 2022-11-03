@@ -772,7 +772,7 @@ As it can be seen in Figure~\ref{fig:four-grid-cycles}, the amount of computatio
 While applying V-cycle always results in significantly fewer computations, in many cases, a single coarse grid correction step is not sufficient to reduce the low-frequency components of the initial error on the finest grid~\cite{trottenberg2000multigrid}.
 Due to the resulting drastic increase in the number of computations, values of $\gamma$ larger than two are usually impractical for multigrid methods~\cite{trottenberg2000multigrid}.
 While Algorithm~\ref{alg:multigrid-cycle} enables the construction of different multigrid methods based on choosing different values for the parameters $l$, $\gamma$, $\nu_1$, $\nu_2$ and $\omega$, the structural composition of the resulting methods is limited.
-For instance, in Algorithm~\ref{alg:multigrid-cycle} it is assumed that the same value of $\gamma$ is chosen on each level, which restricts possible computational pattern to those depicted in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
+For instance, in Algorithm~\ref{alg:multigrid-cycle}, it is assumed that the same value of $\gamma$ is chosen on each level, which restricts possible computational patterns to those portrayed in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
 One way to overcome this limitation is to combine different cycle types in a single method.
 For instance, combining W- and V-cycles on each level results in a so-called F-cycle, whose algorithmic structure is illustrated by Figure~\ref{fig:f-cycle}.
 \begin{figure}

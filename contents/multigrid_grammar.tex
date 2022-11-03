@@ -64,7 +64,7 @@ Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-tradit
 	\caption{Example for a non-classical multigrid method.}
 	\label{fig:non-traditional-multigrid-cycle}
 \end{figure}
-While this method reaches the coarsest level twice and, hence, at first sight looks similar to a W-cycle, it employs a unique pattern of computations that is completely different from any known multigrid cycle.
+While this method reaches the coarsest level twice and, hence, at first sight, looks similar to a W-cycle, it employs a unique pattern of computations that is completely different from any known multigrid cycle.
 As a consequence, this method can not be represented within the classical framework of multigrid cycles, as formulated in Algorithm~\ref{alg:multigrid-cycle}.
 To overcome the limitations of this formulation and construct multigrid methods with an arbitrary sequence of computations on each discretization level, a new formal language is needed.
 The first step towards the development of such a language is to find a way to represent the current state within each step of a multigrid method.
@@ -177,7 +177,7 @@ In this case, we both require the approximate solution $\tilde{x}_{2h}$, compute
 While for coarsening, we can neglect all previous states on the coarser grid, as their information is explicitly contained in the residual, for a coarse-grid correction, the previous state on the fine grid needs to be restored.
 Note that for a multigrid method that operates on a hierarchy of discretizations of even larger depth than the example shown in Algorithm~\ref{alg:example-three-grid-method}, this process must be recursively performed for each bottom-up transition.
 To resolve this issue, we need to extend our original formulation of a multigrid state by a fourth component with the purpose of preserving the current state on the next-higher level.
-While at the topmost level, this component is always empty, whenever coarsening is performed the state of the current level is included.
+While at the topmost level, this component is always empty, whenever coarsening is performed, the state of the current level is included.
 For instance, in line 4 of Figure~\ref{fig:example-tree-grid-method-states} we have to extend the given ternary tuple 
 \begin{equation*}
 S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
@@ -192,7 +192,7 @@ Hence, all required information for restoring the previous fine-grid state value
 	S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda, \, S_h).
 \end{equation*}
 %TODO clarify that line 3 and 4 can in practice be combined to one step
-Note that since $S_h$ represents the current state on the finest grid, its fourth component is empty, while otherwise it would refer to the previous state of the next higher level in the discretization hierarchy.
+Note that since $S_h$ represents the current state on the finest grid, its fourth component is empty, while otherwise, it would refer to the previous state of the next higher level in the discretization hierarchy.
 To assess the feasibility of this approach, we have to check whether all components required to construct the coarse-grid correction expression, as in line 9 of Figure~\ref{fig:example-tree-grid-method-states}, are available within the current state.
 Since in addition to $\tilde{x}_{2h}$, both the approximate solution $\tilde{x}_h$ and right-hand side $b_h$ are now contained in the fourth component of the coarse-grid state tuple, this expression can be assembled in a straightforward manner.
 At this point, note that a coarse-grid correction from the coarsest grid represents a special case. 
@@ -362,48 +362,51 @@ Now let us revisit one of the main goals of this language: The description of me
 To achieve this goal, we have ensured that each possible state transition within a multigrid method is described by the application of a specific combination of well-defined functions. 
 At the same time, we have carefully avoided the inclusion of transitions spanning over multiple states, as this would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
 The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
+
 \section{A Novel Class of Multigrid Grammars}
 \label{sec:multigrid-grammar}
 \setcounter{equation}{0}
-In Section~\ref{sec:formal-languages} we have already introduced the definition of a general grammar $G$ as the quaternary tuple 
+In Section~\ref{sec:formal-languages}, we have already introduced the general grammar $G$ as the quaternary tuple 
 \begin{equation*}
 	G = \left(V, T, S, P \right),
 \end{equation*}
-where $V$ is the set of variables, $T$ the set of terminal symbols, $S \in V$ the start symbol and $P$ the set of productions.
-However, before we start defining a grammars individual components, the question arises whether it is necessary to impose additional restrictions on its structure.
-As it has been discussed in Section~\ref{sec:chomsky-hierarchy}, the Chomsky hierarchy defines four grammatical levels, where each subsequent level introduces additional constraints on a grammar's structure.
+where $V$ is the set of variables, $T$ the set of terminal symbols, $S \in V$ the start variable and $P$ the set of productions.
+However, before we start defining the individual components of a grammar, we need to decide which constraints we want to apply to its structure.
+As it has been discussed in Section~\ref{sec:chomsky-hierarchy}, the Chomsky hierarchy defines four grammatical levels, where each subsequent level introduces additional structural restrictions.
 While an unrestricted or type-0 grammar represents the most general model of computation, it also leads to the highest degree of complexity.
-In particular, enumerating all strings generated by an unrestricted grammar can only be performed by a Turing-machine, which represents the most general model of computation available.
-The main goal of this work enable the grammar-based construction of multigrid methods using evolutionary optimization techniques.
-As we have discussed in Section~\ref{sec:gggp} the application of tree-based grammar-guided genetic programming (GGGP) requires that each possible derivation of a grammar can be represented as a tree, which is then called a derivation tree of the grammar.
+In particular, enumerating all strings generated by an unrestricted grammar requires a Turing machine, which represents the most general model of computation available.
+The main goal of this work is to enable the automated design of multigrid methods using evolutionary program synthesis techniques.
+As we have discussed in Section~\ref{sec:gggp}, the application of tree-based grammar-guided genetic programming (G3P) requires each derivation of a grammar to be representable as a tree, which is then called a derivation tree.
 The class of grammars that fulfills this property corresponds to the type-2 category of the Chomsky hierarchy.
-Type-2 grammars are characterized by the constraint that only single variable is allowed to be placed on the left-hand side of each production, which means that the applicability of each production is independent of the context in which the variable is embedded. 
+Type-2 grammars are characterized by the constraint that only a single variable is allowed to be placed on the left-hand side of each production, which means that the applicability of each production is independent of the context in which the variable is embedded. 
 These grammar are, thus, said to be context-free.
-As each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar all operations that are required within a GGGP can be defined in a straightforward manner, which has been shown in Section~\ref{sec:gggp-initialization} and~\ref{sec:gggp-initialization}.
-In the following, we will derive a family of context-free grammars for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-state-transitions}.
+Since each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar, all operations that are required within a G3P method can be defined in a straightforward manner, which has already been shown in Section~\ref{sec:gggp-initialization} and~\ref{sec:gggp-initialization}.
+In the following, we will derive a family of context-free grammars for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-states} and~\ref{sec:multigrid-state-transitions}.
 Therefore, starting from the initial state 
 \begin{equation*}
 	S^0_h = (x_h^0, b_h, \lambda, \lambda)
 \end{equation*}
-for each possible operation within a multigrid method, we need to define a production in form of sequence of transitions that yields the corresponding state at the end of the operation.
-In the previous section, we have made the distinction between states where the approximate solution $\tilde{x}_h$ has been computed on a certain level $h$ and between those where a correction term $c_h$ is being constructed based on the residual expression $r_h = b_h - A_h \tilde{x}_h$.
-To define a production for each of these two states on every level of a given discretization hierarchy, we have to recursively consider how we can arrive at the final state of a multigrid method, which always represents a state where all computational steps of the method are combined in $\tilde{x}_h$ as a pression.
-We represent this state as the variable $\ps{s_h}$ and, hence, obtain the initial production
+for each possible operation within a multigrid method, we need to define a production in the form of a sequence of transitions that yields the corresponding state after the operation.
+In Section~\ref{sec:multigrid-state-transitions}, we have made the distinction between states where a new approximate solution $\tilde{x}_h$ is computed and those with the purpose of constructing a correction term $c_h$ based on the residual expression $r_h = b_h - A_h \tilde{x}_h$.
+To define the respective productions on every level of a given discretization hierarchy, we have to determine recursively how it is possible to reach the final state of a multigrid method.
+Note that in this state all computational steps of the method are combined in $\tilde{x}_h$ as a single expression.
+We represent the final state of a multigrid method as the variable $\ps{s_h}$ and, thus, obtain the initial production
 \begin{bnf}
 	\bnfprod{$S$} {
 		\bnfpn{$s_h$}
 	}.
 \end{bnf}
-Next we have to consider the different possibilities to obtain a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
-According to Definition~\ref{def:elementary-multigrid-operations}, $\tilde{x}_{h}$ can be either updated through smoothing or coarse-grid correction.
-In case of smoothing, the approximate solution is updated applying the operator $\ps{B_h}$ to a correction term that is included in the previous state represented by the variable $\ps{c_h}$, which can be expressed as a combination of the state transition functions $\textsc{update}$ and $\textsc{apply}$ to obtain the production
+Next, we have to consider the different possibilities of deriving a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
+According to Definition~\ref{def:elementary-multigrid-operations}, $\tilde{x}_{h}$ can either be updated by means of smoothing or by applying a coarse-grid correction.
+In the case of smoothing, the approximate solution is updated by multiplying the operator $\ps{B_h}$ with a correction term, which is contained in the current state in the form of the variable $\ps{c_h}$.
+This operation can be expressed as a combination of the state transition functions $\textsc{update}$ and $\textsc{apply}$ yielding the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}))
 	}.
 \label{prod:smoothing}
 \end{bnf}
-Different smoothers can then be defined by expressing both the operator $\ps{B_h}$ and partitioning $\ps{P}$ in form of a separate production, such that
+Different smoothers can then be realized by expressing the generation of the operator $\ps{B_h}$ and partitioning $\ps{P}$ as two separate productions
 \begin{bnf}
 	\bnfprod{$B_h$} {
 		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
@@ -416,27 +419,28 @@ Different smoothers can then be defined by expressing both the operator $\ps{B_h
 	},
 \label{prod:partitioning}
 \end{bnf}
-where the empty symbol $\lambda$ indicates that no partitioning is used. On the finest level, a correction state is then obtained by computing the residual based on the previous approximate solution, which leads to the production
+where the empty symbol $\lambda$ indicates that no partitioning is used. 
+On the finest level, a correction state is always obtained by computing the residual based on the current approximate solution, which leads to the production
 \begin{bnf}
 	\bnfprod{$c_h$} {
 		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
 	}.
 \label{prod:residual}
 \end{bnf}
-Multiple smoothing steps can, therefore, be defined by means of repeated applications of the productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
-In contrast to smoothing, coarse-grid correction updates the current approximate solution with a correction term obtained from an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
-We can express this operation as a combination of the \textsc{update} and \textsc{cgc} transition functions, which leads to the production
+Multiple smoothing steps can, thus, be defined through repeated applications of the Productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
+In contrast to smoothing, coarse-grid correction updates the current approximate solution with a correction term that is constructed based on an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
+We can express this operation as a combination of the \textsc{update} and \textsc{cgc} transition functions, which yields the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}))
 	}.
 \label{prod:coarse-grid-correction}
 \end{bnf}
-Similar to Production~\eqref{prod:smoothing} the previous state that is passed as a second argument to the \textsc{cgc} function is encoded by the variable $\ps{s_{2h}}$, which means that this state is obtained through a sequence of productions.
-However, in contrast to smoothing the second argument of the \textsc{update} function, which represents the choice of a partitioning, is intentionally left empty, since it is not required in this case.
-Furthermore, note that while we have specified the prolongation operator as a terminal symbol here, it would be also possible to specify the choice of this operators in each coarse-grid correction step in a similar way as Production~\eqref{prod:smoothing-operator} for the smoothing operator $\ps{B_h}$.
-Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, that corresponds to a state on the next coarser level with step size $2h$, we next have to consider the different possibilities to transition to this state.
-First of all, as multigrid methods recursively apply the same operations on each level, we can define the Productions~\eqref{prod:smoothing},~\eqref{prod:smoothing-operator},~\eqref{prod:residual} and~\eqref{prod:coarse-grid-correction} on a coarser level which yields
+Similar to Production~\eqref{prod:smoothing} the previous state that is passed as a second argument to the \textsc{cgc} function is encoded as the variable $\ps{s_{2h}}$, which means that this state is already the result of a sequence of productions.
+However, since a partitioned computation of the coarse-grid correction does not yield any benefits, in contrast to the case of smoothing, the second argument of the \textsc{update} function is intentionally left empty.
+Furthermore, note that while we have specified the prolongation operator as a terminal symbol, it would as well be possible to specify its choice in the form of a separate production, as in the case of the smoothing operator $\ps{B_h}$.
+Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, which corresponds to a state on the next-coarser level with step size $2h$, we next have to consider the different possibilities to transition to this state.
+First of all, as multigrid methods recursively apply the same operations throughout the complete hierarchy of discretizations, we can define the Productions~\eqref{prod:smoothing},~\eqref{prod:smoothing-operator},~\eqref{prod:residual} and~\eqref{prod:coarse-grid-correction} on the corresponding level which yields
 \begin{bnf}
 	\bnfprod{$s_{2h}$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
@@ -444,43 +448,44 @@ First of all, as multigrid methods recursively apply the same operations on each
 	\bnfmore {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}))
 		%\bnfts{\textnormal{\textsc{update}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
-	} \\
+	}\label{prod:coarse-coarse-grid-correction} \\
 	\bnfprod{$c_{2h}$} {
 		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$})
 	} \\
 	\bnfprod{$B_{2h}$} {
 		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}.
-	}\label{prod:coarse-coarse-grid-correction}
+	}
 \end{bnf}
 Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser level with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
-In contrast to coarse-grid correction, which represents a transition to a state on the next finer level, we have not yet considered the opposite direction: The construction of the error equation on a coarser level based on the state on the current level.
-While the state on the finest level is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next coarser-grid that includes the initial residual as a correction term, which yields the production
+In contrast to the coarse-grid correction, which represents a transition to a state on the next finer level, we have not yet considered the opposite direction: The construction of the error equation on a coarser grid based on the state on the current level.
+While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next-coarser grid that includes the initial residual as a correction term, which yields the production
 \begin{bnf}
 \bnfprod{$c_{2h}$} {
 	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }.
 \label{prod:coarsening}
 \end{bnf}
-With the definition of this production we are now capable of generating state transitions both in top-down as well as bottom-up direction within the given hierarchy of discretizations.
-Finally, the remaining steps required for the formulation of complete grammar is the definition of those productions that are only available on the finest and coarsest levels, i.e. the definition of the initial problem and the application of the coarse-grid solver.
-First of all, note that the initial problem corresponds the state $S_h^0 = (x_h^0, b_h, \lambda, \lambda)$.
-As $S_h^0$ represents the starting point of each possible sequence of multigrid operations, we have to introduce it as an additional production of the variable $\ps{s_h}$ that can be defined as
+With the definition of this production, we are now capable of generating state transitions both in a top-down as well as a bottom-up direction within the given hierarchy of discretizations.
+Finally, the remaining step for the formulation of complete grammar is the definition of the initial problem on the finest grid and the application of the coarse-grid solver on the coarsest grid.
+For the former, note that the initial problem corresponds the state $S_h^0 = (x_h^0, b_h, \lambda, \lambda)$.
+Since $S_h^0$ represents the starting point of each possible sequence of multigrid operations, we have to include it as an additional production of the variable $\ps{s_h}$
 \begin{bnf}
 	\bnfprod{$s_h$} {
 	 (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
 	}.
 \label{prod:initial-solution}
 \end{bnf} 
-If we now consider the structure of all the productions defined so far, it becomes obvious that on each level except for the finest only the productions~\eqref{prod:smoothing-operator} and~\eqref{prod:partitioning} generate an expression that consists exclusively of terminal symbols.
-Furthermore, note that all other productions generate exactly one variable of type $\ps{s_H}$ or $\ps{c_H}$, where $H$ is the step size on an arbitrary level in the given hierarchy of discretizations, and that starting from each of these variables there exists a sequence of productions that leads to an expression that contains the variable $\ps{s_h}$, based on which we can apply the production~\eqref{prod:initial-solution} to finalize the derivation process.
-Since each sequence of productions also starts with this variable, all derivations of our grammar possess the following structure
+If we now consider the structure of all the productions defined so far, it becomes obvious that, with the exception of the topmost level, only the productions~\eqref{prod:smoothing-operator} and~\eqref{prod:partitioning} generate an expression that consists exclusively of terminal symbols.
+Furthermore, note that all other productions generate exactly a single variable of type $\ps{s_H}$ or $\ps{c_H}$, where $H$ is the step size on an arbitrary level in the given hierarchy of discretizations, and that starting from each of these variables there exists a sequence of productions that leads to an expression containing the variable $\ps{s_h}$.
+Based on the latter, we can then apply the production~\eqref{prod:initial-solution} to finalize the derivation process.
+Since each sequence of productions also starts with $\ps{s_h}$, all derivations of our grammar are of the form
 \begin{equation*}
-	\ps{S} \Rightarrow \ps{s_h} \Rightarrow \dots \Rightarrow u \ps{s_h} v \Rightarrow u (x_h^0, b_h, \lambda, \lambda) v,
+	\ps{S} \Rightarrow \ps{s_h} \Rightarrow \dots \Rightarrow u \, \ps{s_h} \, v \Rightarrow \, u (x_h^0, b_h, \lambda, \lambda) \, v,
 \end{equation*}
-where $u (x_h^0, b_h, \lambda, \lambda) v$ is a word in the language generated by our multigrid grammar.
-This word then represents a multigrid method whose structure is determined by the order of productions in the corresponding sequence of function applications.
-As a final step we have define one or multiple productions that correspond to the application of the coarse-grid solver on the coarsest level to obtain the correct solution of the corresponding error equation, which is then used to improve the accuracy of the approximate solution on the second coarsest.
-By utilizing a combination of the \textsc{apply} and \textsc{update} function, we can express this operation in form of the two production
+where $u  \, (x_h^0, b_h, \lambda, \lambda) \, v$ is an arbitrary word in the language generated by our multigrid grammar.
+This word then represents a multigrid method whose computational structure is determined by the order of productions in the corresponding sequence of function applications.
+As a final step, we have to define one or multiple productions that correspond to the application of the coarse-grid solver on the lowest level, which allows us to improve the accuracy of the approximate solution on the second-lowest level.
+By utilizing a combination of the \textsc{apply} and \textsc{update} functions, we can express this operation in the form of the two production
 \begin{bnf}
 	\bnfprod{$c_{2H}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{H}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{H}^{2H}$}, \bnfsp\bnfpn{$c_{H}$}))
@@ -489,12 +494,11 @@ By utilizing a combination of the \textsc{apply} and \textsc{update} function, w
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2H}^{H}$}, \bnfsp \bnfpn{$c_{2H}$}))
 	} 	\label{prod:coarse-grid-solver-correction}
 \end{bnf}
+where $H$ is the step size on the second-lowest level.
 \setcounter{equation}{116}
-where $H$ is the step size on the second coarsest level.
-Having now assembled all necessary components, we can finally specify the complete grammar for constructing multigrid methods on a given hierarchy of discretizations.
-As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest.
-Therefore, on the coarsest level a step size of $16h$ is obtained.
-For this purpose, we first define the set of variables 
+Having now assembled all necessary components, we can finally specify the complete grammar for generating multigrid methods on a given hierarchy of discretizations.
+As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest grid, which means that on the coarsest grid, a step size of $16h$ is obtained.
+We, therefore, first define the set of variables 
 \begin{equation}
 \begin{split}
 	V = \{ & \ps{S}, \ps{s_h}, \ps{c_h}, \ps{B_h}, \ps{s_{2h}}, \ps{c_{2h}}, \ps{B_{2h}}, \ps{s_{4h}}, \ps{c_{4h}}, \ps{B_{4h}}, \\
@@ -502,8 +506,8 @@ For this purpose, we first define the set of variables
 \end{split}
 \label{eq:multigrid-grammar-variables}
 \end{equation}
-for each of which we then specify the list of productions available on the respective level. 
-Table~\ref{table:multigrid-grammar} shows the resulting grammar productions for the complete grid hierarchy.
+for each of which we can then specify the list of productions available on the respective level. 
+Table~\ref{table:multigrid-grammar} shows the resulting productions for the complete discretization hierarchy.
 \begin{table}
 	\caption{Grammar Productions for a Five-Grid Method}
 	\label{table:multigrid-grammar}
@@ -569,11 +573,11 @@ Table~\ref{table:multigrid-grammar} shows the resulting grammar productions for 
 		}
 	\end{bnf*}
 \end{table}
-For the sake of simplicity we omit the specification of all terminal symbols here, but instead state that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is assumed to be a terminal symbol.
-Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the finest level the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the coarsest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
-While we have used a five-grid hierarchy as an example for constructing a complete grammar here, it is easily possible to specify a similar grammar on a hierarchy of discretizations with different depth.
-Furthermore, while the maximum number of coarsening steps depends on whether we have defined the required productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e. two-, three- and four-grid methods.
-For this purpose, we simply have to include additional productions for the application of the coarse-grid solver on each subsequent level except for the finest, which in the case of Table~\ref{table:multigrid-grammar} leads to
+For the sake of simplicity, we omit the specification of all terminal symbols here, but the reader can safely assume that each symbol that occurs on the right-hand side of a production, while not being contained in the set of variables, is a terminal symbol.
+Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the topmost level, the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the lowest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
+While we have used a five-grid hierarchy as an example for defining the complete grammar, it is trivially possible to specify a similar grammar on a discretization hierarchy of different depth.
+Furthermore, while the maximum number of coarsening steps depends on the existence of the respective productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
+For this purpose, we only have to include additional productions for the application of the coarse-grid solver on each subsequent level, which in the case of Table~\ref{table:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{h}^{2h}$}, \bnfsp\bnfpn{$c_{h}$}))
@@ -757,7 +761,7 @@ even a supercomputer consisting of one trillion ($10^{12}$) such processors woul
 Furthermore, in practice it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.
 As a consequence, while a pure brute-force-approach that aims to evaluate all possible multigrid methods may be feasible for the constrained parameter space that results from the classical formulation in Algorithm~\ref{alg:multigrid-cycle}, a grammar-based optimization requires the utilization of search strategies, such as grammar-guided genetic programming (GGGP) as it has been presented in Section~\ref{sec:gggp}.
 \paragraph{Final Remarks}
-In the remainder of this thesis we will describe how GGGP can be applied within \emph{EvoStencils}, our implementation of a grammar-guided optimization of multigrid methods in the Python programming language, which is based on the formal framework presented in this chapter.
+In the remainder of this thesis we will describe how G3P can be applied within \emph{EvoStencils}, our implementation of a grammar-guided optimization of multigrid methods in the Python programming language, which is based on the formal framework presented in this chapter.
 We will, furthermore, demonstrate EvoStencils' effectiveness by evolving efficient multigrid methods for a number of different partial differential equations (PDEs).
 In the following we, therefore, assume the reader to be familiar with Python, due to its widespread use in both academia and industry.
 If this should not be the case the reader is advised to consult one of the many available resources for learning Python\footnote{Python:~\url{https://www.python.org/doc/}}.
