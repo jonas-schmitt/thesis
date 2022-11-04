@@ -691,59 +691,60 @@ For this purpose, we have to estimate the size of the search space that is creat
 
 \subsection{Search Space Estimation}
 \label{sec:search-space-estimation}
-If we treat the grammar-based optimization of multigrid method as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
-In practice, in case of a small search space it can be feasible to simply enumerate and evaluate all possible solutions of the given optimization problem, which has the advantage that the optimum is obtained in a deterministic manner while a heuristic search method, as those presented here in Section~\ref{sec:gggp}, is, in general, not guaranteed to find the same solution in each of its executions.
-For this purpose, we consider the following simplified model calculation which acts as a lower bound of the size of the search space of a grammar-guided optimization of multigrid methods on a five-grid hierarchy, as defined by the grammar formulated in Table~\ref{table:multigrid-grammar}. 
-As we have discussed in Section~\ref{sec:multigrid-methods} an effective multigrid method always employs a combination of smoothing and coarse-grid correction steps to efficiently reduce both the high and low-frequency components of the error.
-While often in practice multiple smoothing steps are employed, the application of coarse-grid correction on a certain level without any smoothing is rarely used~\cite{trottenberg2000multigrid}.
-To simplify the search space estimation, we, therefore, introduce the additional constraint that the total number of coarse-grid corrections is always equal or lower than the number of smoothing steps.
-Furthermore, we enforce that coarsening and correction can only be performed after smoothing, with the exception of the finest level, where we additionally allow coarsening to be applied as a first operation.
-As on finest level the original system is solved directly while smoothing is significantly more expensive than on subsequent levels, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method and we, hence, want to enforce fewer constraints on the order in which the individual operations are performed.
-Consequently, using the symbols $S$, $R$ and $P$ for smoothing, coarsening and coarse-grid correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and coarse-grid correction.}, respectively, in each step of the method, depending on the level, only the following sequences of operations can be defined:
+If we treat the grammar-based design of multigrid methods as a search problem, the size of the search space spanned by the underlying grammar corresponds to the number of different methods that can be constructed based on its productions.
+For a small search space, it can be feasible to simply enumerate and evaluate all possible solutions. 
+Such an approach has the advantage that the best solution can be determined in a deterministic manner while heuristic search methods, such as those presented in Section~\ref{sec:gggp}, are, in general, not guaranteed to find it.
+For this purpose, we consider the following simplified model estimation, which acts as a lower bound of the size of the search space of a five-grid hierarchy, as defined by the grammar formulated in Table~\ref{table:multigrid-grammar}. 
+As we have discussed in Section~\ref{sec:multigrid-methods}, multigrid methods need to combine smoothing and coarse-grid correction steps to effectively reduce both the high and low-frequency components of the error.
+While often in practice, multiple smoothing steps are employed, the application of a coarse-grid correction without any smoothing is rarely used on any level~\cite{trottenberg2000multigrid}.
+To simplify the search space estimation, we, therefore, introduce the additional constraint that, on any level, the total number of smoothing steps is always greater or equal to the number of coarse-grid corrections.
+We, furthermore, enforce that coarsening and correction can only be performed after smoothing, with the exception of the topmost level, where we additionally allow coarsening to be applied as a first operation.
+Since, on the finest grid, the original system is solved, finding an optimal sequence of operations is of utmost importance for the efficiency of a multigrid method, and we, hence, want to enforce fewer constraints on the order of the individual operations.
+Therefore, using the symbols $S$, $R$, and $P$ for smoothing, coarsening, and coarse-grid correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and coarse-grid correction.}, respectively, in each step of the method, depending on the level, the following sequences of operations can be defined:
 \begin{align*}
 	S | RS | SR & \quad \text{for} \; l = l_{max} \\
 	A^{-1} & \quad \text{for} \; l = l_{min} \\
 	S | SR | SP & \quad \text{otherwise}.
 \end{align*}
-Therefore, with the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, the number of options for regarding the order of operations is always three.
-However, since each step also includes the application of a smoother, we additionally have to choose a suitable method for this purpose.
-Assuming the the number of available relaxation method is $n$, which includes different types of smoothers, partitionings and relaxation factors, this results in a total number of $3 \cdot n$ options in each step of the method. 
-While none of these constraints is present in our original grammar shown in Table~\ref{table:multigrid-grammar}, they enable us to derive a simple closed-form expression which then acts as a lower bound for the actual size of the search space.
-We can obtain such an expression in form of a finite sum of polynomials by considering the total number smoothing steps that are supposed to be performed within a multigrid method, whereby we know that for each step we need to choose from $3 \cdot n$ options independent from the level on which the operations are performed.
+Consequently, with the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, there always exist three different orderings of the available operations.
+However, each step includes the application of a smoother, which additionally needs to be chosen.
+Assuming the number of available methods for this purpose is $n$, which includes different types of smoothers, partitionings, and relaxation factors, this results in a total number of $3 \cdot n$ options in each step of the method.
+While none of these constraints is included in our original grammar shown in Table~\ref{table:multigrid-grammar}, these simplifications enable us to derive a closed-form expression which then acts as a lower bound for the actual size of the search space.
+We can obtain such an expression in the form of a finite sum of polynomials by considering the total number of smoothing steps that are supposed to be performed within a multigrid method, whereby we know that for each step, we need to choose from $3 \cdot n$ options independent of the level on which the operations are performed.
 As a consequence, if our method incorporates $k$ smoothing steps, the total number of options is 
 \begin{equation}
 	N_{n,k} = (3 n)^k
 	\label{eq:simplified-number-of-options}
 \end{equation}
-We can illustrate this observation by considering the corresponding decision tree, which is shown in Figure~\ref{fig:decision-tree} for $n = 2$.
+We can illustrate this expression by considering the corresponding decision tree, which is shown in Figure~\ref{fig:decision-tree} for $n = 2$.
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/trees/decision_tree_annotated.pdf}
 	\caption{Simplified decision tree - Each node has the same number of children.}
 	\label{fig:decision-tree}
 \end{figure}
-Each node in this tree corresponds to a particular choice from the available set of options.
-Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother which can then optionally be complemented with coarsening or coarse-grid correction, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the corresponding multigrid method.
-Consequently, each leaf of the tree corresponds to a different multigrid method, and the total number of leaves is thus equal to $N_{2,k} = 6^k$.
-However, since the optimal amount of smoothing depends on the properties of the linear system that we aim to solve and a varying total number of smoothing steps should be considered for each problem.
-Now note that each decision tree that corresponds to a certain number of smoothing steps $k$ contains all those with less smoothing steps as a subtree, whereby each subtree is obtained by performing a top-down breadth-first traversal until the depth of the tree coincides with the respective number of smoothing steps.
+Each node in this tree corresponds to a particular choice of operations.
+Since each step within our simplified decision model includes the application of either $S_1$ or $S_2$ as a smoother, which can then optionally be complemented with coarsening or coarse-grid correction, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the multigrid method.
+Each leaf of the tree, therefore, corresponds to a structurally-different multigrid method, and the total number of leaves is thus equal to $N_{2,k} = 6^k$.
+However, since the optimal amount of smoothing is not known beforehand, we must consider a varying number of smoothing steps.
+Now note that each decision tree that corresponds to a certain number of smoothing steps $k$ includes all those with fewer smoothing steps as a subtree, where each of these subtrees can be obtained by performing a top-down breadth-first traversal until the depth of the tree coincides with the respective number of smoothing steps.
 Therefore, the total number of different multigrid methods with at least $k_{min}$ but at most $k_{max}$ smoothing steps is equal to the total number of leaf nodes of all subtrees of a decision tree of depth $k_{max}$ that have at least depth $k_{min}$.
-As we have already seen the number of leaf nodes of a decision tree with depth is given by Equation~\ref{eq:simplified-number-of-options}.
-Hence, the total number of different multigrid methods that employ between $k_{min}$ and $k_{max}$ smoothing steps is given by the finite sum
+Since the number of leaf nodes of a decision tree is given by Equation~\ref{eq:simplified-number-of-options}, the total number of different multigrid methods that employ between $k_{min}$ and $k_{max}$ smoothing steps is equal to
 \begin{equation}
 	N(n, k_{min}, k_{max}) = \sum_{k = k_{min}}^{k_{max}} N_{n,k} = \sum_{k = k_{min}}^{k_{max}} (3 n)^k.
 	\label{eq:search-space-estimation}
 \end{equation}
-We can now finally utilize this formula to obtain an estimated lower bound for the total number of different five-grid method that can be constructed with the grammar formulated in Table~\ref{table:multigrid-grammar}.
+We can now finally make use of this formula to compute a lower bound for the total number of different five-grid methods that can be generated based on the grammar shown in Table~\ref{table:multigrid-grammar}.
 For this purpose, we need to choose a reasonable interval for the minimum and maximum total number of smoothing steps of our method.
-In Algorithm~\ref{alg:multigrid-cycle} the total number of smoothing steps per level depends on the parameters $\nu_1$, $\nu_2$ and $\gamma$, which specify the number of pre-smoothing steps, post-smoothing steps and recursive descents per level, respectively.
+In Algorithm~\ref{alg:multigrid-cycle}, the total number of smoothing steps per level depends on the parameters $\nu_1$, $\nu_2$, and $\gamma$, which specify the number of pre-smoothing steps, post-smoothing steps and recursive descents per level, respectively.
 Therefore, the total number of smoothing steps is given by
 \begin{equation*}
 	\sum_{k = 0}^{n_c - 1} \gamma^k (\nu_1 + \nu_2),
 \end{equation*}
 where $n_c$ is the number of coarsening steps.
 %TODO only true for W-cycle, fix formula!
-Now let us consider how different choices of $\nu_1$, $\nu_2$ and $\gamma$ lead to a different number of total smoothing steps for a five-grid method ($n_c = 4$):
+%TODO check if this has just been forgotten
+Now let us consider how different choices of $\nu_1$, $\nu_2$, and $\gamma$ lead to a different total number of smoothing steps for a five-grid method ($n_c = 4$):
 \begin{itemize}
 	\item $V(1,0)$: $\gamma = 1, \nu_1 = 1, \nu_2 = 0 \Rightarrow 4 \; \text{smoothing steps}$
 	\item $V(3,3)$: $\gamma = 1, \nu_1 = 3, \nu_2 = 3 \Rightarrow 24 \; \text{smoothing steps}$
@@ -751,24 +752,24 @@ Now let us consider how different choices of $\nu_1$, $\nu_2$ and $\gamma$ lead 
 	\item $W(1,1)$: $\gamma = 2, \nu_1 = 1, \nu_2 = 0 \Rightarrow 30 \; \text{smoothing steps}$
 	\item $W(3,3)$: $\gamma = 2, \nu_1 = 3, \nu_2 = 3 \Rightarrow 90 \; \text{smoothing steps}$
 \end{itemize}
-Setting $k_{min} = 4$ and $k_{max} = 30$ as an upper limit for the number of smoothing steps in Equation~\ref{eq:search-space-estimation}, hence, represents a reasonable compromise, as it allows us to generate multigrid methods that perform a similar amount of smoothing steps as the majority of commonly used $V$-cycles while at the same methods comparable to less expensive $W$-cycle variants can be also obtained.
-Finally, the only remaining parameter is the number of different relaxation methods from which we can choose in each smoothing step.
-To obtain a conservative estimate for a lower bound of the search space size we set $n = 2$, which means that in each step we only have to choose from two alternatives, for example the Jacobi and red-black Gauss-Seidel method.
-By utilizing Equation~\eqref{eq:search-space-estimation} we, therefore, obtain 
+Setting $k_{min} = 4$ and $k_{max} = 30$ as an upper limit for the number of smoothing steps in Equation~\eqref{eq:search-space-estimation}, thus, represents a reasonable compromise since it allows us to generate multigrid methods that perform a similar amount of smoothing as the majority of commonly used $V$-cycles while methods comparable to less expensive $W$-cycle variants can also be obtained.
+Finally, the only remaining parameter is the number of different methods available for each smoothing step.
+To obtain a conservative estimate, we set $n = 2$, which means that in each step, we can only choose from two alternatives, for example, the Jacobi and red-black Gauss-Seidel method.
+By utilizing Equation~\eqref{eq:search-space-estimation} we, thus, obtain 
 \begin{equation*}
 	N(2, 4, 30) = \sum_{k = 4}^{30} 6^k \approx 2.65 \cdot 10^{24}
 \end{equation*}
-as an estimated lower bound for the search space spanned by the grammar formulated in Table~\ref{table:multigrid-grammar}.
-If we now assume that a modern multi-core CPU is capable of evaluating each multigrid method in an average time of one millisecond,
-even a supercomputer consisting of one trillion ($10^{12}$) such processors would require more than 8 years to evaluate all methods that are contained in this search space.
-Furthermore, in practice it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.
-As a consequence, while a pure brute-force-approach that aims to evaluate all possible multigrid methods may be feasible for the constrained parameter space that results from the classical formulation in Algorithm~\ref{alg:multigrid-cycle}, a grammar-based optimization requires the utilization of search strategies, such as grammar-guided genetic programming (GGGP) as it has been presented in Section~\ref{sec:gggp}.
+as an estimated lower bound for the search space spanned by the grammar shown in Table~\ref{table:multigrid-grammar}.
+If we now assume that a modern multi-core CPU is capable of evaluating each multigrid method on average in one millisecond,
+even a supercomputer consisting of one trillion ($10^{12}$) such processors would require more than eight years to evaluate all methods contained in this search space.
+Furthermore, in practice, it is usually beneficial to consider a higher number of different smoothers and relaxation factors, which results in an even larger search space.
+As a consequence, while a pure brute-force-approach that aims to evaluate all possible multigrid methods may be feasible for the constrained parameter space that results from the classical formulation in Algorithm~\ref{alg:multigrid-cycle}, a grammar-based design requires the utilization of heuristic search method, such as those presented in Section~\ref{sec:gggp}.
 \paragraph{Final Remarks}
-In the remainder of this thesis we will describe how G3P can be applied within \emph{EvoStencils}, our implementation of a grammar-guided optimization of multigrid methods in the Python programming language, which is based on the formal framework presented in this chapter.
+In the remainder of this thesis, we will describe how G3P can be applied within \emph{EvoStencils}, our implementation of an automated grammar-based design method for multigrid methods in the Python programming language, which is based on the formal framework presented in this chapter.
 We will, furthermore, demonstrate EvoStencils' effectiveness by evolving efficient multigrid methods for a number of different partial differential equations (PDEs).
-In the following we, therefore, assume the reader to be familiar with Python, due to its widespread use in both academia and industry.
-If this should not be the case the reader is advised to consult one of the many available resources for learning Python\footnote{Python:~\url{https://www.python.org/doc/}}.
-Along with this we also assume basic knowledge about programming and parallelization techniques for recent multiprocessor and cluster systems, of which an overview can be found in~\cite{sterling2017high,hager2010introduction}.
+In the following, we, therefore, assume a basic familiarity with Python due to its widespread use in both academia and industry.
+If this should not be the case, the reader is advised to consult one of the many available resources for learning Python\footnote{Python:~\url{https://www.python.org/doc/}}.
+We, furthermore, expect a basic knowledge of programming and parallelization techniques for recent multiprocessor and cluster systems, of which an overview can be found in~\cite{sterling2017high,hager2010introduction}.
 %Furthermore, while hardware-specific code optimization is not a focus of this thesis, the reader should have some basic understanding about the architectural features of recent multiprocessor systems and supercomputers.
 %Along with this, we also assume a familiarity with programming techniques and tools for performing a shared and distributed memory parallelization on these systems, such as OpenMP\footnote{OpenMP:~\url{https://www.openmp.org/}} and MPI\footnote{MPI:~\url{https://www.mpi-forum.org/}}. 
 %\begin{figure}
