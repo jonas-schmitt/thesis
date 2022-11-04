@@ -1,29 +1,30 @@
 \usemintedstyle{tango}
 \setminted[python]{fontsize=\footnotesize, breaklines}
 %\setminted[scala]{fontsize=\footnotesize, breaklines}
-In the first part of this thesis we have established a theoretical basis about multigrid methods, formal languages and genetic programming.
+In the first part of this thesis, we have established a theoretical foundation for multigrid methods, formal languages, and evolutionary program synthesis.
 In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
-While we have already demonstrated that the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet prove its benefits compared to the use of classical multigrid cycles, such as V-, F- and W-cycles.
-We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the grammar-guided optimization of multigrid methods.
-Using this framework we will then show how it is possible to evolve methods that are more efficient than all common multigrid cycles in solving a number of PDE-based problems while being structurally different that any other known method of this type.
-However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview about its workflow and software architecture.
-In general, we can distinguish between EvoStencils' core implementation and the functionality of the framework that is build upon the use of external libraries.
-First of all, since our formulation of the rules to construct a multigrid methods in the form of a context-free grammar, we can utilize the grammar-guided genetic programming techniques presented Chapter~\ref{chapter:formal-languages-and-gp} without adapting their inner workings.
-For this purpose, we employ the widely-used evolutionary computation framework DEAP\footnote{DEAP: \url{https://github.com/deap/deap}}~\cite{rainville2012deap}, which enables us to implement GGGP in a modular way while requiring only a limited amount of adaption.
-However, the questions that then remains to be answered how we can evaluate each multigrid method obtained through GGGP in an automatic and reproducible manner.
+While we have already demonstrated the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet demonstrate its benefits compared to the use of classical multigrid cycles, such as V-, F-, and W-cycles.
+We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the automated grammar-based design of multigrid methods.
+Using this framework, we will show how it is possible to discover structurally-novel methods that are able to solve certain PDE-based problems faster than all classical multigrid cycles.
+However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview of its general workflow and software architecture.
+Here, we distinguish between EvoStencils' core implementation and the functionality of the framework that builds upon external libraries.
+Since we have expressed the rules our multigrid construction rules in the form of a context-free grammar, we can apply the evolutionary program synthesis techniques presented Chapter~\ref{chapter:formal-languages-and-gp} without significant adaptions.
+For this purpose, we employ the widely-used evolutionary computation framework DEAP\footnote{DEAP: \url{https://github.com/deap/deap}}~\cite{rainville2012deap}, which enables us to implement grammar-guided genetic programming (G3P) in a modular way.
+However, we then need to address the question of how we can evaluate each multigrid method obtained through G3P in an automatic and reproducible manner.
 As we have seen in Section~\ref{sec:grammar-based-algorithm-generation} the 
-application of the sequence of state transition functions represented in a given derivation tree produces a computational graph of the form of Figure~\ref{fig:example-three-grid-method-computational-graph}, which can then be transformed to an algorithmic representation, as shown in Algorithm~\ref{alg:example-three-grid-method-generated}.
-However, while any expert could now manually implement the corresponding multigrid solver based on this representation using an arbitrary numerical software package, within GGGP we have to evaluate each method in an automatic way without requiring any human intervention.
-Recently, code-generation techniques based on the specification of a numerical solver in a high-level domain specific language (DSL) have become increasingly powerful~\cite{kostler2020code}.
-An example for this approach is the ExaStencils framework~\cite{lengauer2020exastencils,lengauer2014exastencils}, which has been specifically designed for the automatic generation of fast and scalable implementation of multigrid-based solvers specified in a tailored DSL called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems,kuckuk2016automatic}.
-ExaSlang enables the formulation of a multigrid method as a sequence of high-level operations, without the need to consider the implementation details of each individual statement, while still granting the user the flexibility to apply further optimizations through the addition of code transformations and lower-level statements.
-To evaluate a given solver, obtained from a grammar-based representation, we, therefore, emit its corresponding algorithmic formulation as an ExaSlang specification, based on which we then employ the ExaStencils framework to generate a scalable C++ implementation.
-The resulting program can then be executed on a number of test cases in order to measure the desired performance characteristics of the solver.
-Finally, note that the execution of a GGGP-based optimization approach requires the evaluation of a large number of different multigrid methods.
-Depending on the problem that one aims to solve it can be infeasible to perform the optimization on a single compute node, necessitating the implementation of a multi-node parallelization.
-The message passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of supercomputing devices available.
-While MPI has been originally designed for the traditional scientific computing languages Fortran and C, it recently has been also made available within Python~\cite{dalcin2021mpi4py}. 
-With the addition of MPI, as a distributed computing backend, we arrive at the following high-level view of EvoStencils' software architecture, which is shown in Figure~\ref{fig:evostencils-architecture}.
+execution of the sequence of state transition functions contained in a given derivation tree produces a computational graph in the form of Figure~\ref{fig:example-three-grid-method-computational-graph}.
+This graph can then be translated to an algorithmic representation, as demonstrated by Algorithm~\ref{alg:example-three-grid-method-generated}.
+However, while a domain expert could manually implement the corresponding multigrid solver based on this representation using a numerical software package, our framework has to perform the evaluation of each method in an automatic way without requiring any human intervention.
+Recently, code-generation techniques that only require the specification of a numerical solver in a high-level domain-specific language (DSL) have become increasingly powerful~\cite{kostler2020code}.
+An example of this approach is the ExaStencils framework~\cite{lengauer2020exastencils,lengauer2014exastencils}, which has been specifically designed for the automatic generation of fast and scalable implementations of multigrid-based solvers specified in a tailored DSL called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems,kuckuk2016automatic}.
+ExaSlang allows to represent a multigrid method as a sequence of high-level operations while granting the user the flexibility to apply further optimizations through the addition of code transformations and lower-level statements.
+To evaluate a given solver obtained from a grammar-based representation, we emit its corresponding algorithmic formulation as an ExaSlang specification, based on which we then generate a scalable C++ implementation using the capabilities of the ExaStencils framework.
+The resulting program can then be executed on a number of test cases in order to measure its desired performance characteristics.
+Finally, note that the execution of an evolutionary program synthesis approach requires the evaluation of a large number of different multigrid methods.
+Depending on the problem that one aims to solve, it can be infeasible to run this method on a single compute node, which necessitates a multi-node parallelization.
+The message passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of available supercomputing devices.
+While MPI was originally designed for the traditional scientific computing languages Fortran and C, it has recently been made available within Python~\cite{dalcin2021mpi4py}. 
+With the addition of MPI as a distributed computing backend, we arrive at the following high-level view of EvoStencils' software architecture, which is shown in Figure~\ref{fig:evostencils-architecture}.
 \begin{figure}
 	\resizebox{\columnwidth}{!}{%
 		\begin{tikzpicture}
@@ -53,7 +54,7 @@ With the addition of MPI, as a distributed computing backend, we arrive at the f
 	\label{fig:evostencils-architecture}
 \end{figure}
 In the following, we will now consider the individual parts of this architecture in more detail, starting with the core implementation of EvoStencils, which can be considered as a separate module that does not depend on any of the other tools and libraries mentioned here.
-As a first step, we will outline the implementation of an intermediate representation for multigrid methods that can be easily obtained from a given derivation tree and which then acts as a basis for all subsequent steps of solver generation and evaluation.
+As a first step, we will outline the implementation of an intermediate representation for multigrid methods that can be easily generated based on a given derivation tree and which then acts as a basis for all subsequent steps of solver generation and evaluation.
 
 \section{Intermediate Representation}
 \label{sec:intermediate-representation}
