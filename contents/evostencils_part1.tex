@@ -363,35 +363,38 @@ Based on the resulting tree, a function object is then generated using DEAP's \e
 After introducing the functionality of DEAP's GP module, we can proceed with the actual implementation of the productions of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}.
 However, before we define a function for constructing the corresponding \emph{PrimitiveSetTyped}, we need to consider the unique structure of our grammar.
 As we have discussed in Section~\ref{sec:multigrid-grammar}, Table~\ref{table:multigrid-grammar} is obtained by repeating the same productions on each level for the corresponding set of variables.
-In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all terminals that are contained in each production.
-Therefore, instead of constructing a \emph{PrimitiveSetTyped} that includes all productions in Table~\ref{table:multigrid-grammar} at once, we can instead add the respective primitives on a per-level basis.
-Furthermore, note that Table~\ref{table:multigrid-grammar} is defined on hierarchy of discretizations with a specific number of coarsening steps.
-Hence, defining a function that enables the iterative construction of a multigrid grammar independent of the total number of coarsening steps, allows us to utilize the same function for the generation of grammars defined on different discretization hierarchies. 
-For this purpose, similar to the above example, the first step is the generation of a unique type for each variable that is defined on each level of our grammar.
-While in Listing~\ref{code:grammar:pset-example} we have encoded each of the grammar's variables by an actual Python type, at this point we have to introduce an additional constraint that prevents us from pursuing the same approach.
-In order to store the state of a program in form of a serialized binary format, Python provides the \emph{pickle} module.
-Pickle enables the serialization of arbitrary Python objects, which can then be restored at a later point in time.
-In our implementation object serialization serves multiple purposes.
-First of all, we want to be able to store the current state of a grammar-guided optimization, such that, for instance in case of a hardware failure, the method can be continued at the same position.
-Furthermore, parallelizing certain parts of the optimization on a distributed computing system, for instance using the Message Passing Library (MPI), requires us to transfer arbitrary Python objects through a communication network, for which the pickle module provides a simple and portable solution.
+In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all required terminals for a certain level of the discretization hierarchy.
+Therefore, instead of constructing a \emph{PrimitiveSetTyped} including the complete set of productions in Table~\ref{table:multigrid-grammar} all at once, we can instead add the respective \emph{Primitive} objects on a per-level basis.
+Furthermore, note that Table~\ref{table:multigrid-grammar} is defined for a specific number of coarsening steps.
+We can, therefore, implement a function that iteratively constructs a multigrid grammar independent of the total number of coarsening steps.
+This allows us to employ the same function for the generation of different multigrid grammars defined on varying discretization hierarchies.
+As in the above example, we first need to generate a unique type for each variable that is defined on a certain level of our grammar.
+While in Listing~\ref{code:grammar:pset-example}, we have encoded each of the grammar's variables by an actual Python type, at this point, we have to introduce an additional constraint that prevents us from pursuing the same approach.
+In order to store the state of a program in the form of a serialized binary format, Python provides the \emph{pickle} module.
+This module enables the serialization of arbitrary Python objects, which can then be restored at a later point in time.
+In our implementation, object serialization serves multiple purposes.
+First of all, we want to be able to store the current state of our evolutionary search method such that, for instance in case of a hardware failure, we can continue the search at the same position.
+Furthermore, parallelizing certain parts of the optimization on a distributed computing system, for instance, using the Message Passing Library (MPI), requires us to transfer arbitrary Python objects via a communication network.
+The pickle module provides a simple and portable solution to this problem.
 Unfortunately, pickle enforces a number of additional constraints on the serializability of a Python object.
-In particular, Python types can only be serialized in case they are defined at the top-level domain of a module.
-However, as our goal is to create a \emph{PrimitiveSetTyped} that is adapted to the details of a grammar that is provided during program execution, we need to create the respective types dynamically as well.
-As a consequence, these types can not be serialized directly, as they are not defined at the topmost level of the given Python module, but instead are generated within a function.
-To resolve this issue, we propose a custom \emph{Type} class which enables the dynamic creation of types in form of its instances, which is shown in Listing~\ref{code:grammar:typing}.
+In particular, Python types can only be serialized if they are defined at the top-level domain of a module.
+However, as our goal is to create a \emph{PrimitiveSetTyped} object adapted to the properties of a grammar that is only provided during program execution, we need to create the respective types dynamically as well.
+Dynamically generated types are not defined at the top-level domain of the corresponding Python module, which renders a serialization of the corresponding objects impossible.
+To resolve this issue, we propose a custom \emph{Type} class which is shown in Listing~\ref{code:grammar:typing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/typing.py}
 	\caption{Type Wrapper Class}
 	\label{code:grammar:typing}
 \end{listing}
-The main feature of this class is the existence of an \emph{identifier} attribute, which allows to distinguish different types within a \emph{PrimitiveSetTyped}.
-Additionally, the class also includes a \emph{guard} attribute in form of a boolean variable, whose purpose we will cover later in this section. 
-To achieve type equivalence checking in an automatic manner, we provide a custom \emph{\_\_eq\_\_} method.
-First of all, since we also want to be able the compare a given \emph{Type} object to other Python objects, we check whether the other object is also an instance of the \emph{Type} class.
-If this condition is fulfilled, we proceed checking whether both the \emph{identifier} and \emph{guard} attributes are equal.
-Furthermore, in order to correctly store \emph{Type} objects in a dictionary, we implement the \emph{\_\_hash\_\_} method, where we utilize Python's builtin \emph{hash} function to generate a unique value based on the two attributes of the class. 
-To ensure that type checking is done correctly, we adapt the original implementation of \emph{PrimitiveSetTyped} such that \emph{Type} objects are compared using the equality operator instead of Python's builtin \emph{issubclass} function.
-The resulting adapted implementation of the \emph{\_add} method within \emph{PrimitiveSetTyped} can be found in Section~\ref{appendix:gp} of the appendix.
+Since the instances of this class represent regular Python objects, a pickle-based serialization can be achieved without any further adaption.
+To distinguish different \emph{Type} objects within a \emph{PrimitiveSetTyped}, the \emph{identifier} attribute is provided.
+In addition, the class also includes a \emph{guard} attribute in the form of a boolean variable, whose purpose we will discuss later in this section. 
+To enable type equivalence checking in an automatic manner, we provide a custom \emph{\_\_eq\_\_} method.
+In this method, we first check whether the other object is also an instance of the \emph{Type} class, as we want to be able the compare a given \emph{Type} object to any other Python object.
+If this condition is fulfilled, we then proceed to check if both the \emph{identifier} and \emph{guard} attributes of the \emph{Type} objects are equal.
+Furthermore, in order to correctly store \emph{Type} objects in a Python dictionary, we implement the \emph{\_\_hash\_\_} method, where we utilize Python's builtin \emph{hash} function to generate a unique value based on the content of both attributes. 
+Finally, to ensure that the type checking is performed correctly, we adapt the original implementation of the \emph{PrimitiveSetTyped} class such that types are compared using the equality operator instead of Python's built-in \emph{issubclass} function.
+For the sake of completeness, the resulting implementation can be found in Section~\ref{appendix:gp} of the appendix.
 
 Based on this tailored type representation, we can now implement a data structure in form of the \emph{Types} class that incorporates the corresponding type for each variable defined on a given level of Table~\ref{table:multigrid-grammar}, which is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
