@@ -211,14 +211,14 @@ For this purpose, we first need to generate the set of terminals that is defined
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
 First of all, since, at least in the applications considered in this work, each smoother is derived directly from the system operator, it can be generated automatically within the grammar.
-Also, while so far we have abstractly represented the application of the coarse-grid solver in form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and, thus, be provided by the user.
+Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and, thus, be provided by the user.
 The implementation of a Python class for representing the coarse-grid solver can be found in Section~\ref{appendix:ir} of the appendix.
 Note that each object of this class may additionally contain an expression, again given in the form of an IR object representing a multigrid method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for another multigrid method formulated on top of our original discretization hierarchy.
 
-\subsubsection{State Transition Functions}
+\subsection{State Transition Functions}
 \label{sec:evostencils:state-transition-functions}
-As a next step, based on the \emph{Terminals} class, we can implement the state transition functions defined in Section~\ref{sec:multigrid-state-transitions} to construct the IR object that corresponds to a particular grammar derivation tree.
+As a second step, based on the \emph{Terminals} class, we can implement the state transition functions defined in Section~\ref{sec:multigrid-state-transitions} to construct the IR object that corresponds to a particular grammar derivation tree.
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
@@ -239,75 +239,73 @@ Even though in all subsequent computations, the first entry of this tuple then c
 The \emph{update} function, therefore, needs to be adapted accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
 Finally, as the second argument of the \emph{coarse\_grid\_correction} function results from an application of the \emph{update} function, and, thus, again represents a binary tuple, its first entry needs to be extracted to obtain the \emph{Cycle} object representing the current approximate solution on the coarse grid.
 The second main difference is the implementation of the \emph{update} function compared to its original definition in Table~\ref{table:grammar-semantics} function.
-Here we represent the relaxation factor as an index within a uniformly-sampled interval, that is included in the respective \emph{Terminal} object.
+Here we represent the relaxation factor as an index within a uniformly-sampled interval that is included in the respective \emph{Terminal} object.
 While we could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
 Assume we want to encode a certain derivation tree in a string-based format, which then later needs to be decoded in a different environment to restore the original information.
 If each relaxation factor is stored as a floating point number, we need to ensure that each number is stored with the same accuracy in both environments.
 In contrast, an index can always be accurately represented in the form of a single positive integer value.
 
-While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation for arbitrarily structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
-For instance, smoothing is performed through consecutive application of \textsc{apply} and \textsc{update}.
-We can, therefore, simplify the grammar generation by identifying the possible combinations on each level and, then, implementing each of them in a separate function.
-In Definition~\ref{def:elementary-multigrid-operations} we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening} and \emph{coarse-grid correction}.
-In Table~\ref{table:multigrid-grammar} each of these three operations is represented by a combination of two state transition functions.
-First, consider Production~\ref{prod:smoothing}, which is defined on each level within Table~\ref{table:multigrid-grammar} in a similar way and corresponds to the \emph{smoothing} operation in Definition~\ref{def:elementary-multigrid-operations}.
+While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation of arbitrarily-structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
+For instance, smoothing is performed by means of the consecutive application of \textsc{apply} and \textsc{update}.
+We can, thus, simplify the process of grammar generation by identifying the set of possible combinations of state transitions on each level, each of which we can then be implemented in a single Python function.
+In Definition~\ref{def:elementary-multigrid-operations}, we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening}, and \emph{coarse-grid correction}.
+In Table~\ref{table:multigrid-grammar}, each of these three operations is represented by a combination of two state transition functions.
+First, consider Production~\ref{prod:smoothing}, which is defined on each level in a similar way and corresponds to the \emph{smoothing} operation in Definition~\ref{def:elementary-multigrid-operations}.
 Each of these productions corresponds to the application of an operator
 \begin{equation*}
 	\ps{B_{h}} = \left( A^+_{h} \right)^{-1},
 \end{equation*}
-obtained as the inverse of a smoothing operator $A^+_{h}$, which is defined by the splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
-While in Table~\ref{table:multigrid-grammar}, $A^+_{h}$ is provided as a terminal symbol, in practice it is always derived from the system operator $A_{h}$.
-Therefore, we can instead represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
-If we assume the availability of such a function, the next step is then the implementation of the actual smoother application, in form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
+where $A^+_{h}$ is defined by the splitting $A_{h} = A^+_{h} + A^-_{h}$ on a grid with spacing $h$.
+While in Table~\ref{table:multigrid-grammar} $A^+_{h}$ is provided as a terminal symbol, in practice, it can usually be derived from the system operator $A_{h}$.
+Therefore, we can represent its generation as a function \emph{generate\_smoother}, which returns a similar splitting for each operator provided to it as an argument.
+If given such a function, the next step is the implementation of the actual smoother application, in the form of the function \emph{smoothing}, shown in Listing~\ref{code:grammar:smoothing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/smoothing.py}
 	\caption{State Transition: Smoothing}
 	\label{code:grammar:smoothing}
 \end{listing}
-Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the aforementioned function.
-Consequently, for each specific smoother, we then only need to provide a different generator.
+Similar to Production~\ref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using \emph{generate\_smoother}.
+Consequently, we only need to provide a generator function for each specific smoother.
 For instance, Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/jacobi.py}
 	\caption{Example for generating Jacobi-based smoothers}
 	\label{code:grammar:jacobi}
 \end{listing}
-Similarly, the second basic multigrid operation \emph{coarsening} is realized by combining the functions \textsc{apply} and \textsc{cycle}.
-After the former applies a restriction operator to the previously generated residual expression, the latter is utilized to initiate a new cycle on the next coarser level using the restricted residual as a right-hand side.
+The second basic multigrid operation \emph{coarsening} is realized in a similar way by combining the functions \textsc{apply} and \textsc{cycle}.
+After the former applies a restriction operator to the previously generated residual expression, the latter initiates a new cycle on the next lower level using the restricted residual as a right-hand side.
 Next, we need to provide an implementation for Production~\ref{prod:coarse-grid-correction}, which corresponds to the \emph{coarse-grid correction} operation in Definition~\ref{def:elementary-multigrid-operations}.
-Note that this operation differs from the identically named state transition function in the respect that it additionally updates the current approximate solution with the computed correction.
-In contrast, the function \textsc{cgc} only generates the respective correction term, while restoring the previous state on the next finer level.
-In Production~\ref{prod:coarse-grid-correction} we then additionally apply the \textsc{update} function to generate an expression that updates the current approximate solution with this term.
-Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in form of the functions \textsl{coarsening} and \emph{update\_with\_coarse\_grid\_correction}.
+Note that this operation differs from the state transition function \textsc{cgc} in the respect that it additionally updates the current approximate solution with the computed correction.
+We can realize this behavior by means of a subsequent application of the \textsc{update} function, which generates the respective expression based on the given correction term.
+Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\ref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in the form of the Python functions \textsl{coarsening} and \emph{update\_with\_coarse\_grid\_correction}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/inter_grid_operations.py}
 	\caption{State Transition: Inter-Grid Operations}
 	\label{code:grammar:inter-grid-operations}
 \end{listing}
-In case of the latter we have included the prefix \emph{update\_with} to make it distinguishable from the respective state transition function.
-Finally, in contrast to the functions defined so far, which can be applied on multiple levels, on the coarsest level the only possible operation is the application of a coarse-grid solver, which corresponds to the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
-Here, Production~\ref{prod:coarse-grid-solver} corresponds to the construction of the coarse problem, similar to the coarsening step defined by Production~\ref{prod:coarsening}, while Production~\ref{prod:coarse-grid-solver-correction} performs the actual correction step based on the exact solution obtained on the coarsest level. 
-However, note that only a single productions is available for the variable $\ps{c_{16h}}$ in Table~\ref{table:multigrid-grammar}, which means that the two productions can only be applied in succession.
-We can, therefore, combine the complete process of updating the current approximate solution with a coarse-grid solver-based correction in a single function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
+In the case of the latter, we have included the prefix \emph{update\_with} to make its implementation distinguishable from the respective state transition function.
+Finally, in contrast to the functions defined so far, which can be applied on multiple levels, on the coarsest level, the only possible operation is the application of a coarse-grid solver, which corresponds to the Productions~\ref{prod:coarse-grid-solver} and~\ref{prod:coarse-grid-solver-correction}.
+Here, Production~\ref{prod:coarse-grid-solver} corresponds to the construction of the coarse problem, similar to the coarsening step defined in Production~\ref{prod:coarsening}, while Production~\ref{prod:coarse-grid-solver-correction} performs the actual correction step based on the exact solution obtained on the coarsest grid. 
+However, note that only a single production is available for the variable $\ps{c_{16h}}$ in Table~\ref{table:multigrid-grammar}, which means that the two productions can only be applied in succession.
+We can, therefore, combine the complete process of updating the current approximate solution with a coarse-grid solver-based correction in a single Python function \emph{correct\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
 	\caption{State Transition: Coarse-Grid Solver}
 	\label{code:grammar:coarse-grid-solver}
 \end{listing}
 For this purpose, similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
-However, in contrast to all other levels, the resulting error equations is solved directly, which is denoted by the application of the coarse-grid solver.
-As a last step, the obtained solution is then transferred to the next finer level to correct the current approximate solution.
+However, in contrast to all other levels, the resulting error equation is solved directly, which is denoted by the application of the coarse-grid solver.
+Then, as a final step, the obtained solution is transferred to the next higher level to correct the current approximate solution.
 %TODO mention that EvoStencils includes additional functionality not mentioned here
-\subsubsection{Productions}
-After implementing all required terminals and state transition functions, as shown in Listing~\ref{code:grammar:terminals}--\ref{code:grammar:coarse-grid-solver}, the next task is to generate the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on these components.
-As it has been already mentioned at the beginning of this chapter, for this purpose, we utilize the genetic programming module of the DEAP framework~\cite{rainville2012deap}. 
-In principle, DEAP offers support for untyped and strongly-typed tree-based GP.
-It is, therefore, not possible to implement GGGP directly within the framework. 
-However, as we have already discussed in Section~\ref{sec:gggp-initialization} GGGP can be considered as a variation of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
-However, before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
-In DEAP the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines the rules how a program can be constructed based on a set so-called \emph{primitives}.
+\subsection{Productions}
+Finally, to generate the actual grammar, we need to assemble the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on the terminal and state transition functions implementation presented in the last section.
+As already mentioned at the beginning of this chapter, we, therefore, make use of the genetic programming (GP) module of the DEAP framework~\cite{rainville2012deap}. 
+In principle, DEAP only offers support for untyped and strongly-typed tree-based GP and, therefore, does not allow to implement grammar-guided GP (G3P) directly.
+However, as we have already discussed in Section~\ref{sec:gggp-initialization} G3P can be considered as a special variant of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
+Before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
+In DEAP, the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines the rules of how a program can be constructed based on a set of \emph{Primitive} objects.
 As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints can be generated.
-To demonstrate how a grammar can be implemented in form of a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, which is defined as
+To demonstrate how a grammar can be implemented as a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, whose productions are, again, given by
 \begin{equation*}
 	\begin{split}
 		\ps S \; \; \bnfpo & \; \; \ps E \\
@@ -317,51 +315,52 @@ To demonstrate how a grammar can be implemented in form of a \emph{PrimitiveSetT
 		\ps B \; \; \bnfpo & \; \;  \neg \ps B \; | \; (\ps B \wedge \ps B) \; | \; (\ps B \vee \ps B) \; | \; u \; | \; v.
 	\end{split}
 \end{equation*}
-Listing~\ref{code:grammar:pset-example} shows the resulting implementation of the function \emph{generate\_grammar} which generates a \emph{PrimitiveSetTyped} object that corresponds to the given example grammar.
+Listing~\ref{code:grammar:pset-example} shows the corresponding implementation of the function \emph{generate\_grammar}, which generates a \emph{PrimitiveSetTyped} object.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/pset_example.py}
 	\caption{Example Grammar Generation with PrimitiveSetTyped}
 	\label{code:grammar:pset-example}
 \end{listing}
-Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in line $5$--$7$.
-Next, an empty \emph{PrimitiveSetTyped} is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable in the given grammar.
-We can then proceed defining each of the grammar's production in form of a \emph{Primitive} objective, which consists of a function, a list of input types and an output type.
-Counterintuitively, the output and not the input type then defines which variable is placed on the left side of each production.
-To understand the reasoning behind this design choice, we need to reconsider the process of tree initialization in GGGP.
-As we have seen in Section~\ref{sec:gggp-initialization} a new derivation tree can be generated starting with the variable $\ps{S}$ by recursively choosing productions from the available set for each leaf node of the tree that corresponds to a variable.
-Similarly, to generate a tree based on a given \emph{PrimitiveSetTyped}, \emph{Primitives} are chosen randomly among those whose output type matches with the specified return type.
-After extending the tree accordingly, the process is continued with each of the input types of the chosen \emph{Primitive}.
-Therefore, in order to terminate this process at a certain point within the tree, a \emph{Primitive} with an empty list of input types must be chosen, which corresponds to a production whose right-hand side does not contain any variables.
-In DEAP such a \emph{Primitive} is called a \emph{Terminal}, which should not be confused with the eponymous term introduced in Section~\ref{sec:gggp-representation}, where it refers to each non-variable symbol.
+Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in Line $5$--$7$ of Listing~\ref{code:grammar:pset-example}.
+Next, a new \emph{PrimitiveSetTyped} object is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable in the given grammar.
+We then proceed to define each of the grammar's production in the form of a \emph{Primitive} objective, which consists of a function, a list of input types, and an output type.
+Counterintuitively, the output and not the input type then defines which variable is placed on the left-hand side of each production.
+To understand this contradiction, we need to revisit the process of tree initialization in G3P.
+As we have seen in Section~\ref{sec:gggp-initialization}, a new derivation tree is always generated starting with the variable $\ps{S}$ by recursively choosing productions for each leaf node of the tree that corresponds to a variable.
+Similarly, to generate a tree based on a given \emph{PrimitiveSetTyped}, a \emph{Primitive} is picked randomly from those with an output type matching the specified return type.
+After extending the tree accordingly, the process is then continued with each of the input types of the chosen \emph{Primitive}.
+Therefore, terminating this process at a certain point within the tree requires choosing a \emph{Primitive} with an empty list of input types, which correspond to a production whose right-hand side does not contain any variables.
+In DEAP, such a \emph{Primitive} is called a \emph{Terminal}, which should not be confused with the terminals introduced in Section~\ref{sec:gggp-representation}, which simply refer to each non-variable symbol of a grammar.
 To add either a \emph{Primitive} or \emph{Terminal} object to a given \emph{PrimitiveSetTyped}, the \emph{\_add} method can be used.
 However, for the sake of convenience, the methods \emph{addPrimitive} and \emph{addTerminal} are also available.
-In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, for each of them, we, therefore, add a \emph{Primitive} to the object, using the aforementioned function and the previously defined types.
+In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, we, therefore, include a \emph{Primitive} for each of them, using the aforementioned function and the previously defined types.
 Note that in order to define the production
 \begin{equation*}
 	\ps E \; \; \bnfpo \; \; \ps A,
 \end{equation*}
-we utilize an identify function, as defined in line~12 of Listing~\ref{code:grammar:pset-example}.
-After adding each of the grammar's productions to the set in form of a \emph{Primitive} object, what remains is the treatment of the four symbols $x$, $y$, $u$ and $v$.
-In DEAP terminals are represented by objects of the \emph{Terminal} class, which corresponds to a primitive without any arguments, and, thus, an empty list of input types.
-Optionally, a \emph{Terminal} object may also refer a Python symbol, which can be achieved by setting the \emph{symbolic} argument accordingly.
-Since, similar to Section~\ref{sec:gggp-representation}, we assume that each of the four symbols represents an argument of the generated Python function, we additionally append it to the list of arguments.
-The resulting locally-defined function \emph{add\_argument} can then be utilized to add each of the four symbols as an argument to the set. 
-Note that for each of the two symbols $x$ and $y$ we include two \emph{Terminal} objects, which only differ in their return type.
-As a consequence, our implementation includes primitives that correspond to two additional productions
+we utilize an identity function, which is implemented in Line~12 of Listing~\ref{code:grammar:pset-example}.
+After including each of the grammar's productions as a \emph{Primitive} object, we need to take care of the four symbols $x$, $y$, $u$, and $v$.
+We can represent these symbols as objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} object without any arguments and, thus, an empty list of input types.
+Optionally, a \emph{Terminal} object may also refer to a Python symbol, which can be triggered by setting the \emph{symbolic} argument accordingly.
+If we assume that each of the four symbols represents an argument to a Python function generated by our grammar, we additionally have to append it to the list of arguments of the corresponding \emph{PrimitiveSetTyped} object.
+For this purpose, we define the local function \emph{add\_argument}, which can then be utilized to include each of the four symbols as an argument. 
+Note that for each of the two symbols $x$ and $y$, we create two \emph{Terminal} objects that only differ in their return type.
+As a consequence, our implementation includes two additional productions
 \begin{equation*}
 	\ps E \; \; \bnfpo \; \; \ps x \bnfor \ps y,
 \end{equation*}
 which are not part of the original grammar.
-The reason for this adaption is that within DEAP's implementation of the \emph{grow} operator, as described in Section~\ref{sec:gggp-initialization}, expects the availability of at least one \emph{Terminal} and \emph{Primitive} object for each type within a \emph{PrimitiveSetTyped}.
+The reason for this adaption is that DEAP's implementation of the \emph{grow} operator, as described in Section~\ref{sec:gggp-initialization}, expects the availability of at least one \emph{Terminal} and \emph{Primitive} object for each type within a \emph{PrimitiveSetTyped}.
 In the given case, we only need to include additional \emph{Terminal} objects for the type \emph{E}, as the condition is already fulfilled for all other types.
-While in the given case, we can easily fulfill this condition without changing the grammar's behavior, as the type \emph{E} can already be converted to \emph{A} using the identity function, in general this is not the case.
-In particular for the majority of the variables of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}, only non-terminal productions, i.e. productions that generate strings with at least one variable, are available.
-Therefore, we need to adapt DEAP's implementation of the \emph{grow} operator to handle grammar's that violate the requirement of having at least one terminal production for each of its variables, which we will briefly discuss at the end of this section.
-Finally, after constructing a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can generate a random tree using the \emph{genGrow} function, which corresponds to aforementioned \emph{grow} initialization operator.
-Based on the resulting tree, a function object is then generated using DEAP's \emph{compile} function, which can be executed similar to any other Python function by providing a value for each of its arguments.
+While the example considered here does not require significant adaptions in the structure of the grammar since the type \emph{E} can already be converted to \emph{A} using the identity function, in general, this is not the case.
+In particular, for the majority of the variables of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}, only non-terminal productions, i.e., productions that generate strings with at least one variable, are available.
+To handle grammars that violate the requirement of having at least one terminal production for each of its variables, we, thus, need to adapt DEAP's implementation of the \emph{grow} operator.
+We will cover this adaptation briefly at the end of this section.
+Finally, after constructing a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can construct a random derivation tree using the \emph{genGrow} function, which corresponds to the aforementioned \emph{grow} initialization operator.
+Based on the resulting tree, a function object is then generated using DEAP's \emph{compile} function, which can be executed similarly to any other Python function by providing a value for each of its arguments.
 %Similar to \emph{Primitive} objects, a \emph{Terminal} can be added to an existing \emph{PrimitiveSetTyped} using the \emph{addTerminal} method.
 
-After introducing the functionality of DEAP's GP module, we can continue with the actual implementation of the productions of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}.
+After introducing the functionality of DEAP's GP module, we can proceed with the actual implementation of the productions of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}.
 However, before we define a function for constructing the corresponding \emph{PrimitiveSetTyped}, we need to consider the unique structure of our grammar.
 As we have discussed in Section~\ref{sec:multigrid-grammar}, Table~\ref{table:multigrid-grammar} is obtained by repeating the same productions on each level for the corresponding set of variables.
 In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all terminals that are contained in each production.
