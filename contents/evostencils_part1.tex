@@ -321,7 +321,7 @@ Listing~\ref{code:grammar:pset-example} shows the corresponding implementation o
 	\caption{Example Grammar Generation with PrimitiveSetTyped}
 	\label{code:grammar:pset-example}
 \end{listing}
-Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in Line $5$--$7$ of Listing~\ref{code:grammar:pset-example}.
+Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in Line~5--7 of Listing~\ref{code:grammar:pset-example}.
 Next, a new \emph{PrimitiveSetTyped} object is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable in the given grammar.
 We then proceed to define each of the grammar's production in the form of a \emph{Primitive} objective, which consists of a function, a list of input types, and an output type.
 Counterintuitively, the output and not the input type then defines which variable is placed on the left-hand side of each production.
@@ -396,22 +396,23 @@ Furthermore, in order to correctly store \emph{Type} objects in a Python diction
 Finally, to ensure that the type checking is performed correctly, we adapt the original implementation of the \emph{PrimitiveSetTyped} class such that types are compared using the equality operator instead of Python's built-in \emph{issubclass} function.
 For the sake of completeness, the resulting implementation can be found in Section~\ref{appendix:gp} of the appendix.
 
-Based on this tailored type representation, we can now implement a data structure in form of the \emph{Types} class that incorporates the corresponding type for each variable defined on a given level of Table~\ref{table:multigrid-grammar}, which is shown in Listing~\ref{code:grammar:types}.
+Based on this tailored type representation, we can now implement a data structure in the form of the \emph{Types} class that incorporates the type of each variable defined on a given level of Table~\ref{table:multigrid-grammar}.
+The implementation of this class is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
   	\inputminted[linenos]{python}{evostencils/grammar/types.py}
   	\caption{Data Structure for Variable Types}
   	\label{code:grammar:types}
 \end{listing}
 %TODO include line numbers at the respective text positions
-Within this data structure, a type attribute can be initialized in two different ways depending on whether the types of the next-higher level in the discretization hierarchy are available.
-To distinguish between these two cases, the \emph{\_init\_type} method can be employed, which either creates a new \emph{Type} object using the provided \emph{identifier} or alternatively returns the respective attribute of the given \emph{Types} object.
-Based on this function, in line 13--33 we then generate a \emph{Type} object with unique \emph{identifier} for each variable of two subsequent levels of the discretization hierarchy, whereby each attribute with a subscript $h$ and $2h$ corresponds to a variable on the current level and next-coarser level, respectively.
-Consequently, if we provide an existing \emph{Types} object for the initialization of the corresponding object on the next-coarser level, its coarse-level types correspond to the fine-level types of this object.
-We, therefore, only have to generate a unique type for each variable once, which can then be transmitted to the next-coarser level in form of a reference to the respective \emph{Type} object.
-For the sake of simplicity we utilize Python strings as \emph{identifier} for each \emph{Type} object. 
-Furthermore, in addition to the types that need to be defined for each level, both the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes are level-independent variables, and, thus, in both cases only a single type needs to be defined for the whole grammar, which is shown in line 36 and 37.
+To initialize the type that corresponds to a certain variable of the grammar, we can either create a new \emph{Type} object based on a given \emph{identifier} or retrieve the respective object if it is already contained in the \emph{Types} data structure that refers to the next-higher level in the discretization hierarchy.
+The resulting initialization procedure is implemented in the \emph{\_init\_type} method, which can be found in Lines~2--9 of Listing~\ref{code:grammar:types}.
+Based on this function, we then obtain a \emph{Type} object with unique \emph{identifier} for each variable of two subsequent levels of the discretization hierarchy, whereby each attribute with a subscript $h$ and $2h$ corresponds to a variable on the current level and next-coarser level, respectively.
+Consequently, if we provide an existing \emph{Types} object for the initialization of the corresponding object on the next-lower level, its coarse-grid types correspond to the fine-grid types of this object.
+We, therefore, only have to generate a unique type for each variable once, which can then be transferred to the next higher level in the form of a reference to the respective \emph{Type} object.
+For the sake of simplicity, Python strings are used as \emph{identifier} for a \emph{Type} object. 
+In contrast to the types that need to be defined on each level, the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes are level-independent variables, and, thus, in both cases, only a single type needs to be defined for the whole grammar, which is shown in Line~36 and~37.
 
-With the implementation of a type system that allows us to express the productions of a multigrid grammar as a set of typed primitives we are now finally at the point where we can bring everything together.
+With the implementation of a type system that allows us to express each production as a mapping between input and output types, we are now finally at the point where we can bring everything together.
 Similar to the example shown in Listing~\ref{code:grammar:pset-example}, we first have to create a \emph{PrimitiveSetTyped} to which we can then add the respective \emph{Terminal} and \emph{Primitive} objects in an iterative manner.
 The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}.
 \begin{listing}
@@ -419,68 +420,71 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 	\caption{Primitive Set Initialization}
 	\label{code:grammar:init-grammar}
 \end{listing}
-Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given distretization hierarchy.
-Based on these data structures we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state in form of a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object, and a number of level-independent terminals.
-For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves this information from a domain specific representation.
-All other \emph{Terminal} and \emph{Primitive} objects are then added using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
+Here, we first construct the respective \emph{Terminals} and \emph{Types} data structures for the topmost level of the given discretization hierarchy.
+Based on these data structures, we then proceed with the creation of the \emph{PrimitiveSetTyped} object, to which we first include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and a number of level-independent terminals.
+For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves this information from a domain-specific representation.
+All other \emph{Terminal} and \emph{Primitive} objects are then included using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
 
-At this point we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
-The purpose of this attribute is to enforce additional constraints within the grammar, that are not present in the general structure of Table~\ref{table:grammar-semantics}.
-While our grammar enables the generation of multigrid methods that employ an arbitrary sequence of operations on each level, for the sake of simplicity, we have not yet applied any requirements on a method's structure.
-As a consequence, none of the productions must necessarily be included into a given derivation tree.
-For the majority of productions this does not represent an issue, as, for instance, the optimal number of smoothing and coarse-grid correction steps might be different for each case.
-However, according to Section~\ref{sec:multigrid-methods}, we consider it as essential that the coarse-grid solver is at least applied once within a multigrid method in order to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
-We enforce this requirement by utilizing the mentioned \emph{guard} attribute of the \emph{Type} class.
+At this point, we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
+The purpose of this attribute is to enforce additional constraints that are not present in the grammar shown in Table~\ref{table:multigrid-grammar}.
+Consider, for instance, the derivation
+\begin{equation*}
+\ps{S} \Rightarrow \ps{s_h} \Rightarrow (x_h^0, b_h, \bnfes, \bnfes),
+\end{equation*}
+which according Table~\ref{table:multigrid-grammar} represents a valid derivation.
+However, the resulting method consists only of a single statement, which returns the initial approximate solutions.
+It is, thus, important to define the minimal requirements for a sequence of operations generated based on Table~\ref{table:multigrid-grammar} to qualify as a multigrid method. 
+Therefore, while the optimal amount of smoothing and coarse-grid corrections might differ for each case, we consider it essential to apply the coarse-grid solver at least once within a multigrid method in order to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
+We can now enforce this requirement by utilizing the mentioned \emph{guard} attribute of the \emph{Type} class.
 As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
-For this purpose, we set the output type of the respective \emph{Terminal} object in line 12 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
+For this purpose, we set the output type of the respective \emph{Terminal} object in Line~16 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
 We then define all remaining productions in such a way that all possible derivations include the function \emph{correct\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
-Listing~\ref{code:grammar:add-level} shows how this can be achieved for each level within a discretization hierarchies of arbitrary depth.
+Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for each level within a discretization hierarchy of arbitrary depth.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
 	\caption{Terminal and Primitive Generation per Level}
 	\label{code:grammar:add-level}
 \end{listing}
-As a first step within this function, we utilize the function \emph{add\_terminals} in line 2, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to add all terminals that are required on the respective level to the given primitive set.
+In Line~2, we first make use of the function \emph{add\_terminals}, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to include all terminals that are required on the respective level into the given primitive set.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/add_terminals.py}
 	\caption{Terminal Generation per Level}
 	\label{code:grammar:add-terminals}
 \end{listing}
-Next, to facilitate the process of primitive generation, we implement the helper function \emph{add\_primitive}.
-This function has the purpose of generating the same primitive multiple times using different input and output types. 
-We, therefore, utilize this function to include each primitive with a guarded and unguarded version of the same type.
+To facilitate the process of generating  \emph{Primitive} objects, we implement the helper function \emph{add\_primitive}.
+This function can generate multiple instances of the same \emph{Primitive} using different input and output types, which we utilize to include each of them with a guarded and unguarded version of the same type.
 Now note that each derivation starts with the type \emph{S\_h} and ends with the type \emph{S\_guard\_h}.
-According to the productions of Table~\ref{table:multigrid-grammar}, in general, only four unique primitives are required on each level, except for the treatment of different smoothers.
-In each of the generated \emph{Primitive} objects, in line 10--18, whose list of input types includes exclusively unguarded types, the output type is also unguarded.
-Hence, so far in none of the resulting primitives a transition from an unguarded to a guarded type is possible.
-We can now enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition from an unguarded to a guarded type in line 21.
-As a consequence, the application of the \emph{correct\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation. 
-Note that we only want to add this production on the coarsest level, where it replaces the respective productions for applying coarsening and the coarse-grid correction.
-We, therefore, have to check whether the current level represents the coarsest within the given discretization hierarchy, which is performed in line 15 of Listing~\ref{code:grammar:add-level}.
-Furthermore, note that as the same production is also applicable for the respective guarded types, the coarse-grid solver, together with all other productions can also be applied multiple times within each derivation.
+According to the productions of Table~\ref{table:multigrid-grammar}, in general, only four unique primitives are required on each level, except for the use of different smoothers.
+For each of the \emph{Primitive} objects, generated Lines~9--17 of Listing~\ref{code:grammar:add-level}, with a list of input types consisting of only unguarded types, the output type is also unguarded.
+Hence, so far, in none of the resulting rules, a transition from an unguarded to a guarded type is possible.
+We can now enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition from an unguarded to a guarded type in Line~21.
+Since this transition then represents the only way to reach the final state, the application of the \emph{correct\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
+Note that we only want to add this production on the coarsest level, where it replaces the respective productions for the coarsening and coarse-grid correction steps.
+We, therefore, have to check whether the current level represents the coarsest within the given discretization hierarchy, which is done in Line~15 of Listing~\ref{code:grammar:add-level}.
+Since we generate the respective \emph{Primitive} also with an unguarded input type, as in the case of all other productions, the coarse-grid solver can be applied multiple times within each derivation.
 
-Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, as defined in Listing~\ref{code:grammar:init-grammar} and~\ref{code:grammar:add-level}, respectively, we can implement a Python function \emph{generate\_grammar} for generating the primitive set of arbitrary multigrid grammars, which is shown in Listing~\ref{code:grammar:generate-grammar}.
+Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can implement the Python function \emph{generate\_grammar}, which generates a \emph{PrimitiveSetTyped} for discretization hierarchies of variable depth, which is shown in Listing~\ref{code:grammar:generate-grammar}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/generate_grammar.py}
 	\caption{Grammar Generation}
 	\label{code:grammar:generate-grammar}
 \end{listing}
 %TODO maybe clarify the meaning of max_level in comparison to earlier sections
-Here, we first construct a \emph{PrimitiveSetTyped} object while adding all required terminals and primitives on the finest level using the previously defined function \emph{init\_grammar}, which is applied in line 6.
-In case the given discretization hierarchies comprises at least three levels, we iteratively extend our primitive set with respect to each level using the \emph{add\_level} function.
-For this purpose, similar to the finest level, we only have to create the respective \emph{Terminals} and \emph{Types} object, as shown in line 10--20, which can then be passed to the aforementioned function in order to include all required \emph{Primitive} and \emph{Terminal}.
+Here, we first construct an initial \emph{PrimitiveSetTyped} object to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest level using the previously defined function \emph{init\_grammar}.
+In case the given discretization hierarchy comprises at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
+For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~10--20, which are then passed to \emph{add\_level} in order to include all required \emph{Primitive} and \emph{Terminal} objects.
 After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
-In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar based on the given PDE-based problem to the execution of the actual optimization procedure within an \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar, based on the given PDE-based problem, to the synthesis of an optimal program within an \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
 	\caption{Optimizer class}
 	\label{code:optimization:optimizer}
 \end{listing}
-In addition to the generated primitive set, this class relies on two main components, a \emph{Toolbox} object for the execution of the GGGP-based evolutionary search procedure, and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the given PDE-based problem, for instance, in form of the respective operators.
-Based on the functionality of these two components, which, in the following, will be described in detail, we can implement a \emph{run} method, which first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs a grammar-guided evolutionary search in order to find a population of individuals that represent efficient multigrid methods for the given problem.
-Note that within this search procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
+In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the given PDE-based problem, for instance, in the form of the respective operators.
+Based on the functionality of these two components, which, in the following, will be described in detail, we can implement a \emph{run} method, which first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary program synthesis that yields a population of individuals representing efficient multigrid methods for the given problem.
+Note that within this procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
 
-\section{Evolutionary Search Method}
+\section{Evolutionary Program Synthesis}
 After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system, we can now utilize the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
 However, before we can define each operator, we first need to implement a data structure for storing each derivation tree generated by applying the rules of our grammar.
 For this purpose, DEAP provides the \emph{PrimitiveTree} class, which represents each tree as a list of primitives and terminals stored in depth-first order.
@@ -523,7 +527,7 @@ First of all, we define a data structure for the fitness of each individual base
 Here, the \emph{weights} attribute determines the number of objectives while a negative value means that the respective objective is to be minimized.
 We will later come back to the choice of the optimization objectives and at this point the reader can just assume that either a single or a multi-objective minimization can be performed.
 Next, as we have already discussed previously, we define an \emph{Individual} as a \emph{PrimitiveTree}, whereby we set the \emph{fitness} attribute to the previously defined data structure.
-To facilitate the creation of both classes, in line 6--10, we utilize DEAP's \emph{creator} module.
+To facilitate the creation of both classes, in lines~6--10, we utilize DEAP's \emph{creator} module.
 For a detailed description of the functionality of this module, the reader is referred to the documentation of the DEAP framework\footnote{DEAP Creator Module: \url{https://deap.readthedocs.io/en/master/api/creator.html}}.
 Based on these classes, we can then create the actual \emph{Toolbox} object together with all evolutionary operators.
 To generate a random individual we apply our customly-defined \emph{genGrow} function, as described above.
@@ -689,12 +693,12 @@ If this condition is fulfilled for at least one of the two children created from
 	\label{code:optimization:evaluate-and-create-offspring}
 \end{listing}
 To initiate the search with a sufficiently diverse population, the number of initially-generated individuals can be set higher than $\mu$, which is controlled by the parameter \emph{initial\_population\_size}.
-As a next step, in Line 7, $\mu$ individuals are selected for the first generation, using the registered \emph{elitism} operator.
+As a next step, in Line~7, $\mu$ individuals are selected for the first generation, using the registered \emph{elitism} operator.
 The actual search is then performed for a predefined number of generations.
-As a fallback solution, we additionally implement a simple random search, whereby in each generation we randomly generate $\lambda$ individuals, which can be seen in Line 11 of Listing~\ref{code:optimization:evolutionary_search}.
-In contrast, within the evolutionary algorithm, we first select $\lambda$ individuals for crossover and mutation, using the \emph{select} operator, as shown in Line 14.
+As a fallback solution, we additionally implement a simple random search, whereby in each generation we randomly generate $\lambda$ individuals, which can be seen in Line~11 of Listing~\ref{code:optimization:evolutionary_search}.
+In contrast, within the evolutionary algorithm, we first select $\lambda$ individuals for crossover and mutation, using the \emph{select} operator, as shown in Line~14.
 As mutation represents a modifying operation, we first generate an identical copy of each selected parent individual, based on which then either crossover or mutation is applied using the previously-mentioned \emph{create\_offspring} method.
-Finally, in Line 18--22 the resulting newly created individuals are evaluated and a new elitist population of size $\mu$ is obtained from the combined set of parent and child individuals.
+Finally, in Line~18--22 the resulting newly created individuals are evaluated and a new elitist population of size $\mu$ is obtained from the combined set of parent and child individuals.
 Note that this step is identical for the random search variant of our implementation.
 
 With the implementation of this method, we have now assembled all components required to search for efficient multigrid methods for solving PDE-based problems.
