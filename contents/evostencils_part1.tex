@@ -689,15 +689,15 @@ In accordance with the common notation to describe evolutionary algorithms~\cite
 Therefore, in each generation, $\lambda$ new individuals are created based on $\mu$ parent individuals.
 The new population is then selected from the combined set of parent and child individuals using the defined elitism operator.
 For the sake of simplicity, we implement the evaluation of a list of individuals and the creation of offspring using mutation and crossover in two separate functions, which are shown in Listing~\ref{code:optimization:evaluate-and-create-offspring}.
-To enforce the creation of novel individuals, which have not already been obtained within previous generations of the method, we check whether they are already present in the cache.
-If this condition is fulfilled for at least one of the two children created from each pair of parent individuals, we repeat the application of the respective mutation or crossover operator until two suitable children are obtained.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search_helper.py}
+	\inputminted{python}{evostencils/optimization/evolutionary_search_helper.py}
 	\caption{Auxiliary functions for creating and evaluating offspring}
 	\label{code:optimization:evaluate-and-create-offspring}
 \end{listing}
+To enforce the creation of novel individuals, which have not already been obtained within previous generations of the method, we check whether they are already present in the cache.
+If this condition is fulfilled for at least one of the two children created from each pair of parent individuals, we repeat the application of the respective mutation or crossover operator until two suitable children are obtained.
 To initiate the search with a sufficiently diverse population, the number of initially-generated individuals can be set higher than $\mu$, which is controlled by the parameter \emph{initial\_population\_size}.
-As a next step, in Line~7, $\mu$ individuals are selected for the first generation, using the registered \emph{elitism} operator.
+As a next step, in Line~7 of Listing~\ref{code:optimization:evolutionary_search}, $\mu$ individuals are selected for the first generation, using the registered \emph{elitism} operator.
 The actual search is then performed for a predefined number of generations.
 As a fallback solution, we additionally implement a simple random search, whereby in each generation, we randomly generate $\lambda$ individuals.
 The implementation of this approach can be found in Line~11 of Listing~\ref{code:optimization:evolutionary_search}.
