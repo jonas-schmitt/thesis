@@ -151,27 +151,27 @@ However, we postpone this step until we have described the next major extension 
 
 \section{Distributed Parallelization}
 \label{sec:distributed-parallelization}
-As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our multigrid grammar already rules out the possibility to evaluate all possible solvers that can be generated based on its productions.
-However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of individuals that need to be evaluated, we still have to execute each solver obtained within the search on a number of different problem instances, as described in the last section.
-Furthermore, to evaluate each of these solvers, we utilize ExaStencils' capabilities to first generate a C++ implementation, which then, in a second steps needs to be compiled to an executable program.
-Both steps incur a significant overhead and, hence, further increase the time required for the evaluation of each individual.
-A common approach to accelerate the computationally intensive parts of an evolutionary algorithm, is to distribute their execution to several compute nodes, such that each computational step can be performed in parallel.
+As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our grammar rules out the possibility of evaluating the entirety of multigrid methods that can be generated based on its productions.
+However, even though the application of an evolutionary algorithm as a heuristic search method allows us to significantly reduce the number of considered individuals, we still have to execute a large number of solvers on different problem instances.
+Furthermore, to evaluate each of these solvers, we make use of ExaStencils' capabilities to automatically generate a C++ implementation, which then, in a second step, needs to be compiled into an executable program.
+Both steps induce a significant overhead and, hence, further increase the time required for the evaluation of each individual.
+A common approach to accelerate the computationally intensive parts of an evolutionary algorithm is to distribute their execution to several compute nodes such that each computational step can be performed in parallel.
 An overview of different approaches for the distributed parallelization of evolutionary algorithms can be found in~\cite{gong2015distributed}.
-In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the methods scalability.
-Unfortunately, in general, the question which approach leads to the best outcome can not be answered easily.
-However, before we decide upon a specific parallelization method, it is first important to investigate which parts of our evolutionary search method need to be parallelized in order to achieve good scalability.
+In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to further improve the algorithm's scalability.
+Unfortunately, in general, which approach leads to the best outcome can not be answered easily.
+Before deciding on a specific parallelization method, we first need to investigate which parts of our evolutionary search method need to be parallelized to achieve good scalability.
 
 \subsection{Empirical Execution Time Analysis}
 \label{sec:execution-time-analysis}
-According to Algorithm~\ref{alg:genetic-programming}, each generation of our evolutionary search method in principle consists of the following four steps:
+According to Algorithm~\ref{alg:genetic-programming}, each step of our evolutionary search method, in principle, consists of the following four operations:
 \begin{enumerate}
 	\item Parent Selection
 	\item Child Creation
 	\item Child Evaluation
 	\item Population Selection
 \end{enumerate}
-In order to estimate the expected speedup of a parallel implementation of each of these operations, we first determine the fraction of time each of them occupies within our evolutionary search method.
-For this purpose, as a representative test problem, we consider Poisson's equation on the unit square $\left[0,1\right]^2$ discretized on a uniform grid with step size $h = 1/2^{11}$ using the common five-point stencil
+In order to estimate the expected speedup of a parallel implementation of each of these operations, we first determine their fraction of the total execution time of our evolutionary search method.
+For this purpose, we consider Poisson's equation on the unit square $\left[0,1\right]^2$ discretized on a uniform grid with step size $h = 1/2^{11}$ using the common five-point stencil
 \begin{equation*}
 	\nabla^2_h = 
 	\frac{1}{h^2} \begin{bmatrix}
@@ -182,8 +182,8 @@ For this purpose, as a representative test problem, we consider Poisson's equati
 \end{equation*}
 and Dirichlet boundary conditions, which leads to a system of linear equations with $4\,190\,209$ unknowns.
 For the sake of simplicity, we omit the complete specification of this test problem at this point, which can be found in Section~\ref{sec:poisson-equation}.
-In order to obtain representative measurements for each of the four steps of our search method, we sequentially execute our evolutionary search method for a total number 250 generations on a single socket of the Meggie compute cluster of the Erlangen Regional Computing Center\footnote{As an exception, the child evaluation step is performed in parallel on multiple sockets of the same type. Since the order of evaluation does not change the behavior of our algorithm, this decision does not affect our measurements.}.
-In each generation we select $\lambda = 256$ individuals from the current population based on which we create $\lambda$ children.
+In order to obtain representative measurements for each of the four steps of our search method, we execute our evolutionary program synthesis method sequentially for a total number of 250 generations on a single socket of the Meggie compute cluster of the Erlangen Regional Computing Center\footnote{As an exception, the child evaluation step is performed in parallel on multiple sockets of the same type. Since the order of evaluation does not change the behavior of our algorithm, this decision does not affect our measurements.}.
+In each generation, we select $\lambda = 256$ individuals from the current population, based on which we create $\lambda$ children.
 Finally, we select $\mu = 256$ individuals as a new population for the next generation from the combined set of $512$ individuals using the NSGA-II non-dominated sorting procedure described in~\cite{deb2002fast}.
 We then measure the average time required for each of the four steps over all generations, which is shown in Table~\ref{table:evolutionary-search-profiling}.
 \begin{table}
@@ -204,71 +204,72 @@ We then measure the average time required for each of the four steps over all ge
 		\bottomrule
 	\end{tabular}
 \end{table}
-As it can be seen in this table, the overall execution time of our evolutionary search method is heavily dominated by the evaluation step, which is reflected in the fact that the combined execution times of all other steps do not even account for one percent of the overall time.
-Consequently, we can drastically reduce the execution time of our evolutionary search method by performing the evaluation of multiple individuals in parallel, while the parallelization of any other step will only result in a negligible speedup. 
-However, as we have to evaluate at least a single individual per compute node, the maximum achievable speedup is equal to $\lambda$, i.e., the number of children created in each generation of the search.
+According to these measurements, the overall execution time of our evolutionary program synthesis method is heavily dominated by the evaluation step, which is reflected in the fact that the combined execution times of all other steps do not even account for one percent of the overall time.
+Consequently, we can drastically reduce the execution time of our approach by performing the evaluation of multiple individuals in parallel, while the parallelization of any other step will only result in a negligible speedup. 
+However, as we have to evaluate at least a single individual per compute node, the maximum achievable speedup is equal to $\lambda$, i.e., the number of children created in each generation of our method.
 Finally, note that the two-dimensional Poisson equation represents a common test problem that is well known to be efficiently solvable by multigrid.
 Therefore, for the majority of other PDE-based problems of similar size, we can expect a further increase in the execution time and, hence, in the relative time consumption of the evaluation step.
 
 \subsection{Parallelization Method}
 Based on the previous discussion, we can now derive a suitable parallelization scheme for our algorithm.
-However, while we have already estimated the impact of a parallel execution of each of the four steps of our method, we have not yet discussed how we can parallelize its individual operations. 
-In general, if each operation within a sequence of computations is independent, which means that it is not affected by the result of any other operation in the sequence, the sequence is trivially parallelizable and can, thus, be executed completely in parallel without affecting the outcome.
-As this condition is fulfilled for step 2-3 of our evolutionary algorithm, these steps can be performed in a fully parallel manner.
-In contrast, both selection steps in our evolutionary search method need to access the complete population from each processing elements.
-As a consequence, we can distinguish two different options to parallelize these steps on a multi-processor system:
+However, while we have already estimated the impact of parallel execution of each of the four steps of our method, we have not yet discussed how we can parallelize its individual operations on a given number of processing units. 
+In general, if each operation within a sequence of computations can be performed independently, which means that it is not affected by the result of any other operation, the sequence is trivially parallelizable.
+As this condition is fulfilled for steps 2--3 of our evolutionary algorithm, these operations can be performed in a fully parallel manner.
+In contrast, in both selection steps of our method, each processing unit needs to access the complete population.
+As a consequence, we can distinguish two fundamentally different ways to parallelize these steps on a multi-processor system:
 \begin{enumerate}
-	\item Duplicate the population on each processing element.
-	\item Split the population into subpopulations and perform the selection on each subpopulation independently, while allowing the periodic migration between certain subpopulations. This approach is usually summarized under the term island-based evolutionary algorithm.
+	\item Duplicate the population on each processing unit.
+	\item Split the population into subpopulations and perform the selection on each of them independently while allowing the periodic migration between certain subpopulations. Usually, to describe this approach, the term island-based evolutionary algorithm is used.
 \end{enumerate}   
-The first approach achieves behavioral equivalence to a sequential evolutionary search at the cost that both the memory and computational requirements of the resulting program increases with the population size $\mu$, which restricts its applicability to only medium-sized populations.
-In contrast, depending on the amount of migration between the individual subpopulations, which require a certain amount of communication, island-based models are, in principle able to achieve unlimited scalability, as all operations are performed on completely independent subpopulations.
-On the downside, since only individuals in the respective subpopulation are considered for selection, an island-based approach comprises the risk of selecting a higher percentage of inferior individuals, which might lead to slower convergence compared to its sequential counterpart.
-Considering the relative low cost of selection even compared to the evaluation of a single individual\footnote{If we divide the total evaluation time per generation in Table~\ref{table:evolutionary-search-profiling} by the number of children, we obtain an average evaluation time of 47 seconds per individual.}, as demonstrated for the given test problem with a population size of $\mu = 256$, we can conclude that a duplication of the whole population is feasible for most experiments performed on small to medium-sized clusters.
+The first approach achieves behavioral equivalence to a sequential evolutionary search at the cost that both the memory and computational requirements of the resulting program increase with the population size $\mu$, which restricts its applicability to only medium-sized populations.
+In contrast, depending on the amount of migration between the individual subpopulations, which require a certain amount of communication, island-based models can, in principle, yield unlimited scalability since all operations are performed on completely independent subpopulations.
+On the downside, as only individuals in the respective subpopulation are considered for selection, an island-based approach comprises the risk of selecting a higher percentage of inferior individuals, which might lead to slower convergence compared to its sequential counterpart.
+Considering the relatively low cost of selection even compared to the evaluation of a single individual\footnote{If we divide the total evaluation time per generation in Table~\ref{table:evolutionary-search-profiling} by the number of children, we obtain an average evaluation time of 47 seconds per individual.}, as demonstrated for the given test problem with a population size of $\mu = 256$, we can conclude that a duplication of the whole population is feasible for most experiments performed on small to medium-sized compute clusters.
 It is, therefore, the chosen method of parallelization within our implementation.
-While this decision theoretically limits its scalability, for all experiments considered in this work, which do not employ populations larger than 256 individuals, a duplication of the complete population is always feasible.
+While this decision theoretically limits scalability, for all experiments considered in this work, which do not employ populations larger than 256 individuals, a duplication of the complete population is feasible.
 However, an island-based parallelization can be considered a viable future extension for potential applications that require us to perform an evolutionary search with significantly larger population sizes.
 
 \subsection{Implementation}
-After deciding upon a parallelization approach we can now describe its implementation as an extension of our previously defined \emph{Optimizer} class based on the message passing interace (MPI), which is available in form of the MPI for Python (mpi4py) package.
-While MPI only defines interfaces for the C and Fortran programming languages, mpi4py provides an additional layer of abstractions which enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
-Pickle provides a unified way to serialize and deserialize objects using a portable binary format, which can then be transmitted using the core functionality provided by MPI.
-Since MPI represents the de facto standard for distributed computing and is, thus, supported on the majority of high-performance computing systems, its use facilitates the portability of our implementation.
-Furthermore, the availability of highly-optimized MPI implementations, which are often developed in cooperation with hardware manufacturers\footnote{For instance Intel MPI is available on most systems using Intel CPUs.}, enables the communication between different processors in an highly-efficient manner.
-As a first step to parallelize our evolutionary search method using mpi4py, we extend the previously defined \emph{Optimizer} class as shown in Listing~\ref{code:optimization:optimizer-mpi} to provide an interface to all required MPI operations. 
+After describing our parallelization approach, we can now proceed with its implementation as an extension of our previously defined \emph{Optimizer} class.
+For this purpose, we utilize the message-passing interface (MPI), which is available in the form of the MPI for Python (mpi4py) package.
+While MPI only defines interfaces for the C and Fortran programming languages, mpi4py provides an additional layer of abstractions that enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
+As we have already described in Section~\ref{sec:evostencils-part1:productions}, Pickle provides a unified way to serialize and deserialize objects based on a portable binary format, which can then be transmitted using the core functionality provided by MPI.
+Since MPI represents the de facto standard for distributed computing and is, thus, supported on the majority of high-performance computing systems, its usage facilitates the portability of our implementation.
+Furthermore, the availability of highly-optimized MPI implementations, which are often developed in cooperation with hardware manufacturers\footnote{For instance, Intel MPI is available on most systems with Intel CPUs.}, enables the communication between different processors in a highly-efficient manner.
+As a first step towards the parallelization of our evolutionary program synthesis method with mpi4py, we extend the previously defined \emph{Optimizer} class found in Listing~\ref{code:optimization:optimizer-mpi} by providing an interface to all required MPI operations. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/optimizer_mpi.py}
 	\caption{Optimizer class: MPI extension}
 	\label{code:optimization:optimizer-mpi}
 \end{listing}
-First, we include the MPI communicator object, the number of processes and the process rank as additional arguments of the initialization method.
+Therefore, we include the MPI communicator object, the number of processes, and the process rank as additional arguments of the initialization method.
 Note that all MPI operations can then be performed solely based on this information and the respective communicator object.
-In order to exchange individuals between the processes, we utilize the \emph{allgather} operation, which first collects a list of objects from all processes that is then distributed to each individual process.
-Therefore, as in our case each of these objects corresponds to a list of individuals, we additionally employ the \emph{merge\_lists} function to merge all sublists into a single list, which then contains the individuals collected from all processes.
-Note that in case only single process exists, we simply return the object passed to the method without modification, which provides a unified interface for the sequential and parallel execution of our evolutionary search method.  
+In order to exchange individuals between the processes, we utilize the \emph{allgather} operation, which first collects a list of objects from all processes that are then distributed to each individual process.
+Therefore, as in our case, each of these objects corresponds to a list of individuals, we additionally employ the \emph{merge\_lists} function to merge all sublists into a single list, which then contains the individuals collected from all processes.
+Note that in case only a single process exists, we simply return the object passed to the method without modification, which provides a unified interface for the sequential and parallel execution of our evolutionary search method.
+The resulting operation is then implemented in Lines~18--22 of Listing~\ref{code:optimization:optimizer-mpi}. 
 
-Finally, we can now utilize this interface to implement a parallel version of the generalization procedure described in Algorithm~\ref{alg:generalization-procedure}, as an extension of the basic implementation of our evolutionary search method shown in Listing~\ref{code:optimization:evolutionary_search}.
-The resulting final implementation is shown in Listing~\ref{code:optimization:evolutionary-search-mpi}, where we have omitted the implementation of random search for the sake of brevity.
+As a final step, we can now make use of this interface to implement a parallel version of the generalization procedure described in Algorithm~\ref{alg:generalization-procedure} as an extension of the basic implementation of our evolutionary program synthesis method discussed in Section~\ref{sec:evostencils-part1:search-algorithm}.
+The resulting Python implementation is shown in Listing~\ref{code:optimization:evolutionary-search-mpi}, where we have omitted the implementation of the random search for the sake of brevity.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search_mpi.py}
 	\caption{Evolutionary Search Method}
 	\label{code:optimization:evolutionary-search-mpi}
 \end{listing}
-In principle, as the required functionality is already implemented within the \emph{adapt\_problem\_size} and \emph{allgather} method, only a few adaptions of our original implementation are required.
+Since most of the required functionality is already implemented within the \emph{adapt\_problem\_size} and \emph{allgather} methods, only a few adaptions of our original implementation are required.
 First of all, we include an additional argument \emph{generalization\_interval}, which corresponds to the parameter $m$ in Algorithm~\ref{alg:generalization-procedure}.
 Based on the value of this argument, we iteratively increase the problem size after a specified number of generations.
-Finally, in order to parallelize the individual steps of our evolutionary search method, we utilize the previously defined interfaces.
-According to the MPI programming model, in case the number of processes is larger than one, each process executes its own instance of the same program.
-As a consequence, we only have to implement the required synchronization points between the process.
-Similar to our original implementation, the first step within our evolutionary search is the generation and evaluation of an initial population.
-Therefore, as a first step, which is shown in line 7--10, each process generates and evaluates its respective fraction of the initial population, which is then combined and distributed using the \emph{allgather} method in line 11.
-In a similar fashion, each process generates its fraction of the offspring by first selecting the respective number of parents based on which new individuals are created using crossover and mutation, as shown in line 29--31.
-Again, after each process has finished the evaluation of its local individuals the combined offspring is obtained using the \emph{allgather} method in line 35.
-Since each process then has an exact copy of all newly-created individuals, the following elitist selection in line 38 consistently leads to the same population, based on which the search is then proceeded until the maximum number of generations has been reached.
+Finally, we parallelize the individual steps of our evolutionary search method using the previously defined MPI interface.
+According to the MPI programming model, if the number of processes is larger than one, each process executes its own instance of the same program.
+We, thus, only have to implement the required synchronization points between the processes.
+Similar to our original implementation, the first step within our evolutionary program synthesis method is the generation and evaluation of an initial population.
+Therefore, in Lines~7--10, each process first generates and evaluates its respective fraction of the initial population, which is then combined and distributed using the \emph{allgather} method in Line~11.
+In a similar fashion, each process generates its fraction of the offspring by first selecting the respective number of parents, based on which new individuals are created in Lines~29--31 by applying crossover and mutation.
+Again, after each process has finished the evaluation of its local individuals, the combined offspring is obtained using the \emph{allgather} method in Line~35.
+Since after this operation, each process has an exact copy of all newly-created individuals, the following elitist selection in Line~38 consistently leads to the same population, based on which the search then proceeds until the maximum number of generations has been reached.
 
-With the implementation of a scalable evolutionary search method that is able to utilize the compute capabilities of current multi-node systems, we can now evaluate the effectiveness of our grammar-based approach for the construction of multigrid methods in a number of experiments, where we consider two common PDE-based model problems, Poisson's equation and a linear elastic boundary value problem.
+With the implementation of a scalable evolutionary program synthesis method that is able to utilize the compute capabilities of current multi-node systems, we can now evaluate the effectiveness of our approach for the grammar-based design of multigrid methods in a number of experiments, where we consider two common PDE-based model problems, Poisson's equation, and a linear elastic boundary value problem.
 Furthermore, as a final evaluation step, we assess the efficiency and generalizability of the solvers evolved within the generalization procedure described in Algorithm~\ref{alg:generalization-procedure} on a difficult benchmark problem, the indefinite Helmholtz equation with increasingly-large wavenumbers.
-
 
 % TODO Maybe include this section again
 %\section{Systems of Partial Differential Equations}
