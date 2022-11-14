@@ -839,7 +839,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 	\caption{Computational pattern of the F-cycle with a different number of coarsening steps.}
 	\label{fig:f-cycle}
 \end{figure}
-Except for $l = 2$, in which case the F-cycle and W-cycle are equivalent, this method represents a compromise between a pure V- or W-cycle.
+Except for $l = 2$, in which case the F-cycle and W-cycle are equivalent, this method represents a compromise between a pure V-cycle and W-cycle.
 While the composition of a multigrid method from different cycle types represents an additional degree of freedom, the individual cycles can still be formulated within the rules of Algorithm~\ref{alg:multigrid-cycle} and, hence, are fully described by the aforementioned parameters.
 Since, according to the classical formulation of a multigrid method as in~\cite{brandt1977multi,hackbusch2013multi,trottenberg2000multigrid,briggs2000multigrid}, these parameters are considered global, adapting one of their values uniformly changes the method's behavior on each level. 
 While for many applications, this approach has shown to yield efficient multigrid methods~\cite{trottenberg2000multigrid}, there are still cases where multigrid could not achieve its full potential~\cite{ernst2012difficult,benzi2005numerical}.

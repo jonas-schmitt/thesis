@@ -26,7 +26,8 @@
 % The current maintainer of this work is Markus Putnings.
 
 \documentclass[
-  paper = 17x24,
+  %paper = 17x24,
+  a5,
     % 17x24 (= studienpartitur, default)
     % a5 (= a5paper)
   language = english,
@@ -87,7 +88,6 @@
 \newtheorem{definition}{Definition}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{subfig}
 \usepackage{graphicx}
 \usepackage{algorithmicx}
 \usepackage{algorithm}
@@ -119,16 +119,16 @@
 \origin{Forchheim}
 
 % publication identifiers
-\yearofpublication{Year of Publication}
+\yearofpublication{2022}
 \series{}
-\volume{XXX}
-\doi{10.25593/978-3-96147-XXX-X}
-\isbn{978-3-96147-XXX-X}
-\eisbn{978-3-96147-XXX-X}
-\issn{2625-9974}
+\volume{}
+\doi{}
+\isbn{}
+\eisbn{}
+\issn{}
 \printinformation{%
-  ggf. Satz \\%
-  ggf. Druck%
+%  ggf. Satz \\%
+%  ggf. Druck%
 }
 
 % miscellaneous
@@ -138,9 +138,11 @@
 % university and examination
 \institute{Lehrstuhl für Informatik 10}
 \supervisor{Prof. Harald Köstler}
-\oralexam{Date of oral exam}
-\dean{Vorsitzender Pruefungskommision}
+\oralexam{}
+\dean{}
 \reviewer{%
+	Prof. Harald Köstler \\
+	Prof. Dietmar Fey
 }
 
 
@@ -191,7 +193,7 @@
   % inserts introduction heading (hat \label{ch:intro},
   % reference via \autoref{ch:intro} or \ref{ch:intro})
 \chapter{Introduction}
-  \input{contents/introduction.tex}
+%  \input{contents/introduction.tex}
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR INTRODUCTION %%%
     %\input{contents/my_introduction.tex}
@@ -220,7 +222,7 @@
   \input{contents/experiments.tex}
 \chapter{Related Work and Conclusion}
   \input{contents/related_work.tex}
-  \input{contents/conclusion.tex}
+  %\input{contents/conclusion.tex}
 
 
 % start the appendix (arabic page numbering [continued],
