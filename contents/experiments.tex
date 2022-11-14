@@ -174,6 +174,7 @@ For each smoothing and coarse-grid correction step, the relaxation factor $\omeg
 As a baseline for assessing the efficiency and generalizability of the designed multigrid solvers, we consider a number of common multigrid cycles with RB-GS smoothing and optimized relaxation factors.
 We, therefore, formulate these methods on the same five-grid hierarchy using the same restriction, prolongation operators, and coarse-grid solver.
 In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
+
 \subsection{Experimental Settings and Evaluation Platform}
 \label{sec:optimization-settings}
 After specifying the operator and parameter choices considered within the construction of each multigrid solver, we next describe the settings under which we perform each experiment.
@@ -183,7 +184,7 @@ The resulting individuals are then subject to a subsequent evaluation and compar
 Table~\ref{table:gp-parameters} gives an overview of the algorithmic configuration used within each experiment.
 \begin{table}
 	\centering
-	\caption{Summary of GGGP configuration parameters.}
+	\caption{Summary of G3P configuration parameters.}
 	\label{table:gp-parameters}
 	\begin{tabular}{l c}
 		\toprule
@@ -685,18 +686,18 @@ However, if we consider the evolved method ES-2, which leads to the fastest solv
 In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively RB-GS smoothing.
 
-\section{Evolving Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
-While within the last section, we could already demonstrate that our grammar-based approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered is particularly challenging to solve.   
-Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in case of such a PDE, we consider the indefinite Helmholtz equation.
+\section{Designing Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
+While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
+Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in the case of a problem that is difficult to solve numerically, we consider the indefinite Helmholtz equation.
 At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.
 The Helmholtz equation, whose basic form is given as 
 \begin{equation}
 	-\nabla ^{2}u - k^{2}u = f,
 	\label{eq:helmholtz}
 \end{equation} 
-is a famously-difficult test problem for the application of numerical methods, that also has practical relevance for many real-world applications, such as~\cite{versteeg1994marmousi,martin2006marmousi2,billette20052004,gray1995migration}.
+is a famously-difficult test problem for the application of numerical methods that also has practical relevance for many real-world applications, such as~\cite{versteeg1994marmousi,martin2006marmousi2,billette20052004,gray1995migration}.
 The main difficulty in solving this equation is that the system of linear equations resulting from its discretization becomes highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
-If we, for instance, assume the use of ten grid points per wavelength~\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = \frac{2 \pi}{\lambda}$ }, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
+If we, for instance, assume the use of ten grid points per wavelength\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = 2 \pi/\lambda$ }, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
 Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
 \begin{figure}
 		\centering
@@ -704,31 +705,31 @@ Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the sy
 		\caption{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$}
 		\label{fig:condition-number-helmholtz}
 \end{figure}
-The condition number gives us a notion of how much an initial approximation error is magnified by the application of the operator $A$.
-As we can see in Figure~\ref{fig:condition-number-helmholtz} for larger values of $k$ the condition number of $A$ increases dramatically, which results in an extreme accumulation of numerical errors. 
-Therefore, the necessity to handle these errors makes the design of an efficient or even functioning numerical method for the indefinite Helmholtz equation outstandingly difficult.
-In particular, without any modification classical multigrid methods can not effectively be applied as a numerical solver for indefinite Helmholtz problems~\cite{ernst2012difficult}.
-One multigrid-based approach that mitigates this problem is the application of multigrid as a preconditioner instead of applying it to the discretized Helmholtz system directly.
-In general, preconditioning has the purpose of modifying a given system of linear equations, by applying a so-called preconditioning matrix $M$ in order to obtain a new system that is then easier to solve.
-For instance, right-preconditioning the system $A x = b$ with the matrix $M$ results in
+The condition number gives us a measure of how much an initial approximation error is magnified by the application of the operator $A$.
+As we can see in Figure~\ref{fig:condition-number-helmholtz} for larger values of $k$, the condition number of $A$ increases dramatically, which leads to an extreme accumulation of numerical errors. 
+The necessity to handle these errors makes the design of an efficient or even functioning numerical method for the indefinite Helmholtz equation outstandingly difficult.
+In particular, without any modification, classical multigrid methods can not effectively be applied as a numerical solver for indefinite Helmholtz problems~\cite{ernst2012difficult}.
+One multigrid-based approach that mitigates this problem is the application of the method as a preconditioner instead of applying it to the discretized Helmholtz system directly.
+In general, preconditioning has the purpose of modifying a given system of linear equations by applying a so-called preconditioning matrix $M$ in order to obtain a new system that is then easier to solve.
+For instance, right-preconditioning the system $A \bm{x} = \bm{b}$ with the matrix $M$ results in
 \begin{equation}
 	A M^{-1} \bm{y} = \bm{b},
 	\label{eq:right-preconditioning}
 \end{equation}
 with $M \bm{x} = \bm{y}$. 
-The main consequence of this formulation is that, we now have to solve an additional system of linear equations of the form of $M \bm{x} = \bm{y}$, whenever the operator $A$ is applied within our original solution method.
-If we consider the extreme choice of $M$ as the original operator $A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $I \bm{y} = \bm{b}$, however with the consequence that the system $M \bm{x} = \bm{y}$ becomes just as ill-conditioned as the original one.
-Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ to effectively improve its condition number and the ease of solveability of $M \bm{x} = \bm{y}$~\cite{benzi2002preconditioning}.
-In the recent decades the choice of $M$ as a complex-shifted version of the original operator, has proven its effectiveness for indefinite Helmholtz problems~\cite{erlangga2004preconditioner,erlangga2008advances,cocquet2017shift}, which leads to
+The main consequence of this formulation is that we now have to solve an additional system of linear equations in the form of $M \bm{x} = \bm{y}$ whenever the operator $A$ is applied within our original solution method.
+If we consider the extreme choice of $M$ as the original operator $A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $I \bm{y} = \bm{b}$, however, with the consequence that the system $M \bm{x} = \bm{y}$ becomes just as ill-conditioned as the original one.
+Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ and the ease of solvability of $M \bm{x} = \bm{y}$~\cite{benzi2002preconditioning}.
+Since its invention by Erlangga et al.~\cite{erlangga2004preconditioner}, the choice of $M$ as a complex-shifted version of the original operator has proven its effectiveness for indefinite Helmholtz problems~\cite{erlangga2008advances,cocquet2017shift,umetami2009multigrid,cools2013analysis}, which leads to
 \begin{equation*}
 	M = -\nabla ^{2} - (k^{2} + i \varepsilon).
 \end{equation*}
 %TODO include all suitable citations
 As it has been shown in~\cite{cocquet2017shift}, a shift $\varepsilon \approx \mathcal{O}(k^2)$ enables the efficient inversion of $M$ by multigrid, whereas the choice of a smaller shift increases the preconditioning effectiveness.
-Since the resulting linear system $A M^{-1} \bm{y} = \bm{b}$ is complex-symmetric but non-hermitian, it is then commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGSTAB~\cite{saad2003iterative}.
+Since the resulting linear system, $A M^{-1} \bm{y} = \bm{b}$ is often complex-symmetric but non-hermitian, it is commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGSTAB~\cite{saad2003iterative}.
 \subsection{Problem Formulation}
-After introducing the indefinite Helmholtz equation and the difficulties its solution comprises in general manner, we can now proceed by defining a representative instance of this equation for the evaluation of our grammar-based approach for multigrid method design.
-For this purpose, we consider the two-dimensional Helmholtz equation on a unit square with Dirichlet boundary conditions at the top and bottom, and Robin radiation conditions at the left and right, as given by
+After introducing the indefinite Helmholtz equation and the difficulties its solution comprises in a general manner, we can now proceed by defining a representative instance of this equation for the evaluation of our grammar-based approach for the automated design of multigrid methods.
+For this purpose, we consider the two-dimensional Helmholtz equation on a unit square with Dirichlet boundary conditions at the top and bottom and Robin radiation conditions at the left and right, as given by
 \begin{equation}
 	\label{eq:helmholtz-test-problem}
 	\begin{split}
@@ -749,11 +750,11 @@ We discretize this equation on a uniform Cartesian grid using the classical five
 \end{equation*}
 In addition, $\delta(\bm{x})$ is approximated with a second-order Zenger correction~\cite{koestler2004extrapolation}.
 The spacing $h$ of the grid is chosen to fulfill the second-order accuracy requirement $h k = 0.625$ as described above.
-Finally, the shifted-Laplacian
+Finally, we apply the shifted-Laplace
 \begin{equation*}
 	M = -\nabla^{2} - (k^{2} + 0.5 i k^{2}),
 \end{equation*}
-which is discretized similar to the original operator using the five-point stencil
+suggested in~\cite{erlangga2008advances} as a preconditioner, which is discretized similarly to the original operator using the five-point stencil
 \begin{equation*}
 	M_h = \frac{1}{h^2} \begin{bmatrix}
 		& -1 & \\
@@ -773,11 +774,11 @@ where $\bm{b}_h$ contains the values of $\delta(\bm{x})$ at each grid point, and
 	M_h \bm{x}_h = \bm{y}_h,
 	\label{eq:helmholtz-test-problem-preconditioning}
 \end{equation}
-where $\bm{x}$ represents the approximate solution of Equation~\eqref{eq:helmholtz-test-problem}.
+where $\bm{x}_h$ represents the approximate solution of Equation~\eqref{eq:helmholtz-test-problem}.
 While for each of these two systems of linear equations, a functioning solver is needed, the focus of our experimental evaluation is the design of an efficient multigrid method for the approximate solution of Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
-Here, to limit the cost of preconditioning, we assume that the application of a single multigrid cycle is sufficient to compute a reasonable approximation for $M_{h}^{-1}$.
-After obtaining a suitable multigrid-based preconditioner, Equation~\ref{eq:helmholtz-test-problem-discretized-and-preconditioned} is then solved using the a biconjugate gradient stabilized method (BiCGSTAB)~\cite{saad2003iterative}.
-The resulting iterative solution scheme is shown in Algorithm~\ref{alg:preconditioned-bicgstab}, in which, for the sake of simplicity, omit the grid spacing $h$.
+Here, to limit the cost of preconditioning, as in~\cite{erlangga2008advances}, we assume that the application of a single multigrid cycle is sufficient to compute a reasonable approximation for $M_{h}^{-1}$.
+After designing a suitable multigrid-based preconditioner, Equation~\eqref{eq:helmholtz-test-problem-discretized-and-preconditioned} is then solved using the biconjugate gradient stabilized method (BiCGSTAB)~\cite{saad2003iterative}.
+The resulting iterative solution scheme is summarized in Algorithm~\ref{alg:preconditioned-bicgstab}, in which, for the sake of simplicity, we omit the grid spacing $h$.
 \begin{algorithm}[t]
 	\caption{Right-Preconditioned BiCGSTAB}
 	\label{alg:preconditioned-bicgstab}
@@ -806,8 +807,8 @@ The resulting iterative solution scheme is shown in Algorithm~\ref{alg:precondit
 			\EndFor
 		\end{algorithmic}
 \end{algorithm}
-In each step of this iterative scheme, it is necessary to compute an approximate solution for two systems of linear equations of the form $M \bm{x}^i = \bm{y}^i$, %, in line 9 and 14, 
-each of which is then achieved through the application of a single multigrid cycle.
+In each step of this iterative scheme, it is necessary to compute an approximate solution for two systems of linear equations in the form of $M \bm{x}^i = \bm{y}^i$, %, in line 9 and 14, 
+which is achieved in both cases by applying a single multigrid cycle.
 To construct an efficient method for this purpose, we consider the set of five-grid methods that are defined on a hierarchy of discretization with $h = 1/2^{l}$ on each level $l \in \left[l_{max} - 4,l_{max}\right]$. 
 Similar to Section~\ref{sec:experiments-part1}, we then consider the following components within each step of the method:
 \begin{description}
@@ -817,27 +818,27 @@ Similar to Section~\ref{sec:experiments-part1}, we then consider the following c
 	\item[\textbf{Relaxation factors}:] $\left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots, 1.9 \right)$
 	\item[\textbf{Coarse-grid solver}:] BiCGSTAB for $l = l_{max} - 4$
 \end{description}
-The resulting grammar is similar to the multigrid grammar shown in Figure~\ref{table:multigrid-grammar}, however, with the modification that each occurrence of a system matrix $A_H$ and right-hand side $\ps{b_H}$ is replaced by the respective preconditioning matrix $M_H$ and right-hand side $\ps{y_H}$.
+The resulting multigrid grammar is similar to the one shown in Table~\ref{table:multigrid-grammar}, however, with the modification that each occurrence of a system matrix $A_H$ and right-hand side $\ps{b_H}$ is replaced by the respective preconditioning matrix $M_H$ and right-hand side $\ps{y_H}$.
 Similar to Section~\ref{sec:experiments1-multigrid-configuration}, block Jacobi smoothers are generated based on rectangular blocks of grid points, while the relaxation factor $\omega$ of each smoothing and coarse-grid correction step is chosen from the above interval.
-To assess the efficiency and generalizability of the multigrid preconditioners evolved with our approach, we consider the set of possible multigrid cycles that can be constructed based on the classical formulation of these methods, using the same components as described above, for comparison.
-In order to ensure, that these methods represent the state of the art we ensure to pick the optimal smoother and relaxation factor for the given case, which is determined by evaluating each possible combination from the available set of options on the largest problem size for which we convergence can be achieved.
-Due to the ill-conditioning of the indefinite Helmholtz equation, we consider an approximate solution to be sufficient, when the initial residual has been reduced by a factor of $10^{-7}$ for $k \leq 160$ and $10^{-6}$ for all larger wavenumbers.
+To assess the efficiency and generalizability of the multigrid preconditioners evolved with our approach, we consider the set of possible multigrid cycles that can be constructed based on the classical formulation of these methods, using the same components as described above.
+To ensure that each method uses the optimal smoother and relaxation factor, we evaluate each possible combination from the available set of options on the largest problem size for which convergence can be achieved.
+Due to the ill-conditioning of the indefinite Helmholtz equation, we consider an approximate solution to be sufficient when the initial residual has been reduced by a factor of $10^{-7}$ for $k \leq 160$ and $10^{-6}$ for all larger wavenumbers.
 
-\subsection{Optimization Settings and Evaluation Platform}
-In Section~\ref{sec:experiments-part1}, the relative simplicity of the problems considered along with the fact that our main focus has been to gain an understanding of the general behavior of our evolutionary algorithm, motivates use to keep the problem size constant during each optimization run.
-However, in the given case this strategy is infeasible due to a number of reasons.
-First of all, doubling the wavenumber requires us to use twice as many grid points in each dimension because of the requirement $kh = 0.625$, which means that we end up with a system of linear equations that is not only significantly worse conditioned, but also has four times the number of unknowns.
-As a consequence, solving Helmholtz problems with large wavenumber becomes tremendously expensive, which makes the evaluation of a large number of different preconditioners infeasible.
-Furthermore, in practice, our goal is to evolve multigrid methods that can be applied to a wide range of different problem instances and, thus, generalizability is one of our main concerns.
-In Section~\ref{sec:generalization-procedure}, we have already proposed a systematic procedure for the generalization of a population of individuals to a set of instances of the same problem.
+\subsection{Experimental Settings and Evaluation Platform}
+In Section~\ref{sec:experiments-part1}, due to the relative simplicity of the problems considered, along with the fact that our main focus has been to gain an understanding of the general behavior of our evolutionary algorithm, we kept the problem size constant throughout each experiment.
+However, in the case of the indefinite Helmholtz equation, this strategy is infeasible due to a number of reasons.
+First of all, doubling the wavenumber requires us to use twice as many grid points in each dimension because of the requirement $kh = 0.625$, which means that we end up with a system of linear equations that is not only significantly worse conditioned but also has four times the number of unknowns.
+As a consequence, solving Helmholtz problems with a large wavenumber becomes tremendously expensive, which makes the evaluation of a large number of different preconditioners infeasible.
+Furthermore, in practice, our goal is to design multigrid methods that can be applied to a wide range of different problem instances, and thus, generalizability is one of our main concerns.
+In Section~\ref{sec:generalization-procedure}, we have already proposed a systematic procedure for the generalization of a population of individuals to multiple instances of the same problem.
 This method aims to evolve a population of generalizable multigrid methods by iteratively increasing the size of the test problem considered within the evaluation of each solver after a certain number of generations $m$.
 While the formulation of our problem based on the wavenumber-dependent grid spacing $h$ allows us to construct problem instances of larger size and difficulty in a straightforward manner, it is unclear after how many generations this operation should be performed.
-However, in the experiments performed in Section~\ref{sec:experiments-part1} we could observe that the majority of improvement in both objectives is achieved within the first 50 generations of each optimization run.
+However, in the experiments performed in Section~\ref{sec:experiments-part1}, we could observe that the majority of improvement in both objectives is achieved within the first 50 generations of our evolutionary algorithm.
 Therefore, setting the generalization interval $m$ to 50 represents a reasonable compromise between allowing the population to adapt to modified conditions and preventing it from overfitting to the characteristics of a particular problem instance.
-To initiate each optimization run, we choose $k = 80$ as a problem instance, which leads to a maximum level $l_{max} = 7$ and a system of linear equations consisting of 16129 unknowns and. 
-Therefore, the cost of evaluation at the beginning of the search is drastically reduced compared to later generations.
-We then execute Algorithm~\ref{alg:generalization-procedure} with a population size of 128 and a total number of 150 generations, whereby after 50 and 100 generations we increase the value of wavenumber to 160 and 320, respectively.
-Table~\ref{table:gp-parameters-helmholtz} gives an overview about the algorithmic parameters used for each experiment, which are mostly similar to the ones employed in Section~\ref{sec:experiments-part1}.
+To initiate the execution of our evolutionary algorithm, we choose $k = 80$ as a problem instance, which leads to a maximum level $l_{max} = 7$ and a system of linear equations consisting of 16129 unknowns. 
+Therefore, the cost of evaluation at the beginning is significantly lower compared to later generations.
+We then execute Algorithm~\ref{alg:generalization-procedure} with a population size of 128 and a total number of 150 generations, whereby after 50 and 100 generations, we increase the value of wavenumber to 160 and 320, respectively.
+Table~\ref{table:gp-parameters-helmholtz} gives an overview of the algorithmic parameters used for each experiment, which are mostly similar to the ones employed in Section~\ref{sec:experiments-part1}.
 \begin{table}
 	\centering
 	\caption{Summary of GGGP configuration parameters.}
@@ -881,32 +882,34 @@ Table~\ref{table:gp-parameters-helmholtz} gives an overview about the algorithmi
 In order to evaluate each multigrid method, we measure the number of iterations $n$ Algorithm~\ref{alg:preconditioned-bicgstab} requires to achieve the desired defect reduction for Equation~\ref{eq:helmholtz-test-problem-discretized-and-preconditioned} together with its execution time per iteration $t$.
 These two metrics then serve as the two objectives for our multi-objective evolutionary algorithm.
 Note that in previous formulations of our method, we have employed the solver's convergence factor $\rho$ as a first objective.
-However, as the average number of iterations required to solve the given system with a preconditioned iterative method is significantly higher than for the three PDEs considered in Section~\ref{sec:experiments-part1}, even small changes in the effectiveness of preconditioning have a measurable effect on this metric. 
-In contrast, the potentially small relative difference in the number of iterations between two preconditioners, means that the absolute values of their convergence factors are hardly distinguishable~\footnote{Note that the convergence factor is estimated by computing the n-th root of the product of the measured defect reductions in each iteration, as given by Equation~\eqref{eq:asymptotic_convergence_factor}}, which has the potential to lead to the accumulation of numerical errors in the computation of population-density metrics, such as the crowding distance~\cite{deb2002fast}.
-Individuals are then selected using a binary tournament selection based on their dominance-relation and crowding distance.
-New individuals are either created using single-point crossover with a probability of 2/3 or random subtree insertion with a probability of 1/3, whereby in the latter case we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
+However, due to the difficulty of the problem considered here, we expect the average number of iterations to achieve the desired defect reduction to be significantly larger than in our previous experiments. 
+Therefore, the potentially small difference relative to the total number of iterations between two preconditioners means that the absolute values of their convergence factors are hardly distinguishable~\footnote{Note that the convergence factor is estimated by computing the n-th root of the product of the measured defect reductions in each iteration, as given by Equation~\eqref{eq:asymptotic_convergence_factor}}, which has the potential to lead to the accumulation of numerical errors in the computation of population-density metrics, such as the crowding distance~\cite{deb2002fast}.
+Using the number of iterations instead as the first objective avoids this issue, while, due to the ill-conditioning of the considered problem, even a small improvement in the accuracy of the preconditioner will lead to a measurable decrease in the value of this metric.
 
-Similar to Section~\ref{sec:experiments-part1} we perform a total number of ten experiments with random initialization, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
-Even though the population size as well as the number of generations is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost of each optimization run.
-To parallelize our evolutionary search method, we employ a MPI-based described in Section~\ref{sec:distributed-parallelization} using 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
+Similar to Section~\ref{sec:experiments-part1}, we select individuals for crossover and mutation using a binary tournament selection based on their dominance relation and crowding distance.
+New individuals are again created using a single-point crossover with a probability of 2/3 and random subtree insertion with a probability of 1/3, whereby in the latter case, we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
+
+To evaluate the effectiveness of our evolutionary program synthesis approach, we perform a total number of ten experiments with a random initialization, each of which is executed on SuperMUC-NG\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}}.
+Even though the population size, as well as the number of generations, is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost of each optimization run.
+To parallelize our evolutionary search method, we employ an MPI-based described in Section~\ref{sec:distributed-parallelization} using 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
 Therefore, each process creates and evaluates two new individuals per generation, which are then executed on the respective island using on OpenMP-based shared-memory parallelization with 12 threads.
 
 \subsection{Reference Methods}
-To assess whether our evolutionary algorithm is able to evolve generalizable and efficient multigrid preconditioners for the indefinite Helmholtz equation, we first need to investigate what degree of efficiency that can be achieved with known multigrid cycles.
+To assess whether our evolutionary program synthesis method can discover competitive multigrid preconditioners for the indefinite Helmholtz equation, we first need to investigate the preconditioning efficiency of classical multigrid cycles.
 As in previous evaluations, we consider the time required to achieve a certain error reduction as a measure of the efficiency of a solver.
 However, since in the given case, we apply the same iterative solver to each problem instance but vary the multigrid cycle used for preconditioning, this metric instead relates to the efficiency of the latter.
 For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which, however, might come at the prize of a higher computational cost.
-The second quality metric that we aim to investigate in this section, is the capability of each multigrid preconditioner to generalize to different instances of the same problem.
-Therefore, we consider three different wavenumbers $k = 160, 320$ and $640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
-As a multigrid-based preconditioner, we then consider different V, W and F-cycles with up to five pre and post-smoothing steps based on the configuration space in Section~\ref{sec:solver-configuration-helmholtz}.
-Note as proposed by the authors of~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, which all use their classical formulation of multigrid methods to construct a multigrid-based preconditioner for the indefinite Helmholtz equation, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
+The second quality metric that we aim to investigate in this section is the capability of each multigrid preconditioner to generalize to different instances of the same problem.
+Therefore, we consider three different wavenumbers $k = 160, 320$, and $640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
+As a multigrid-based preconditioner, we then consider different V, W, and F-cycles with up to five pre and post-smoothing steps based on the configuration space described in Section~\ref{sec:solver-configuration-helmholtz}.
+As in previous works on multigrid-based preconditioners for the indefinite Helmholtz equation~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
 To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and, hence, worst conditioned problem with $k = 640$.
-However, since none of the available configuration options led to a converging solver for this case, we instead employ the next smaller problem size with a wavenumber of $k = 320$ to find out which pair of smoother and relaxation factor leads to fastest solving time for each multigrid cycle.
+However, since none of the available configuration options led to a converging solver for this case, we instead employ the next smaller problem size with a wavenumber of $k = 320$ to find out which pair of smoother and relaxation factor leads to the fastest solving time for each multigrid cycle.
 In general, according to our experimental evaluation RB-GS represents the single most efficient smoother for the given case, while Jacobi-type smoothers only lead to a converging solver for wavenumbers of at most $k = 160$, with, however, less efficiency in all cases than the former.
 Therefore, Table~\ref{table:reference-methods-helmholtz} shows the resulting average solving times for each multigrid cycle with RB-GS smoothing and an optimum relaxation factor for $k = 320$, where the omission of a number means that convergence could not be achieved within 20,000 iterations. 
-Since the use of more than three pre- and post-smoothing steps does not yield any additional benefit for this smoother, we omit all multigrid cycles with a higher number of smoothing steps.
+Since the use of more than three pre and post-smoothing steps did not yield any additional benefit, we have omitted all multigrid cycles with a higher number of smoothing steps.
 \begin{table}
-	\caption{Reference methods - Optimum relaxation factors $\omega$ for $k = 320$, number of iterations and average time required for solving a problem with the particular wavenumber.}
+	\caption{Reference methods - Optimum relaxation factors $\omega$ for $k = 320$, number of iterations, and the average time required for solving a problem with the particular wavenumber.}
 	\label{table:reference-methods-helmholtz}
 	\centering
 	\begin{tabular}{l l l l l l}
@@ -948,18 +951,18 @@ Since the use of more than three pre- and post-smoothing steps does not yield an
 	\end{tabular}
 \end{table}
 To eliminate the variability between individual measurements, each value contained in the table represents the average of 50 solver executions.
-As expected, a higher number of smoothing steps and coarse-grid corrections increases the efficiency the preconditioner and, thus, leads to a lower number of iterations to achieve convergence.
-However, if we consider the configuration that leads to the fastest solving time, which is the V(0,1), we can see that a single coarse-grid correction followed by a single step of RB-GS smoothing actually seams to be the most efficient choice for all wavenumbers considered.
-After determining the best possible configuration for each known multigrid cycle, we can finally investigate whether the multigrid methods obtained with our grammar-guided evolutionary search method are able to achieve the same degree of efficiency and generalizability in preconditioning indefinite Helmholtz problems.
+As expected, a higher number of smoothing steps and coarse-grid corrections increases the efficiency of the preconditioner and, thus, leads to a lower number of iterations until convergence.
+However, if we consider the configuration that leads to the fastest solving time, which is the V(0,1), we can see that a single coarse-grid correction followed by a single step of RB-GS smoothing is actually the best choice for all wavenumbers considered.
+After determining the best possible configuration for each classical multigrid cycle, we can finally investigate whether the multigrid methods designed with our evolutionary program synthesis method are able to achieve the same degree of efficiency and generalizability in preconditioning indefinite Helmholtz problems.
 \subsection{Evaluation of the Evolved Multigrid Methods}
 First, in order to identify the most promising multigrid-based preconditioners for our final evaluation, we sort the population at the end of each experiment according to the product of both objectives.
 Note that while this metric corresponds to the solving time achieved on a single island, we intend to execute each method on a full node of the system, which can lead to a different outcome.
-We then evaluate the ten best multigrid methods according to this metric by employing them as a preconditioner for Equation~\eqref{eq:helmholtz-test-problem-preconditioning} with $k = 640$.
+We then evaluate the ten best multigrid methods by employing them as a preconditioner for Equation~\eqref{eq:helmholtz-test-problem-preconditioning} with $k = 640$ while we measure the solving time of the resulting preconditioned iterative method.
 In case none of the methods considered is able to reduce the initial residual by a factor of $10^{-6}$ within 20,000 iterations, we repeat the evaluation with the next smaller wavenumber $k = 320$.
-The best-performing method is then evaluated on the full set of wavenumbers, i.e. $k = 160, 320, 640$.
-Table~\ref{table:evolved-solvers} shows the required number of iterations and time to achieve the desired residual reduction when using the resulting multigrid method as a preconditioner for Algorithm~\ref{alg:preconditioned-bicgstab}.
+The best-performing method is then evaluated on the full set of wavenumbers, i.e., $k = 160, 320, 640$.
+Table~\ref{table:evolved-solvers} shows the required number of iterations and time to achieve the desired residual reduction when using each multigrid method as a preconditioner for Algorithm~\ref{alg:preconditioned-bicgstab}.
 \begin{table}
-	\caption{Best preconditioners according to the product of both objectives - Number of iterations and average time required for solving a problem with the particular wavenumber.}
+	\caption{Best preconditioners according to the product of both objectives - Number of iterations and the average time required for solving a problem with the particular wavenumber.}
 	\label{table:evolved-solvers}
 	\centering
 	\begin{tabular}{l l l l l l l }
@@ -990,20 +993,20 @@ Table~\ref{table:evolved-solvers} shows the required number of iterations and ti
 		\bottomrule
 	\end{tabular}
 \end{table}
-With the exception of EP-4, the multigrid-based preconditioner obtained with our evolutionary search method all achieve faster solving times than the best reference method V(0,1) for $k = 320$, while, in the majority of cases, the same methods also works efficiently for $k = 160$.
-If we consider the required number of iterations as a second metric, we can see that the methods evolved with our approach achieve at least a similar degree of preconditioning effectiveness as most W-cycles, however, with a significantly higher degree of computational efficiency.
-Furthermore, even though the largest wavenumber considered within the evolutionary search is $320$, in six out of ten experiments, our method can find multigrid-based preconditioners that lead to a converging solver for $k = 640$, while all available reference methods fail to achieve convergence in this case.
+With the exception of EP-4, the multigrid-based preconditioners discovered with our evolutionary program synthesis method all achieve faster solving times than the best reference method V(0,1) for $k = 320$, while, in the majority of cases, the same methods also work efficiently for $k = 160$.
+If we consider the required number of iterations as a second metric, we can see that the methods discovered with our approach achieve at least a similar degree of preconditioning effectiveness as most W-cycles, however, with a significantly higher degree of computational efficiency.
+Furthermore, even though the largest wavenumber considered within our evolutionary algorithm is $320$, in six out of ten experiments, our approach yields multigrid-based preconditioners that lead to a converging solver for $k = 640$, while all available reference methods fail to achieve convergence in this case.
 Figure~\ref{fig:helmholtz-solving-time-comparison} shows a direct comparison of the preconditioners from both categories that lead to the fastest solving time for large wavenumbers.
 \begin{figure}
 	\includegraphics[width=\textwidth]{figures/solving-time.pdf}
 	\caption{Solving time comparison of the best preconditioners according to the product of both objectives for different wavenumbers ($k$).}
 	\label{fig:helmholtz-solving-time-comparison}
 \end{figure} 
-For a better interpretability of the results, we have normalized each solving time by the number of grid points.
+For better interpretability of the results, we have normalized each solving time by the number of grid points.
 As the system of linear equations resulting from a discretization of Equation~\ref{eq:helmholtz-test-problem} becomes increasingly ill-conditioned for larger values of the wavenumber $k$, the relative cost to solve for each unknown grows accordingly.
-All three evolved methods included in Figure~\ref{fig:helmholtz-solving-time-comparison} achieve a faster solving time than the best reference method V(0,1), while also staying competitive for smaller wavenumbers.
+All three discovered multigrid methods included in Figure~\ref{fig:helmholtz-solving-time-comparison} achieve a faster solving time than the best reference method V(0,1) while also staying competitive for smaller wavenumbers.
 In particular, the overall best preconditioner EP-5 leads to a consistent improvement of 20 \% to the V(0,1) cycle.
-To understand how the methods evolved with our approach represent more effective preconditioners than all known multigrid cycles, we can analyze their algorithmic structure.
+To understand how the methods obtained with our approach represent more effective preconditioners than all known multigrid cycles, we can analyze their algorithmic structure.
 For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a graphical representation of the two multigrid-based preconditioners, EP-5 and EP-2, that achieve the fastest solving times for $k = 640$.
 \begin{figure}
 	\begin{subfigure}[t]{\columnwidth}
@@ -1133,36 +1136,35 @@ First of all, both multigrid methods employ a unique sequence of operations that
 While both methods initially apply the coarse-grid solver exactly once and, thus, resemble a V-cycle, they incorporate additional smoothing-based coarse-grid correction steps.
 Furthermore, our grammar-based representation enables the combination of different smoothers or even the complete omission of smoothing on certain levels.
 While both methods employ predominantly red-black Gauss-Seidel smoothing, especially EP-2 also incorporates multiple intermediate Jacobi steps.
-With respect to the number of smoothing steps, similar to the most efficient reference methods, V(0,1), V(1,1) and F(0,1), smoothing on the finest level is reduced to a bare minimum, in the form of one or two red-black Gauss-Seidel steps.
+With respect to the number of smoothing steps, similar to the most efficient reference methods, V(0,1), V(1,1), and F(0,1), smoothing on the finest grid is reduced to a bare minimum, in the form of one or two red-black Gauss-Seidel steps.
 However, this is augmented with a significantly larger number of smoothing and coarse-grid correction steps on subsequent levels, which is in contrast to the uniform structure of classical multigrid cycles.
-In general, the computational structure of EP-2 comprises a higher degree of regularity, as the same sequence of operations is repeated three times at the end of its computation.
-While within each execution of this sequence, the relaxation factors of certain smoothing operations are altered, the same two values, 0.30 and 0.85, are employed within the two coarse-grid correction steps. 
-Even though the computational structure of EP-5 is less uniform, on the second finest level the method repeatedly applies a similar sequence of restriction, smoothing and prolongation, whereby in each step a different combination of smoothers is used.
-The resulting effectiveness of both multigrid methods as a preconditioner together with their high computational efficiency, highlights the advantages of our grammar-based representation.
+In general, the computational structure of EP-2 comprises a higher degree of regularity since, at its end,
+the same sequence of operations is repeated three times.
+While within each execution of this sequence, the relaxation factors of certain smoothing operations are altered, the same two values, 0.30 and 0.85, are employed within the two coarse-grid correction steps.
+The computational structure of EP-5 is less uniform compared to EP-2.
+However, on the second finest grid, the method repeatedly applies a similar sequence of restriction, smoothing, and prolongation, whereby in each step, a different combination of smoothers is used.
+The resulting effectiveness of both multigrid methods as a preconditioner, together with their high computational efficiency, highlights the advantages of our grammar-based representation.
 The construction of both methods requires the alternation of individual operations within their sequence.
-Encoding the computational structure of a multigrid method based on number of global parameters does not come with that flexibility.
+Encoding the computational structure of a multigrid method based on a number of global parameters does not come with that flexibility.
 For instance, choosing a different value for $\mu$ in Algorithm~\ref{alg:multigrid-cycle} changes the number of recursive descents on each level of the method.
-However, none of the available offers a way to insert a single coarse-grid correction or smoothing step after at a specific position within the sequence.
-In contrast, expressing each computational step in the form of a separate production within a formal grammar, allows us to easily achieve this goal by inserting the corresponding subtree into the derivation tree that encodes the respective sequence of multigrid operations, as discussed in Section~\ref{sec:gggp} and Chapter~\ref{chapter:multigrid-formal-language}.
+However, none of the available parameters offers a way to insert a single coarse-grid correction or smoothing step after at a specific position within the sequence.
+In contrast, expressing each computational step in the form of a separate production within a formal grammar allows us to achieve this goal by inserting the corresponding subtree into the respective derivation tree, as discussed in Section~\ref{sec:gggp} and Chapter~\ref{chapter:multigrid-formal-language}.
 
-Finally, we need to address the question why our evolutionary search method could not consistently find multigrid-based preconditioners that achieve the same degree of efficiency and generalizability in each experiment.
+Finally, we need to address the question of why our evolutionary program synthesis did not consistently discover multigrid-based preconditioners that achieve the same degree of efficiency and generalizability in each experiment.
 For this purpose, we again consider the space of non-dominated solutions at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
 \begin{figure}
 	\includegraphics[width=\textwidth]{figures/pareto-front.pdf}
 	\caption{Distribution of non-dominated solutions at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
 	\label{fig:pareto-front-helmholtz}
 \end{figure}
-First of all, note that the number of non-dominated solution is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
+First of all, note that the number of non-dominated solutions is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
 However, this is clearly expected due to the smaller population size, which is only half as large as in our previous experiments.
-Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty to evolve the same number of non-dominated individuals. 
-However, despite this fact, our evolutionary search method achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
-In contrast, in the left half of Figure~\ref{fig:pareto-front-helmholtz}, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each run. 
+Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty of evolving the same number of non-dominated individuals. 
+However, despite this fact, our evolutionary algorithm achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
+In contrast, in the left half of Figure~\ref{fig:pareto-front-helmholtz}, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each experiment.
 Note that all multigrid-based preconditioners considered in our final evaluation shown in Table~\ref{table:evolved-solvers} correspond to individuals located here.
 The larger distance of certain individuals in Figure~\ref{fig:pareto-front-helmholtz} to the combined front, therefore, explains why we could not achieve the same degree of efficiency in each run.
 To reduce the number of iterations until convergence through preconditioning, we need to improve the accuracy of the approximate solution computed for Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
-Since this require us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
-In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our evolutionary algorithm.
+Since this requires us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
+In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our algorithm.
 As we have already investigated in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, NSGA-II struggles to achieve this goal consistently~\cite{liu2022evolvability}, which, in certain experiments, leads to a suboptimal outcome in the leftmost part of the objective function space.
-
-
-
