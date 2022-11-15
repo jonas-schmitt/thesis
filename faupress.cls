@@ -1910,8 +1910,8 @@
     \vspace{16mm}
     \begin{tabular}{@{}l l}
       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
-      \parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
-      Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
+      %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
+      %Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
     \end{tabular}
     \vskip18mm
   \end{titlepage}

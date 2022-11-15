@@ -1,4 +1,17 @@
 %TODO The following is about general algorithm design
-In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and, thus, might affect multiple computational steps simultaneously. 
-For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and, thus, leads to a globally different type of multigrid cycle.
-In contrast, a bottom-up approach is characterized by the ability to change each computational step within an algorithm without affecting the behavior of any other.
+Many of the most fundamental laws of nature can be formulated as partial differential equations (PDEs).
+Understanding these equations is, therefore, foundational for many branches of science and engineering.
+Since, for many PDEs, it is unknown whether a general solution exists, the efficient approximate solution of these equations represents one of humanity's greatest challenges.
+Since the invention of modern computers, great efforts have been made to develop PDE solvers with ever-increasing efficiency.
+As a result of this effort, computer simulations nowadays represent an essential tool for both researchers and engineers.
+However, leveraging the power of simulation-based methods, in many cases, requires designing solvers that achieve the highest possible degree of efficiency.
+Unfortunately, this task often not only requires a great deal of expertise and domain knowledge that only a limited group of people possesses, but often also uncountable working hours need to be invested for its accomplishment.
+All this makes the manual design and implementation of efficient PDE solvers a challenging and costly endeavor.
+The automation of manual labor has always been one of the greatest incentives of the technical revolution since the first industrial revolution.
+However, in contrast to previous technological advancements, which were mostly concerned with freeing people from physical labor, the development of computing devices with ever-increasing power and speed has led to a point where the automation even of challenging cognitive tasks has started to come into reach.
+Within the last decade, artificial intelligence (AI) methods have demonstrated super-human performance in a number of different domains, such as game playing and natural language processing.
+While artificial intelligence (AI) methods have demonstrated super-human performance in numerous applications, such as image processing, game playing, and natural language processing.
+However, in contrast to the widespread success in these domains, AI-based techniques for automated algorithm design have only been leveraged in a limited number of applications such as the design of SAT-solvers~\cite{khudabukhsh2016satenstein}, metaheuristics~\cite{stuetzle2019automated}, and matrix-multiplication algorithms~\cite{fawzi2022discovering}.
+%In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and, thus, might affect multiple computational steps simultaneously. 
+%For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and, thus, leads to a globally different type of multigrid cycle.
+%In contrast, a bottom-up approach is characterized by the ability to change each computational step within an algorithm without affecting the behavior of any other.
