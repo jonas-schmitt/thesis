@@ -6,24 +6,24 @@ Therefore, since the invention of modern computers, great efforts have been made
 As a result of this effort, computer simulations nowadays represent an essential tool for researchers and engineers.
 %However, leveraging the power of simulation-based methods, in many cases, requires designing solvers that achieve the highest possible degree of efficiency.
 %Unfortunately, this task often not only requires a great deal of expertise and domain knowledge that only a limited group of people possesses, but often also uncountable working hours need to be invested for its accomplishment.
-However, leveraging the power of simulation-based methods, in many cases, requires designing solvers that achieve the highest possible degree of efficiency.
-Unfortunately, this task often not only requires a great deal of expertise and domain knowledge that only a limited group of mathematical experts possesses, but often also uncountable working hours need to be invested for its accomplishment.
+However, leveraging the power of simulation-based methods, in many cases, requires designing PDE solvers that achieve the highest possible degree of efficiency.
+Unfortunately, this task often not only requires a great deal of expertise and domain knowledge that only a limited group of mathematical experts possesses, but often also a lot of effort needs to be invested for its accomplishment.
 All this makes the manual design and implementation of efficient PDE solvers a difficult and labor-intensive endeavor.
 %The automation of manual labor has always been one of the greatest incentives of the technical revolution since the first industrial revolution.
 %However, in contrast to previous technological advancements, which were mostly concerned with freeing people from physical labor, the development of computing devices with ever-increasing power and speed has led to a point where the automation even of challenging cognitive tasks has started to come into reach.
 However, with the development of computing devices with ever-increasing power and speed, the automation even of challenging cognitive tasks has started to come into reach.
 Recently, artificial intelligence (AI) methods have demonstrated super-human performance in numerous applications, such as image processing~\cite{krizhevsky2017imagenet}, game playing~\cite{schrittwieser2020mastering,reed2022generalist}, and natural language processing~\cite{brown2020language}.
-Alongside the widespread success in these domains, AI-based techniques for automated algorithm design have achieved breakthroughs in a number of applications, such as the design of SAT-solvers~\cite{khudabukhsh2016satenstein} and mixed-integer programming~\cite{hutter2010automated}.
+Alongside the widespread success in these domains, AI-based techniques for automated algorithm design have achieved breakthroughs in certain domains, such as the design of SAT-solvers~\cite{khudabukhsh2016satenstein} and mixed-integer programming~\cite{hutter2010automated}.
 
 In general, methods for automated algorithm design can be classified into \emph{top-down}, and \emph{bottom-up} approaches.
-Top-down approaches, often also called algorithm configuration, aim to represent an algorithm design space as a finite list of global parameters.
+Top-down approaches, often also called algorithm configuration methods, aim to represent an algorithm design space as a finite list of global parameters.
 Finding an optimal algorithm design, thus, corresponds to solving a combinatorial optimization problem, sometimes including continuous parameters, which can be tackled using classical black-box optimizers, such as evolutionary algorithms~\cite{back1996evolutionary} and bayesian optimization~\cite{frazier2018tutorial}.
 However, a severe limitation of these approaches is that they do not allow modifying individual steps of an algorithm unless each of them is represented as a distinct global parameter.
 Bottom-up design methods aim to overcome these limitations by considering the construction of an algorithm from its fundamental building blocks.
 An algorithm is essentially a list of statements written in a formal language.
 Therefore, if we consider this language to be a programming language, the formulation of an algorithm is nothing else than writing a program in that language.
 The automated design of an optimal algorithm can, thus, be treated as a program synthesis task, which gives us the same flexibility available in the construction of programs in modern programming languages.
-On the downside, bottom-up algorithm design requires us to first derive a programming language for expressing the individual steps of an algorithm as formal statements.
+On the downside, bottom-up algorithm design requires the derivation of a programming language for expressing the individual steps of an algorithm as formal statements.
 %Furthermore, since many algorithms already include a number of parameters facilitating the application of top-down design methods, which can often be formulated irrespective of the underlying algorithm structure~\cite{hutter2007proceedings,hutter2011sequential,lopez2016irace}.
 Furthermore, the flexibility of bottom-up algorithm design means that the number of different algorithms considered is significantly larger than in the case of top-down methods.
 While all these difficulties impede the widespread use of bottom-up algorithm design methods, recent works in the area of machine learning~\cite{real2020automl,co2021evolving} and matrix multiplication~\cite{fawzi2022discovering} demonstrate that these methods have the potential to discover completely novel algorithms in different domains, a feat that is not possible with classical top-down approaches.
@@ -32,13 +32,12 @@ With the expected ongoing increase in computational power, we can expect these m
 In contrast to the area of automated machine learning, where the application of automated algorithm design and configuration methods has become an active field of research~\cite{ren2021comprehensive,hutter2019automated,elsken2019neural,he2021automl,schrodi2022towards}, the automated design of PDE solvers is a largely unexplored research field.
 This thesis aims to change this situation by introducing a novel framework for the automated design of a certain class of multigrid methods, a class of numerical methods that offer the potential to solve many PDEs in an asymptotically optimal way.
 Since multigrid methods can only achieve this property through the correct choice and composition of their individual operations, for many PDEs, the design of an optimal or even functioning multigrid method is an open problem~\cite{trottenberg2000multigrid,ernst2012difficult}.
-As a remedy, the works by Oosterlee et al.~\cite{oosterlee2003genetic} and Thekale et al.~\cite{thekale2010optimizing} represent a first step towards the automated design of these methods.
-However, both works only consider a limited configuration space and, therefore, fail to leverage the potential of state-of-the-art automated algorithm design methods.
-In the spirit of other bottom-up methods, this thesis considers the task of constructing an optimal multigrid method from its basic components as a program synthesis task.
-For this purpose, this thesis introduces a novel formal language for the automated bottom-up design of multigrid methods.
-By levering the power of evolutionary computation, we will, furthermore, demonstrate that this language enables the discovery of unique sequences of multigrid operations that can yield faster solvers than all classical multigrid methods.
-To give the reader the necessary background for the main part of this thesis, in the following, we will first establish a basic understanding of the fundamental theory of multigrid methods, formal languages, and evolutionary program synthesis.  
-
+As a remedy, the works by Oosterlee et al.~\cite{oosterlee2003genetic}, Thekale et al.~\cite{thekale2010optimizing}, and Brown et al.~\cite{brown2021tuning} represent a first step towards the automated design of these methods.
+However, the authors of these papers only consider a limited configuration space and, therefore, fail to leverage the potential of state-of-the-art automated algorithm design methods.
+In the spirit of bottom-up algorithm design, this thesis considers the task of constructing an optimal multigrid method from its basic components as a program synthesis task.
+For this purpose, a novel formal language for the automated bottom-up design of multigrid methods will be introduced.
+By levering the power of evolutionary computation, it will furthermore be demonstrated that this language enables the discovery of unique sequences of multigrid operations that can yield faster solvers than all classical multigrid methods.
+However, to give the reader the necessary background for the main part of this thesis, in the following, a basic understanding of the fundamental theory of multigrid methods, formal languages, and evolutionary program synthesis will be established first.
 %In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and, thus, might affect multiple computational steps simultaneously. 
 %For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and, thus, leads to a globally different type of multigrid cycle.
 %In contrast, a bottom-up approach is characterized by the ability to change each computational step within an algorithm without affecting the behavior of any other.
