@@ -686,8 +686,8 @@ However, if we consider the evolved method ES-2, which leads to the fastest solv
 In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively RB-GS smoothing.
 
-\section{Designing Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
-While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated discovery of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
+\section{Discovering Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
+While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated design of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in the case of a problem that is difficult to solve numerically, we consider the indefinite Helmholtz equation.
 At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.
 The Helmholtz equation, whose basic form is given as 
@@ -1006,11 +1006,12 @@ For better interpretability of the results, we have normalized each solving time
 As the system of linear equations resulting from a discretization of Equation~\ref{eq:helmholtz-test-problem} becomes increasingly ill-conditioned for larger values of the wavenumber $k$, the relative cost to solve for each unknown grows accordingly.
 All three discovered multigrid methods included in Figure~\ref{fig:helmholtz-solving-time-comparison} achieve a faster solving time than the best reference method V(0,1) while also staying competitive for smaller wavenumbers.
 In particular, the overall best preconditioner EP-5 leads to a consistent improvement of 20 \% to the V(0,1) cycle.
+\subsection{Algorithmic Analysis}
 To understand how the methods obtained with our approach represent more effective preconditioners than all known multigrid cycles, we can analyze their algorithmic structure.
 For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a graphical representation of the two multigrid-based preconditioners, EP-5 and EP-2, that achieve the fastest solving times for $k = 640$.
 \begin{figure}
 	\begin{subfigure}[t]{\columnwidth}
-		\resizebox{\columnwidth}{!}{%
+		\scalebox{0.85}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1070,7 +1071,7 @@ For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a 
 		\label{fig:ep-5}
 	\end{subfigure}
 	\begin{subfigure}[t]{\columnwidth}
-		\resizebox{\columnwidth}{!}{%
+		\scalebox{0.85}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1128,6 +1129,68 @@ For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a 
 		}
 		\caption{EP-2}
 		\label{fig:ep-2}
+	\end{subfigure}
+ 	\begin{subfigure}[t]{\columnwidth}
+			\scalebox{0.85}{%
+			\begin{tikzpicture}
+			\node   (h) at (-0.75, 4){$h$};
+			\node   (2h) at (-0.75, 3){$2h$};
+			\node   (4h) at (-0.75, 2){$4h$};
+			\node   (8h) at (-0.75, 1){$8h$};
+			\node   (16h) at (-0.75, 0){$16h$};
+			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(c) at (1,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(g) at (3,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.55};
+			\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+			\node	(i) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
+			\node	(j) at (4.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+			\node	(k) at (5,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.50};
+			\node	(l) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.20};
+			\node	(m) at (7,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.55};
+			\node	(n) at (7.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+			\node	(o) at (8,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
+			\node	(p) at (8.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+			\node	(q) at (9,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.25};
+			\node	(r) at (10,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+			\node	(s) at (10.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(t) at (11,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(u) at (11.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+			\node	(v) at (12,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
+			\node	(w) at (12.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+   			\node	(x) at (13,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.80};
+			\draw 
+			(a) edge[->] (b) 
+			(b) edge[->] (c)
+			(c) edge[->] (d)
+			(d) edge[->] (e)   
+			(e) edge[->] node[near end,left] {\tiny 1.00} (f)
+			(f) edge[->] node[near end,left] {\tiny 0.70} (g)
+			(g) edge[->] node[near end,left] {\tiny 1.10} (h)
+			(h) edge[->] (i)
+			(i) edge[->] node[near end,left] {\tiny 0.85} (j) 
+			(j) edge[->] (k)
+			(k) edge[->] (l)
+			(l) edge[->] (m)   
+			(m) edge[->] node[near end,left] {\tiny 1.00} (n)
+			(n) edge[->] (o)
+			(o) edge[->] node[near end,left] {\tiny 1.40} (p)
+			(p) edge[->] (q)
+			(q) edge[->] (r)
+			(r) edge[->] node[near end,left] {\tiny 1.70} (s)
+			(s) edge[->] node[near end,left] {\tiny 1.65} (t)
+			(t) edge[->] (u)
+			(u) edge[->] (v)
+			(v) edge[->] node[near end,left] {\tiny 1.40} (w)
+   			(w) edge[->] node[near end,left] {\tiny 0.80} (x)
+			;
+			\end{tikzpicture}
+		}
+		\caption{EP-10}
+		\label{fig:ep-10}
 	\end{subfigure}
 	\caption{Computational structure of the evolved multigrid preconditioners. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
 	\label{fig:structure-evolved-preconditioners}
