@@ -555,7 +555,6 @@ In Section~\ref{sec:generalization}, we have already addressed this issue by pro
 %In the next section of this chapter, we will, thus, investigate the effectiveness of this approach on the indefinite Helmholtz equation, a problem of substantially higher difficulty than those considered within this section.
 
 To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} contains a graphical representation of the discovered multigrid method that achieves the fastest solving time for the larger problem instance of two and three-dimensional Poisson equation, respectively. 
-%TODO include reference to and discuss \cite{avnat2022recursive}
 \begin{figure}
 	%2D Poisson
 		\begin{subfigure}[t]{\columnwidth}
@@ -1007,6 +1006,26 @@ As the system of linear equations resulting from a discretization of Equation~\r
 All three discovered multigrid methods included in Figure~\ref{fig:helmholtz-solving-time-comparison} achieve a faster solving time than the best reference method V(0,1) while also staying competitive for smaller wavenumbers.
 In particular, the overall best preconditioner EP-5 leads to a consistent improvement of 20 \% to the V(0,1) cycle.
 \subsection{Algorithmic Analysis}
+\begin{table}
+	\caption{Operations per level}
+	\label{table:operations-per-level}
+	\centering
+	\begin{tabular}{l c c c c c c c}
+		\toprule
+  		& \multicolumn{3}{c}{Smoothing} & \multicolumn{3}{c}{Coarse-Grid Correction} & \\
+		\cmidrule(l){2-4} \cmidrule(l){5-7}
+		Level & Mean & Min & Max & Mean & Min & Max & Total Mean \\
+        \midrule
+        $h$ & $1.17$ & $1$ & $2$ & $2.17$ & $1$ & $5$ & $3.33$\\
+        \midrule
+        $2h$ & $3.33$ & $2$ & $5$ & $4.50$ & $3$ & $6$ & $7.83$ \\
+        \midrule
+        $4h$ & $5.50$ & $3$ & $9$ & $1.83$ & $1$ & $4$ & $7.33$ \\
+        \midrule
+        $8h$ & $1.33$ & $0$ & $3$ & $1.17$ & $1$ & $2$ & $2.50$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 To understand how the methods obtained with our approach represent more effective preconditioners than all known multigrid cycles, we can analyze their algorithmic structure.
 For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a graphical representation of the two multigrid-based preconditioners, EP-5 and EP-2, that achieve the fastest solving times for $k = 640$.
 \begin{figure}
