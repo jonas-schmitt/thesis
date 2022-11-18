@@ -1005,27 +1005,27 @@ For better interpretability of the results, we have normalized each solving time
 As the system of linear equations resulting from a discretization of Equation~\ref{eq:helmholtz-test-problem} becomes increasingly ill-conditioned for larger values of the wavenumber $k$, the relative cost to solve for each unknown grows accordingly.
 All three discovered multigrid methods included in Figure~\ref{fig:helmholtz-solving-time-comparison} achieve a faster solving time than the best reference method V(0,1) while also staying competitive for smaller wavenumbers.
 In particular, the overall best preconditioner EP-5 leads to a consistent improvement of 20 \% to the V(0,1) cycle.
+
+Finally, we need to address the question of why our evolutionary program synthesis did not consistently discover multigrid-based preconditioners that achieve the same degree of efficiency and generalizability in each experiment.
+For this purpose, we again consider the space of non-dominated solutions at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/pareto-front.pdf}
+	\caption{Distribution of non-dominated solutions at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
+	\label{fig:pareto-front-helmholtz}
+\end{figure}
+First of all, note that the number of non-dominated solutions is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
+However, this is clearly expected due to the smaller population size, which is only half as large as in our previous experiments.
+Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty of evolving the same number of non-dominated individuals. 
+However, despite this fact, our evolutionary algorithm achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
+In contrast, in the left half of Figure~\ref{fig:pareto-front-helmholtz}, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each experiment.
+Note that all multigrid-based preconditioners considered in our final evaluation shown in Table~\ref{table:evolved-solvers} correspond to individuals located here.
+The larger distance of certain individuals in Figure~\ref{fig:pareto-front-helmholtz} to the combined front, therefore, explains why we could not achieve the same degree of efficiency in each run.
+To reduce the number of iterations until convergence through preconditioning, we need to improve the accuracy of the approximate solution computed for Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
+Since this requires us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
+In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our algorithm.
+As we have already investigated in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, NSGA-II struggles to achieve this goal consistently~\cite{liu2022evolvability}, which, in certain experiments, leads to a suboptimal outcome in the leftmost part of the objective function space.
+
 \subsection{Algorithmic Analysis}
-\begin{table}
-	\caption{Operations per level}
-	\label{table:operations-per-level}
-	\centering
-	\begin{tabular}{l c c c c c c c}
-		\toprule
-  		& \multicolumn{3}{c}{Smoothing} & \multicolumn{3}{c}{Coarse-Grid Correction} & \\
-		\cmidrule(l){2-4} \cmidrule(l){5-7}
-		Level & Mean & Min & Max & Mean & Min & Max & Total Mean \\
-        \midrule
-        $h$ & $1.17$ & $1$ & $2$ & $2.17$ & $1$ & $5$ & $3.33$\\
-        \midrule
-        $2h$ & $3.33$ & $2$ & $5$ & $4.50$ & $3$ & $6$ & $7.83$ \\
-        \midrule
-        $4h$ & $5.50$ & $3$ & $9$ & $1.83$ & $1$ & $4$ & $7.33$ \\
-        \midrule
-        $8h$ & $1.33$ & $0$ & $3$ & $1.17$ & $1$ & $2$ & $2.50$ \\
-		\bottomrule
-	\end{tabular}
-\end{table}
 To understand how the methods obtained with our approach represent more effective preconditioners than all known multigrid cycles, we can analyze their algorithmic structure.
 For this purpose, Figure~\ref{fig:structure-evolved-preconditioners} contains a graphical representation of the two multigrid-based preconditioners, EP-5 and EP-2, that achieve the fastest solving times for $k = 640$.
 \begin{figure}
@@ -1231,22 +1231,37 @@ Encoding the computational structure of a multigrid method based on a number of 
 For instance, choosing a different value for $\mu$ in Algorithm~\ref{alg:multigrid-cycle} changes the number of recursive descents on each level of the method.
 However, none of the available parameters offers a way to insert a single coarse-grid correction or smoothing step after at a specific position within the sequence.
 In contrast, expressing each computational step in the form of a separate production within a formal grammar allows us to achieve this goal by inserting the corresponding subtree into the respective derivation tree, as discussed in Section~\ref{sec:gggp} and Chapter~\ref{chapter:multigrid-formal-language}.
-
-Finally, we need to address the question of why our evolutionary program synthesis did not consistently discover multigrid-based preconditioners that achieve the same degree of efficiency and generalizability in each experiment.
-For this purpose, we again consider the space of non-dominated solutions at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
+\begin{table}
+	\caption{Statistics about the operations on every level performed by the preconditioners that yield a converging solver for $k = 640$.}
+	\label{table:operations-per-level}
+	\centering
+	\begin{tabular}{l c c c c c c c}
+		\toprule
+  		& \multicolumn{3}{c}{Smoothing} & \multicolumn{3}{c}{Coarse-Grid Correction} & \\
+		\cmidrule(l){2-4} \cmidrule(l){5-7}
+		Level & Mean & Min & Max & Mean & Min & Max & Total Mean \\
+        \midrule
+        $h$ & $1.17$ & $1$ & $2$ & $2.17$ & $1$ & $5$ & $3.33$\\
+        \midrule
+        $2h$ & $3.33$ & $2$ & $5$ & $4.50$ & $3$ & $6$ & $7.83$ \\
+        \midrule
+        $4h$ & $5.50$ & $3$ & $9$ & $1.83$ & $1$ & $4$ & $7.33$ \\
+        \midrule
+        $8h$ & $1.33$ & $0$ & $3$ & $1.17$ & $1$ & $2$ & $2.50$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 \begin{figure}
-	\includegraphics[width=\textwidth]{figures/pareto-front.pdf}
-	\caption{Distribution of non-dominated solutions at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
-	\label{fig:pareto-front-helmholtz}
-\end{figure}
-First of all, note that the number of non-dominated solutions is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
-However, this is clearly expected due to the smaller population size, which is only half as large as in our previous experiments.
-Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty of evolving the same number of non-dominated individuals. 
-However, despite this fact, our evolutionary algorithm achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
-In contrast, in the left half of Figure~\ref{fig:pareto-front-helmholtz}, which corresponds to those individuals that lead to increasingly effective but more costly preconditioners, the algorithm is not able to find the same non-dominated individuals in each experiment.
-Note that all multigrid-based preconditioners considered in our final evaluation shown in Table~\ref{table:evolved-solvers} correspond to individuals located here.
-The larger distance of certain individuals in Figure~\ref{fig:pareto-front-helmholtz} to the combined front, therefore, explains why we could not achieve the same degree of efficiency in each run.
-To reduce the number of iterations until convergence through preconditioning, we need to improve the accuracy of the approximate solution computed for Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
-Since this requires us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
-In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our algorithm.
-As we have already investigated in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, NSGA-II struggles to achieve this goal consistently~\cite{liu2022evolvability}, which, in certain experiments, leads to a suboptimal outcome in the leftmost part of the objective function space.
+\begin{subfigure}[b]{\textwidth}
+    \includegraphics[height=0.4\textheight]{figures/histogram_rbgs.pdf}
+	\caption{Red-black Gauss-Seidel}
+	\label{fig:histogram-rbgs}
+\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+    \includegraphics[height=0.4\textheight]{figures/histogram_cgc.pdf}
+	\caption{Coarse-grid correction}
+	\label{fig:histogram-rbgs}
+\end{subfigure}
+	\label{fig:histograms}
+    \caption{Histogram of the relaxation factor distribution of the preconditioners that yield a converging solver for $k = 640$.}
+\end{figure} 
