@@ -43,3 +43,45 @@
 	\caption{Tree generation function}
 	\label{code:gp:generate}
 \end{listing}
+\clearpage
+\section{Full-Approximation Scheme (FAS)}
+\begin{bnf}
+\setcounter{equation}{6}
+\bnfprod{$s_{h}$} {
+	\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^{h}$}, \bnfts{$I_{h}^{2h}$}, \bnfsp \bnfpn{$s_{2h}$}))
+ }
+ \\
+\setcounter{equation}{8}
+\bnfprod{$s_{2h}$} {
+    \bnfts{\textnormal{\textsc{cgs}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfts{$A_{4h}$}, \bnfsp \bnfts{$I_{2h}^{4h}$}, \bnfpn{$s_{2h}$})
+	}
+ \\
+ \setcounter{equation}{11}
+\bnfprod{$c_{2h}$} {
+	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+}
+\end{bnf}
+\begin{table}[!htb]
+	%\caption{State transition functions adapted for FAS}
+	%\label{table:fas-grammar-semantics}
+	\begin{algorithmic}
+	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, $I_{h}^{2h}$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+	\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
+	\State $b_{2h} \gets c_{2h} + A_{2h} \left( I_{h}^{2h} \tilde{x}_h \right) $
+	\State $c_{2h} \gets b_{2h} - A_{2h} \left( \tilde{x}_{2h} \right)$ 
+	\State $S_h \gets$ ($\tilde{x}_{h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
+	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+	\EndFunction
+	\State
+	\Function{cgc}{$I_{2h}^{h}$, $I_{h}^{2h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, S_{h})$}
+	\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+	\State $c_h \gets I_{2h}^{h} \cdot (\tilde{x}_{2h} - I_{h}^{2h} \tilde{x}_h)$
+	\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+	\EndFunction
+    \State
+	\Function{cgs}{$I_{2h}^{h}$, $A_{2h}$, $I_{h}^{2h}$, ($\tilde{x}_h$, $b_{h}$, $c_{h}$, $S_{h/2}$)}
+	\State $x_{h} \gets I_{2h}^{h} \left( A_{2h}^{-1}\left( I_{h}^{2h} c_h \right) - I_{h}^{2h} \tilde{x}_h \right)$ 
+	\State return ($\tilde{x}_{h}$, $b_{h}$, $c_{h}$, $S_{h/2}$)
+	\EndFunction
+	\end{algorithmic}
+\end{table}

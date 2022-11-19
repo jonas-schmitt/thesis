@@ -291,7 +291,7 @@ The resulting state transition is implemented in the function \textsc{cycle} sho
 		\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
-		\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
+		\State $S_h \gets$ ($\tilde{x}_{h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
 		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
 	\EndFunction
 	\end{algorithmic}
@@ -347,7 +347,7 @@ The functions described in this section, therefore, can be considered as a \emph
 	\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 	\State $b_{2h} \gets c_{2h}$
 	\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
-	\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
+	\State $S_h \gets$ ($\tilde{x}_{h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
 	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
 	\EndFunction
 	\State
@@ -438,7 +438,7 @@ We can express this operation as a combination of the \textsc{update} and \texts
 \end{bnf}
 Similar to Production~\eqref{prod:smoothing} the previous state that is passed as a second argument to the \textsc{cgc} function is encoded as the variable $\ps{s_{2h}}$, which means that this state is already the result of a sequence of productions.
 However, since a partitioned computation of the coarse-grid correction does not yield any benefits, in contrast to the case of smoothing, the second argument of the \textsc{update} function is intentionally left empty.
-Furthermore, note that while we have specified the prolongation operator as a terminal symbol, it would as well be possible to specify its choice in the form of a separate production, as in the case of the smoothing operator $\ps{B_h}$.
+Furthermore, note that while we have specified the pr\textbf{}olongation operator as a terminal symbol, it would as well be possible to specify its choice in the form of a separate production, as in the case of the smoothing operator $\ps{B_h}$.
 Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, which corresponds to a state on the next-coarser level with step size $2h$, we next have to consider the different possibilities to transition to this state.
 First of all, as multigrid methods recursively apply the same operations throughout the complete hierarchy of discretizations, we can define the Productions~\eqref{prod:smoothing},~\eqref{prod:smoothing-operator},~\eqref{prod:residual} and~\eqref{prod:coarse-grid-correction} on the corresponding level which yields
 \begin{bnf}
