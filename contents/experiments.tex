@@ -1403,8 +1403,8 @@ The EP-4 represents another noteworthy exception.
 In contrast to the other multigrid-based preconditions, which more closely resemble V-cycles, as they all apply the coarse-grid solver only once, this method combines a four-grid W-cycle with a series of smoothing-based coarse-grid corrections, each of which is structurally similar to a three-grid V-cycle whereby the coarse-grid solver is replaced by a single Jacobi-step.
 In general, the distinct sequences of operations shown in Figure~\ref{fig:structure-evolved-preconditioners1} and~\ref{fig:structure-evolved-preconditioners2} demonstrate that our evolutionary program synthesis approach is capable of discovering multigrid methods with novel algorithmic strategies that have not yet been investigated in the literature.
 Since the utilization of different relaxation factors within each smoothing and coarse-grid correction step represents an integral feature of all six investigated multigrid-based preconditioners, as the last step within this analysis, we investigate their overall distribution of relaxation factors.
-For this purpose, Figure~\ref{fig:histograms} contains a histogram of the distribution of relaxation factors used within each red-black Gauss-Seidel and coarse-grid correction step, respectively.
-Since the number of Jacobi steps is significantly smaller and, thus, does not permit a reliable statistical analysis, the corresponding histogram is omitted here.
+For this purpose, Figure~\ref{fig:histograms} shows the distributions of relaxation factors used within each red-black Gauss-Seidel, Jacobi, and coarse-grid correction step in the form of a histogram.
+%Since the number of Jacobi steps is significantly smaller and, thus, does not permit a reliable statistical analysis, the corresponding histogram is omitted here.
 
 
 
@@ -1447,24 +1447,23 @@ Since the number of Jacobi steps is significantly smaller and, thus, does not pe
 \end{table}
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
-\begin{subfigure}[b]{\textwidth}
 	\centering
-    \includegraphics[height=0.3\textheight]{figures/histogram_rbgs.pdf}
+\begin{subfigure}[b]{0.495\columnwidth}
+    \includegraphics[width=\columnwidth]{figures/histogram_rbgs.pdf}
 	\caption{Red-black Gauss-Seidel}
 	\label{fig:histogram-rbgs}
 \end{subfigure}
-  \par\bigskip
-\begin{subfigure}[b]{\textwidth}
 	\centering
-    \includegraphics[height=0.3\textheight]{figures/histogram_jacobi.pdf}
+\begin{subfigure}[b]{0.495\columnwidth}
+	\centering
+    \includegraphics[width=\columnwidth]{figures/histogram_jacobi.pdf}
 	\caption{Jacobi}
 	\label{fig:histogram-jacobi}
 \end{subfigure}
-  \par\bigskip
-
-\begin{subfigure}[b]{\textwidth}
+\par\bigskip
 	\centering
-    \includegraphics[height=0.3\textheight]{figures/histogram_cgc.pdf}
+\begin{subfigure}[b]{0.495\columnwidth}
+    \includegraphics[width=\columnwidth]{figures/histogram_cgc.pdf}
 	\caption{Coarse-grid correction}
 	\label{fig:histogram-rbgs}
 \end{subfigure}
