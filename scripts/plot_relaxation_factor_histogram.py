@@ -19,6 +19,7 @@ ep_3_jacobi = [1.25]
 ep_4_jacobi = [0.95,1.05,0.3,1.7,1.05,0.30,1.25]
 ep_8_jacobi = [1.55]
 jacobi = ep_5_jacobi+ep_2_jacobi+ep_10_jacobi+ep_3_jacobi+ep_4_jacobi+ep_8_jacobi
+# print(len(jacobi)/len(rbgs))
 ep_5_cgc = [1.0,1.0,0.8,1.6,0.85,0.85,1.05,1.1,1.05,1.80]
 ep_2_cgc = [1.0,1.6,0.85,0.3,0.85,0.3,0.85,0.3,0.85,1.35]
 ep_10_cgc = [1.0,0.7,1.1,0.85,1.0,1.40,1.70,1.65,1.40,0.80]
@@ -26,12 +27,19 @@ ep_3_cgc = [1.0,1.25,1.05,0.9,0.9,1.4]
 ep_4_cgc = [1.0,0.8,1.0,0.55,1.7,1.8,1.7,0.95,1.1,0.55,0.95,0.95,1.1,0.9]
 ep_8_cgc = [1.0,0.95,1.45,1.3,1.1,1.65,1.1,1.2]
 cgc = ep_5_cgc+ep_2_cgc+ep_10_cgc+ep_3_cgc+ep_4_cgc+ep_8_cgc
-rc('text', usetex=True)
-sns.set_context("paper")
-sns.set_style('ticks', {'font.family': 'serif', 'font.serif': 'Times New Roman'})
-cgc = pd.DataFrame(cgc)
-ax = sns.histplot(cgc, binwidth=0.1, binrange=[0.0,2.0], legend=False)
-ax.set_xlabel("Relaxation Factor")
-ax.set_xlim(0.0,2.0)
-plt.tight_layout()
-plt.savefig("histogram_cgc.pdf", dpi=300)
+def plot_histogram(name, data):
+    plt.clf()
+    rc('text', usetex=True)
+    sns.set_context("paper")
+    sns.set_style('ticks', {'font.family': 'serif', 'font.serif': 'Times New Roman'})
+    data = pd.DataFrame(data)
+    ax = sns.histplot(data, binwidth=0.1, binrange=[0.0,2.0], stat="percent", legend=False)
+    ax.set_xlabel("Relaxation Factor")
+    ax.set_xlim(0.0,2.0)
+    plt.tight_layout()
+    plt.savefig(f"histogram_{name}.pdf", dpi=300)
+
+plot_histogram("rbgs", rbgs)
+plot_histogram("jacobi", jacobi)
+plot_histogram("cgc", cgc)
+
