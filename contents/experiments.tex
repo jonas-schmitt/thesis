@@ -1030,7 +1030,7 @@ As we have already investigated in Section~\ref{sec:experiments1-algorithm-behav
 \subsection{Algorithmic Analysis}
 While the results shown in Table~\ref{table:evolved-solvers} indicate that our automatically-designed preconditioners yield faster solvers than classical multigrid cycles for a wide range of different wavenumbers, we have not investigated how these methods are able to achieve this feat.
 Therefore, we first need to gain an understanding of the computational structure of these methods and how it compares to those of classical multigrid cycles.
-For this purpose, the Figures~\ref{fig:structure-evolved-preconditioners1} and ~\ref{fig:structure-evolved-preconditioners2} contain graphical representations of the six automatically-designed preconditioners EP-2, EP-3, EP4, EP-5, EP-8 and EP-10 that yield a converging solver for a wavenumber of $k = 640$, for which all classical multigrid cycles fail to achieve convergence.
+For this purpose, the two Figures~\ref{fig:structure-evolved-preconditioners1} and~\ref{fig:structure-evolved-preconditioners2} contain the graphical representations of those automatically-designed preconditioners that yield a converging solver for a wavenumber of $k = 640$, for which all V-, F- and W-cycles fail to achieve convergence.
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 \begin{subfigure}[b]{\columnwidth}
@@ -1384,15 +1384,15 @@ For this purpose, the Figures~\ref{fig:structure-evolved-preconditioners1} and ~
 	\caption{Computational structure of the evolved multigrid preconditioners EP-5 and EP-10. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
 	\label{fig:structure-evolved-preconditioners2}
 \end{figure}
-As illustrated by their graphical representations, the employed sequence of multigrid operations varies wildly between the individual methods, and none of them can easily be characterized as one of the classical multigrid cycles.
+As illustrated by their graphical representations, the employed sequence of multigrid operations varies significantly between the individual methods, and none of them can easily be characterized as one of the classical multigrid cycles.
 However, we can still identify a number of common characteristics.
-First of all, while we have also included different block Jacobi smoothers into the search space, each of our automatically-designed methods employs exclusively pointwise Jacobi and red-black Gauss-Seidel smoothing, whereby, with the exception of EP-3, the latter is used predominantly.
-If we consider the total amount of smoothing used within each method, we can deduce that, on average, Jacobi is used in $1/3$ of the smoothing steps.
-However, in contrast to classical multigrid cycles, both the type of smoother and relaxation factor can be varied in each step, which stems from the capability of our evolutionary program synthesis method to alter each computational step within the sequence without affecting the rest.
-If we examine the computational structure of the methods more closely, we can see that many coarse-grid correction steps originate from one or multiple smoothing steps on intermediate levels, often using a different combination of relaxation factors.
-In contrast, again, with the exception of EP-4, each method only employs the coarse-grid solver only once, which is then proceeded with multiple smoothing-based coarse-grid corrections on intermediate levels, whereby often individual smoothing steps are completely skipped.
-If we consider that EP-5 represents the overall most efficient preconditioner for different wavenumbers, we can see that here, a combination of different smoothers and relaxation factors within these correction steps seems to be the most effective approach.
-Furthermore, note that in contrast to classical multigrid methods, the number of smoothing and coarse-grid correction steps is unevenly distributed over the range of levels.
+First of all, while we have also included different block Jacobi smoothers into the search space, all methods employ exclusively pointwise Jacobi and red-black Gauss-Seidel smoothing, whereby, with the exception of EP-3, the latter is predominantly used.
+If we consider the total amount of smoothing within each method, on average, the Jacobi method is used in $1/3$ of the smoothing steps.
+However, in contrast to classical multigrid cycles, which usually utilize the same smoother with a fixed number of steps on each level, our evolutionary program synthesis approach has the capability to alter each operation independently, yielding varying smoothers and relaxation factors in each subsequent step.
+If we examine the computational structure of each of the six multigrid-based preconditioners more closely, we can see that many coarse-grid correction steps originate from one or multiple smoothing steps on intermediate levels, often using a different combination of relaxation factors.
+However, each method applies the coarse-grid solver only once or at most twice but uses multiple smoothing-based coarse-grid corrections on intermediate levels, whereby often individual smoothing steps are completely skipped.
+Considering that EP-5 represents the overall most efficient preconditioner for different wavenumbers, a combination of different smoothers and relaxation factors within these correction steps seems to be the most effective approach.
+Furthermore, in contrast to classical multigrid cycles, the number of smoothing and coarse-grid correction steps is unevenly distributed over the range of levels.
 Table~\ref{table:operations-per-level} shows the average number of smoothing steps, coarse-grid correction steps, and the number of updates of the approximate solution\footnote{Note that this includes both smoothing and coarse-grid correction steps} on every level.
 \begin{table}
 	\caption{Statistics about the operations that are performed by the preconditioners that yield a converging solver for $k = 640$ on every level.}
@@ -1414,16 +1414,18 @@ Table~\ref{table:operations-per-level} shows the average number of smoothing ste
 		\bottomrule
 	\end{tabular}
 \end{table}
-As this analysis reveals, the number of operations on the intermediate levels $2h$ and $4h$ is significantly higher than on the higher and lower levels, which means that these levels seem to be most cost-effective for accelerating the convergence of the BiCGSTAB solver.
-Here it is especially interesting that instead of applying the combined error reduction of all smoothing steps in a single coarse-grid correction, as it is usually performed in classical multigrid cycles, the correction is split into multiple steps, such that, on average, the total number of coarse-grid corrections is roughly equal to the number of smoothing steps.
-To gain a better understanding of the consequences of this strategy, consider the method EP-3, which uses the lowest total number of operations, and, thus, leads to the highest number of iterations.
-If we compare the solving time and the number of iterations this method achieves according to Table~\ref{table:evolved-solvers}, with the characteristics of the classical multigrid cycles shown in Table~\ref{table:reference-methods-helmholtz}, we can see that it converges as fast as the W(3,3)-cycle while requiring 69 - 75 \% less time per iteration.
-While especially EP-2, EP-5 and EP-10 utilize a higher number of coarse-grid corrections and smoothing steps to achieve faster convergence, the simplicity of the EP-3 method demonstrates that the alternation of smoothers and relaxation factors combined with the addition of only two smoothing-based correction steps on intermediate levels can yield a remarkably efficient preconditioner for the indefinite Helmholtz equation.
-The EP-4 represents another noteworthy exception. 
-In contrast to the other multigrid-based preconditions, which more closely resemble V-cycles, as they all apply the coarse-grid solver only once, this method combines a four-grid W-cycle with a series of smoothing-based coarse-grid corrections, each of which is structurally similar to a three-grid V-cycle whereby the coarse-grid solver is replaced by a single Jacobi-step.
+As this analysis reveals, the number of operations on the intermediate levels $2h$ and $4h$ is significantly higher than on the higher and lower levels, which means that these resolutions seem to be most cost-effective for accelerating the convergence of the preconditioned iterative solver.
+Here it is especially interesting that instead of applying the combined error reduction of all smoothing steps in a single coarse-grid correction, as it is usually performed in multigrid cycles, the correction is split into multiple steps.
+As a consequence, the average number of coarse-grid corrections is roughly equal to the number of smoothing steps.
+To gain a better understanding of the consequences of this strategy, consider the method EP-3, which uses the lowest total number of operations, and, therefore, as expected, leads to the highest number of iterations until convergence.
+If we compare the solving time and the number of iterations this method achieves according to Table~\ref{table:evolved-solvers}, with the characteristics of the V-, F- and W-cycles shown in Table~\ref{table:reference-methods-helmholtz}, we can see that it converges as fast as the W(3,3)-cycle while requiring 69 - 75 \% less time per iteration.
+While especially EP-2, EP-5 and EP-10 utilize a higher number of coarse-grid corrections and smoothing steps to achieve faster convergence, the simplicity of the EP-3 method demonstrates that the addition of only two smoothing-based correction steps on intermediate levels using the right combination of smoothers and relaxation factors yields a remarkably efficient preconditioner for the indefinite Helmholtz equation.
+The EP-4 method represents another noteworthy exception. 
+In contrast to the other multigrid-based preconditioners, which more closely resemble V-cycles, as they all apply the coarse-grid solver only once, this method combines a four-grid W-cycle with a series of smoothing-based coarse-grid corrections.
+Each of these corrections is structurally similar to a three-grid V-cycle that does not use any smoothing while replacing the coarse-grid solver with a single Jacobi step.
 In general, the distinct sequences of operations shown in Figure~\ref{fig:structure-evolved-preconditioners1} and~\ref{fig:structure-evolved-preconditioners2} demonstrate that our evolutionary program synthesis approach is capable of discovering multigrid methods with novel algorithmic strategies that have not yet been investigated in the literature.
-Finally, the use of varying relaxation factors represents an integral feature of all six investigated multigrid-based preconditioners. 
-Figure~\ref{fig:histograms} shows the distribution of relaxation factors for each of the three relevant operations, red-black Gauss-Seidel, Jacobi, and coarse-grid correction, that are employed within the six preconditioners in the form of a histogram.
+Finally, since the use of varying relaxation factors is integral to all six investigated multigrid-based preconditioners, it is important to investigate this feature in more detail. 
+Figure~\ref{fig:histograms} shows the distribution of relaxation factors for each of the three operations red-black Gauss-Seidel, Jacobi, and coarse-grid correction, that are employed within the six preconditioners in the form of a histogram.
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 	\centering
@@ -1449,11 +1451,12 @@ Figure~\ref{fig:histograms} shows the distribution of relaxation factors for eac
     \caption{Histogram of the relaxation factor distributions of the six multigrid-based preconditioners that yield a converging solver for $k = 640$.}
     \label{fig:histograms}
 \end{figure}
-First of all note that both for red-black Gauss-Seidel and the coarse-grid correction, the majority of relaxation factors are scattered around one, whereby the former favors slightly higher values and, thus, more overrelaxation.
-However, in both cases, also distinct peaks comprising roughly 12 \% of the relaxation factors can be found outside this range, which are located around a value of 0.65 in Figure~\ref{fig:histogram-rbgs} and 1.65 in Figure~\ref{fig:histogram-cgc}.
-Note that since Jacobi is only employed in $1/3$ of the smoothing steps, analyzing the resulting distribution comprises a higher degree of statistical uncertainty.
-
-
+First of all, note that both for red-black Gauss-Seidel and the coarse-grid correction, the majority of relaxation factors is concentrated around the value one, whereby the former favors slightly higher values and, thus, more overrelaxation.
+However, in both cases, also distinct peaks comprising roughly 12 \% of the values can be found outside this range, which are located around 0.65 in Figure~\ref{fig:histogram-rbgs} and 1.65 in Figure~\ref{fig:histogram-cgc}.
+In the case of Jacobi smoothing, which is shown in Figure~\ref{fig:histogram-jacobi}, the relaxation factor values are more scattered. 
+While, similar to red-black Gauss-Seidel, overrelaxation has a higher prevalence, in 17.5 \% of the smoothing steps, a drastic underrelaxation with $\omega \in \left[0.25, 0.30\right]$ is used.
+In general, this analysis underlines our observation that a combination of varying relaxation factors in subsequent smoothing and coarse-grid correction steps has the potential to improve the effectiveness of a multigrid method, as illustrated by the faster speed of convergence attained with our automatically-designed preconditioners compared to most classical multigrid cycles. 
+However, note that especially in the case of the Jacobi method, which is only employed in $1/3$ of the smoothing steps, the distribution shown in Figure~\ref{fig:histogram-jacobi} comprises a certain degree of statistical uncertainty.
 
 % First of all, both multigrid methods employ a unique sequence of operations that does not resemble any known multigrid cycle.
 % While both methods initially apply the coarse-grid solver exactly once and, thus, resemble a V-cycle, they incorporate additional smoothing-based coarse-grid correction steps.
