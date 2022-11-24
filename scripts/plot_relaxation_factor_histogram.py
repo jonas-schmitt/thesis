@@ -36,6 +36,7 @@ def plot_histogram(name, data):
     ax = sns.histplot(data, binwidth=0.1, binrange=[0.0,2.0], stat="percent", legend=False)
     ax.set_xlabel("Relaxation Factor")
     ax.set_xlim(0.0,2.0)
+    ax.set_ylim(0.0,25.0)
     plt.tight_layout()
     plt.savefig(f"histogram_{name}.pdf", dpi=300)
 
