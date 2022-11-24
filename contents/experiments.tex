@@ -1026,7 +1026,6 @@ To reduce the number of iterations until convergence through preconditioning, we
 Since this requires us to perform more smoothing and coarse-grid correction steps, the size of the corresponding derivation trees grows accordingly.
 In order to obtain the same derivation tree, we need to find an exact sequence of productions starting from a random initialization in each individual run of our algorithm.
 As we have already investigated in Section~\ref{sec:experiments1-algorithm-behavior-analysis}, NSGA-II struggles to achieve this goal consistently~\cite{liu2022evolvability}, which, in certain experiments, leads to a suboptimal outcome in the leftmost part of the objective function space.
-
 \subsection{Algorithmic Analysis}
 While the results shown in Table~\ref{table:evolved-solvers} indicate that our automatically-designed preconditioners yield faster solvers than classical multigrid cycles for a wide range of different wavenumbers, we have not investigated how these methods are able to achieve this feat.
 Therefore, we first need to gain an understanding of the computational structure of these methods and how it compares to those of classical multigrid cycles.
@@ -1381,7 +1380,8 @@ For this purpose, the two Figures~\ref{fig:structure-evolved-preconditioners1} a
 		\caption{EP-10}
 		\label{fig:ep-10}
 	\end{subfigure}
-	\caption{Computational structure of the evolved multigrid preconditioners EP-5 and EP-10. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
+	\caption{Computational structure of the evolved multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
+ }
 	\label{fig:structure-evolved-preconditioners2}
 \end{figure}
 As illustrated by their graphical representations, the employed sequence of multigrid operations varies significantly between the individual methods, and none of them can easily be characterized as one of the classical multigrid cycles.
@@ -1395,7 +1395,7 @@ Considering that EP-5 represents the overall most efficient preconditioner for d
 Furthermore, in contrast to classical multigrid cycles, the number of smoothing and coarse-grid correction steps is unevenly distributed over the range of levels.
 Table~\ref{table:operations-per-level} shows the average number of smoothing steps, coarse-grid correction steps, and the number of updates of the approximate solution\footnote{Note that this includes both smoothing and coarse-grid correction steps} on every level.
 \begin{table}
-	\caption{Statistics about the operations that are performed by the preconditioners that yield a converging solver for $k = 640$ on every level.}
+	\caption{Statistics about the operations that are performed by the preconditioners yielding a converging solver for $k = 640$.}
 	\label{table:operations-per-level}
 	\centering
 	\begin{tabular}{l c c c c c c c}
@@ -1425,7 +1425,7 @@ In contrast to the other multigrid-based preconditioners, which more closely res
 Each of these corrections is structurally similar to a three-grid V-cycle that does not use any smoothing while replacing the coarse-grid solver with a single Jacobi step.
 In general, the distinct sequences of operations shown in Figure~\ref{fig:structure-evolved-preconditioners1} and~\ref{fig:structure-evolved-preconditioners2} demonstrate that our evolutionary program synthesis approach is capable of discovering multigrid methods with novel algorithmic strategies that have not yet been investigated in the literature.
 Finally, since the use of varying relaxation factors is integral to all six investigated multigrid-based preconditioners, it is important to investigate this feature in more detail. 
-Figure~\ref{fig:histograms} shows the distribution of relaxation factors for each of the three operations red-black Gauss-Seidel, Jacobi, and coarse-grid correction, that are employed within the six preconditioners in the form of a histogram.
+Figure~\ref{fig:histograms} shows the distribution of relaxation factors for each of the three operations, red-black Gauss-Seidel, Jacobi, and coarse-grid correction, that are employed within the six preconditioners in the form of a histogram.
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 	\centering
@@ -1454,7 +1454,7 @@ Figure~\ref{fig:histograms} shows the distribution of relaxation factors for eac
 First of all, note that both for red-black Gauss-Seidel and the coarse-grid correction, the majority of relaxation factors is concentrated around the value one, whereby the former favors slightly higher values and, thus, more overrelaxation.
 However, in both cases, also distinct peaks comprising roughly 12 \% of the values can be found outside this range, which are located around 0.65 in Figure~\ref{fig:histogram-rbgs} and 1.65 in Figure~\ref{fig:histogram-cgc}.
 In the case of Jacobi smoothing, which is shown in Figure~\ref{fig:histogram-jacobi}, the relaxation factor values are more scattered. 
-While, similar to red-black Gauss-Seidel, overrelaxation has a higher prevalence, in 17.5 \% of the smoothing steps, a drastic underrelaxation with $\omega \in \left[0.25, 0.30\right]$ is used.
+While similar to red-black Gauss-Seidel, overrelaxation has a higher prevalence, a drastic underrelaxation with $\omega \in \left[0.25, 0.30\right]$ is also used in 17.5 \% of the smoothing steps.
 In general, this analysis underlines our observation that a combination of varying relaxation factors in subsequent smoothing and coarse-grid correction steps has the potential to improve the effectiveness of a multigrid method, as illustrated by the faster speed of convergence attained with our automatically-designed preconditioners compared to most classical multigrid cycles. 
 However, note that especially in the case of the Jacobi method, which is only employed in $1/3$ of the smoothing steps, the distribution shown in Figure~\ref{fig:histogram-jacobi} comprises a certain degree of statistical uncertainty.
 
