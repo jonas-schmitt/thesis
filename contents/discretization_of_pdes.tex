@@ -18,11 +18,11 @@ These so-called \emph{boundary conditions} (BCs) can usually be classified into 
 \end{description}
 Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
 The difference between Robin and Cauchy BCs is that in the former case, one condition is formulated as a weighted average of $u$ and its derivative in the normal direction, while in the latter, two conditions must be met individually.
-While depending on the boundary conditions, an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs, such a solution has not been discovered, or its computation is unfeasible.
+While depending on the boundary conditions, an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs, such a solution has not been discovered, or its computation is infeasible.
 A remedy is the application of so-called numerical methods that are based on approximating the solution of a given PDE on a discrete set of points. 
 %\subsection{Grid Creation}
 %Before computing a numerical approximation of the solution of a given PDE, we need to define a set of discrete points within the domain $\Omega$ at which we aim to obtain the solution.
-Usually, these points are defined on a grid or mesh with a particular structure.
+Usually, these points are defined on a \emph{grid} or \emph{mesh} with a particular structure.
 In general, a distinction is made between structured (or regular) and unstructured grids.
 A structured grid is characterized by the uniform neighborhood of its grid points, which means that the number of neighbors is typically the same for each grid point.
 In contrast, each point within an unstructured grid can have a varying number of neighbors.
@@ -33,6 +33,7 @@ This thesis focuses on numerical methods that can be formulated on a hierarchy o
 Furthermore, while there exists a wide range of different PDEs, of which many also describe time-dependent phenomena, we only discuss discretization methods that can be applied in the spatial domain.
 However, note that the techniques described in this thesis can, in principle, also be utilized for the numerical solution of time-dependent PDEs, for instance, by applying them within an implicit time-stepping scheme~\cite{ames2014numerical}.
 One possibility to approximate a certain (time-independent) PDE on a structured grid is to compute the Taylor series expansion around each grid point, leading to the so-called \emph{finite difference method} (FDM).
+
 \subsection{Finite Difference Method}
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
@@ -79,10 +80,10 @@ We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
 with $u_{i,j} = u(ih, jh)$, $f_{i,j} = f(ih, jh)$ and $n = 1/h - 1$.
-By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} we can be formulated as a system of linear equation of type $A \bm{u} = \bm{f}$. 
+By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} can be formulated as a system of linear equation of type $A \bm{u} = \bm{f}$. 
 For instance, setting $h = 0.25$, results in $n = 3$ and a total number of nine grid points.
 %TODO draw grid
-Assuming a natural ordering of grid points, we can represent the resulting system of linear equations as follows
+A natural ordering of the grid points then yields the system of linear equations
 \begin{equation}
 \frac{1}{h^2} \underbrace{ \begin{pmatrix}
 \begin{array}{ccc|ccc|ccc}~4&-1&~0&-1&~0&~0&~0&~0&~0\\-1&~4&-1&~0&-1&~0&~0&~0&~0\\~0&-1&~4&~0&~0&-1&~0&~0&~0\\\hline -1&~0&~0&~4&-1&~0&-1&~0&~0\\~0&-1&~0&-1&~4&-1&~0&-1&~0\\~0&~0&-1&~0&-1&~4&~0&~0&-1\\\hline ~0&~0&~0&-1&~0&~0&~4&-1&~0\\~0&~0&~0&~0&-1&~0&-1&~4&-1\\~0&~0&~0&~0&~0&-1&~0&-1&~4\end{array}
@@ -93,7 +94,8 @@ Assuming a natural ordering of grid points, we can represent the resulting syste
 \end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f
 \label{eq:2D-poisson-assembled-matrix}
 \end{equation}
-with a right-hand side $\bm f$. This system can be further reduced by incorporating the given Dirichlet BCs, which assume a constant value of zero at all boundary points:
+with a right-hand side $\bm f$. 
+By incorporating the given Dirichlet BCs, which assume a constant value of zero at all boundary points, into the right-hand side $\bm{f}$, we obtain
 \begin{equation}
 \bm f = \begin{pmatrix}
 		f_{11} + \frac{1}{h^2} (u_{10} + u_{01}) \\f_{12} + \frac{1}{h^2} u_{02} \\ f_{13} + \frac{1}{h^2} (u_{03} + u_{14})  \\ f_{21} + \frac{1}{h^2} u_{20} \\ f_{22} \\ f_{23} + \frac{1}{h^2} u_{24} \\ f_{31} + \frac{1}{h^2} (u_{30} + u_{41}) \\ f_{32} + \frac{1}{h^2} u_{42} \\ f_{33} + \frac{1}{h^2} (u_{34} + u_{43})
@@ -113,7 +115,7 @@ f_{33}
 Note that $A$ represents a sparse matrix, which means that only a minority of its entries are nonzero.
 Moreover, since we already represent the solution of Equation~\eqref{eq:2D-poisson-model-discrete} on a regular grid, storing the resulting linear system in a matrix-vector format is inefficient.
 If we assume that each operation required for solving a system of linear equations can be formulated as a matrix-vector or vector-vector operation, it is unnecessary to store the corresponding matrix explicitly.
-Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector with the respective ordering of the grid points.
+Instead, we only have to store the computational pattern that corresponds to a matrix-vector multiplication performed on a vector containing the grid points in a fixed order.
 On regular grids, each such pattern can be represented as a so-called \emph{stencil code}.
 
 \subsection{Stencil Codes}
@@ -122,7 +124,7 @@ In the previous section, we have already introduced the notion of a regular grid
 \begin{equation}
 	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \circ \bm{h}, \bm{i} \in \mathbb{N}^d \right\},
 \end{equation}
-where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\circ$ represents the Hadamard product between two vectors.\footnote{Even though when used as a subscript the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
+where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\circ$ represents the Hadamard (or element-wise) product between two vectors.\footnote{Even though when used as a subscript, the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
 A grid function or variable $u_h$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
@@ -130,7 +132,7 @@ A grid function or variable $u_h$ is then a mapping of the form
 		& \bm{x} \to u_h(\bm{x})
 	\end{split}
 \end{equation}
-As in the previous section one often makes use of the simplified notation
+As in the previous section, one often makes use of the simplified notation
 \begin{equation}
 	\begin{split}
 		 & u_i = u_{h_x}(i h_x) \\
