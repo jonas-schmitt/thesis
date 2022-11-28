@@ -124,7 +124,7 @@ In the previous section, we have already introduced the notion of a regular grid
 \begin{equation}
 	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \circ \bm{h}, \bm{i} \in \mathbb{N}^d \right\},
 \end{equation}
-where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\circ$ represents the Hadamard (or element-wise) product between two vectors.\footnote{Even though when used as a subscript, the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
+where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\bm{i} \circ \bm{h}$ represents the Hadamard (or element-wise) product between two vectors \bm{i} and \bm{h}.\footnote{Even though when used as a subscript, the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
 A grid function or variable $u_h$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
@@ -151,7 +151,7 @@ We then define the general stencil $S_h$ as a finite set of $m$ tuples of the fo
 \label{eq:stencil-definition}
 \end{equation}
 Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
-For one- and two-dimensional problems, it is often more convenient to use the alternative notations 
+For one and two-dimensional problems, it is often more convenient to use the alternative notations 
 \begin{equation}
 	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
@@ -167,7 +167,7 @@ and
 		& \vdots & \vdots & \vdots &
 	\end{bmatrix}_{h_x, h_y}.
 \end{equation}
-We can also extend this notation to three dimensions, by representing all components with the same offset as a separate two-dimensional stencil, such that
+We can also extend this notation to three dimensions by representing all components with the same offset as a separate two-dimensional stencil, such that
 \begin{equation}
 	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
@@ -175,7 +175,6 @@ We can also extend this notation to three dimensions, by representing all compon
 	\end{bmatrix}_{h_x, h_y, h_z}.
 \label{eq:3D-stencil-matrix-notation}
 \end{equation}
-%TODO specify range of i
 
 Furthermore, we define the application of a stencil $S_h$ to a grid function $u_h(\bm x)$ with $\bm x \in G_h$:
 \begin{equation}
@@ -185,7 +184,7 @@ Furthermore, we define the application of a stencil $S_h$ to a grid function $u_
 	\end{split}
 \label{eq:stencil-application}
 \end{equation}
-For $d = 3$, we can formulate the application of a three-dimensional stencil $S_{h_x, h_y, h_z}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
+For $d = 3$, we can define the application of a three-dimensional stencil $S_{h_x, h_y, h_z}$, based on Equation~\eqref{eq:3D-stencil-matrix-notation}, as a dot product of the form
 \begin{equation}
 	\begin{split}
 	& S_{h_x, h_y, h_z} \cdot u_{i,j,k} = 	
@@ -195,7 +194,7 @@ For $d = 3$, we can formulate the application of a three-dimensional stencil $S_
 	\begin{bmatrix}
 	\vdots \\ u_{i,j,k-1} \\ u_{i,j,k} \\ u_{i,j,k+1} \\ \vdots 
 	\end{bmatrix} \\
-	& = \cdots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \cdots .
+	& = \cdots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \cdots
 	\end{split}
 \end{equation}
 
@@ -211,7 +210,8 @@ Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields
 	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
-From this example, it becomes evident that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can always be considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order, which has been already demonstrated in Equation~\eqref{eq:2D-poisson-assembled-matrix}.
+From this example, we can conclude that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can always be considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order.
+We have already illustrated this conclusion in the form of Equation~\eqref{eq:2D-poisson-assembled-matrix}.
 Therefore, in case it is possible to define each computational step for solving a given discretized PDE on a regular grid by means of a stencil application, we only need to obtain the respective stencil entries instead of assembling or even storing a complete matrix.
 Furthermore, many operators defined for matrices can similarly be formulated as a stencil operation.
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
@@ -221,9 +221,7 @@ As a first elementary operation, we define the multiplication of a stencil with 
 \end{equation}
 
 Next, we can formulate certain binary operations such as the addition, subtraction, and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
-Equation~\eqref{eq:stencil-addsub} contains a recursive definition of stencil addition and subtraction.
-Here, we simply add the weights of each entry with the same offset contained in both $A_h$ and $B_h$.
-In case an offset is not contained in both stencils the respective tuple is included unmodified.  
+Equation~\eqref{eq:stencil-addsub} shows a recursive definition of stencil addition and subtraction.
 % Stencil addition and subtraction
 \begin{equation}
 	A_h \pm B_h = 
@@ -245,7 +243,9 @@ In case an offset is not contained in both stencils the respective tuple is incl
 	\end{cases}
 \label{eq:stencil-addsub}
 \end{equation}
-Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definition for the multiplication of two stencils $A_h$ and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
+Here, we simply add the weights of each entry with the same offset contained in both $A_h$ and $B_h$.
+In case an offset is not contained in both stencils, the respective tuple is included unmodified.  
+Based on Equation~\eqref{eq:stencil-addsub}, we can then provide a definition for the multiplication of two stencils $A_h$, and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
 % Stencil multiplication
 \begin{equation}
 	A_h \cdot B_h = 
@@ -253,20 +253,20 @@ Based on Equation~\eqref{eq:stencil-addsub} we can then also provide a definitio
 		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} \; + & \text{if} \; A_h = \{(\bm{a}, b ) \} \cup \tilde{A}_h \\
 		\{(\bm{a}, b ) \} \cdot \tilde{B}_h + \tilde{A}_h \cdot B_h & 
 		\text{and} \; B_h = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B}_h \\ & \\
-		\emptyset & \text{if} \; A_h = \emptyset \vee B_h = \emptyset
+		\emptyset & \text{if} \; A_h = \emptyset \vee B_h = \emptyset.
 	\end{cases}
 \label{eq:stencil-mult}
 \end{equation}
 To compute the stencil product $A_h \cdot B_h$, for each pair of entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
-To define this computation recursively, we first pick two entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combine them as described above.
-We then multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A_h$ with the remainder stencil $\tilde{B}_h = B_h \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B_h$.
-Finally, the process is continued recursively by computing the product of the remainder $\tilde{A}_h = A_h \setminus \{(\bm{a}, b ) \}$, with the original stencil $B_h$.
+We then define this computation recursively by first picking two entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combining them as described above.
+Next, we multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A_h$ with the remainder stencil $\tilde{B}_h = B_h \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B_h$.
+Finally, the process is continued recursively by computing the product of the remainder $\tilde{A}_h = A_h \setminus \{(\bm{a}, b ) \}$ with the original stencil $B_h$.
 Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to accumulate the corresponding weights and combine them in a single tuple.
-To add up all tuples with matching offset obtained within each recursive sub-computation, we, therefore, employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}.
+To sum up all tuples with matching offsets obtained within subcomputations, we employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}.
 \subsection{Systems of Partial Differential Equations}
 \label{subsec:systems-of-pdes}
-While so far we have only considered a single partial differential equation, many phenomena can only be modeled in the form of a system of PDEs.
-One of the most simplest examples for such a system is the so-called biharmonic equation
+While so far, we have only considered a single partial differential equation, many phenomena can only be modeled in the form of a system of PDEs.
+One of the simplest examples of such a system is the so-called biharmonic equation
 \begin{equation}
 	\begin{split}
 		\nabla^2 u & = v  \\
@@ -298,7 +298,7 @@ By utilizing matrix-vector notation, we can reformulate Equation~\eqref{eq:bihar
 }_{\bm{f}}.
 \label{eq:biharmonic-system-matrix-formulation}
 \end{equation}
-Even though Equation~\eqref{eq:biharmonic-system-matrix-formulation} now includes partial derivatives of multiple variables, we can employ the same techniques to discretize each individual operator and obtain a corresponding system of linear equations. 
+Even though Equation~\eqref{eq:biharmonic-system-matrix-formulation} now includes partial derivatives of multiple variables, we can employ the same techniques to discretize each individual operator and obtain the corresponding system of linear equations. 
 Consider the two-dimensional biharmonic system
 \begin{equation}
 	\begin{split}
@@ -320,17 +320,18 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 		\begin{pmatrix}
 			0 \\ f_{i,j}
 		\end{pmatrix} \\
-\forall i,j \in \{1, 2, \dots n\},
+\forall i,j \in \{1, 2, \dots, n\},
 	\label{eq:2D-biharmonic-system-stencil}
 \end{equation}
 where $\Delta_{h,h}$ is the two-dimensional five-point stencil defined in Equation~\eqref{eq:five-point-stencil}.
 Equation~\eqref{eq:2D-biharmonic-system-stencil} represents a system of two linear equations which needs to be solved at every pair of grid points $u_{i,j}$ and $v_{i,j}$.
-If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points at once, a system of linear equations which corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system}.
+If we consider Equation~\eqref{eq:2D-biharmonic-system-stencil} at all grid points, a system of linear equations which corresponds to the discrete solution of Equation~\eqref{eq:2D-biharmonic-system} is obtained.
+
 Before we conclude this section, it is important to mention that we have not yet discussed how each variable, in the given case $u_{i,j}$ and $v_{i,j}$, is placed on the grid.
-While it is tempting to always place each variable at the same position within a grid, in certain applications, such as the incompressible Navier-Stokes equation, this can lead to adverse numerical properties.
+While it is tempting to always place each variable at the same position within a grid, in certain applications, such as the incompressible Navier-Stokes equation, this can lead to unfavorable numerical properties.
 As a consequence, often more complex grid placing strategies, such as so-called staggered discretizations, need to be used in practice~\cite{trottenberg2000multigrid}, which we, for the sake of brevity, do not further discuss here.
-After introducing suitable numerical discretization methods that allow us to transfer a given system of PDEs into a system of linear equations, we can next direct our attention to the efficient solution of these systems.
-%Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
+Also note that in order to solve Equation~\eqref{eq:2D-biharmonic-system}, or any other system of PDEs, we need to define suitable conditions at the boundaries of each domain on which a given variable, contained in one of the equations, is defined.
+After briefly discussing numerical discretization methods that allow us to convert a given system of PDEs into a system of linear equations, we can next direct our attention to the efficient solution of these systems.
 %These boundary conditions can be of the same type as described above.
 %Again, for a more detailed treatment of boundary conditions for systems of PDEs, the reader is referred to %TODO insert suitable reference. 
 
