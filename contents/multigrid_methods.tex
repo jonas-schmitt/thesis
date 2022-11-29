@@ -2,18 +2,18 @@
 %Multigrid methods aim to accelerate the convergence of iterative methods by eliminating certain error components more efficiently on a coarser resolution of the same problem.
 While basic iterative methods, such as Jacobi and Gauss-Seidel, are applicable to many PDE-based problems, in practice, their speed of convergence is often insufficient, which means that a large number of iterations is required until an acceptable approximation accuracy can be attained. 
 The main reason for this behavior is that these methods are only efficient in the reduction of certain error components, while others remain mostly unaffected~\cite{briggs2000multigrid}.
-This can be best understood by investigating the effect of applying these methods to oscillatory errors of different frequency.
+This can be best understood by investigating their effect on oscillatory errors with different frequencies.
 For this purpose, we consider the one-dimensional Laplace equation
 \begin{equation}
 		\begin{split}
-			- \dv[2]{x} u(x) & = 0 \quad \forall x \in (0, 1) \\
-			u(0) = u(1) & = 0,
+			- \Delta u(x) & = 0 \quad \forall x \in (0, 1) \\
+			u(0) & = u(1) = 0,
 		\end{split}
 		\label{eq:1D-laplace-model}
 \end{equation}
 which is discretized using the three-point stencil
 \begin{equation}
-	\Delta_h = \frac{1}{h^2}\begin{bmatrix}
+	- \Delta_h = \frac{1}{h^2}\begin{bmatrix}
 		-1 & 2 & -1
 	\end{bmatrix}.
 		\label{eq:1D-laplace-stencil}
@@ -42,19 +42,17 @@ Figure~\ref{fig:different-error-components} shows the impact of applying the Jac
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_4pi.pdf}
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_16pi.pdf}
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_32pi.pdf}
-	\caption{Error after applying Gauss-Seidel}
+	\caption{Error after applying GS}
 	\end{subfigure}
-	\caption{Different error components on a grid with step size $h = 2^{-9}$ before and after applying either 100 steps of the Jacobi or Gauss-Seidel method.}
+	\caption{Different error components on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 	\label{fig:different-error-components}
 \end{figure}
 Here, the first column shows the initial error discretized on a grid with step size $h = 2^{-9}$ while the second and third include the remaining error after applying 100 Jacobi and Gauss-Seidel steps, respectively.
 Note that the frequency of change increases from top to bottom, whereas the amplitude of the error is always the same.
-As it can be seen in the second and third column of the first row of Figure~\ref{fig:different-error-components}, the Jacobi and Gauss-Seidel methods do not yield a significant reduction of the low-frequency error components within 100 iterations.
+As can be seen in the second and third column of the first row of Figure~\ref{fig:different-error-components}, the Jacobi and Gauss-Seidel methods do not yield a significant reduction of the low-frequency error components within 100 iterations.
 In contrast, in the third row, which shows a highly-oscillating component, the application of 100 steps of the Jacobi method already reduces the initial error to less than one-fifth of its original value.
 The same behavior can also be observed for the Gauss-Seidel method, whereby, compared to the Jacobi method, high-frequency error components are reduced even faster.
-We can further illustrate the error reduction properties of basic iterative methods by investigating Figure~\ref{fig:combined-error}, which contains a combination of two error components with equal magnitude, one of them with low the other one with high frequency.
-Again, the first plot shows the initial error while the second and third contains the reduced error after 100 iterations of Jacobi and Gauss-Seidel, respectively.
-In accordance with our previous observations, the attained improvement achieved with both methods can be almost fully attributed to the reduction of the highly-oscillating component.
+We can further illustrate the error reduction properties of basic iterative methods by investigating Figure~\ref{fig:combined-error}, which contains a combination of two error components with equal magnitude, one of them with low and the other one with high frequency.
 \begin{figure}
 	\begin{subfigure}[t]{0.32\textwidth}
 	\centering
@@ -70,82 +68,83 @@ In accordance with our previous observations, the attained improvement achieved 
 \begin{subfigure}[t]{0.32\textwidth}
 	\centering
 	\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_combined.pdf}
-	\caption{Error after applying Gauss-Seidel}
+	\caption{Error after applying GS}
 \end{subfigure}
-	\caption{Combination of two error components discretized on a grid with step size $h = 2^{-9}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
+	\caption{Combination of two error components discretized on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 \label{fig:combined-error}
 \end{figure}
-Because the remaining error is more smooth than initially, basic iterative methods are often denoted as \emph{smoothers} and their effectiveness is measured in terms of their capability to reduce the high-frequency components of a given error. 
+Again, the first plot shows the initial error, while the second and third contain the reduced error after 100 iterations of Jacobi and Gauss-Seidel, respectively.
+In accordance with our previous observations, the attained improvement achieved with both methods can be almost fully attributed to the reduction of the highly-oscillating component.
+Because the remaining error is more smooth than initially, basic iterative methods are often called \emph{smoothers}, and their effectiveness is measured in terms of their capability to reduce the high-frequency components of a given error. 
 
 Now observe what happens if we represent the same low-frequency error component shown in the first row of Figure~\ref{fig:different-error-components} on a grid with larger step size $h = 2^{-6}$ and, thus, a smaller number of grid points.
 Because the number of (inner) grid points $n = 1/h - 1$ is inversely proportional to the step size, we call such a grid \emph{coarser}.
-The resulting error reduction, again after 100 iterations of each of both iterative methods, is shown in Figure~\ref{fig:low-frequency-error-component-coarse}. 
+The resulting error reduction, again after 100 iterations of each method, is shown in Figure~\ref{fig:low-frequency-error-component-coarse}. 
 \begin{figure}
-	\begin{subfigure}[b]{0.32\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 	\centering
 	\includegraphics[width=\textwidth]{figures/error_plots//initial_error_jacobi_4pi_coarse.pdf}
 	\caption{Initial error}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.32\textwidth}
+\begin{subfigure}[t]{0.32\textwidth}
 	\centering
 	\includegraphics[width=\textwidth]{figures/error_plots//final_error_jacobi_4pi_coarse.pdf}
 	\caption{Error after applying Jacobi}
 \end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.32\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_4pi_coarse.pdf}
-		\caption{Error after applying Gauss-Seidel}
+		\caption{Error after applying GS}
 	\end{subfigure}
-	\caption{Low-frequency error component discretized on a coarse grid with step size $h = 2^{-6}$ before and after applying 100 steps of either the Jacobi or Gauss-Seidel method.}
+	\caption{Low-frequency error component discretized on a coarser one-dimensional grid with step size $h = 2^{-6}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 	\label{fig:low-frequency-error-component-coarse}
 \end{figure}
 As it can be seen, the amount of low-frequency error reduction is significantly higher for both methods than on the \emph{finer} grid with a step size of $h = 2^{-9}$.
 While smoothers, such as Jacobi and Gauss-Seidel, are only effective in reducing the high-frequency components of a given error, we can overcome this limitation by representing the remaining error on a coarser grid.
-Since on this level the remaining low-frequency components become more oscillatory, smoothing regains its effectiveness. 
-\emph{Multigrid} methods are built around this idea by automating the process of recursively obtaining a coarser representation of the same problem, which can then be effectively reduced by employing only a few \emph{smoothing} iterations.
-These methods operate on a so-called hierarchy of grids, where on each subsequent discretization level certain error components are reduced.
-This correction is then used to extinguish the remaining error on the next-finer level.
-In the following, we first introduce the basic components of a multigrid method, i.e. the smoothing, restriction, prolongation and coarse-grid correction operations.
+Since, on this level, the remaining low-frequency components become more oscillatory, smoothing regains its effectiveness. 
+\emph{Multigrid} methods extend this idea by recursively obtaining a coarser representation of the same problem, whose error can then be effectively reduced by employing only a few \emph{smoothing} iterations.
+The result is then used to extinguish the remaining error on the next-higher level.
+In the following, we introduce the basic components of multigrid methods, i.e., the smoothing, restriction, prolongation, and coarse-grid correction operations.
 %Based on this definition, we then develop a formal language for the representation of multigrid solvers.
 \subsection{Smoothing}
 \label{subsec:smoothing}
-One of the central elements of multigrid methods is the utilization of a smoothing procedure that is able to quickly reduce the oscillatory components of a given error.
+One of the central elements of multigrid methods is the utilization of a smoothing procedure for quickly reducing the oscillatory components of a given error.
 We have already shown that the Jacobi and Gauss-Seidel method behave in such a way for the considered one-dimensional model problem.
-To further improve the smoothing effectiveness of an iterative methods, it is often beneficial to introduce an additional relaxation factor $\omega$ which yields the iteration 
+To further improve the smoothing effectiveness of an iterative method, it is often beneficial to introduce an additional relaxation factor $\omega$, which yields the iteration 
 \begin{equation}
-	\bm{x}^{(i+1)} = \bm{x}^{(i)} + \omega M^{-1}(\bm b - A \bm{x}^{(i)}).
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + \omega M^{-1}(\bm b - A \bm{x}^{(k)}).
 	\label{eq:general-weighted-stationary-iterative-method}
 \end{equation}
-Again, the weighted Jacobi or Gauss-Seidel method is obtained by replacing the matrix $M$ by the respective term.
+Again, the weighted Jacobi or Gauss-Seidel method is obtained by replacing the matrix $M$ with the respective term.
 \subsubsection{Red-Black Gauss-Seidel}
 \label{sec:rb-gs}
-While the Gauss-Seidel method often exhibits superior smoothing properties compared to the Jacobi method~\cite{briggs2000multigrid,trottenberg2000multigrid}, each iteration requires solving a lower triangular system of the form
+While the Gauss-Seidel method often exhibits a superior smoothing property compared to the Jacobi method~\cite{briggs2000multigrid,trottenberg2000multigrid}, each iteration requires solving a lower triangular system of the form
 \begin{equation*}
 	(D - L) (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)},
 \end{equation*}
 with $D - L$ as the lower triangular part of the system matrix $A$.
 Since $U = A - (D - L)$, we can rewrite this equation to obtain
-\begin{equation*}
+\begin{equation}
 	(D - L) \bm{x}^{(k+1)} = \bm{b} - U \bm{x}^{(k)},
-\end{equation*}  
-which can then be solved using forward substitution by applying
+\end{equation}  
+which can then be solved using forward substitution by computing
 \begin{equation}
 	x_{i}^{(k+1)}={\frac {1}{a_{ii}}}\left(b_{i}-\sum _{j=1}^{i-1}a_{ij}x_{j}^{(k+1)}-\sum _{j=i+1}^{n}a_{ij}x_{j}^{(k)}\right),
 	\label{eq:gauss-seidel-element-wise}
 \end{equation}
 where $x_{i}^{(k)}$ represents the $i$th element of the vector $\bm{x}^{(k)}$.
 However, because $x_{i+1}^{(k)}$ depends on $x_{i}^{(k)}$ this computation can only be performed sequentially, which means that the individual components of $\bm{x}^{(k+1)}$ must be computed one after another. 
-Modern compute architectures exhibit an ever-increasing degree of parallelism, and, hence, we must be able to perform all computations in parallel to fully utilize their capabilities.
+Modern compute architectures exhibit an ever-increasing degree of parallelism, and hence we must be able to perform all computations in parallel to fully utilize their capabilities.
 Now consider the Jacobi method as defined by 
 \begin{equation*}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + D^{-1}(\bm b - A \bm{x}^{(k)}).
 \end{equation*}
 Similar to the Gauss-Seidel method, we can rewrite this equation to obtain
-\begin{equation*}
+\begin{equation}
 	\bm{x}^{(k+1)} = D^{-1}(\bm b - (A - D)\bm{x}^{(k)}),
-\end{equation*}
+\end{equation}
 which yields the following element-wise formulation of the Jacobi method:
 \begin{equation}
 x_{i}^{(k+1)}={\frac {1}{a_{ii}}}\left(b_{i}-\sum _{j\neq i}a_{ij}x_{j}^{(k)}\right).
@@ -156,40 +155,45 @@ Consequently, the computation of each individual element of the new approximate 
 
 One possibility to enable a parallel Gauss-Seidel-like computation of the approximate solution $\bm{x}^{(k+1)}$ is to partition the grid points into multiple subsets.
 The computation of each subset is then performed in a Jacobi-like fashion using the updated values from other subsets.
-A common variant of this approach is the red-black Gauss-Seidel method.
+A common variant of this approach is the \emph{red-black Gauss-Seidel} (RB-GS) method.
 Here, the grid points are assigned to two distinct subsets, where the first represents the red and the second one the black points.
-We can define the red-black Gauss-Seidel method in the following way:
+We can define the RB-GS method in the following way:
 \begin{equation}
 	\begin{split}
-		& \bm{x}^{(k+1/2)} = \bm{x}^{(k)} + P_r D^{-1} (\bm{b} - A \bm{x}^{k}) \\
-		& \bm{x}^{(k+1)} = \bm{x}^{(k+1/2)} + P_b D^{-1} (\bm{b} - A \bm{x}^{k+1/2})
+		& \bm{x}^{(k+1/2)} = \bm{x}^{(k)} + P_r D^{-1} (\bm{b} - A \bm{x}^{(k)}) \\
+		& \bm{x}^{(k+1)} = \bm{x}^{(k+1/2)} + P_b D^{-1} (\bm{b} - A \bm{x}^{(k+1/2)})
 	\end{split}
 \end{equation}
 The entries of the matrices $P_R$ and $P_B$ are then defined as
-\begin{equation*}
+\begin{equation}
 	P_{R,ij} = \begin{cases}
 	1 & \text{if} \; i = j \; \text{and} \; i,j \in R \\
 	0 & \text{otherwise},  
 	\end{cases}
-\end{equation*}
-\begin{equation*}
+\end{equation}
+\begin{equation}
 	P_{B,ij} = \begin{cases}
 		1 & \text{if} \; i = j \; \text{and} \; i,j \in B \\
 		0 & \text{otherwise},
 	\end{cases}
-\end{equation*}
+\end{equation}
 where $R$ and $B$ are the sets of grid indices that correspond to the red and black points, respectively.
-If we, for instance, apply the red-black Gauss-Seidel method to the three-point stencil defined in Equation~\eqref{eq:1D-laplace-stencil}, we obtain
-\begin{equation*}
-	x_{i}^{(k+1)}=\frac {1}{2}\left(b_{i} + x_{i-1}^{(k+1)} + x_{i+1}^{(k)}\right).
-\end{equation*}
-Note that the update of each individual grid point is now exclusively based on its neighbors, whereas the left neighbor $x_{i-1}^{(k+1)}$ has already been updated in the previous step of the method.
-One way to achieve a similar behavior on any $d$-dimensional grid is to assign neighboring points to different partitions, for instance, by defining $R$ and $B$ in the following way:
+For instance, an RB-GS method for the three-point stencil defined in Equation~\eqref{eq:1D-laplace-stencil} can be formulated as
+\begin{equation}
+\begin{split}
+   	& x_{2i}^{(k+1/2)} = \frac {1}{2}\left(h^2 b_{2i} + x_{2i+1}^{(k)} + x_{2i-1}^{(k)}\right) \\
+    & x_{2i+1}^{(k+1)} = \frac {1}{2}\left(h^2 b_{2i+1} + x_{2i+2}^{(k+1/2)} + x_{2i}^{(k+1/2)}\right),
+\end{split}
+\end{equation}
+where each grid point with an even index belongs to the red and each one with an odd index to the black points.
+Note that the update of each grid point is exclusively based on its neighbors, which have already been updated in the previous step of the method.
+By always assigning neighboring points to different partitions, a similar effect can be achieved on any $d$-dimensional grid. 
+For instance, a suitable partitioning for the discretized Laplace operator $\Delta_h$ is given by
 \begin{equation}
 		R = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{even} \}, \;
 		B = \{ \bm{i} : \bm{i} \in \mathbb{N}^d, \sum_{k=1}^d i_k \; \text{odd} \}.
 \end{equation}
-In many cases, the resulting method has better smoothing properties than the Jacobi method without sacrificing much of its parallelism, since the computations on each partition can be performed in parallel~\cite{trottenberg2000multigrid}.
+In many cases, the resulting method has better smoothing properties than the Jacobi method without sacrificing much of its parallelism, as the computations on each partition can be performed concurrently~\cite{trottenberg2000multigrid}.
 \subsubsection{Block Smoothing}
 \label{subsec:block-smoothing}
 So far, we have only discussed smoothers that operate in a pointwise manner.

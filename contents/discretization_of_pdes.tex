@@ -173,7 +173,7 @@ We can also extend this notation to three dimensions by representing all compone
 \begin{equation}
 	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
-		\cdots & S_{h_x, h_y}^{(k-1)} & S_{h_x, h_y}^{(k)} & S_{h_x, h_y}^{(k+1)} & \cdots 
+		\cdots & S^{(k-1)} & S^{(k)} & S^{(k+1)} & \cdots 
 	\end{bmatrix}.
 \label{eq:3D-stencil-matrix-notation}
 \end{equation}
@@ -203,13 +203,13 @@ For $d = 3$, we can define the application of a three-dimensional stencil $S_{h_
 As an example, we consider the following five-point stencil defined on a two-dimensional regular grid with uniform step size $h_x = h_y = h$:
 \begin{equation}
 	\begin{split}
-		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
+		-\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
 	\end{split}
 	\label{eq:five-point-stencil}
 \end{equation}
-Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields 
+Applying $-\Delta_{h,h}$ to a given point $u_{i,j}$ yields 
 \begin{equation}
-	\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i+0,j+0}  - u_{i-1,j+0} - u_{i+1,j+0} - u_{i+0,j-1} - u_{i+0,j-1}\right),
+	-\Delta_{h,h} \cdot u_{i,j} = \frac{1}{h^2} \left(4 u_{i,j}  - u_{i-1,j} - u_{i+1,j} - u_{i,j-1} - u_{i,j-1}\right),
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
 From this example, we can conclude that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can always be considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order.
