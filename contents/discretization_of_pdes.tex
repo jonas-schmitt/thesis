@@ -124,7 +124,7 @@ In the previous section, we have already introduced the notion of a regular grid
 \begin{equation}
 	G_{h} = \left\{ \bm{x} : \bm{x} = \bm{i} \circ \bm{h}, \bm{i} \in \mathbb{N}^d \right\},
 \end{equation}
-where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\bm{i} \circ \bm{h}$ represents the Hadamard (or element-wise) product between two vectors \bm{i} and \bm{h}.\footnote{Even though when used as a subscript, the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
+where $d \in \mathbb{N}$ is the dimensionality of the problem, and $\bm{i} \circ \bm{h}$ represents the Hadamard (or element-wise) product between two vectors $\bm{i}$ and $\bm{h}$.\footnote{Even though when used as a subscript, the step size $h$ might represent a vector, we avoid the use of bold letters for better readability in all subsequent equations.}
 A grid function or variable $u_h$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
@@ -140,22 +140,24 @@ As in the previous section, one often makes use of the simplified notation
 		& u_{i,j,k} = u_{h_x, h_y, h_z}(i h_x, j h_y, k h_z).
 	\end{split}
 \end{equation}
-We then define the general stencil $S_h$ as a finite set of $m$ tuples of the following form:
+We then define the general stencil $S$ as a finite set of $m$ tuples of the following form:
 
 \begin{equation}
 	\begin{split}
-			& S_h = \{(\bm{a}_k, b_k) \}_{h,k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots, (\bm{a}_m, b_m)\}_h, m \in \mathbb{N}
+			& S = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots, (\bm{a}_m, b_m)\}, m \in \mathbb{N}
 	\\ & \forall \, i, j, k \in \{1, 2, \dots, m \}: \,
 	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{if} \; i \neq j, \; b_k \in \mathbb{C}.
 	\end{split}
 \label{eq:stencil-definition}
 \end{equation}
 Here, the left entry $\bm{a}_k$ of each tuple $(\bm{a}_k, b_k)$ denotes the \emph{offset} from the index of the current grid point and the left entry $b_k$ the respective \emph{weight} or \emph{value}.
+From a mathematical point of view, stencils are indistinguishable from regular sets, and thus their special properties are simply derived from the way they are constructed.
+Furthermore, note that a specific stencil instance is independent of the step size $\bm{h}$, and the interpretation of each individual offset $\bm{a}_k$ depends on the grid function to which the stencil is applied.
 For one and two-dimensional problems, it is often more convenient to use the alternative notations 
 \begin{equation}
 	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
-	\end{bmatrix}_{h_x}
+	\end{bmatrix}
 \end{equation}
 and
 \begin{equation}
@@ -165,22 +167,22 @@ and
 		\cdots & s_{0,-1} & s_{0,0} & s_{0,1} & \cdots \\
 		\cdots & s_{-1,-1} & s_{-1,0} & s_{-1,1} & \cdots \\
 		& \vdots & \vdots & \vdots &
-	\end{bmatrix}_{h_x, h_y}.
+	\end{bmatrix}.
 \end{equation}
 We can also extend this notation to three dimensions by representing all components with the same offset as a separate two-dimensional stencil, such that
 \begin{equation}
 	S_{h_x, h_y, h_z} = 
 	\begin{bmatrix}
 		\cdots & S_{h_x, h_y}^{(k-1)} & S_{h_x, h_y}^{(k)} & S_{h_x, h_y}^{(k+1)} & \cdots 
-	\end{bmatrix}_{h_x, h_y, h_z}.
+	\end{bmatrix}.
 \label{eq:3D-stencil-matrix-notation}
 \end{equation}
 
-Furthermore, we define the application of a stencil $S_h$ to a grid function $u_h(\bm x)$ with $\bm x \in G_h$:
+Furthermore, we define the application of a stencil $S$ to a grid function $u_h(\bm x)$ with $\bm x \in G_h$:
 \begin{equation}
 	\begin{split}
-		& S_h \cdot u_h(\bm{x}) = \sum_{k=1}^m b_k u_h({\bm x + \bm{a}_k} \circ \bm{h}) \quad 
-		\text{with} \; \bm{x} \in G_h, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in S_h \; \forall \, k \in \{ 1, 2, \dots, m \}
+		& S \cdot u_h(\bm{x}) = \sum_{k=1}^m b_k u_h({\bm x + \bm{a}_k} \circ \bm{h}) \quad 
+		\text{with} \; \bm{x} \in G_h, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in S \; \forall \, k \in \{ 1, 2, \dots, m \}
 	\end{split}
 \label{eq:stencil-application}
 \end{equation}
@@ -189,19 +191,19 @@ For $d = 3$, we can define the application of a three-dimensional stencil $S_{h_
 	\begin{split}
 	& S_{h_x, h_y, h_z} \cdot u_{i,j,k} = 	
 	\begin{bmatrix}
-	\cdots & S_{h}^{(k-1)} & S_{h}^{(k)} & S_{h}^{(k+1)} & \cdots 
-	\end{bmatrix}_{h_x, h_y, h_z} \cdot
+	\cdots & S^{(k-1)} & S^{(k)} & S^{(k+1)} & \cdots 
+	\end{bmatrix} \cdot
 	\begin{bmatrix}
 	\vdots \\ u_{i,j,k-1} \\ u_{i,j,k} \\ u_{i,j,k+1} \\ \vdots 
 	\end{bmatrix} \\
-	& = \cdots \, + S_{h}^{(k-1)} \cdot u_{i,j,k-1} + S_{h}^{(k)} \cdot u_{i,j,k} + S_{h}^{(k+1)} \cdot u_{i,j,k+1} + \, \cdots
+	& = \cdots \, + S^{(k-1)} \cdot u_{i,j,k-1} + S^{(k)} \cdot u_{i,j,k} + S^{(k+1)} \cdot u_{i,j,k+1} + \, \cdots
 	\end{split}
 \end{equation}
 
 As an example, we consider the following five-point stencil defined on a two-dimensional regular grid with uniform step size $h_x = h_y = h$:
 \begin{equation}
 	\begin{split}
-		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}_{h,h}.
+		\Delta_{h,h} = & \bigg\{ \left( \left( 0,0 \right), \frac{4}{h^2}\right), \left(\left(1,0\right), \frac{-1}{h^2}\right), \left(\left(-1,0\right), \frac{-1}{h^2}\right), \\ & \left(\left(0,1\right), \frac{-1}{h^2}\right), \left(\left(0,-1\right), \frac{-1}{h^2}\right) \bigg\}
 	\end{split}
 	\label{eq:five-point-stencil}
 \end{equation}
@@ -211,56 +213,56 @@ Applying $\Delta_{h,h}$ to a given point $u_{i,j}$ yields
 \end{equation}
 which corresponds precisely to the left part of Equation~\eqref{eq:2D-poisson-model-discrete}.
 From this example, we can conclude that applying a given stencil to a grid function $u_h(\bm{x})$ defined on a regular grid can always be considered as a sparse matrix-vector product, where the matrix is obtained by sorting the grid points according to a well-defined order.
-We have already illustrated this conclusion in the form of Equation~\eqref{eq:2D-poisson-assembled-matrix}.
+We have already illustrated this fact using the example of Equation~\eqref{eq:2D-poisson-assembled-matrix}.
 Therefore, in case it is possible to define each computational step for solving a given discretized PDE on a regular grid by means of a stencil application, we only need to obtain the respective stencil entries instead of assembling or even storing a complete matrix.
 Furthermore, many operators defined for matrices can similarly be formulated as a stencil operation.
 As a first elementary operation, we define the multiplication of a stencil with a scalar, which is simply achieved by multiplying the weight of each entry with the respective value:
 % Scalar multiplication
 \begin{equation}
-	\alpha S_h = \{(\bm{a}_k, \alpha b_k) \}_{k=1, h}^m, m \in \mathbb{N}
+	\alpha S = \{(\bm{a}_k, \alpha b_k) \}_{k=1}^m, m \in \mathbb{N}
 \end{equation}
 
-Next, we can formulate certain binary operations such as the addition, subtraction, and multiplication of two stencils $A_h$ and $B_h$ with equal step size $\bm{h}$.
+Next, we can formulate certain binary operations such as the addition, subtraction, and multiplication of two stencils $A$ and $B$.
 Equation~\eqref{eq:stencil-addsub} shows a recursive definition of stencil addition and subtraction.
 % Stencil addition and subtraction
 \begin{equation}
-	A_h \pm B_h = 
+	A \pm B = 
 	\begin{cases}
-		\{(\bm{a}, b\pm c ) \} \cup (\tilde{A}_h \pm \tilde{B}_h) & \text{if} \; A_h = 	\{(\bm{a}, b ) \} \cup \tilde{A}_h \\
-		& \text{and} \; B_h = \{(\bm{a}, c ) \} \cup \tilde{B}_h \\
+		\{(\bm{a}, b\pm c ) \} \cup (\tilde{A} \pm \tilde{B}) & \text{if} \; A = 	\{(\bm{a}, b ) \} \cup \tilde{A} \\
+		& \text{and} \; B = \{(\bm{a}, c ) \} \cup \tilde{B} \\
 		
-		\{(\bm{a}, b ) \} \cup (\tilde{A}_h \pm B_h) & \text{if} \; A_h = 	\{(\bm{a}, b ) \} \cup \tilde{A}_h \\
-		& \text{and} \; \nexists  c \in \mathbb{C} : \{(\bm{a}, c ) \} \in B_h 
+		\{(\bm{a}, b ) \} \cup (\tilde{A} \pm B) & \text{if} \; A = 	\{(\bm{a}, b ) \} \cup \tilde{A} \\
+		& \text{and} \; \nexists  c \in \mathbb{C} : \{(\bm{a}, c ) \} \in B 
 		\\
 % TODO case probably unnecessary
-%		\{(\bm{a}, c ) \} \cup (A_h \pm \tilde{B}_h) & \text{if} \; B_h = 	\{(\bm{a}, c ) \} \cup \tilde{B}_h \wedge
-%		\{(\bm{a}, b ) \} \notin A_h \; \forall b \in \mathbb{C}
+%		\{(\bm{a}, c ) \} \cup (A \pm \tilde{B}) & \text{if} \; B = 	\{(\bm{a}, c ) \} \cup \tilde{B} \wedge
+%		\{(\bm{a}, b ) \} \notin A \; \forall b \in \mathbb{C}
 %		\\
-		A_h & \text{if} \; B_h = \emptyset
+		A & \text{if} \; B = \emptyset
 		\\
-		B_h & \text{else} 
+		B & \text{else} 
 		\\
 	\end{cases}
 \label{eq:stencil-addsub}
 \end{equation}
-Here, we simply add the weights of each entry with the same offset contained in both $A_h$ and $B_h$.
+Here, we simply add the weights of each entry with the same offset contained in both $A$ and $B$.
 In case an offset is not contained in both stencils, the respective tuple is included unmodified.  
-Based on Equation~\eqref{eq:stencil-addsub}, we can then provide a definition for the multiplication of two stencils $A_h$, and $B_h$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
+Based on Equation~\eqref{eq:stencil-addsub}, we can then provide a definition for the multiplication of two stencils $A$, and $B$, which can be seen as a recursive version of the iterative computation scheme described in~\cite{rittich2018extending}:
 % Stencil multiplication
 \begin{equation}
-	A_h \cdot B_h = 
+	A \cdot B = 
 	\begin{cases}
-		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} \; + & \text{if} \; A_h = \{(\bm{a}, b ) \} \cup \tilde{A}_h \\
-		\{(\bm{a}, b ) \} \cdot \tilde{B}_h + \tilde{A}_h \cdot B_h & 
-		\text{and} \; B_h = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B}_h \\ & \\
-		\emptyset & \text{if} \; A_h = \emptyset \vee B_h = \emptyset.
+		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} \; + & \text{if} \; A = \{(\bm{a}, b ) \} \cup \tilde{A} \\
+		\{(\bm{a}, b ) \} \cdot \tilde{B} + \tilde{A} \cdot B & 
+		\text{and} \; B = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B} \\ & \\
+		\emptyset & \text{if} \; A = \emptyset \vee B = \emptyset.
 	\end{cases}
 \label{eq:stencil-mult}
 \end{equation}
-To compute the stencil product $A_h \cdot B_h$, for each pair of entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
-We then define this computation recursively by first picking two entries $\{(\bm{a}, b ) \} \in A_h$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B_h$ and combining them as described above.
-Next, we multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A_h$ with the remainder stencil $\tilde{B}_h = B_h \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B_h$.
-Finally, the process is continued recursively by computing the product of the remainder $\tilde{A}_h = A_h \setminus \{(\bm{a}, b ) \}$ with the original stencil $B_h$.
+To compute the stencil product $A \cdot B$, for each pair of entries $\{(\bm{a}, b ) \} \in A$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B$ the tuple $\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \}$ needs to be formed.
+We then define this computation recursively by first picking two entries $\{(\bm{a}, b ) \} \in A$ and $\{(\bm{\hat{a}}, \hat{b} ) \} \in B$ and combining them as described above.
+Next, we multiply the entry $\{(\bm{a}, b ) \}$ chosen from $A$ with the remainder stencil $\tilde{B} = B \setminus \{(\bm{\hat{a}}, \hat{b} ) \}$, which means that we now obtain the combination of this entry with all remaining ones from $B$.
+Finally, the process is continued recursively by computing the product of the remainder $\tilde{A} = A \setminus \{(\bm{a}, b ) \}$ with the original stencil $B$.
 Since it is possible that the combination of different pairs of stencil offsets leads to the same result, we, additionally, need to accumulate the corresponding weights and combine them in a single tuple.
 To sum up all tuples with matching offsets obtained within subcomputations, we employ stencil addition, as defined in Equation~\eqref{eq:stencil-addsub}.
 \subsection{Systems of Partial Differential Equations}
