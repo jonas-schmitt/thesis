@@ -155,7 +155,7 @@ Consequently, the computation of each individual element of the new approximate 
 
 One possibility to enable a parallel Gauss-Seidel-like computation of the approximate solution $\bm{x}^{(k+1)}$ is to partition the grid points into multiple subsets.
 The computation of each subset is then performed in a Jacobi-like fashion using the updated values from other subsets.
-A common variant of this approach is the \emph{red-black Gauss-Seidel} (RB-GS) method.
+A common variant of this approach is the \emph{red-black} Gauss-Seidel (RB-GS) method.
 Here, the grid points are assigned to two distinct subsets, where the first represents the red and the second one the black points.
 We can define the RB-GS method in the following way:
 \begin{equation}
@@ -168,7 +168,7 @@ The entries of the matrices $P_R$ and $P_B$ are then defined as
 \begin{equation}
 	P_{R,ij} = \begin{cases}
 	1 & \text{if} \; i = j \; \text{and} \; i,j \in R \\
-	0 & \text{otherwise},  
+	0 & \text{otherwise} 
 	\end{cases}
 \end{equation}
 \begin{equation}
@@ -218,7 +218,7 @@ For example, we can rearrange our original system, as given by Equation~\eqref{e
 where $m = n / n_b$, if $n_b$ is the size of each block.
 A block Jacobi method can then be defined as
 \begin{equation}
-	\bm{x}_{i}^{(k+1)}=A_{ii}^{-1}\left(\bm{b}_{i}-\sum _{j\neq i}A_{ij}\bm{x}_{j}^{(k)}\right),
+	\bm{x}_{i}^{(k+1)}=A_{ii}^{-1}\left(\bm{b}_{i}-\sum _{j\neq i}A_{ij}\bm{x}_{j}^{(k)}\right).
 	\label{eq:jacobi-block-wise}
 \end{equation}
 For instance, choosing a block size of two for the one-dimensional Laplace equation yields
@@ -272,37 +272,37 @@ In both cases, we obtain a system of two linear equations
 	\end{pmatrix}.
 \end{equation}
 which must be solved for each block, for instance, using a direct solver such as Gaussian elimination.
-As in the pointwise Jacobi method, each block can be solved independently and, therefore, operations on different blocks can be performed in parallel. 
-Considering the fact that a direct solver in general requires $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \cdot n / n_b) = \mathcal{O}(n_b^2 n)$.
+As in the pointwise Jacobi method, each block can be solved independently, and hence operations on different blocks can be performed in parallel. 
+Considering the fact that a direct solver, in general, requires $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \cdot n / n_b) = \mathcal{O}(n_b^2 n)$.
 Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and, hence, solve the original system using Gaussian elimination.
 In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which can be computed with a constant number of operations per grid point.
 While we here only provide a brief introduction to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
 Finally, it is also possible to define overlapping block smoothers, which means that multiple blocks contain the same grid point as an unknown~\cite{trottenberg2000multigrid}.
 \pagebreak
 \subsection{The Coarse-Grid Correction Scheme}
-The core idea behind multigrid methods is to reduce the oscillatory components of an error by obtaining an approximation of the same problem on a coarser grid.
-As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using the same smoothing techniques employed on the fine grid.
-Before we can define this approach algorithmically, note that our original system
+The core idea behind multigrid methods is to reduce the oscillatory components of an error by computing an approximation of the same problem on a coarser grid.
+As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse}, these components can then be efficiently reduced using the same smoothing techniques already employed on the fine grid.
+Before we can define this approach algorithmically, note that the system of linear equations
 \begin{equation}
 	A_h \bm{x}_h = \bm{b}_h
 \end{equation}
-is equivalent to the error equation
+can be reformulated as
 \begin{equation}
-	A_h \left(\bm{x}_h - \bm {x}^{(0)}_h\right) = \bm{b}_h - A_h \bm{x}^{(0)}_h
+	A_h \left(\bm{x}_h - \bm {x}^{(0)}_h\right) = \bm{b}_h - A_h \bm{x}^{(0)}_h,
 \end{equation}
-with the arbitrary-chosen initial guess $\bm{x}^{(0)}_h$.
-The subscripts $A_h$ and $\bm{x}_h$ indicate a discretization with step size $\bm{h}$.
-Therefore, each entry of the vector $\bm{x}_h$ represents a grid function value $u_h(\bm{i} \cdot \bm{h})$ at the respective position within the grid.
-We can further introduce the error $\bm{e}_h = \bm{x}_h - \bm {x}^{(0)}_h$ to obtain the equation
+with an arbitrary-chosen initial guess $\bm{x}^{(0)}_h$.
+Here, the subscript in $A_h$ and $\bm{x}_h$ indicates a discretization with step size $\bm{h}$.
+Therefore, each entry of the vector $\bm{x}_h$ represents a grid function value $u_h(\bm{i} \circ \bm{h})$ at the respective position.
+Furthermore, introducing the error $\bm{e}_h = \bm{x}_h - \bm {x}^{(0)}_h$, yields the equation
 \begin{equation}
-	A \bm{e} = \bm{b} - A \bm{x}^{(0)}.
+	A_h \bm{e}_h = \bm{b}_h - A_h \bm{x}^{(0)}_h.
 	\label{eq:linear-system-error-equation}
 \end{equation}
-Based on the solution $\bm{e}_h$ of this system, which depends on the initial solution $\bm{x}^{(0)}_h$, we can, again, obtain the solution of the original system by computing
+Based on the solution $\bm{e}_h$ of this system, which depends on $\bm{x}^{(0)}_h$, we obtain the solution of the original system by computing
 \begin{equation}
 	\bm{x}_h = \bm{x}^{(0)}_h + \bm{e}_h.
 \end{equation}
-Now, assume there exists both a prolongation and restriction operator, $I_h^{2h}$ and $I_{2h}^h$, that enables us to compute an approximation for a given variable $\bm{x}_h$ on a coarser and finer grid, respectively, such that
+Now, assume there exist two inter-grid operators, $I_h^{2h}$ and $I_{2h}^h$, that enable us to compute the approximation of a given vector $\bm{x}_h$ on a coarser and finer grid, respectively, such that
 \begin{equation}
 	\bm{x}_{2h} \approx I_h^{2h} \bm{x}_{h}, \;
 	\bm{x}_{h} \approx I_{2h}^{h} \bm{x}_{2h}. 
@@ -311,7 +311,7 @@ In general, this approximation can obviously never be exact.
 However, we have already observed that if a certain error exclusively consists of smooth components, we can approximate them on a coarser grid without a significant loss of accuracy.
 This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, which shows the discretization of two error components with different frequencies on one-dimensional uniform grids with decreasing step size.
 Here, the first error component, which possesses a higher frequency, can not be accurately represented on the coarsest grid with step size $h = 2^{-5}$.
-In contrast, the course of the second error component, which is relatively smooth, is still clearly visible on the same grid. 
+In contrast, the slope of the second error component, which is relatively smooth, is still clearly visible on this grid. 
 \begin{figure}
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
@@ -347,35 +347,35 @@ In contrast, the course of the second error component, which is relatively smoot
 	\caption{Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size.}
 	\label{fig:error-on-multiple-levels}
 \end{figure}
-Assuming that the error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and, hence, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define the coarse grid correction 
+Assuming that an error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and, thus, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define a coarse-grid correction 
 \begin{equation}
 	\bm{x}^{k+1}_h = \bm{x}^{k}_h + I_{2h}^h \bm{e}_{2h}.
 \end{equation} 
 Now the question remains to be answered how we can compute an approximation for the error $\bm{e}_{2h}$ on the coarse grid.
 As we have pointed out above, Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
-We can, therefore, can apply our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2\bm{h}$
+We can, therefore, make use of our previously defined inter-grid transfer operators to define the error equation on a coarser grid with step size $2\bm{h}$
 \begin{equation}
 	\underbrace{I_{h}^{2h} A_h I_{2h}^h}_{A_{2h}} \bm{e}_{2h} = I_{h}^{2h} \left(\bm{b}_h - A_h \bm{x}^{(0)}_h\right).
 	\label{eq:coarse-grid-error-equation}
 \end{equation}
 Note that we have again made use of the fact that in case $\bm{e}_{2h}$ is smooth, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$ is a reasonably accurate approximation.
-Note that in Equation~\eqref{eq:coarse-grid-error-equation} the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$, which is called \emph{Galerkin coarsening}.
+Note that in Equation~\eqref{eq:coarse-grid-error-equation}, the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$, which is called \emph{Galerkin coarsening}.
 However, in cases where the operator $A_h$ can be directly discretized on a coarser grid with step size $2\bm{h}$, it is often also possible to use the resulting operator $A_{2h}$ instead.
 By bringing all these components together, we can formulate the two-level-method shown in Algorithm~\ref{alg:two-grid-method}.
 \begin{algorithm}
 	\caption{Two-Grid Method}
 	\label{alg:two-grid-method}
 	\begin{algorithmic}
-		\State{Relax on $A_h \bm{x}_h = \bm{b}_h$ to obtain an approximation $\tilde{\bm{x}}_h$}
+		\State{Smooth on $A_h \bm{x}_h = \bm{b}_h$ to obtain an approximation $\tilde{\bm{x}}_h$}
 		\State{Compute the residual $\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
 		\State{\hskip1em Obtain $A_{2h}$ through Galerkin coarsening or rediscretization}
 		\State{\hskip1em Restrict the residual $\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
 		\State{\hskip1em Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
 		\State{Perform the correction $\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \bm{x}_{2h}$}
-		\State{Relax again $A_h \bm{x}_h = \bm{b}_h$ with an initial guess of $\tilde{\bm{x}}_h$}
+		\State{Smooth again on $A_h \bm{x}_h = \bm{b}_h$ now using $\tilde{\bm{x}}_h$} as an initial guess
 	\end{algorithmic}
 \end{algorithm}
-Note that while on the coarse grid we are actually solving the error equation, it has been redefined as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
+Note that while on the coarse grid, we are actually solving the error equation, it has been redefined as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
 Based on this notation, we could similarly define a two-level method starting from a grid with step size $2\bm{h}$.
 However, to put this approach into practice, we need to choose an initial guess for the error equation on this level.
 For this purpose, note that one step of smoothing applied to Equation~\eqref{eq:coarse-grid-error-equation} with an initial guess of zero corresponds to
@@ -391,7 +391,7 @@ and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose $\bm{x}_{2h}^{(0)}
 \begin{equation}
 	\bm{x}_{2h}^{(1)} = I_{h}^{2h} \bm{x}_{h}^{(0)} + M_{2h}^{-1} ( I_{h}^{2h} \bm{b}_h - \underbrace{I_{h}^{2h} A_h I_{2h}^{h}}_{A_{2h}} I_{h}^{2h} \bm{x}_{h}^{(0)} ).
 \end{equation}
-Performing one smoothing step with an initial guess of zero on the coarse-grid error equation, therefore, corresponds to one smoothing step applied to the equation
+Performing one smoothing step with an initial guess of zero on the coarse-grid error equation is, thus, similar to smoothing on the equation
 \begin{equation}
 	I_{h}^{2h} A_h I_{2h}^h \bm{x}_{2h} = I_{h}^{2h} \bm{b}_h,
 \end{equation}
@@ -401,28 +401,29 @@ Because smoothing aims to remove the remaining oscillatory components of the err
 \subsection{Restriction and Prolongation}
 \label{subsec:restriction-and-prolongation}
 %TODO fix stencil notation in this section
-Before we can define an actual multigrid method, which recursively applies the techniques introduced here to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{2h}^{h}$ and $I_{h}^{2h}$.
-Here, the restriction operator $I_{2h}^{h}$ should yield an accurate approximation of the current residual on a coarser grid, while the goal of the prolongation operator $I_{h}^{2h}$ is to transfer the computed solution of the error equation back to a finer grid.
-In both cases, we are, first and foremost, interested in preserving the low-frequency components, as the remaining ones will be quickly reduced by smoothing.
+Before we can define an actual multigrid method, which recursively applies the techniques introduced in the last section to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{2h}^{h}$ and $I_{h}^{2h}$.
+Here, the \emph{restriction} operator $I_{2h}^{h}$ is supposed to yield an accurate approximation of the current residual on a coarser grid, while the goal of the \emph{prolongation} operator $I_{h}^{2h}$ is to transfer the computed solution of the error equation back to a finer grid.
+In both cases, we are, first and foremost, interested in preserving the low-frequency components, as all the others can already be quickly reduced by smoothing.
 In general, the implementation of these operators depends on the chosen method of discretization. 
 Since, as mentioned in Section~\ref{sec:discretization}, this work focuses on the discretizations of PDEs on regular grids, we do not consider inter-grid operators defined on other grid types, such as unstructured grids.
 For a detailed treatment of these cases, the reader is referred to~\cite{trottenberg2000multigrid,ruge1987algebraic,stuben2001introduction}.
 As a first step towards defining a suitable restriction operator, note that on a regular grid, the set of coarse-grid points is always contained in the set of fine-grid points.
 Therefore, the easiest way to define such an operator is to simply carry over the values present at the respective points of the fine grid over to the coarse grid, which leads to the so-called \emph{injection} restriction operator.
-While this approach can lead to a functioning multigrid method in case the residual is sufficiently smooth, it neglects the information contained within all fine grid points that do not coincide with a coarse grid point.
+While this approach might lead to a functioning multigrid method in case the residual is sufficiently smooth, it neglects the information contained within all fine grid points that do not coincide with one on the coarse grid.
 In most cases, it is beneficial to incorporate this information into the coarse grid by computing a weighted average over all neighboring fine grid points.
 This idea leads to the so-called \emph{full-weighting} and \emph{half-weighting} restriction operators.
 Using our previously defined stencil notation, the one-dimensional full-weighting restriction operator is given by
 \begin{equation}
-	I_{h}^{2 h} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_{h_x}^{2h}
+	I_{h_x}^{2 h_x} = \frac{1}{4}\{((-1), 1), ((0), 2), ((1), 1)\}_{h_x}^{2h_x},
 \end{equation} 
 or equivalently using the matrix notation
 \begin{equation}
-	I_{h}^{2h} =  \frac{1}{4} \begin{bmatrix}
+	I_{h_x}^{2h_x} =  \frac{1}{4} \begin{bmatrix}
 			1 & 2 & 1
-		\end{bmatrix}_{h_x}^{2h}.
+		\end{bmatrix}_{h_x}^{2h_x}.
 	\label{eq:full-weighting-restriction}
 \end{equation} 
+Since the application of this stencil yields a grid function of different dimensionality than the one to which it is applied, we additionally include the respective step sizes as a sub- and superscript.
 If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
 	I^{2h_x, 2h_y}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
@@ -435,7 +436,7 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 	1 & 2 & 1 \\
 	2 & 4 & 2 \\
 	1 & 2 & 1
-\end{bmatrix}^{2h_x, 2h_y}_{h_x, h_y},
+\end{bmatrix}^{2h_x, 2h_y}_{h_x, h_y}
 \end{equation} 
 \begin{equation}
 \begin{split}
@@ -463,7 +464,7 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 	2 & 4 & 2 \\
 	1 & 2 & 1
 \end{bmatrix}
-\end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}.
+\end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}
 \end{split}
 \end{equation}
 A second restriction operator based on the idea of averaging neighboring fine grid points is the half-weighting restriction operator, whose two- and three-dimensional versions can be defined as
@@ -473,97 +474,117 @@ A second restriction operator based on the idea of averaging neighboring fine gr
 		0 & 1 & 0 \\
 		1 & 4 & 1 \\
 		0 & 1 & 0
-	\end{bmatrix}^{2h_x}_{h_x},
+	\end{bmatrix}^{2h_x, 2h_y}_{h_x, h_y}
 \end{equation} 
 \begin{equation}
-\begin{split}
-	& I^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z} = 
-\frac{1}{4} \begin{bmatrix}
-	1 & 2 & 1
-\end{bmatrix}_{h_z}^{2h_z}
-\otimes 
-\frac{1}{8}
+	I^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z} = 
+\frac{1}{12} \begin{bmatrix}
 	\begin{bmatrix}
-	0 & 1 & 0 \\
-	1 & 4 & 1 \\
-	0 & 1 & 0 
-\end{bmatrix}^{2h_x,2h_y}_{h_x, h_y} \\
-& =
-\frac{1}{32} \begin{bmatrix}
-	\begin{bmatrix}
-		& 1 &  \\
-		1 & 4 & 1 \\
-		& 1 & 
+		0& 0 & 0 \\
+		0 & 1 & 0 \\
+		0& 0 & 0
 	\end{bmatrix}
  &		\begin{bmatrix}
- 	& 2 &  \\
- 	2 & 6 & 2 \\
- 	& 2 & 
+ 	0 & 1 & 0 \\
+ 	1 & 6 & 1 \\
+ 	0 & 1 & 0
  \end{bmatrix} &
 	\begin{bmatrix}
-	& 1 &  \\
-	1 & 4 & 1 \\
-	& 1 & 
-\end{bmatrix}
+		0& 0 & 0 \\
+		0 & 1 & 0 \\
+		0& 0 & 0
+	\end{bmatrix}
 \end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}
-\end{split}
 \end{equation} 
-Note that in contrast to our original definition of the stencil application in Equation~\eqref{eq:stencil-application}, which applies the stencil to each point on the current grid, the restriction stencils presented here only have to be applied to each point on the fine grid that coincides with a coarse-grid point.
-We can therefore replace it with the following slightly adapted definition of stencil application
+% \begin{equation}
+% \begin{split}
+% 	& I^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z} = 
+% \frac{1}{4} \begin{bmatrix}
+% 	1 & 2 & 1
+% \end{bmatrix}_{h_z}^{2h_z}
+% \otimes 
+% \frac{1}{8}
+% 	\begin{bmatrix}
+% 	0 & 1 & 0 \\
+% 	1 & 4 & 1 \\
+% 	0 & 1 & 0 
+% \end{bmatrix}^{2h_x,2h_y}_{h_x, h_y} \\
+% & =
+% \frac{1}{32} \begin{bmatrix}
+% 	\begin{bmatrix}
+% 		0& 1 & 0 \\
+% 		1 & 4 & 1 \\
+% 		0& 1 & 0
+% 	\end{bmatrix}
+%  &		\begin{bmatrix}
+%  	0 & 2 & 0 \\
+%  	2 & 6 & 2 \\
+%  	0 & 2 & 0
+%  \end{bmatrix} &
+% 	\begin{bmatrix}
+% 	0& 1 & 0 \\
+% 	1 & 4 & 1 \\
+% 	0& 1 & 0
+% \end{bmatrix}
+% \end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}
+% \end{split}
+% \end{equation} 
+Note that in contrast to our original definition of the stencil application in Equation~\eqref{eq:stencil-application}, the restriction stencils presented here only have to be applied to each point on the fine grid that coincides with a coarse-grid point.
+We can thus replace it with the following slightly adapted definition of stencil application
 \begin{equation}
 	\begin{split}
 		& I_{h}^{2h} \cdot u_h(\bm{x}) = \sum_{k=1}^m b_k u_h({\bm x + \bm{a}_k} \circ \bm{h}) \quad 
-		\text{with} \; \bm{x} \in G_{2h}, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in I_{h}^{2h} \; \forall \, k \in \{ 1, 2, \dots, m \}
+		\text{with} \; \bm{x} \in G_{2h}, m \in \mathbb{N} \\ & (\bm{a}_k, b_k) \in I_{h}^{2h} \; \forall \, k \in \{ 1, 2, \dots, m \},
 	\end{split}
 	\label{eq:stencil-restriction-application}
 \end{equation}
-where $u_h(\bm{x})$ with $\bm{x} \in G_{2h}$ represents an arbitrary point on the fine grid for which there exists a unique coarse-grid point defined at the same spatial position within the computational domain.
+where $u_h(\bm{x})$ with $\bm{x} \in G_{2h} \supset G_h$ represents an arbitrary point on the fine grid for which there exists a unique coarse-grid point defined at the same spatial position within the computational domain.
 Note that this is an immediate consequence of the fact that we have defined the set of coarse-grid points as a subset of the fine-grid points.
 
 On the other hand, for prolongation, our goal is to define an operator that transfers an approximation of the error computed on a certain discretization level to a grid of higher resolution.
-We, therefore, must be able to restore a higher number of grid points based on the given values on the coarse grid, which can be regarded as a distribution process.
-The application of this operator to a given coarse-grid point $u_{2h}(\bm{x})$ with $\bm{x} \in G_{2h} \supset G_h$ can be defined as
+Therefore, we must be able to restore a larger number of grid points based on the given values on the coarse grid, which can be regarded as a distribution process.
+The application of this operator to a given coarse-grid point $u_{2h}(\bm{x})$ with $\bm{x} \in G_{2h}$ can be defined as
 \begin{equation}
-	I_{h}^{2h} \cdot u_{2h}(\bm{x}) \rightarrow
+	I_{2h}^{h} \cdot u_{2h}(\bm{x}) \rightarrow
 	\begin{cases}
 		& \forall \, (\bm{a}_k, b_k) \in I_{2h}^{h} \; \text{with} \; k \in \{ 1, 2, \dots, m \} \; \wedge \; \bm{x} \in G_{2h} : \\
-		& u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) = u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) + b_k u_{2h}(\bm{x}) 
-	\end{cases},
+		& u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) = u_{h}(\bm{x} + \bm{a}_k \circ \bm{h}) + b_k u_{2h}(\bm{x}), 
+	\end{cases}
 	\label{eq:stencil-prolongation application}
 \end{equation}
-whereby we assume that initially $\forall u_h(\bm{x}) \; \text{with} \; \bm{x} \in \mathcal G_h : u_h(\bm{x}) = 0$.
+where we assume that initially $\forall u_h(\bm{x}) \; \text{with} \; \bm{x} \in \mathcal G_h : u_h(\bm{x}) = 0$.
 A common choice for one-dimensional prolongation is the linear interpolation operator~\cite{trottenberg2000multigrid}, which can be defined as
 \begin{equation}
-	I_{h_x}^{2h} =  \frac{1}{2} \begin{bmatrix}
+	I_{2h_x}^{h_x} =  \frac{1}{2} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_{h}^{2h}.
+	\end{bmatrix}_{2h_x}^{h_x}.
 	\label{eq:linear-interpolation}
 \end{equation}
 Similar to full-weighting restriction, we can derive two- and three-dimensional versions of this operator as tensor products of the form
 \begin{equation}
-	I_{h_x, h_y}^{2h_x, 2h_y} = \frac{1}{2} \begin{bmatrix}
+	I_{2h_x, 2h_y}^{h_x, h_y} = \frac{1}{2} \begin{bmatrix}
 		1 \\ 2 \\ 1
-	\end{bmatrix}_{h_y}^{2h_y} \otimes \frac{1}{2} \begin{bmatrix}
+	\end{bmatrix}_{2h_y}^{h_y} \otimes \frac{1}{2} \begin{bmatrix}
 		1 & 2 & 1
-	\end{bmatrix}_{h_x}^{2h_x} =
+	\end{bmatrix}_{2h_x}^{h_x} =
 	\frac{1}{4} 
 	\begin{bmatrix}
 		1 & 2 & 1 \\
 		2 & 4 & 2 \\
 		1 & 2 & 1
-	\end{bmatrix}_{h_x, h_y}^{2h_x, 2h_y},
+	\end{bmatrix}_{2h_x, 2h_y}^{h_x, h_y}
 \end{equation}
 \begin{equation}
 	\begin{split}
-		I_{h_x, h_y, h_z}^{2h_x, 2h_y, 2h_z} = & \frac{1}{2} \begin{bmatrix}
+		I_{2h_x, 2h_y, 2h_z}^{h_x, h_y, h_z} = & \frac{1}{2} \begin{bmatrix}
 			1 & 2 & 1
-		\end{bmatrix}_{2h}^{h} \otimes 
+		\end{bmatrix}_{2h_z}^{h_z} \otimes 
 		\frac{1}{4} 
 		\begin{bmatrix}
 			1 & 2 & 1 \\
 			2 & 4 & 2 \\
 			1 & 2 & 1
-		\end{bmatrix}_{2h}^{h} \\
+		\end{bmatrix}_{2h_x,2h_y}^{h_x,h_y} \\
 		= & \frac{1}{8} \begin{bmatrix}
 			\begin{bmatrix}
 				1 & 2 & 1 \\
@@ -579,25 +600,25 @@ Similar to full-weighting restriction, we can derive two- and three-dimensional 
 				2 & 4 & 2 \\
 				1 & 2 & 1
 			\end{bmatrix}
-		\end{bmatrix}_{2h}^{h} .
+		\end{bmatrix}_{2h_x,2h_y,2h_z}^{h_x,h_y,h_z}
 	\end{split}
 \end{equation}
 Finally, we want to emphasize again that while the prolongation and restriction operators presented here represent a common choice for regular grids with uniform step sizes, for instance, the discretization of PDEs with varying coefficients often necessitates the use of more complex operators, such as~\cite{dendy1982black}.
 
 \subsection{The Multigrid Cycle}\label{sec:multigrid-cycles}
-By putting this all together, we can now implement a recursive version of Algorithm~\ref{alg:two-grid-method}, that allows us to perform an arbitrary number of coarsening steps until the resulting system of linear equation is small enough to be solved precisely.
-The resulting implementation of a \emph{multigrid cycle} in the form of the function \textsc{mg-cycle} is shown in Algorithm~\ref{alg:multigrid-cycle}.
+By putting this all together, we can now implement a recursive version of Algorithm~\ref{alg:two-grid-method} that allows us to perform an arbitrary number of coarsening steps until the resulting system of linear equation is small enough to be solved directly.
+The corresponding implementation of a \emph{multigrid cycle} in the form of the function \textsc{mg-cycle} is shown in Algorithm~\ref{alg:multigrid-cycle}.
 \begin{algorithm}[h]
 	\caption{Multigrid Cycle}
 	\label{alg:multigrid-cycle}
 	\begin{algorithmic}
-		\Function{mg-cycle}{$\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $l$, $\gamma$, $\nu_1$, $\nu_2$, $\omega$}
+		\Function{mg-cycle}{$k$, $\gamma$, $\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $\nu_1$, $\nu_2$, $\omega$}
 		\For{$i = 1, \dots, \nu_1$}
 		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
 		\EndFor
 		\State{$\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
 		\State{$\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
-		\If{$l = 0$}
+		\If{$k = 1$}
 		\State{ Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
 		\Else
 		\State{$\tilde{\bm{x}}_{2h} = \bm{0}_{2h}$}
@@ -614,17 +635,19 @@ The resulting implementation of a \emph{multigrid cycle} in the form of the func
 	\end{algorithmic}
 \end{algorithm}
 Note that this function has a number of additional parameters compared to our original two-grid method.
-First of all, $l$ defines the number of recursive coarsening steps until the respective system of linear equations is solved directly.
-Furthermore, since, in certain cases, a single recursive application of this function is not sufficient to obtain a reasonably accurate approximation on the coarse grid, additional coarse-grid correction steps can be performed, as controlled by the parameter $\gamma$.
-Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing steps before and after the coarse grid correction is performed, respectively.
-Note that when performing multiple sweeps of smoothing or coarse grid correction, the initial guess is, as usual, replaced by the approximation obtained in the previous step.
-While in principle, the parameters of \textsc{mg-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value yields a distinct computational pattern.
+First of all, $k$ defines the number of discretization levels and, thus, determines how many recursive coarsening steps need to be performed until the respective system of linear equations is solved directly.
+Furthermore, since sometimes a single recursive application of this function is not sufficient to obtain a reasonably accurate approximation on the coarse grid, additional coarse-grid correction steps can be performed, as controlled by the parameter $\gamma$.
+Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing steps before and after the coarse-grid correction is performed, respectively.
+Note that when applying multiple sweeps of smoothing or coarse-grid correction, the initial guess is replaced by the approximation obtained in the previous step.
+While in principle the parameters of \textsc{mg-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value yields a distinct computational pattern.
 For instance, choosing $\gamma = 1$ means that only a single recursive descent is performed on each discretization level.
 Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the algorithmic structure resulting from different values of $\gamma$ on a hierarchy of three and four grids, respectively.
+Each white node corresponds to one or multiple steps of smoothing on the respective level, while a black node implies that the resulting error equation is solved directly.
+%TODO fix these figures
 \begin{figure}
 \centering
 	\captionsetup{justification=centering}
-   \begin{subfigure}{0.1\textwidth}
+   \begin{subfigure}[t]{0.1\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -632,13 +655,13 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{}
 	\end{subfigure}
-	\begin{subfigure}{0.22\textwidth}
+	\begin{subfigure}[t]{0.21\textwidth}
 		\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,,fill=black,scale=0.8] {};
-			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,4) [draw, circle, scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw,circle,fill=black,scale=1] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=1] {};
+			\node	(e) at (2,4) [draw, circle, scale=1] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -649,15 +672,15 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
-	\begin{subfigure}{0.32\textwidth}
+	\begin{subfigure}[t]{0.31\textwidth}
 		\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
-			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
-			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
-			\node	(g) at (3,4) [draw, circle, scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=1] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=1] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=1] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=1] {};
+			\node	(g) at (3,4) [draw, circle, scale=1] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -670,17 +693,17 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
-	\begin{subfigure}{0.32\textwidth}
+	\begin{subfigure}[t]{0.31\textwidth}
 		\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
-			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
-			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
-			\node	(g) at (3,2) [draw, circle, fill=black,scale=0.8] {};
-			\node	(h) at (3.5,3) [draw, circle, scale=0.8] {};	
-			\node	(i) at (4,4) [draw, circle, scale=0.8] {};	
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=1] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=1] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=1] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=1] {};
+			\node	(g) at (3,2) [draw, circle, fill=black,scale=1] {};
+			\node	(h) at (3.5,3) [draw, circle, scale=1] {};	
+			\node	(i) at (4,4) [draw, circle, scale=1] {};	
 			\draw 
 			(a) edge[->] (b) 
 			(b) edge[->] (c)
@@ -694,12 +717,12 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 3$}
 	\end{subfigure}
-	\caption{Three-grid cycles ($l = 2$).}
+	\caption{Three-grid cycles ($k = 3$).}
 	\label{fig:three-grid-cycles}
 \end{figure}
 \begin{figure}
 	\captionsetup{justification=centering}
-	\begin{subfigure}{0.1\textwidth}
+	\begin{subfigure}[t]{0.1\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -708,15 +731,15 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{}
 	\end{subfigure}
-	\begin{subfigure}{0.3\textwidth}
+	\begin{subfigure}[t]{0.3\textwidth}
 		\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
-			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
-			\node	(f) at (2.5,3) [draw, circle,scale=0.8] {};
-			\node	(g) at (3,4) [draw, circle,scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,scale=1] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=1] {};
+			\node	(e) at (2,2) [draw, circle, scale=1] {};
+			\node	(f) at (2.5,3) [draw, circle,scale=1] {};
+			\node	(g) at (3,4) [draw, circle,scale=1] {};
 			\draw 
 			(a) edge[->] (b) 
 			(b) edge[->] (c)
@@ -729,23 +752,23 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
-	\begin{subfigure}{0.6\textwidth}
+	\begin{subfigure}[t]{0.6\textwidth}
 		\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
-			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
-			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=0.8] {};
-			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
-			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
-			\node	(i) at (4,2) [draw, circle,scale=0.8] {};
-			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=0.8] {};
-			\node	(k) at (5,2) [draw, circle, scale=0.8] {};
-			\node	(l) at (5.5,1) [draw, circle,fill=black,scale=0.8] {};
-			\node	(m) at (6,2) [draw, circle,scale=0.8] {};
-			\node	(n) at (6.5,3) [draw, circle, scale=0.8] {};
-			\node	(o) at (7,4) [draw, circle, scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,scale=1] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=1] {};
+			\node	(e) at (2,2) [draw, circle, scale=1] {};
+			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=1] {};
+			\node	(g) at (3,2) [draw, circle,scale=1] {};
+			\node	(h) at (3.5,3) [draw, circle,scale=1] {};
+			\node	(i) at (4,2) [draw, circle,scale=1] {};
+			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=1] {};
+			\node	(k) at (5,2) [draw, circle, scale=1] {};
+			\node	(l) at (5.5,1) [draw, circle,fill=black,scale=1] {};
+			\node	(m) at (6,2) [draw, circle,scale=1] {};
+			\node	(n) at (6.5,3) [draw, circle, scale=1] {};
+			\node	(o) at (7,4) [draw, circle, scale=1] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -766,33 +789,32 @@ Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
-	\caption{Four-grid cycles ($l = 3$).}
+	\caption{Four-grid cycles ($k = 4$).}
 	\label{fig:four-grid-cycles}
 \end{figure}
-Here each white node corresponds to one or multiple steps of smoothing on the respective level, while a black node implies that the resulting error equation is solved precisely.
 Since, as it can be seen in Figure~\ref{fig:three-grid-cycles}, the choice of $\gamma = 1$ results in a V-shaped computational pattern, the corresponding multigrid method is usually called a V-cycle.
-Similarly, the computational pattern of a method with $\gamma = 2$ on a three-grid hierarchy looks like a W, and hence the resulting method is called a W-cycle.
+Similarly, the computational pattern of a method with $\gamma = 2$ on a three-grid hierarchy looks like the letter W, and hence the resulting method is called a W-cycle.
 As it can be seen in Figure~\ref{fig:four-grid-cycles}, the amount of computational work within a W-cycle drastically increases with the number of coarsening steps.
-While applying V-cycle always results in significantly fewer computations, in many cases, a single coarse grid correction step is not sufficient to reduce the low-frequency components of the initial error on the finest grid~\cite{trottenberg2000multigrid}.
-Due to the resulting drastic increase in the number of computations, values of $\gamma$ larger than two are usually impractical for multigrid methods~\cite{trottenberg2000multigrid}.
-While Algorithm~\ref{alg:multigrid-cycle} enables the construction of different multigrid methods based on choosing different values for the parameters $l$, $\gamma$, $\nu_1$, $\nu_2$ and $\omega$, the structural composition of the resulting methods is limited.
-For instance, in Algorithm~\ref{alg:multigrid-cycle}, it is assumed that the same value of $\gamma$ is chosen on each level, which restricts possible computational patterns to those portrayed in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
+While applying a V-cycle always results in significantly fewer computations, in many cases, a single coarse-grid correction step is not sufficient to reduce the low-frequency components of the initial error on the finest grid~\cite{trottenberg2000multigrid}.
+Due to the resulting drastic increase in the number of computations, values of $\gamma$ larger than two are usually impractical for multigrid methods.
+While Algorithm~\ref{alg:multigrid-cycle} enables the realization of different multigrid methods based on choosing different values for the parameters $k$, $\gamma$, $\nu_1$, $\nu_2$ and $\omega$, the structural composition of the resulting methods is limited.
+For instance, in Algorithm~\ref{alg:multigrid-cycle}, it is assumed that the same value of $\gamma$ is chosen on each level, which restricts the set of possible multigrid cycles to those portrayed in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
 One way to overcome this limitation is to combine different cycle types in a single method.
 For instance, combining W- and V-cycles on each level results in a so-called F-cycle, whose algorithmic structure is illustrated by Figure~\ref{fig:f-cycle}.
 \begin{figure}
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}[t]{0.4\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 			\node   (8h) at (-0.75, 1){};
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,fill=black,scale=0.8] {};
-			\node	(d) at (1.5,3) [draw, circle,scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, fill=black, scale=0.8] {};
-			\node	(f) at (2.5,3) [draw, circle, scale=0.8] {};
-			\node	(g) at (3,4) [draw, circle, scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,fill=black,scale=1] {};
+			\node	(d) at (1.5,3) [draw, circle,scale=1] {};
+			\node	(e) at (2,2) [draw, circle, fill=black, scale=1] {};
+			\node	(f) at (2.5,3) [draw, circle, scale=1] {};
+			\node	(g) at (3,4) [draw, circle, scale=1] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -804,25 +826,25 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 			;
 		\end{tikzpicture}
 	\end{subfigure}
-	\begin{subfigure}{0.6\textwidth}
+	\begin{subfigure}[t]{0.6\textwidth}
 		\begin{tikzpicture}
 				\node   (h) at (-0.75, 4){$h$};
 				\node   (2h) at (-0.75, 3){$2h$};
 				\node   (4h) at (-0.75, 2){$4h$};
 				\node   (8h) at (-0.75, 1){$8h$};
-			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
-			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
-			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
-			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=0.8] {};
-			\node	(e) at (2,2) [draw, circle, scale=0.8] {};
-			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=0.8] {};
-			\node	(g) at (3,2) [draw, circle,scale=0.8] {};
-			\node	(h) at (3.5,3) [draw, circle,scale=0.8] {};
-			\node	(i) at (4,2) [draw, circle,scale=0.8] {};
-			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=0.8] {};
-			\node	(k) at (5,2) [draw, circle, scale=0.8] {};
-			\node	(l) at (5.5,3) [draw, circle,scale=0.8] {};
-			\node	(m) at (6,4) [draw, circle,scale=0.8] {};
+			\node	(a) at (0,4) [draw, circle,scale=1] {};
+			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
+			\node	(c) at (1,2) [draw, circle,scale=1] {};
+			\node	(d) at (1.5,1) [draw, circle,fill=black, scale=1] {};
+			\node	(e) at (2,2) [draw, circle, scale=1] {};
+			\node	(f) at (2.5,1) [draw, circle,fill=black,scale=1] {};
+			\node	(g) at (3,2) [draw, circle,scale=1] {};
+			\node	(h) at (3.5,3) [draw, circle,scale=1] {};
+			\node	(i) at (4,2) [draw, circle,scale=1] {};
+			\node	(j) at (4.5,1) [draw, circle,fill=black, scale=1] {};
+			\node	(k) at (5,2) [draw, circle, scale=1] {};
+			\node	(l) at (5.5,3) [draw, circle,scale=1] {};
+			\node	(m) at (6,4) [draw, circle,scale=1] {};
 			
 			\draw 
 			(a) edge[->] (b) 
@@ -843,13 +865,13 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 	\caption{Computational pattern of the F-cycle with a different number of coarsening steps.}
 	\label{fig:f-cycle}
 \end{figure}
-Except for $l = 2$, in which case the F-cycle and W-cycle are equivalent, this method represents a compromise between a pure V-cycle and W-cycle.
-While the composition of a multigrid method from different cycle types represents an additional degree of freedom, the individual cycles can still be formulated within the rules of Algorithm~\ref{alg:multigrid-cycle} and, hence, are fully described by the aforementioned parameters.
+Except for $k = 3$, in which case the F-cycle and W-cycle are equivalent, this method represents a compromise between a pure V-cycle and W-cycle.
+While the composition of a multigrid method from different cycle types represents an additional degree of freedom, the individual cycles are still derived from the rules of Algorithm~\ref{alg:multigrid-cycle} and are, thus, fully described by the aforementioned parameters.
 Since, according to the classical formulation of a multigrid method as in~\cite{brandt1977multi,hackbusch2013multi,trottenberg2000multigrid,briggs2000multigrid}, these parameters are considered global, adapting one of their values uniformly changes the method's behavior on each level. 
-While for many applications, this approach has shown to yield efficient multigrid methods~\cite{trottenberg2000multigrid}, there are still cases where multigrid could not achieve its full potential~\cite{ernst2012difficult,benzi2005numerical}.
+While for many applications, this approach has demonstrated to yield efficient multigrid methods~\cite{trottenberg2000multigrid}, there are still cases where multigrid could not yet achieve its full potential~\cite{ernst2012difficult,benzi2005numerical}.
 Even though, to date, there exists a rich amount of research on the optimization of multigrid cycles based on a fixed set of global parameters, the variation of its components on an individual level has not been considered yet.
 Such an approach would grant the flexibility to generate multigrid cycles that consist of varying restriction and coarse-grid correction steps, each with a different combination of smoothers and relaxation factors.
 In this work, we aim to realize this vision by expressing each multigrid cycle as a finite sequence of instructions whose order is restricted by the rules of linear algebra and multigrid theory.
-To specify these rules in a mathematically formal way, we make use of programming language theory, such that the formulation of a multigrid method is treated as a program synthesis task.
+To specify these rules in a mathematically formal way, we make use of programming language theory, such that the design of an efficient multigrid method is treated as a program synthesis task.
 In the next section, we, therefore, provide a brief overview of programming language theory and introduce the concept of formal languages and grammars.
-We then combine this formalism together with our knowledge about multigrid methods to derive a novel representation of multigrid solvers that enables us to construct these methods in the form of a program design and optimization task.
+We then leverage this formalism together with the theoretical background presented in this chapter to derive a grammar-based representation of multigrid cycles that enables us to automate the design of these methods using evolutionary program synthesis techniques.

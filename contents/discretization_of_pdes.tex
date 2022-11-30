@@ -3,7 +3,7 @@ Many problems in science and engineering can be modeled as partial differential 
 A PDE is an equation that contains functions of one or multiple variables together with their partial derivatives.
 Consider, for instance, the equation
 \begin{equation}
-	-\alpha \nabla^2 u = f \quad \text{in} \; \Omega 
+	-\alpha \nabla^2 u = f \quad \text{in} \; \Omega,
 	\label{eq:heat-equation}
 \end{equation}
 where $u = u(\bm{x})$ and $f = f(\bm{x})$ are both functions with respect to the vector of space variables $\bm{x} = (x_1, x_2, \dots, x_n)^T$ and $\Omega \supset \mathbb{R}^d$.
@@ -14,7 +14,7 @@ These so-called \emph{boundary conditions} (BCs) can usually be classified into 
 	\item[Dirichlet] $u(\bm{x}) = g(\bm{x})$
 	\item[Neumann] $\frac{\partial}{\partial \vec{n}} u(\bm{x}) = 0$
 	\item[Robin] $a u(\bm{x}) + b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = g(\bm{x})$
-	\item[Cauchy] $a u(\bm{x}) = g(\bm{x}), \; b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = h(\bm{x})$
+	\item[Cauchy] $a u(\bm{x}) = g(\bm{x}), \; b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = h(\bm{x})$.
 \end{description}
 Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
 The difference between Robin and Cauchy BCs is that in the former case, one condition is formulated as a weighted average of $u$ and its derivative in the normal direction, while in the latter, two conditions must be met individually.
@@ -38,7 +38,7 @@ One possibility to approximate a certain (time-independent) PDE on a structured 
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
 \begin{equation}
-	u(x + h) = u(x) - h \dv{x} u(x) + \mathcal{O}(h^2)
+	u(x + h) = u(x) - h \dv{x} u(x) + \mathcal{O}(h^2).
 \end{equation}
 Assuming $h$ is sufficiently small, the first-order approximation 
 \begin{equation}
@@ -75,7 +75,7 @@ We then discretize Equation~\eqref{eq:2D-poisson-model} using finite differences
 \begin{equation}
 	\begin{split}
 		\frac{1}{h^2} (4 u_{i,j} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) = f_{i, j} \quad & \forall i, j \in \{1, 2, \dots, n\} \\
-		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} = 0 \quad & \forall i, j \in \{1, 2, \dots, n\}
+		u_{0, j} = u_{i, 0} = u_{n+1, j} = u_{i, n+1} = 0 \quad & \forall i, j \in \{1, 2, \dots, n\},
 	\end{split} 
 	\label{eq:2D-poisson-model-discrete}
 \end{equation}
@@ -91,7 +91,7 @@ A natural ordering of the grid points then yields the system of linear equations
 \underbrace{
 	\begin{pmatrix}
 	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
-\end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f
+\end{pmatrix}}_{\textstyle{\bm{u}}} = \bm f,
 \label{eq:2D-poisson-assembled-matrix}
 \end{equation}
 with a right-hand side $\bm f$. 
@@ -129,7 +129,7 @@ A grid function or variable $u_h$ is then a mapping of the form
 \begin{equation}
 	\begin{split}
 		& u_h : G_{h}\to \mathbb{C} \\
-		& \bm{x} \to u_h(\bm{x})
+		& \bm{x} \to u_h(\bm{x}).
 	\end{split}
 \end{equation}
 As in the previous section, one often makes use of the simplified notation
@@ -146,7 +146,7 @@ We then define the general stencil $S$ as a finite set of $m$ tuples of the foll
 	\begin{split}
 			& S = \{(\bm{a}_k, b_k) \}_{k=1}^m = \{(\bm{a}_1, b_1),  (\bm{a}_2, b_2), \dots, (\bm{a}_m, b_m)\}, m \in \mathbb{N}
 	\\ & \forall \, i, j, k \in \{1, 2, \dots, m \}: \,
-	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{if} \; i \neq j, \; b_k \in \mathbb{C}.
+	\bm{a}_k \in \mathbb{Z}^d \wedge \bm{a}_i \neq \bm{a}_j \; \text{if} \; i \neq j, \; b_k \in \mathbb{C}
 	\end{split}
 \label{eq:stencil-definition}
 \end{equation}
@@ -157,7 +157,7 @@ For one and two-dimensional problems, it is often more convenient to use the alt
 \begin{equation}
 	S_{h_x} = \begin{bmatrix}
 		\cdots & s_{-1} & s_{0} & s_{1} & \cdots
-	\end{bmatrix}
+	\end{bmatrix},
 \end{equation}
 and
 \begin{equation}
@@ -255,7 +255,7 @@ Based on Equation~\eqref{eq:stencil-addsub}, we can then provide a definition fo
 		\{(\bm{a} + \bm{\hat{a}}, b \cdot \hat{b} ) \} \; + & \text{if} \; A = \{(\bm{a}, b ) \} \cup \tilde{A} \\
 		\{(\bm{a}, b ) \} \cdot \tilde{B} + \tilde{A} \cdot B & 
 		\text{and} \; B = \{(\bm{\hat{a}}, \hat{b} ) \} \cup \tilde{B} \\ & \\
-		\emptyset & \text{if} \; A = \emptyset \vee B = \emptyset.
+		\emptyset & \text{if} \; A = \emptyset \vee B = \emptyset
 	\end{cases}
 \label{eq:stencil-mult}
 \end{equation}
@@ -304,8 +304,8 @@ Even though Equation~\eqref{eq:biharmonic-system-matrix-formulation} now include
 Consider the two-dimensional biharmonic system
 \begin{equation}
 	\begin{split}
-		\frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) - v(x, y) & = 0 \\
-		\frac{\partial^2}{\partial x^2} v(x,y) + \frac{\partial^2}{\partial y^2} v(x,y) & = f(x, y) \\ \forall x, y \in (0, 1)^2
+		& \frac{\partial^2}{\partial x^2} u(x,y) + \frac{\partial^2}{\partial y^2} u(x,y) - v(x, y) = 0 \\
+		& \frac{\partial^2}{\partial x^2} v(x,y) + \frac{\partial^2}{\partial y^2} v(x,y) = f(x, y) \quad \forall x, y \in (0, 1)^2.
 	\end{split}
 	\label{eq:2D-biharmonic-system}
 \end{equation}
@@ -321,7 +321,7 @@ Discretizing Equation~\eqref{eq:2D-biharmonic-system} using finite differences w
 	=
 		\begin{pmatrix}
 			0 \\ f_{i,j}
-		\end{pmatrix} \\
+		\end{pmatrix} \quad
 \forall i,j \in \{1, 2, \dots, n\},
 	\label{eq:2D-biharmonic-system-stencil}
 \end{equation}

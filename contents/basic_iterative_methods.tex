@@ -27,7 +27,7 @@ We begin our introduction of basic iterative methods by considering the general 
 \end{pmatrix}}_{\bm{x}} = 
 \underbrace{\begin{pmatrix}
 		b_1 \\ b_2 \\ \vdots \\ b_n
-\end{pmatrix}}_{\bm{b}}
+\end{pmatrix}}_{\bm{b}},
 	\label{eq:general-system-of-linear-equations}
 \end{equation}
 where $A \in \mathbb{C}^{n \times n}$ is the coefficient matrix, $\bm x \in \mathbb{C}^n$ the vector of unknowns and $\bm b \in \mathbb{C}^n$ the right-hand side.
@@ -149,7 +149,7 @@ The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 	\text{lower}(S) = \begin{cases}
 		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
 		\text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
-		\emptyset & \text{else}.
+		\emptyset & \text{else}
 	\end{cases}
 	\label{eq:stencil-lower}
 \end{equation}
@@ -159,7 +159,7 @@ Similarly, we can also extract the upper triangle of a given stencil, which is f
 	\text{upper}(S) = \begin{cases}
 		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
 		\text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
-		\emptyset & \text{else}.
+		\emptyset & \text{else}
 	\end{cases}
 	\label{eq:stencil-upper}
 \end{equation}
@@ -250,7 +250,7 @@ For this purpose, we introduce the general \emph{convergence factor} $\rho$ of a
 \end{equation} 
 Furthermore, the \emph{convergence rate} $\tau$ is defined as the inverse natural logarithm of the convergence factor
 \begin{equation}
-	\tau = -\ln \rho
+	\tau = -\ln \rho.
 \end{equation}
 We can now establish a link between the spectral radius of the iteration matrix and the convergence factor of the corresponding stationary iterative method by considering the following theorem:  
 \begin{theorem}
