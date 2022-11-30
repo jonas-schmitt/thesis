@@ -197,11 +197,11 @@ In many cases, the resulting method has better smoothing properties than the Jac
 \subsubsection{Block Smoothing}
 \label{subsec:block-smoothing}
 So far, we have only discussed smoothers that operate in a pointwise manner.
-For instance, in the Jacobi method Equation~\eqref{eq:jacobi-element-wise} is computed for each individual grid point.
-The idea of block smoothing is to reorder the original system in such a way, that the same operations can be defined on small subsets of grid points, which are chosen in the form of rectangular blocks of a particular size.
-As a consequence, each scalar operation in the original pointwise method is replaced by a matrix or vector operation, whose dimensionality corresponds to the chosen block size.
+For instance in the Jacobi method, Equation~\eqref{eq:jacobi-element-wise} is computed for each individual grid point.
+The idea of block smoothing is to reorder the original system in such a way that the same operations can be defined on small subsets of grid points, which are usually chosen in the form of rectangular blocks of a particular size.
+As a consequence, each scalar operation in the original pointwise method is replaced by a matrix or vector operation whose dimensionality corresponds to the chosen block size.
 
-For example, we can rearrange our original system of the form of Equation~\eqref{eq:general-system-of-linear-equations} in the following way:
+For example, we can rearrange our original system, as given by Equation~\eqref{eq:general-system-of-linear-equations}, in the following way:
 \begin{equation}
 \underbrace{
 \begin{pmatrix}A_{11}&A_{12}&\cdots &A_{1m}\\A_{21}&A_{22}&\cdots &A_{2m}\\\vdots &\vdots &\ddots &\vdots \\A_{m1}&A_{m2}&\cdots &A_{mm}\end{pmatrix}}_{A}
@@ -221,7 +221,7 @@ A block Jacobi method can then be defined as
 	\bm{x}_{i}^{(k+1)}=A_{ii}^{-1}\left(\bm{b}_{i}-\sum _{j\neq i}A_{ij}\bm{x}_{j}^{(k)}\right),
 	\label{eq:jacobi-block-wise}
 \end{equation}
-For example, choosing a block size of two for the one-dimensional Laplace equation yields
+For instance, choosing a block size of two for the one-dimensional Laplace equation yields
 \begin{equation}
 	\begin{pmatrix}
 		2 & -1 \\
@@ -250,14 +250,14 @@ This method can be defined in a similar way using our previously introduced sten
 \begin{equation}
 \begin{split}
 	& \begin{pmatrix}
-		\left[0 \quad 2 \quad -1 \right]_{h} \cdot x_{j}^{(k+1)} \\ \left[ -1 \quad 2 \quad 0 \right]_{h} \cdot x_{j+1}^{(k+1)} 
+		\left[0 \quad 2 \quad -1 \right] \cdot x_{j}^{(k+1)} \\ \left[ -1 \quad 2 \quad 0 \right] \cdot x_{j+1}^{(k+1)} 
 	\end{pmatrix}
 	= \\ - & 
 	\begin{pmatrix}
-		\left[ 0 \right]_{h} \cdot x_{j+2}^{(k)} \\ \left[-1 \quad 0 \quad 0 \right]_{h} \cdot x_{j + 3}^{(k)}
+		\left[ 0 \right] \cdot x_{j+2}^{(k)} \\ \left[-1 \quad 0 \quad 0 \right] \cdot x_{j + 3}^{(k)}
 	\end{pmatrix} -
 	\begin{pmatrix}
-		\left[0 \quad 0 \quad -1 \right]_{h} \cdot x_{j-2}^{(k)} \\ \left[ 0 \right]_{h} \cdot x_{j-1}^{(k)} 
+		\left[0 \quad 0 \quad -1 \right] \cdot x_{j-2}^{(k)} \\ \left[ 0 \right] \cdot x_{j-1}^{(k)} 
 	\end{pmatrix}.
 \end{split}
 \end{equation}
@@ -273,12 +273,12 @@ In both cases, we obtain a system of two linear equations
 \end{equation}
 which must be solved for each block, for instance, using a direct solver such as Gaussian elimination.
 As in the pointwise Jacobi method, each block can be solved independently and, therefore, operations on different blocks can be performed in parallel. 
-Considering the fact that a direct solver in general require $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \frac{n}{n_b}) = \mathcal{O}(n_b^2 n)$.
-Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and, therefore, solve the original system using Gaussian elimination.
-In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which, for a constant stencil, can be computed with a constant number of operations per grid point.
+Considering the fact that a direct solver in general requires $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \cdot n / n_b) = \mathcal{O}(n_b^2 n)$.
+Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and, hence, solve the original system using Gaussian elimination.
+In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which can be computed with a constant number of operations per grid point.
 While we here only provide a brief introduction to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
-Finally, alternatively, it is also possible to define overlapping block smoothers, which means that multiple blocks contain the same grid point as an unknown~\cite{trottenberg2000multigrid}.
-
+Finally, it is also possible to define overlapping block smoothers, which means that multiple blocks contain the same grid point as an unknown~\cite{trottenberg2000multigrid}.
+\pagebreak
 \subsection{The Coarse-Grid Correction Scheme}
 The core idea behind multigrid methods is to reduce the oscillatory components of an error by obtaining an approximation of the same problem on a coarser grid.
 As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse} these components can then be reduced quickly using the same smoothing techniques employed on the fine grid.

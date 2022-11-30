@@ -54,7 +54,7 @@ Next, we consider
 	\label{eq:general-preconditioned-system-of-linear-equations}
 \end{equation}
 which represents a modified version of Equation~\eqref{eq:general-system-of-linear-equations}, that is obtained by multiplying each side of the equation by the inverse of a matrix $M$.
-By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and, therefore, has the same solution.
+By the rules of linear algebra, Equation~\ref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and, therefore, has the same solution.
 However, it can also be considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as a preconditioner.
 Considering again the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} yields the iteration
 \begin{equation}
@@ -99,7 +99,7 @@ Next, to derive a suitable choice for $M$ that leads to a faster convergence tha
 	A = D - L - U,
 \end{equation} 
 where $D$ is the lower diagonal, $-L$ the lower triangular, and $-U$ the upper triangular part of $A$, respectively.
-Both the Jacobi and the Gauss-Seidel method are defined based on this splitting.
+Both the Jacobi and Gauss-Seidel method are defined based on this splitting.
 First of all, setting $M = D$, yields the Jacobi method
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + D^{-1}(\bm b - A \bm{x}^{(k)}).
@@ -207,7 +207,7 @@ For this purpose, we rewrite Equation~\eqref{eq:general-stationary-iterative-met
 \begin{equation}
 	\bm{x}^{(k+1)} = (I - M^{-1} A) \bm{x}^{(k)} + M^{-1}\bm b.
 \end{equation}
-Within this equation we can now set $\bm{x}^{(i)} = \bm{x}^{(0)}$ 
+Within this equation we can now set $\bm{x}^{(i)} = \bm{x}^{(0)}$ which yields
 \begin{equation*}
 	\bm{x}^{(1)} = (I - M^{-1} A) \bm{x}^{(0)} + M^{-1}\bm b,
 \end{equation*}
