@@ -603,7 +603,7 @@ Similar to full-weighting restriction, we can derive two- and three-dimensional 
 		\end{bmatrix}_{2h_x,2h_y,2h_z}^{h_x,h_y,h_z}
 	\end{split}
 \end{equation}
-Finally, we want to emphasize again that while the prolongation and restriction operators presented here represent a common choice for regular grids with uniform step sizes, for instance, the discretization of PDEs with varying coefficients often necessitates the use of more complex operators, such as~\cite{dendy1982black}.
+Finally, we want to emphasize that while the prolongation and restriction operators presented here represent a common choice for regular grids with uniform step sizes, for instance, the discretization of PDEs with varying coefficients often necessitates the use of more complex operators, such as~\cite{dendy1982black}.
 
 \subsection{The Multigrid Cycle}\label{sec:multigrid-cycles}
 By putting this all together, we can now implement a recursive version of Algorithm~\ref{alg:two-grid-method} that allows us to perform an arbitrary number of coarsening steps until the resulting system of linear equation is small enough to be solved directly.
@@ -623,7 +623,7 @@ The corresponding implementation of a \emph{multigrid cycle} in the form of the 
 		\Else
 		\State{$\tilde{\bm{x}}_{2h} = \bm{0}_{2h}$}
 		\For{$i = 1, \dots, \gamma$}
-		\State{$\tilde{\bm{x}}_{2h} =  \textsc{mg-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, l-1, \gamma, \nu_1, \nu_2)$}
+		\State{$\tilde{\bm{x}}_{2h} =  \textsc{mg-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, k-1, \gamma, \nu_1, \nu_2)$}
 		\EndFor
 		\EndIf
 		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \tilde{\bm{x}}_{2h}$}
@@ -639,30 +639,28 @@ First of all, $k$ defines the number of discretization levels and, thus, determi
 Furthermore, since sometimes a single recursive application of this function is not sufficient to obtain a reasonably accurate approximation on the coarse grid, additional coarse-grid correction steps can be performed, as controlled by the parameter $\gamma$.
 Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing steps before and after the coarse-grid correction is performed, respectively.
 Note that when applying multiple sweeps of smoothing or coarse-grid correction, the initial guess is replaced by the approximation obtained in the previous step.
-While in principle the parameters of \textsc{mg-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value yields a distinct computational pattern.
+While, in principle, the parameters of \textsc{mg-cycle} can be freely chosen, one usually classifies multigrid cycles according to the choice of $\gamma$, as each value yields a distinct computational pattern.
 For instance, choosing $\gamma = 1$ means that only a single recursive descent is performed on each discretization level.
 Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the algorithmic structure resulting from different values of $\gamma$ on a hierarchy of three and four grids, respectively.
 Each white node corresponds to one or multiple steps of smoothing on the respective level, while a black node implies that the resulting error equation is solved directly.
 %TODO fix these figures
 \begin{figure}
-\centering
 	\captionsetup{justification=centering}
-   \begin{subfigure}[t]{0.1\textwidth}
+   \begin{subfigure}[t!]{0.075\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 		\end{tikzpicture}
-		\subcaption*{}
+		\subcaption*{\phantom{$\gamma = 1$}}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.21\textwidth}
+	\begin{subfigure}[t!]{0.21\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
 			\node	(c) at (1,2) [draw,circle,fill=black,scale=1] {};
 			\node	(d) at (1.5,3) [draw, circle,scale=1] {};
 			\node	(e) at (2,4) [draw, circle, scale=1] {};
-			
 			\draw 
 			(a) edge[->] (b) 
 			(b) edge[->] (c)
@@ -672,7 +670,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.31\textwidth}
+	\begin{subfigure}[t!]{0.29\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -693,7 +691,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.31\textwidth}
+	\begin{subfigure}[t!]{0.3\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -722,16 +720,16 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 \end{figure}
 \begin{figure}
 	\captionsetup{justification=centering}
-	\begin{subfigure}[t]{0.1\textwidth}
+	\begin{subfigure}[t!]{0.075\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 			\node   (8h) at (-0.75, 1){$8h$};
 		\end{tikzpicture}
-		\subcaption*{}
+		\subcaption*{\phantom{$\gamma = 1$}}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t!]{0.295\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -752,7 +750,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.6\textwidth}
+	\begin{subfigure}[t!]{0.59\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -800,14 +798,14 @@ Due to the resulting drastic increase in the number of computations, values of $
 While Algorithm~\ref{alg:multigrid-cycle} enables the realization of different multigrid methods based on choosing different values for the parameters $k$, $\gamma$, $\nu_1$, $\nu_2$ and $\omega$, the structural composition of the resulting methods is limited.
 For instance, in Algorithm~\ref{alg:multigrid-cycle}, it is assumed that the same value of $\gamma$ is chosen on each level, which restricts the set of possible multigrid cycles to those portrayed in Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles}.
 One way to overcome this limitation is to combine different cycle types in a single method.
-For instance, combining W- and V-cycles on each level results in a so-called F-cycle, whose algorithmic structure is illustrated by Figure~\ref{fig:f-cycle}.
+For instance, combining W- and V-cycles on each level results in a so-called F-cycle, whose algorithmic structure is illustrated in Figure~\ref{fig:f-cycle}.
 \begin{figure}
 	\begin{subfigure}[t]{0.4\textwidth}
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){};
+			\node   (8h) at (-0.75, 1){\phantom{$8h$}};
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
 			\node	(c) at (1,2) [draw, circle,fill=black,scale=1] {};
@@ -825,6 +823,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 			(f) edge[->] (g)
 			;
 		\end{tikzpicture}
+  		\subcaption*{}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.6\textwidth}
 		\begin{tikzpicture}
@@ -861,6 +860,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 			(l) edge[->] (m)
 			;
 		\end{tikzpicture}
+    		\subcaption*{}
 	\end{subfigure}
 	\caption{Computational pattern of the F-cycle with a different number of coarsening steps.}
 	\label{fig:f-cycle}
@@ -872,6 +872,6 @@ While for many applications, this approach has demonstrated to yield efficient m
 Even though, to date, there exists a rich amount of research on the optimization of multigrid cycles based on a fixed set of global parameters, the variation of its components on an individual level has not been considered yet.
 Such an approach would grant the flexibility to generate multigrid cycles that consist of varying restriction and coarse-grid correction steps, each with a different combination of smoothers and relaxation factors.
 In this work, we aim to realize this vision by expressing each multigrid cycle as a finite sequence of instructions whose order is restricted by the rules of linear algebra and multigrid theory.
-To specify these rules in a mathematically formal way, we make use of programming language theory, such that the design of an efficient multigrid method is treated as a program synthesis task.
+To specify these rules in a mathematically formal way, we make use of programming language theory, such that the design of an efficient multigrid method can be treated as a program synthesis task.
 In the next section, we, therefore, provide a brief overview of programming language theory and introduce the concept of formal languages and grammars.
 We then leverage this formalism together with the theoretical background presented in this chapter to derive a grammar-based representation of multigrid cycles that enables us to automate the design of these methods using evolutionary program synthesis techniques.
