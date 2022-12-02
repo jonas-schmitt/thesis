@@ -109,7 +109,7 @@ The result is then used to extinguish the remaining error on the next-higher lev
 In the following, we introduce the basic components of multigrid methods, i.e., the smoothing, restriction, prolongation, and coarse-grid correction operations.
 %Based on this definition, we then develop a formal language for the representation of multigrid solvers.
 \subsection{Smoothing}
-\label{subsec:smoothing}
+\label{sec:smoothing}
 One of the central elements of multigrid methods is the utilization of a smoothing procedure for quickly reducing the oscillatory components of a given error.
 We have already shown that the Jacobi and Gauss-Seidel method behave in such a way for the considered one-dimensional model problem.
 To further improve the smoothing effectiveness of an iterative method, it is often beneficial to introduce an additional relaxation factor $\omega$, which yields the iteration 
@@ -691,7 +691,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 		\end{tikzpicture}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
-	\begin{subfigure}[t!]{0.3\textwidth}
+	\begin{subfigure}[t!]{0.35\textwidth}
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -825,7 +825,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 		\end{tikzpicture}
   		\subcaption*{}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.6\textwidth}
+	\begin{subfigure}[t]{0.59\textwidth}
 		\begin{tikzpicture}
 				\node   (h) at (-0.75, 4){$h$};
 				\node   (2h) at (-0.75, 3){$2h$};

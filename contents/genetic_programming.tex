@@ -103,9 +103,9 @@ While it is possible to deal with this problem by simply evicting those individu
 A different and usually more efficient approach is to annotate each node within an expression tree with additional type information, which leads to the concept of strongly-typed GP, first proposed by David Montana~\cite{montana1995strongly}.
 Strongly-typed GP represents a viable solution to the problem of retaining type correctness, but it requires us to transform the implicit type information contained within the productions of our grammar into explicit type annotations at the nodes of each expression tree.
 As an alternative, we can instead utilize the information encoded in the productions of a grammar $G$ by considering the \emph{derivations} of an expression $e \in L_G$, as defined by
-\begin{equation}
+\begin{equation*}
 	S \Rightarrow e_1 \Rightarrow e_2 \Rightarrow \dots \Rightarrow e_n \Rightarrow e.
-\end{equation}
+\end{equation*}
 %Furthermore, if $G$ is regular, its derivations can be further simplified to finite state machine, where each state corresponds to a sequential form.
 Consider again the grammar whose productions are shown in Equation~\eqref{eq:gp-example-grammar} and the example functions $f_1$ and $f_2$ as defined in Equation~\eqref{eq:gp-example-functions}.
 % TODO Produce always leftmost symbol
@@ -198,9 +198,9 @@ For instance, consider the encoding
 	\label{eq:gp-example-grammar-ge-encoding}
 \end{equation}
 of our example grammar, based on which we can represent $f_1$ as an array consisting of the following integers:
-\begin{equation}
+\begin{equation*}
 	\left[ 0, 0, 1, 0, 3, 4, 1, 3, 6, 6, 1, 4, 6, 7 \right].
-\end{equation}
+\end{equation*}
 Since we are always processing the leftmost variable first, each array entry corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
 While in this case, we have chosen each number from the available range of productions, in practice, we can always map any non-negative integer to this range by applying a modulo $n$ operation, where $n$ is the number of available productions for each variable.
 We can now investigate how changing a single array entry will affect the interpretation of all subsequent ones.
@@ -208,7 +208,7 @@ For instance, changing the second entry to a value of one results in the choice 
 \begin{equation*}
 	\ps E \Rightarrow \ps A,
 \end{equation*}
-instead of 
+instead of
 \begin{equation*}
 	\ps E \Rightarrow \text{if} \; (\ps B \wedge \ps B) \; \text{then} \; \ps E \; \text{else} \; \ps E,
 \end{equation*}
