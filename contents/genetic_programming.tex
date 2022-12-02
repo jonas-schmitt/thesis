@@ -365,7 +365,7 @@ Finally, it must be mentioned that, besides the mutation and crossover operators
 However, these operators are designed for general tree-based GP systems and, hence, do not take the underlying grammatical representation into account. 
 As a remedy, in~\cite{couchet2007crossover}, mutation and crossover operators that are tailored toward grammar-based representations have been proposed.
 
-After creating a number of novel individuals by means of mutation and crossover, the remaining question that needs to be addressed is how the search should be progressed by forming a new population based on the previous one and the individuals created through mutation and crossover, as it is shown in line 7 of Algorithm~\ref{alg:genetic-programming}.
+After creating a number of novel individuals by means of mutation and crossover, the remaining question that needs to be addressed is how the search should be progressed by forming a new population based on the previous one and the individuals created through mutation and crossover, as it is shown in Line 7 of Algorithm~\ref{alg:genetic-programming}.
 Here one possibility is to completely replace the previous generation with new individuals.
 However, this approach incurs the danger of evicting individuals that are located in promising areas of the search space and, thus, might negatively affect the outcome of the search.
 As a remedy, many evolutionary algorithms employ \emph{elitism}, which means that individuals from the previous population are allowed to pass over to the next one in case their fitness is not surpassed by enough newly-created ones.
