@@ -16,6 +16,7 @@ def add(s1: set, s2: set):
             if x == a:
                 c = y
                 in_both = True
+                break
         if in_both:
             s2_.remove((a, c))
             return {(a, b + c)} | add(s1_, s2_)
