@@ -206,7 +206,7 @@ where
 	\item $\tilde{x}_{h}$ is a mathematical expression for computing an approximate solution of the above equation,
 	\item $b_{h}$ is an expression for computing the right-hand side of the above equation,
 	\item $c_{h}$ is a correction term for improving the accuracy of the approximate solution,
-	\item $Z_{h/2}$ is either the current state on the next finer level with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
+	\item $Z_{h/2}$ is either the current state on the next finer grid with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
 \end{itemize}
 \end{definition}
 Note that in Definition~\ref{def:multigrid-state}, the third component $c_{h}$ of a multigrid state no longer has to refer to the residual but now represents an expression that corresponds to a general correction term.
@@ -395,10 +395,11 @@ we need to define a production for each possible operation within a multigrid me
 Each of these productions needs to be expressed as a sequence of transitions that yields the correct state after the respective operation.
 In Section~\ref{sec:multigrid-state-transitions}, we have made the distinction between states where a new approximate solution $\tilde{x}_h$ is computed and those with the purpose of constructing a correction term $c_h$ based on the residual expression $r_h = b_h - A_h \tilde{x}_h$.
 To define the respective productions on every level of a given discretization hierarchy, we need to recursively determine how the final state of a multigrid method can be reached.
-\setcounter{equation}{0}
-Note that in the final state of a multigrid method, all computational steps are combined in $\tilde{x}_h$ as a single expression.
-We represent this state as the variable $\ps{s_h}$ and, thus, obtain the initial production
+Note that in this state, all computational steps are combined in $\tilde{x}_h$ as a single expression.
+\renewcommand{\theequation}{p\arabic{production}}
+We represent the final state of a multigrid method as the variable $\ps{s_h}$ and, thus, obtain the initial production
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$S$} {
 		\bnfpn{$s_h$}
 	}.
@@ -408,6 +409,7 @@ According to Definition~\ref{def:elementary-multigrid-operations}, $\tilde{x}_{h
 In the case of smoothing, the approximate solution is updated with a correction term obtained by multiplying the residual expression with an operator.
 This operation can be expressed as a combination of the state transition functions $\textsc{update}$ and $\textsc{apply}$ yielding the production
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$s_h$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$}))
 	}.
@@ -416,10 +418,12 @@ This operation can be expressed as a combination of the state transition functio
 Here, the current state, containing the previously computed residual, is represented by the variable $\ps{c_h}$.
 Different smoothers can be realized by expressing the generation of the operator and partitioning variable, i.e., $\ps{B_h}$ and $\ps{P}$, as two separate productions
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$B_h$} {
-		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
+		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_h$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = M_{h} + N_{h}$}
 	},
 \label{prod:smoothing-operator}
+\stepcounter{production}
 \end{bnf}
 \begin{bnf}
 	\bnfprod{$P$} {
@@ -430,6 +434,7 @@ Different smoothers can be realized by expressing the generation of the operator
 where the empty symbol $\lambda$ indicates that no partitioning is used. 
 On the topmost level, a correction term is always obtained by computing the residual based on the current approximate solution, which leads to the production
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$c_h$} {
 		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
 	}.
@@ -439,6 +444,7 @@ Multiple smoothing steps can, thus, be realized by means of a repeated applicati
 In contrast to smoothing, a coarse-grid correction updates the current approximate solution with a correction term that is constructed based on an approximate solution for the error equation on the next lower level in the discretization hierarchy.
 We can express this operation as a combination of the \textsc{update} and \textsc{cgc} transition functions, which yields the production
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$s_h$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$}))
 	}.
@@ -450,18 +456,22 @@ Furthermore, note that while we have encoded the prolongation operator as a term
 Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, which corresponds to the state on a coarser grid with step size $2h$, we next have to consider the different possibilities to transition to this state.
 First of all, as multigrid methods recursively apply the same operations throughout the complete hierarchy of discretizations, we can define the Productions~\eqref{prod:smoothing}, \eqref{prod:smoothing-operator}, \eqref{prod:residual} and \eqref{prod:coarse-grid-correction} on the corresponding level which yields
 \begin{bnf}
+ \stepcounter{production}
 	\bnfprod{$s_{2h}$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
 	} \\
+ \stepcounter{production}
 	\bnfmore {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$s_{4h}$}))
 		%\bnfts{\textnormal{\textsc{update}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 	}\label{prod:coarse-coarse-grid-correction} \\
+  \stepcounter{production}
 	\bnfprod{$c_{2h}$} {
 		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$})
 	} \\
+ \stepcounter{production}
 	\bnfprod{$B_{2h}$} {
-		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}.
+		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{2h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = M_{2h} + N_{2h}$}.
 	}
 \end{bnf}
 Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser grid with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
@@ -469,6 +479,7 @@ In contrast to a coarse-grid correction, which represents a transition to a stat
 While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next lower level that includes the initial residual as a correction term, which leads to the production
 \begin{bnf}
 \bnfprod{$c_{2h}$} {
+\stepcounter{production}
 	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }.
 \label{prod:coarsening}
@@ -478,6 +489,7 @@ Finally, the remaining step for the formulation of complete grammar is the defin
 For the former, note that the initial problem corresponds to the state $Z_h^0$, as given by Equation~\eqref{eq:initial-mg-state}.
 Since this state represents the starting point of each possible sequence of multigrid operations, we have to include it as an additional production of the variable $\ps{s_h}$
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$s_h$} {
 	 (\bnfts{$x_h^0$}, \bnfts{$b_h$}, \bnfes, \bnfes)
 	}.
@@ -495,19 +507,22 @@ This word then represents a multigrid method whose computational structure is de
 As a final step, we have to define one or multiple productions that correspond to the application of the coarse-grid solver on the lowest level, which allows us to improve the accuracy of the approximate solution on the above level.
 By utilizing a combination of the \textsc{apply} and \textsc{update} functions, we can express this operation in the form of the two production
 \begin{bnf}
+\stepcounter{production}
 	\bnfprod{$c_{2H}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{H}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{H}^{2H}$}, \bnfsp\bnfpn{$c_{H}$}))
 	} 	\label{prod:coarse-grid-solver} \\
+  \stepcounter{production}
 	\bnfprod{$s_H$}{
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2H}^{H}$}, \bnfsp \bnfpn{$c_{2H}$})).
 	} 	\label{prod:coarse-grid-solver-correction}
 \end{bnf}
 where $H$ is the step size on the second lowest level.
-\setcounter{equation}{122}
 Having now assembled all necessary components, we can finally specify the complete grammar for generating multigrid methods on a given hierarchy of discretizations.
 As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest grid, which means that on the coarsest grid, a step size of $16h$ is obtained.
-We, therefore, first define the set of variables 
+Therefore, we first define the set of variables 
 \begin{equation}
+\setcounter{equation}{6}
+\numberwithin{equation}{chapter}
 \begin{split}
 	V = \{ & \ps{S}, \ps{s_h}, \ps{c_h}, \ps{B_h}, \ps{s_{2h}}, \ps{c_{2h}}, \ps{B_{2h}}, \ps{s_{4h}}, \ps{c_{4h}}, \ps{B_{4h}}, \\
 	& \ps{s_{8h}}, \ps{c_{8h}}, \ps{B_{8h}}, \ps{c_{16h}}, \ps{P} \},
@@ -517,7 +532,7 @@ We, therefore, first define the set of variables
 for each of which we can then specify the list of productions available on the respective level. 
 Table~\ref{table:multigrid-grammar} shows the resulting productions for the complete discretization hierarchy.
 \begin{table}
-	\caption{Grammar Productions for a Five-Grid Method}
+	\caption{Productions for generating five-grid methods.}
 	\label{table:multigrid-grammar}
 	\begin{bnf*}
 		\bnfprod{$S$} {
@@ -527,13 +542,13 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_h$}, \bnfsp \bnfpn{$c_h$})) \bnfor
 		} \\
 		\bnfmore {
-			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$})) \bnfor (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
+			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^h$}, \bnfsp \bnfpn{$s_{2h}$})) \bnfor (\bnfts{$x_h^0$}, \bnfts{$b_h$},\bnfes, \bnfes)
 		} \\
 		\bnfprod{$c_h$} {
 			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
 		} \\
 		\bnfprod{$B_h$} {
-			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_h$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = M_{h} + N_{h}$}
 		} \\ \\
 		\bnfprod{$s_{2h}$} {
 			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
@@ -546,7 +561,7 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 		} \\
 		\bnfprod{$B_{2h}$} {
-			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{2h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = M_{2h} + N_{2h}$}
 		} \\ \\
 		\bnfprod{$s_{4h}$} {
 			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{4h}$}, \bnfsp \bnfpn{$c_{4h}$})) \bnfor
@@ -559,7 +574,7 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$x^0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
 		} \\
 		\bnfprod{$B_{4h}$} {
-			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{4h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = A_{4h}^{+} + A_{4h}^{-}$}
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{4h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = M_{4h} + N_{4h}$}
 		} \\ \\
 		\bnfprod{$s_{8h}$} {
 			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{8h}$}, \bnfsp \bnfpn{$c_{8h}$})) \bnfor
@@ -571,7 +586,7 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$x^0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
 		} \\ 
 		\bnfprod{$B_{8h}$} {
-			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{8h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = A_{8h}^{+} + A_{8h}^{-}$}
+			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{8h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = M_{8h} + N_{8h}$}
 		} \\ \\
 		\bnfprod{${c}_{16h}$} {
 			\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{16h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{16h}$}, \bnfsp \bnfpn{$c_{8h}$}))
@@ -583,8 +598,8 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 \end{table}
 For the sake of simplicity, we omit the specification of all terminal symbols here, but the reader can safely assume that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is a terminal symbol.
 Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the topmost level, the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the lowest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be included additionally.
-While we have used a five-grid hierarchy as an example for defining the complete grammar, it is possible to specify a similar grammar on a discretization hierarchy with a different depth.
-Furthermore, while the maximum number of coarsening steps depends on the presence of the productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
+While we have used a five-grid hierarchy as an example for defining the complete grammar, it is possible to specify a similar grammar on a discretization hierarchy with a different number of coarsening steps.
+Furthermore, we can extend the grammar also to encompass multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
 For this purpose, we only have to include additional productions for the application of the coarse-grid solver on each subsequent level, which in the case of Table~\ref{table:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
@@ -606,14 +621,13 @@ For this purpose, we only have to include additional productions for the applica
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{8h}^{4h}$}, \bnfsp \bnfpn{$c_{8h}$}))
 	}.
 \end{bnf*}
-
 \subsection{Grammar-Based Algorithm Generation}
 \label{sec:grammar-based-algorithm-generation}
-Within the previous sections, we have developed a formal language for representing multigrid methods based on simple state transition functions.
-Furthermore, we have shown how it is possible to formulate a context-free grammar for generating representations of arbitrarily-structured multigrid methods in that language.
-As we have already discussed in Section~\ref{sec:gggp-representation}, every derivation of a context-free grammar can be represented as a tree.
+Up to this point, we have derived a formal language for representing multigrid methods as a sequence of state transitions, where each transition corresponds to a particular computational step within the method.
+Furthermore, we have demonstrated that it is possible to formulate a CFG for generating representations of arbitrarily-structured multigrid methods in that language.
+As we have already discussed in Section~\ref{sec:gggp-representation}, every derivation of a CFG can be represented as a tree.
 Consider, for instance, the three-grid method shown in Algorithm~\ref{alg:example-three-grid-method}.
-We can express this method as a sequence of the productions defined in Section~\ref{sec:multigrid-grammar}, which yields the derivation tree shown in Figure~\ref{fig:example-three-grid-method-derivation-tree}.
+We can express this method as a sequence of the productions defined in Table~\ref{table:multigrid-grammar}, which yields the derivation tree shown in Figure~\ref{fig:example-three-grid-method-derivation-tree}.
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/trees/three_grid_method_grammar_tree.pdf}
@@ -642,14 +656,14 @@ While this expression includes all information about the computational structure
 We can, however, remove this redundancy by considering Equation~\eqref{eq:example-three-grid-method-expression} as a computational graph, where each node either corresponds to an arithmetic operation or to a predefined symbol, such as $x^0_h$, $b_h$ and $A_h$.
 The resulting graph for Equation~\eqref{eq:example-three-grid-method-expression} is shown in Figure~\ref{fig:example-three-grid-method-computational-graph}.
 \begin{figure}
-	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
+	\captionsetup{justification=centering}
+	\begin{subfigure}[b]{0.49\textwidth}\centering
 		\includegraphics[scale=0.5]{figures/trees/three_grid_method_computational_graph.pdf}
 		\caption{Original graph}
 		\label{fig:example-three-grid-method-computational-graph-original}
 	\end{subfigure}
-	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
+ 	\centering
 		\includegraphics[scale=0.5]{figures/trees/three_grid_method_computational_graph_annotated.pdf}
 		\caption{Annotated graph}
 		\label{fig:example-three-grid-method-computational-graph-annotated}
@@ -657,7 +671,7 @@ The resulting graph for Equation~\eqref{eq:example-three-grid-method-expression}
 	\caption{Computational graph for the three-grid method shown in Algorithm~\ref{alg:example-three-grid-method}.}
 	\label{fig:example-three-grid-method-computational-graph}
 \end{figure}
-Again each node within this graph either corresponds to a predefined symbol or an operation defined on vectors and matrices, whereby in the latter case, there exists a direct edge to each node that refers to one of its arguments.  
+Again each node within this graph either corresponds to a predefined symbol or an operation defined on vectors and matrices, whereby in the case of the latter, there exists a direct edge to each node that refers to one of its arguments.  
 Therefore, whenever a node serves as an argument to more than one operation, multiple edges are directed toward it.
 Based on this representation, we can now define a redundancy-free sequence of computations that corresponds to the given multigrid method.
 The most straightforward way to achieve this for a general graph is to simply introduce a temporary value for each non-leaf node of the graph.
