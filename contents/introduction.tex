@@ -14,8 +14,7 @@ All this makes the manual design and implementation of efficient PDE solvers a d
 Fortunately, with the development of computing devices with ever-increasing power and speed, the automation even of challenging cognitive tasks has started to come into reach.
 Recently, artificial intelligence (AI) methods have demonstrated super-human performance in numerous applications, such as image processing~\cite{krizhevsky2017imagenet}, game playing~\cite{schrittwieser2020mastering,reed2022generalist}, and natural language processing~\cite{brown2020language}.
 Alongside the widespread success in these domains, AI-based techniques for automated algorithm design have achieved breakthroughs in different domains, such as the design of SAT-solvers~\cite{khudabukhsh2016satenstein} and mixed-integer programming~\cite{hutter2010automated}.
-
-In general, methods for automated algorithm design can be classified into \emph{top-down}, and \emph{bottom-up} approaches.
+In general, methods for automated algorithm design can be classified into \emph{top-down} and \emph{bottom-up} approaches.
 Top-down approaches, often also called algorithm configuration methods, aim to represent an algorithm design space as a finite list of global parameters.
 Finding an optimal algorithm design, thus, corresponds to solving a combinatorial optimization problem, sometimes including continuous parameters, which can be tackled using classical black-box optimizers, such as evolutionary algorithms~\cite{back1996evolutionary} and bayesian optimization~\cite{frazier2018tutorial}.
 However, a severe limitation of these approaches is that they do not allow modifying individual steps of an algorithm unless each of them is represented as a distinct global parameter.
