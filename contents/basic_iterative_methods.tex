@@ -1,17 +1,18 @@
-\section{Basic Iterative Methods}~\label{sec:basic-iterative-methods}
+\section{Basic Iterative Methods}
+\label{sec:basic-iterative-methods}
 In general, methods for solving systems of linear equations fall into two categories: Direct and iterative methods.
 Direct methods are characterized by the fact that they are able to compute the exact solution of a linear system in a finite number of steps.
 In contrast, iterative methods compute a series of approximations for the solution of the linear system.
 Even though this series often converges to the exact solution, there is usually no guarantee that the approximations will ever reach the accuracy of a solution computed by a direct method.
-Unfortunately, for many problems applying direct methods is infeasible, due to their high computational complexity and memory storage requirements.
+Unfortunately, for many problems applying direct methods is infeasible due to their high computational complexity and memory storage requirements.
 For instance, Gaussian elimination, in general, requires $\mathcal O(n^3)$ operations for solving a system of linear equations with $n$ unknowns.
-Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, it is based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
+Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, the method is based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
 In contrast, many iterative methods only require the computation of matrix-vector products and do not manipulate the input matrix directly.
 
-As we have shown in Section~\ref{subsec:stencil-codes}, the discretization of many partial differential equations enables the representation of matrix-vector products as the application of a stencil code, whereas each stencil is directly derived from the discretization of a continuous differential operator.
-If we assume that each stencil includes only a finite number of entries and that we need to store at most one stencil per grid point, we can reduce the storage requirements to $\mathcal{O}(n)$, where $n$ is the total number of grid points.
-In case the same stencil applies to the whole domain, we even only need to store a single stencil, whose memory requirements are negligible compared to those for storing the grid.
-Furthermore, due to the approximation of real numbers by floating-point numbers on a computer, even the solution of a direct method is prone to numerical errors.
+As we have illustrated in Section~\ref{subsec:stencil-codes}, the discretization of many partial differential equations (PDEs) enables the representation of matrix-vector products as the application of a stencil code, whereas each stencil is directly derived from the discretization of a continuous differential operator.
+If we assume that each stencil includes only a finite number of entries and at most one stencil per grid point needs to be stored, we can reduce the storage requirements to $\mathcal{O}(n)$, where $n$ is the total number of grid points.
+If the same stencil applies to the whole domain, we even only need to store a single stencil, whose memory requirements are negligible compared to storing the grid itself.
+Furthermore, due to the inevitable approximation of real numbers by floating-point numbers on computers, even the solution of a direct method is prone to numerical errors.
 As a consequence, the exactness of direct methods can be undermined by these effects, and the approximations computed by an iterative method do not necessarily achieve a lower degree of numerical accuracy~\cite{higham2002accuracy}.
 Assuming that we can compute an acceptable approximation using only a finite number of $m$ matrix-vector multiplications, the application of an iterative method reduces the computational complexity of solving a system of linear equations to $O(mn)$.
 In the following, we first introduce basic iterative methods, such as the Jacobi and Gauss-Seidel method, and then derive fundamental statements about their convergence. 
@@ -26,11 +27,11 @@ We begin our introduction of basic iterative methods by considering the general 
 \end{pmatrix}}_{\bm{x}} = 
 \underbrace{\begin{pmatrix}
 		b_1 \\ b_2 \\ \vdots \\ b_n
-\end{pmatrix}}_{\bm{b}}
+\end{pmatrix}}_{\bm{b}},
 	\label{eq:general-system-of-linear-equations}
 \end{equation}
 where $A \in \mathbb{C}^{n \times n}$ is the coefficient matrix, $\bm x \in \mathbb{C}^n$ the vector of unknowns and $\bm b \in \mathbb{C}^n$ the right-hand side.
-At this point, we do not specify whether $A$ is represented as a dense/sparse matrix or a stencil, as long as all the operations employed within subsequent steps are well-defined for a mathematical object of this type.
+At this point, we do not specify whether $A$ is represented as a dense/sparse matrix or a stencil as long as all the operations employed within subsequent steps are well-defined for a mathematical object of this type.
 We can now rewrite Equation~\eqref{eq:general-system-of-linear-equations} to obtain
 \begin{equation}
 	\bm{x} = \bm{x} + \bm{b} - A \bm{x}.
@@ -45,7 +46,7 @@ Replacing $\bm x$ by $\bm{x}^{(k+1)}$ in the left and by $\bm{x}^{(k)}$ in the r
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + \bm b - A \bm{x}^{(k)}.
 	\label{eq:richardson-iteration}
 \end{equation}
-Equation~\eqref{eq:richardson-iteration} is usually called Richardson iteration and can be considered as the most basic form of an iterative method for solving a system of linear equations.
+Equation~\eqref{eq:richardson-iteration} is usually called the Richardson iteration and is the most basic form of an iterative method for solving a system of linear equations.
 Here, the term $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ represents the \emph{residual} or \emph{defect} in iteration $k$ of the method.
 Next, we consider 
 \begin{equation}
@@ -53,31 +54,28 @@ Next, we consider
 	\label{eq:general-preconditioned-system-of-linear-equations}
 \end{equation}
 which represents a modified version of Equation~\eqref{eq:general-system-of-linear-equations}, that is obtained by multiplying each side of the equation by the inverse of a matrix $M$.
-By the rules of linear algebra, Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and, therefore, has the same solution.
-However, it can be also considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as a preconditioner.
-By again considering the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} we obtain the iteration
+By the rules of linear algebra, Equation~\ref{eq:general-preconditioned-system-of-linear-equations} is equivalent to the original system and, therefore, has the same solution.
+However, it can also be considered as a left-preconditioned version of Equation~\eqref{eq:general-system-of-linear-equations}, with $M$ as a preconditioner.
+Considering again the fixed point of Equation~\eqref{eq:general-preconditioned-system-of-linear-equations} yields the iteration
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:general-stationary-iterative-method}
 \end{equation}
 which represents the general form of a stationary iterative method. 
-For instance, if we replace $M$ with the unit matrix $I$, we obtain a Richardson iteration.
-Furthermore, setting $M = A$ allows us to obtain the solution in one step since then
+For instance, if we replace $M$ with the unit matrix $I$, we obtain the Richardson iteration.
+Furthermore, setting $M = A$ allows us to compute the solution of the system in a single step since then
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + A^{-1}(\bm b - A \bm{x}^{(k)}),
 	\label{eq:one-step-iteration}
 \end{equation}
-which leads to
-\begin{equation}
-	\bm{x}^{(k+1)} = A^{-1}\bm b.
-\end{equation}
+which leads to $\bm{x}^{(k+1)} = A^{-1}\bm b$.
 The result of this iteration $\bm{x}^{(k+1)}$ is, thus, independent of the choice of $\bm{x}^{(k)}$. 
 If we insert $\bm{x} = A^{-1}\bm b$ into Equation~\eqref{eq:general-system-of-linear-equations}, it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
 Since the computation of the inverse of a general matrix $A$ is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is, of course, impractical.
 However, this derivation already provides us with an intuition about the choice of $M$.
 In fact, the closer $M^{-1}$ is to the actual inverse of $A$, the faster we can expect the convergence of the respective stationary iterative method to be.
-In contrast, the choice of a matrix $M$ that is easy to invert, with Richardson's iteration representing the extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute but that potentially suffers from slow convergence.
-Before we introduce some basic iterative methods that fall into the framework of Equation~\eqref{eq:general-stationary-iterative-method}, note that it can be reformulated as
+In contrast, the choice of a matrix $M$ that is easy to invert, with the Richardson iteration representing an extreme case with $I^{-1} = I$, leads to an iterative method that is easy to compute but which might suffer from slow convergence.
+Before we introduce some basic iterative methods within the framework of Equation~\eqref{eq:general-stationary-iterative-method}, note that it can be reformulated as
 \begin{equation}
 	M (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)}. 
 \end{equation}
@@ -90,39 +88,39 @@ we obtain a new system of linear equations
 	M \bm{c}^{(k+1)} = \bm{b} - A \bm{x}^{(k)}. 
 	\label{eq:general-stationary-iterative-method-system-formulation}
 \end{equation}
-The solution of this system $\bm{c}^{(k+1)}$ then provides us with the approximate solution in step $i+1$ through the relation
+The solution of this system $\bm{c}^{(k+1)}$ provides us with the approximate solution in step $i+1$ through the relation
 \begin{equation}
 	\bm{x}^{(k+1)} =  \bm{x}^{(k)} + \bm{c}^{(k+1)}.
 \end{equation}
-Instead of computing the inverse of $M$ in each iteration, we can, therefore, solve the system of linear equations represented by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}.
+Therefore, instead of computing the inverse of $M$ in each iteration, we can solve the system of linear equations represented by Equation~\eqref{eq:general-stationary-iterative-method-system-formulation}.
 
-To derive a suitable choice for $M$ that leads to a faster convergence than Richardson's iteration, we define the splitting
+Next, to derive a suitable choice for $M$ that leads to a faster convergence than Richardson's iteration, we define the splitting
 \begin{equation}
 	A = D - L - U,
 \end{equation} 
 where $D$ is the lower diagonal, $-L$ the lower triangular, and $-U$ the upper triangular part of $A$, respectively.
-Both the Jacobi and the Gauss-Seidel method is defined based on this splitting.
+Both the Jacobi and Gauss-Seidel method are defined based on this splitting.
 First of all, setting $M = D$, yields the Jacobi method
 \begin{equation}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + D^{-1}(\bm b - A \bm{x}^{(k)}).
 	\label{eq:jacobi-method}
 \end{equation}
-Note that since $D$ is a diagonal matrix, we can easily obtain its inverse by inverting all of its diagonal entries.
+Since $D$ is a diagonal matrix, we can easily compute its inverse by inverting all of its diagonal entries.
 Therefore, each iteration of the Jacobi method consists of a simple matrix-vector multiplication of the residual $\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)}$ by the diagonal matrix $D^{-1}$.
-To define the Jacobi method as a series of stencil operations, according to the derivation presented in Section~\ref{subsec:stencil-codes}, we need to obtain the diagonal of a given stencil $S$.
+To define the Jacobi method as a series of stencil operations, according to the derivation presented in Section~\ref{subsec:stencil-codes}, we need to extract the diagonal of a given stencil $S$.
 Since a stencil entry with an offset of zero always refers to the current grid point, its value is equal to the corresponding diagonal entry of the matrix $A$.
 We can therefore define the diagonal of $S$ as
 \begin{equation}
-	\text{diag}(S_h) = \begin{cases}
-		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S_h \\
+	\text{diag}(S) = \begin{cases}
+		\{(\bm{0}, b) \} & \text{if} \; (\bm 0, b) \in S \\
 		\{(\bm{0}, 0) \} & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag}
 \end{equation}
 Based on this definition, we can also derive the inverse diagonal of a stencil as
 \begin{equation}
-	\text{diag-inv}(S_h) = \begin{cases}
-		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S_h \\
+	\text{diag-inv}(S) = \begin{cases}
+		\{(\bm{0}, \frac{1}{b}) \} & \text{if} \; (\bm 0, b) \in S \\
 		\{(\bm{0}, 0) \} & \text{else}.
 	\end{cases}
 	\label{eq:stencil-diag-inv}
@@ -133,7 +131,7 @@ Because the Jacobi method, as defined in Equation~\eqref{eq:jacobi-method}, does
 	\label{eq:weighted-jacobi-method}
 \end{equation}
 where $\omega$ is chosen from the interval $\left(0, 2\right)$.
-Here, employing a value $\omega$ smaller than one is called underrelaxation and larger than one overrelaxation.
+Here, employing a value smaller than one is called \emph{underrelaxation}, while for a value larger than one, the term \emph{overrelaxation} is used.
 Note that $\omega = 1$ leads to the original Jacobi method without any relaxation.
 
 As a second variant of Equation~\eqref{eq:general-stationary-iterative-method}, we define the Gauss-Seidel method with $M = D - U$ which results in an iteration of the form
@@ -141,27 +139,27 @@ As a second variant of Equation~\eqref{eq:general-stationary-iterative-method}, 
 	(D - L) \bm{c}^{(k+1)} = \bm{b} - A \bm{x}^{(k)}, 
 	\label{eq:gauss-seidel-method}
 \end{equation}
-where $\bm{c}^{(k+1)}$ is again the correction term $\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)}$.
-Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily compute its inverse, but instead need to solve Equation~\eqref{eq:gauss-seidel-method} in each iteration of the method.
+where $\bm{c}^{(k+1)}$ again is the correction term $\bm{c}^{(k+1)} = \bm{x}^{(k+1)} - \bm{x}^{(k)}$.
+Note that since $M = D - L$ does not represent a diagonal matrix, we can not easily compute its inverse but instead need to solve Equation~\eqref{eq:gauss-seidel-method} in every iteration of the method.
 However, since $D - L$ is a lower triangular matrix, the solution of this system can be computed with a single step of back-substitution~\cite{saad2003iterative}. 
-To formulate the Gauss-Seidel method as a sequence of stencil operations, we now additionally need to define a function that extracts the lower triangle of a given stencil.
-As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by only including all entries with an offset lower than zero.
+To express the Gauss-Seidel method as a sequence of stencil operations, we now additionally need to define a function that extracts the lower triangle of a given stencil.
+As each diagonal entry corresponds to an offset of zero in each dimension, we can obtain the lower triangle by including only those entries with an offset lower than zero.
 The resulting operation is defined in Equation~\eqref{eq:stencil-lower}.
 \begin{equation}
-	\text{lower}(S_h) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\text{lower}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\emptyset & \text{else}.
+	\text{lower}(S) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a < \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\text{lower}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \geq \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\emptyset & \text{else}
 	\end{cases}
 	\label{eq:stencil-lower}
 \end{equation}
 
 Similarly, we can also extract the upper triangle of a given stencil, which is formulated in Equation~\eqref{eq:stencil-upper}.
 \begin{equation}
-	\text{upper}(S_h) = \begin{cases}
-		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\text{upper}(\tilde{S}_h) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \\ & \text{and} \; S_h = (\bm a, b) \cup \tilde{S}_h \\
-		\emptyset & \text{else}.
+	\text{upper}(S) = \begin{cases}
+		\{(\bm{a}, b) \} \cup \text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a > \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\text{upper}(\tilde{S}) & \text{if} \; \exists\, \bm a, b \; \text{with} \; \bm a \leq \bm 0 \\ & \text{and} \; S = (\bm a, b) \cup \tilde{S} \\
+		\emptyset & \text{else}
 	\end{cases}
 	\label{eq:stencil-upper}
 \end{equation}
@@ -171,37 +169,37 @@ Therefore, we postpone the treatment of other and more advanced variants of the 
 \subsection{Convergence}
 In contrast to direct methods, which compute the solution of a given system of linear equations in a fixed number of computational steps, iterative methods compute a series of approximations.
 This series is said to converge when the difference between the actual solution and subsequent approximations approaches zero.
-To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations obtained with a specific iterative method.
+To quantify this behavior, we introduce a number of metrics used for evaluating the quality of a series of approximations computed with a specific iterative method.
 First of all, assuming $\bm{x}^{(k)}$ is the $k$th approximation and $\bm{x}^{*}$ the correct solution of the system, we can define the error in iteration $k$ as
-\begin{equation*}
+\begin{equation}
 	\bm{e}^{(k)} = \bm{x}^{(k)} - \bm{x}^{*}.
-\end{equation*}
+\end{equation}
 While the error gives us an immediate way to quantify the accuracy of an approximation, we usually do not know the correct solution of a given system of linear equations.
 As a remedy, we instead consider the residual
-\begin{equation*}
+\begin{equation}
 	\bm{r}^{(k)} = \bm{b} - A \bm{x}^{(k)},
-\end{equation*}
+\end{equation}
 which can always be computed irrespective of whether we know $\bm{x}^{*}$.
 Note that for an error of zero, the residual vanishes as well.
 Remember that the iterative methods introduced in the last section can all be considered as a fixed-point iteration of the form
-\begin{equation}
-	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}).
-\end{equation}
-Assuming that $\bm{e}^{(k)} = \bm{0}$, we, thus, have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
-\begin{equation}
-	\bm{x}^{(k+1)} = \bm{x}^{*}.
-\end{equation}
-The solution $\bm{x}^{*}$ of the system $A \bm{x} = b$ is therefore a fixed point of each stationary iterative method.
-However, note that this represents a necessary and not sufficient condition. 
-Consider an arbitrary fixed-point of Equation~\eqref{eq:general-stationary-iterative-method}
 \begin{equation*}
-	\bm{x} = \bm{x} + M^{-1}(\bm b - A \bm{x}).
+	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}).
 \end{equation*}
+Assuming that $\bm{e}^{(k)} = \bm{0}$, we, thus, have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
+\begin{equation*}
+	\bm{x}^{(k+1)} = \bm{x}^{*}.
+\end{equation*}
+The solution $\bm{x}^{*}$ of the system $A \bm{x} = \bm{b}$ is, therefore, a fixed point of each stationary iterative method.
+However, note that this represents a necessary and not sufficient condition. 
+Consider an arbitrary fixed-point $\bm{x}$ of Equation~\eqref{eq:general-stationary-iterative-method}
+\begin{equation}
+	\bm{x} = \bm{x} + M^{-1}(\bm b - A \bm{x}).
+\end{equation}
 Transforming this equation again into a system of linear equations yields
 \begin{equation*}
 	M^{-1} A \bm{x} = M^{-1}\bm b,
 \end{equation*}
-which means that each fixed-point $\bm{x}$ represents a solution of the preconditioned linear system~\eqref{eq:general-preconditioned-system-of-linear-equations} and, hence, also of the original system~\eqref{eq:general-system-of-linear-equations}.
+which means that each fixed-point $\bm{x}$ represents a solution of the preconditioned linear system~\eqref{eq:general-preconditioned-system-of-linear-equations} and hence also of the original system~\eqref{eq:general-system-of-linear-equations}.
 If we assume that $A$ is a square, nonsingular matrix, the solution of each system of linear equations with $A$ as its coefficient matrix is unique. 
 Therefore, it must be true that $\bm{x} = \bm{x}^{*}$, which means that the computed fixed point is equal to the correct solution of the linear system the method aims to solve.
 However, the question remains to be answered under which conditions a sequence of the form of Equation~\eqref{eq:general-stationary-iterative-method} converges to a fixed point and how many iterations must be performed to achieve this goal.
@@ -209,14 +207,14 @@ For this purpose, we rewrite Equation~\eqref{eq:general-stationary-iterative-met
 \begin{equation}
 	\bm{x}^{(k+1)} = (I - M^{-1} A) \bm{x}^{(k)} + M^{-1}\bm b.
 \end{equation}
-Within this equation we can now set $\bm{x}^{i} = \bm{x}^{0}$ 
-\begin{equation}
+Within this equation we can now set $\bm{x}^{(i)} = \bm{x}^{(0)}$ which yields
+\begin{equation*}
 	\bm{x}^{(1)} = (I - M^{-1} A) \bm{x}^{(0)} + M^{-1}\bm b,
-\end{equation}
+\end{equation*}
 and expand this sequence to the two-iteration series
-\begin{equation}
+\begin{equation*}
 	\bm{x}^{(2)} = (I - M^{-1} A)^2 \bm{x}^{(0)} + (2I - M^{-1} A)M^{-1} \bm{b}.
-\end{equation}
+\end{equation*}
 By continuing this recursively for an arbitrary number of $k$ times, we see that the resulting equation will always be of the form
 \begin{equation}
 	\bm{x}^{(k)} = (I - M^{-1} A)^k \bm{x}^{(0)} + N^{(k)}\bm{b},
@@ -224,7 +222,11 @@ By continuing this recursively for an arbitrary number of $k$ times, we see that
 \end{equation}
 which means that we can always separate the term $N^{(k)}\bm{b}$ from the rest of the equation.
 Note that here the superscript $G^k$ denotes the $k$th power of $G$, while $N^{(k)}$ means that the matrix has been obtained through $k$ recursive substitutions of the respective iterate $\bm{x}^{(k)}$.
-Since we have derived Equation~\eqref{eq:stationary-iterative-method-series} from Equation~\eqref{eq:general-stationary-iterative-method}, it still holds true that $\bm{x}^{*}$ is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
+Since we have derived Equation~\eqref{eq:stationary-iterative-method-series} from Equation~\eqref{eq:general-stationary-iterative-method}, it still holds true that
+\begin{equation}
+	\bm{x}^{*} = (I - M^{-1} A)^k \bm{x}^{*} + N^{(k)}\bm{b},
+\end{equation}
+is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
 \begin{equation}
 	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
 	\label{eq:iteration-matrix-sequence}
@@ -235,7 +237,7 @@ To reason about the convergence of this sequence, we introduce the spectral radi
 	\rho (A)=\max \limits_{1 \leq k \leq n} |\lambda _{k}|,
 \end{equation}
 where $A$ is a matrix of rank $n$ with the eigenvalues $\lambda_{1}, \dots, \lambda_{n}$.
-Based on this definition we can then state the following theorem:
+Based on this definition, we can state the following theorem:
 \begin{theorem}
 $\lim \limits_{k \to  \infty} G^k = 0$ if and only if $\rho(G) < 1$~\cite{varga1962iterative,saad2003iterative}.
 \label{theorem:general-convergence-result}
@@ -246,9 +248,9 @@ For this purpose, we introduce the general \emph{convergence factor} $\rho$ of a
 \begin{equation}
 	\rho = \lim \limits_{k \to  \infty} \left( \max \limits_{x^{(0)} \in \mathbb{R}^{n}} \frac{\norm{\bm{x}^{(k)} - \bm{x}^{*}}}{\norm{\bm{x}^{(0)} - \bm{x}^{*}}} \right)^{\frac{1}{k}}.
 \end{equation} 
-Furthermore, the \emph{convergence rate} $\tau$ is defined as the natural logarithm of the inverse of the convergence factor
+Furthermore, the \emph{convergence rate} $\tau$ is defined as the inverse natural logarithm of the convergence factor
 \begin{equation}
-	\tau = -\ln \rho
+	\tau = -\ln \rho.
 \end{equation}
 We can now establish a link between the spectral radius of the iteration matrix and the convergence factor of the corresponding stationary iterative method by considering the following theorem:  
 \begin{theorem}

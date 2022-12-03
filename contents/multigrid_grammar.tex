@@ -1,21 +1,16 @@
 After establishing a theoretical foundation on both multigrid methods and evolutionary program synthesis, we can now focus on developing a formal language for expressing arbitrarily-structured multigrid solvers in a generalized way.
-As we have seen in Section~\ref{sec:multigrid-cycles}, according to the classical formulation of multigrid, each of these methods belongs to a particular class of \emph{cycles}.
-Each of these cycles possesses a distinct computational structure that stems from the number of recursive descents performed on each level of the method, as determined by the parameter $\gamma$ in Algorithm~\ref{alg:multigrid-cycle}.
+As we have seen in Section~\ref{sec:multigrid-cycles}, according to the classical formulation of multigrid, each of these methods belongs to a particular class of cycles.
+Each cycle possesses a distinct computational structure that stems from the number of recursive descents performed on each level of the method, as determined by the parameter $\gamma$ in Algorithm~\ref{alg:multigrid-cycle}.
 For instance, a V-cycle is characterized by exactly one recursive descent per level.
 Furthermore, each classical multigrid cycle employs a fixed number of smoothing steps per discretization level, which is determined by the parameters $\nu_1$ and $\nu_2$.
 While the representation of a multigrid method as a recursive cycle yields a formally simple and easily parameterizable algorithmic formulation, it also enforces unnecessary restrictions on its structure.
 Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-traditional-multigrid-cycle}.
 \begin{figure}
-	\begin{subfigure}{0.1\textwidth}
 		\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
+            \node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 			\node   (8h) at (-0.75, 1){$8h$};
-		\end{tikzpicture}
-	\end{subfigure}
-	\begin{subfigure}{0.9\textwidth}
-		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=0.8] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=0.8] {};
 			\node	(c) at (1,2) [draw, circle,scale=0.8] {};
@@ -60,53 +55,50 @@ Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-tradit
 			(t) edge[->] (u)
 			;
 		\end{tikzpicture}
-	\end{subfigure}
 	\caption{Example for a non-classical multigrid method.}
 	\label{fig:non-traditional-multigrid-cycle}
 \end{figure}
 While this method reaches the coarsest level twice and, hence, at first sight, looks similar to a W-cycle, it employs a unique pattern of computations that is completely different from any known multigrid cycle.
 As a consequence, this method can not be represented within the classical framework of multigrid cycles, as formulated in Algorithm~\ref{alg:multigrid-cycle}.
-To overcome the limitations of this formulation and construct multigrid methods with an arbitrary sequence of computations on each discretization level, a new formal language is needed.
-The first step towards the development of such a language is to find a way to represent the current state within each step of a multigrid method.
-Based on this representation, we can then define transition rules between the individual states, which will allow us to construct methods of arbitrary structure.
+To overcome the limitations of this formulation by constructing multigrid methods with a unique sequence of computations on each discretization level, a new formal language is needed.
+The first step toward the development of such a language is to find a way to represent the state within each step of a multigrid method.
+Based on this representation, we can then define transition rules between the individual states, which will allow us to design multigrid methods of novel structure.
 \section{Multigrid States}
 \label{sec:multigrid-states}
-In order to derive a representation for the state of a multigrid method, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
+In order to derive a representation of the state of a multigrid method, we need to reconsider our original formulation of a multigrid cycle in Algorithm~\ref{alg:multigrid-cycle}.
 For the sake of simplicity, in the following, symbols that correspond to vectors are written in regular font.
 In case the mathematical interpretation of a certain lowercase symbol is ambiguous, its meaning will be explicitly stated. 
-With the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, denoted by
-\begin{equation*}
-	x_{H} = A^{-1}_H b_H,
-\end{equation*}
-where $H$, as usual, is the spacing of the grid points on this level, we can identify three elementary multigrid operations that can be performed within a cycle.
+With the exception of the coarsest level, where the only allowed operation is the application of the coarse-grid solver, we can identify three elementary multigrid operations that can be performed within a cycle.
 \begin{definition}[Elementary Multigrid Operations]
 \label{def:elementary-multigrid-operations}
-On each level, $l > 0$, the following three operations can be performed within a multigrid cycle.
+On each level except for the lowest, the following three operations can be performed within a multigrid cycle.
 \begin{itemize}
 	\item \textbf{Smoothing}: Reduce the oscillatory error components of the approximate solution $\tilde{x}_h$ on the current level. 
-	\begin{equation*}
+	\begin{equation}
 		\tilde{x}_h = \tilde{x}_h + \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right) \; \text{where} \; A_h = M_h + N_h
-	\end{equation*}
+	\end{equation}
 	\item \textbf{Coarsening}: A coarse problem is obtained by restricting the residual.
-	\begin{align*}
-		\tilde{x}_{2h} & = 0 \\
+	\begin{equation}
+    \begin{split}
+     	\tilde{x}_{2h} & = 0 \\
 		b_{2h} & = I_h^{2h} (b_h - A_h \tilde{x}_h)
-	\end{align*}
+    \end{split}
+	\end{equation}
 	\item \textbf{Coarse-Grid Correction}: Prolongate a correction $\tilde{x}_{2h}$ obtained on a coarser grid to reduce the low-frequency error components of the approximate solution $\tilde{x}_h$.
-	\begin{equation*}
+	\begin{equation}
 		\tilde{x}_h = \tilde{x}_h + I_{2h}^h \tilde{x}_{2h}
-	\end{equation*}
+	\end{equation}
 \end{itemize}
 \end{definition}
 Except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e., $\tilde{x}_{h}$ and $\tilde{x}_{2h}$, and the right-hand side $b_h$.
-However, in contrast to the coarse-grid correction step, which utilizes the current approximate solution on the coarse grid, both smoothing and coarsening require us to first compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
-While this differentiation is not strictly necessary, it leads to simpler expressions since both coarsening and smoothing can then be split into two steps.
-Furthermore, since in practice, the actual error can usually not be computed, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be repeatedly computed.
+However, in contrast to the coarse-grid correction step, which makes use of the current approximate solution on the coarse grid, both smoothing as well as coarsening requires us first to compute the residual $r_h = b_h - A_h \tilde{x}_h$, which can be considered as an intermediate step.
+While this differentiation is not strictly necessary, it leads to simpler expressions since both operations can then be split into two steps.
+Furthermore, as in practice, the error can usually not be computed directly, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be computed repeatedly.
 %The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a coarse-grid correction term of the form $\omega A_h^{-1} r_h$.
 To derive a general representation for the state of a multigrid method based on our previous observations, we next consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}, which corresponds to a three-grid V-cycle that performs one step of underrelaxed Jacobi smoothing on the second finest level.
 \begin{algorithm}
 	\begin{algorithmic}[1]
-		\State $\tilde{x}_{h} = x_{h}^0$
+		\State $\tilde{x}_{h} = x_{h}^{0}$
 		\State $r_{h} = b_{h} - A_h \tilde{x}_{h} $
 		\State $ \tilde{x}_{2h} = 0$
 		\State $ b_{2h} = I_{h}^{2h} r_{h}$
@@ -119,38 +111,38 @@ To derive a general representation for the state of a multigrid method based on 
 \caption{Example for a three-grid V-cycle}
 \label{alg:example-three-grid-method}
 \end{algorithm}
-In each step of this sequence of operations, either the approximate solution, right-hand side or residual is updated on a certain level.
-While in practice, each of these variables corresponds to a data structure encompassing numerical values, our goal is to represent the algorithmic structure of a multigrid solver in the form of symbolic expressions.
+In each step of this sequence, either the approximate solution, right-hand side, or residual is updated on a particular level.
+While in practice, each of these variables corresponds to a data structure comprising numerical values, our goal is to represent the algorithmic structure of a multigrid method in the form of symbolic expressions.
 In this case, the value of each variable is determined by the expression that computes its value.
 Updating a variable, therefore, corresponds to assigning a new expression to the corresponding symbol.
 For this purpose, we consider the tuple
 \begin{equation*}
-	S_h = (\tilde{x}_h, b_h, r_h)
+	Z_h = (\tilde{x}_h, b_h, r_h)
 \end{equation*} 
 on each level with step size $h$, which then refers to the expression of each of the corresponding three variables.
-Starting from the first line, we can progressively update the contents of this tuple with the expression given in each line, whereby each occurrence of one of the three symbols is replaced by the expression currently contained at the respective position in the tuple.
-Figure~\ref{fig:example-tree-grid-method-states} shows the respective state tuple for each line of Algorithm~\ref{alg:example-three-grid-method}.
+Starting from the first line, we can progressively update the contents of this tuple with the expression given in each line, whereby each occurrence of one of the three symbols is replaced by the expression currently contained in the respective entry of the tuple.
+Figure~\ref{fig:example-tree-grid-method-states} shows the content of the state tuple for each line of Algorithm~\ref{alg:example-three-grid-method}.
 \begin{figure}
 	\begin{equation*}
-		\begin{array}{l l l}
+		\begin{array}{l l}
 			\hline
-			\bm{S_h} & \bm{=} & \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
-			1: & &  x_{h}^0, \, b_h, \, \lambda \\
-			2: & &  x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0 \\ \hline
-			\bm{S_{2h}} & \bm{=} &  \bm{(\tilde{x}_{2h}, \, b_{2h}, \, r_{2h})} \\
-			3: & &  0, \, \lambda, \, \lambda \\
-			4: & &  0, \, I_{h}^{2h}\underbrace{(b_{h} - A_h x_{h}^0)}_{r_{h}}, \, \lambda \\
-			5: & &  0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \,\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} 0 \\
-			6: & & 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0}_{r_{2h}}), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda\\
-			7: & & 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \\ 
-			& &  \underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{u}_{2h}}) \\
-			8: & &   (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{u}_{2h}}) + 0.6 \cdot D_{2h}^{-1} \cdot \\ 
-			& & (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0))}_{r_{2h}}), \\ 
-			& & I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda \\ \hline 
-			\bm{S_h} & \bm{=} & \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
-			9: & & x_{h}^0 + I_{2h}^h ((0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)) + 0.6 \cdot D_{2h}^{-1} \cdot \\ 
-			& &  (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)))), \\ 
-			& &  b_h, \, \lambda \\
+			\bm{Z_h} & \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
+			1: &  x_{h}^0, \, b_h, \, \lambda \\
+			2: &  x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0 \\ \hline
+			\bm{Z_{2h}} &  \bm{(\tilde{x}_{2h}, \, b_{2h}, \, r_{2h})} \\
+			3: &  0, \, \lambda, \, \lambda \\
+			4: &  0, \, I_{h}^{2h}\underbrace{(b_{h} - A_h x_{h}^0)}_{r_{h}}, \, \lambda \\
+			5: &  0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \,\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} 0 \\
+			6: & 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0}_{r_{2h}}), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda\\
+			7: & 0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0), \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \\ 
+			&  \underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0)}_{b_{2h}} - A_{2h} (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{x}_{2h}}) \\
+			8: &   (\underbrace{0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)}_{\tilde{x}_{2h}}) + 0.6 \cdot D_{2h}^{-1} \cdot \\ 
+			& (\underbrace{I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0))}_{r_{2h}}), \\ 
+			& I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda \\ \hline 
+			\bm{Z_h} & \bm{(\tilde{x}_h, \, b_h, \, r_h)}  \\
+			9: & x_{h}^0 + I_{2h}^h ((0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)) + 0.6 \cdot D_{2h}^{-1} \cdot \\ 
+			& (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} (0 + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} (I_{h}^{2h}(b_{h} - A_h x_{h}^0) - A_{2h} 0)))), \\ 
+			&  b_h, \, \lambda \\
 			\hline
 		\end{array}
 	\end{equation*}
@@ -158,106 +150,113 @@ Figure~\ref{fig:example-tree-grid-method-states} shows the respective state tupl
 	\label{fig:example-tree-grid-method-states}
 \end{figure}
 As introduced in Section~\ref{sec:formal-languages}, the empty symbol $\lambda$ denotes that a certain component of the tuple is unspecified.
-After the last step of the sequence (line 9), the first component of the tuple ($\tilde{x}_h$) combines all computational steps of the method in a single expression.
+After the last step of the sequence (Line~9), the first component $\tilde{x}_h$ of the tuple combines all computational steps of the method in a single expression.
 
-While Figure~\ref{fig:example-tree-grid-method-states} illustrates the ternary tuple $S_h$ contains all relevant information of a multigrid method's current state on a certain level, we have not yet discussed how we can transition between the states of two subsequent levels.
-First, we consider the case of transitioning from a level with step size $h$ to the next coarser level with step size $2h$, which is shown in line 3 and 4 of Figure~\ref{fig:example-tree-grid-method-states}.
+While Figure~\ref{fig:example-tree-grid-method-states} illustrates that the ternary tuple $Z_h$ contains all relevant information of a multigrid method's current state on a certain level, we have not yet discussed how we can transition between the states of two subsequent levels.
+First, we consider the case of transitioning from a level with step size $h$ to the next coarser grid with step size $2h$, which is shown in Line~3~and~4 of Figure~\ref{fig:example-tree-grid-method-states}.
 Here, the tuple
 \begin{equation*}
-	S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
+	Z_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
 \end{equation*} 
 corresponds to the coarse-grid error equation 
 \begin{equation*}
 	A_{2h} x_{2h} = I_{h}^{2h}(b_{h} - A_h x_{h}^0),
 \end{equation*}
-whose solution is to be approximated starting with an initial guess of zero.
-Therefore, all information to create this state is obtained from the next finer level in form of the restricted residual $I_h^{2h} r_h = I_h^{2h} (b_{h} - A_h x_{h}^0)$.
-On the other hand, consider the transition from a coarse grid back to the next finer grid in form of the coarse-grid correction in line 9.
-In this case, we both require the approximate solution $\tilde{x}_{2h}$, computed on the coarse grid, as well as the previous values of the first two components $\tilde{x}_h$ and $b_h$ of the fine-grid state tuple.
-While for coarsening, we can neglect all previous states on the coarser grid, as their information is explicitly contained in the residual, for a coarse-grid correction, the previous state on the fine grid needs to be restored.
-Note that for a multigrid method that operates on a hierarchy of discretizations of even larger depth than the example shown in Algorithm~\ref{alg:example-three-grid-method}, this process must be recursively performed for each bottom-up transition.
-To resolve this issue, we need to extend our original formulation of a multigrid state by a fourth component with the purpose of preserving the current state on the next-higher level.
-While at the topmost level, this component is always empty, whenever coarsening is performed, the state of the current level is included.
-For instance, in line 4 of Figure~\ref{fig:example-tree-grid-method-states} we have to extend the given ternary tuple 
+whose solution is to be approximated, starting with an initial guess of zero.
+Therefore, all necessary information for the creation of this state is obtained from the next higher level in the form of the restricted residual 
 \begin{equation*}
-S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
+    I_h^{2h} r_h = I_h^{2h} (b_{h} - A_h x_{h}^0).
+\end{equation*}
+On the other hand, consider the transition from a coarse grid back to the next finer grid in the form of the coarse-grid correction in Line~9.
+In this case, we require both the approximate solution $\tilde{x}_{2h}$, computed on the coarse grid, as well as the previous values of the first two entries of the fine-grid state tuple, i.e., $\tilde{x}_h$ and $b_h$.
+While for coarsening, we can neglect all previous states on the coarser grid, as their information is explicitly contained in the residual, for a coarse-grid correction, the previous state on the fine grid needs to be restored.
+Note that for a multigrid method that operates on a hierarchy of discretizations of even larger depth than the example shown in Algorithm~\ref{alg:example-three-grid-method}, this process must be carried out recursively for each bottom-up transition.
+To resolve this issue, we need to extend our original formulation of a multigrid state with a fourth component that has the purpose of preserving the current state on the next-higher level.
+While at the topmost level, this component is always empty, whenever coarsening is performed, the state of the current level is included.
+For instance, in Line~4 of Figure~\ref{fig:example-tree-grid-method-states} we have to extend the given ternary tuple 
+\begin{equation*}
+Z_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda)
 \end{equation*}
 by including the state 
 \begin{equation*}
-S_h = (x_{h}^0, \, b_h, \, b_{h} - A_h x_{h}^0, \, \lambda) 
+Z_h = (x_{h}^0, \, b_h, \, \lambda, \, \lambda) 
 \end{equation*} 
 as an additional fourth entry. 
-Hence, all required information for restoring the previous fine-grid state values is then included in the quaternary tuple 
+As a consequence, all required information for restoring the previous fine-grid state values is included in the quaternary tuple 
 \begin{equation*}
-	S_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda, \, S_h).
+	Z_{2h} = (0, \, I_{h}^{2h}(b_{h} - A_h x_{h}^0), \, \lambda, \, Z_h).
 \end{equation*}
-%TODO clarify that line 3 and 4 can in practice be combined to one step
-Note that since $S_h$ represents the current state on the finest grid, its fourth component is empty, while otherwise, it would refer to the previous state of the next higher level in the discretization hierarchy.
-To assess the feasibility of this approach, we have to check whether all components required to construct the coarse-grid correction expression, as in line 9 of Figure~\ref{fig:example-tree-grid-method-states}, are available within the current state.
+Note that since $Z_h$ represents the current state on the finest grid, its fourth component is empty, while otherwise, it would refer to the previous state of the next higher level in the discretization hierarchy.
+To assess the feasibility of this approach, we have to check whether all components required to construct the coarse-grid correction expression, as in Line~9 of Figure~\ref{fig:example-tree-grid-method-states}, are available within the current state.
 Since in addition to $\tilde{x}_{2h}$, both the approximate solution $\tilde{x}_h$ and right-hand side $b_h$ are now contained in the fourth component of the coarse-grid state tuple, this expression can be assembled in a straightforward manner.
-At this point, note that a coarse-grid correction from the coarsest grid represents a special case. 
-Since the only allowed operation on this level is the application of the coarse-grid solver, which is denoted by multiplication with the inverse of the system matrix, it is represented as a single operation in the form of the expression 
+At this point, note that a coarse-grid correction on the lowest level represents a special case. 
+Since the only allowed operation on this level is the application of the coarse-grid solver, which is denoted by multiplication with the inverse of the system matrix, it is represented as a single operation given by the expression 
 \begin{equation*}
 	\tilde{x}_{2h} = \tilde{x}_{2h} + I_{4h}^{2h} A_{4h}^{-1} I_{2h}^{4h} r_{2h}.
 \end{equation*}
-After resolving the issue of restoring previous states during a coarse-grid correction, we can, thus, provide a complete formal definition of the state of a multigrid method.
+After resolving the issue of restoring previous states during a coarse-grid correction, we can thus provide a complete formal definition of the state of a multigrid method.
 \begin{definition}[Multigrid State]
 \label{def:multigrid-state}
-The state of a multigrid method for solving the equation $A_{h} x_{h} = b_{h}$ on a certain grid with step size $h$ is given by the quaternary tuple
-\begin{equation*}
-	S_{h} = \left( \tilde{x}_{h}, b_{h}, c_{h}, S_{h/2}\right), 
-\end{equation*}
+The state of a multigrid method for solving the equation $A_{h} x_{h} = b_{h}$ on a grid with step size $h$ is given by the quaternary tuple
+\begin{equation}
+	Z_{h} = \left( \tilde{x}_{h}, b_{h}, c_{h}, Z_{h/2}\right), 
+\end{equation}
 where
 \begin{itemize}
 	\item $\tilde{x}_{h}$ is a mathematical expression for computing an approximate solution of the above equation,
 	\item $b_{h}$ is an expression for computing the right-hand side of the above equation,
 	\item $c_{h}$ is a correction term for improving the accuracy of the approximate solution,
-	\item $S_{h/2}$ is either the current state on the next finer level with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
+	\item $Z_{h/2}$ is either the current state on the next finer level with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
 \end{itemize}
 \end{definition}
-Note that in Definition~\ref{def:multigrid-state}, the third component $c_{2h}$ of a multigrid state no longer has to refer to the residual but now represents an expression that corresponds to a general correction term.
+Note that in Definition~\ref{def:multigrid-state}, the third component $c_{h}$ of a multigrid state no longer has to refer to the residual but now represents an expression that corresponds to a general correction term.
 While in the classical multigrid formulation, as presented in Section~\ref{sec:multigrid-methods}, all smoothing expressions are directly derived from the residual, this is not necessarily the case for all smoothers, such as, for instance, distributive smoothing~\cite{trottenberg2000multigrid}.
 Furthermore, the general notion of a correction term enables us to represent intermediate expressions that do not specifically refer to the current residual within a multigrid state.
-For instance, $c_h = \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right)$ corresponds to the complete expression that is used to correct the current approximate solution within smoothing.
+For instance,
+\begin{equation*}
+    c_h = \omega M_h^{-1} \left( b_h - A_h \tilde{x}_h \right)
+\end{equation*}
+contains the complete expression for correcting the current approximate solution within smoothing.
 %Finally, note that the computation of the coarse-grid correction does not require the value of the previous fine-grid residual.
 %Therefore, the corresponding expression does not need to be restored and the residual can be omitted in the respective state tuple when performing the fine-to-coarse grid transition.
 \section{State Transition Functions}
 \label{sec:multigrid-state-transitions}
 After developing a representation for the state of a multigrid method, the next step towards a formal language for representing arbitrary sequences of multigrid operations,
-such as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is the derivation of a set of rules that describes all possible transitions between states.
-For this purpose, based on Definition~\ref{def:elementary-multigrid-operations}, we first need to investigate which operations are allowed within a multigrid method.
+such as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is the derivation of a list of rules that describes all possible transitions between states.
+For this purpose, we first need to investigate which operations are allowed within a multigrid method.
 From a mathematical point of view, all operations performed within a multigrid method exclusively consist of either matrix-vector multiplications or vector additions and subtractions.
-First of all, the computation of the residual $r_h = b_h - A_h \tilde{x}_h$ represents the fundamental operation based on which an approximation of the solution of the target system $A_h x_h = b_h$ is iteratively improved, either through smoothing or by computing a coarse-grid correction.
-The \textsc{residual} function shown in Algorithm~\ref{alg:state-transition-residual} implements the corresponding state transition for computing the residual on a certain level with step size $h$.
-For this purpose, first, the residual expression is assembled based on the system matrix $A_h$ and the given state $S_h = (\tilde{x}_h, b_h, \lambda, S_{h/2})$, which contains the current approximate solution $\tilde{x}_h$ and right-hand side $b_h$.
-The resulting expression is included in $S_h$ as a correction term $c_h$, which is returned at the end of the function.
+First of all, the computation of the residual $r_h = b_h - A_h \tilde{x}_h$ represents a fundamental operation, based on which an approximation of the solution of the target system $A_h x_h = b_h$ is iteratively improved.
+The latter is either achieved through smoothing or by computing a coarse-grid correction.
+The \textsc{residual} function shown in Algorithm~\ref{alg:state-transition-residual} implements the corresponding state transition for computing the residual on a particular level within the discretization hierarchy with step size $h$\footnote{While so far, the letter $h$ did always refer to the spacing of the finest grid, in this case, it represents the grid spacing on an arbitrary level.}.
+The residual expression is assembled based on the system matrix $A_h$ and the given state $Z_h = (\tilde{x}_h, b_h, \lambda, Z_{h/2})$, which contains the current approximate solution $\tilde{x}_h$ and right-hand side $b_h$.
+The resulting expression is then included in $Z_h$ as a correction term $c_h$, which is returned at the end of the function.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, S_{h/2})$}
+		\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, Z_{h/2})$}
 		\State $c_h \gets b_h - A_h \tilde{x}_h$
-		\State return $(\tilde{x}_h, b_h, c_h, S_{h/2})$
+		\State return $(\tilde{x}_h, b_h, c_h, Z_{h/2})$
 		\EndFunction
 	\end{algorithmic}
 \caption{Residual Computation}
 \label{alg:state-transition-residual}
 \end{algorithm}
-After constructing an initial correction $c_h$ from the residual expression $b_h - A_h \tilde{x}_h$, we can next apply an operator $B_h$ to this term, either as part of a smoothing expression or in the form of a restriction, yielding the right-hand side $b_h$ of the coarse-grid error equation.
+After constructing an initial correction $c_h$ from the residual expression $b_h - A_h \tilde{x}_h$, we can next apply an operator $B_h$ to this term, either as part of a smoothing expression or in the form of a restriction that yields the right-hand side $b_h$ of the coarse-grid error equation.
 Since both operations can be formulated as a matrix-vector multiplication, we consider this operator application as an intermediate step that is implemented in the form of the \textsc{apply} function shown in Algorithm~\ref{alg:state-transition-apply}.
 This function applies the operator $B_h$ to the current correction term. 
 The resulting expression then serves as a new correction term within the returned state.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, S_h)$}
-		\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
+		\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, Z_{h/2})$}
+		\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, Z_{h/2})$
 		\EndFunction
 	\end{algorithmic}
 \caption{Operator Application}
 \label{alg:state-transition-apply}
 \end{algorithm}
-In general, the choice of the operator $B_h$ leads to the two elementary options available within a multigrid method, i.e., smoothing and solving the given problem on a coarser grid.
+In general, the choice of the operator $B_h$ leads to the two elementary operations available within a multigrid method, i.e., smoothing and solving the given problem on a coarser grid.
 For instance, $B_h = D_h^{-1}$ leads to the expression
 \begin{equation*}
-	c_h = D^{-1} (b_h - A_h \tilde{x}_h),
+	c_h = D_h^{-1} (b_h - A_h \tilde{x}_h),
 \end{equation*}
 which corresponds to one step of the Jacobi method, as formulated in Equation~\eqref{eq:jacobi-method}.
 In contrast, choosing $B_h$ as the restriction operator $I_h^{2h}$ leads to
@@ -270,39 +269,44 @@ In the first case, we must be able to generate an expression that computes an im
 This behavior is implemented in the function \textsc{update}\footnote{Note that in previous publications~\cite{schmitt2020constructing,schmitt2021evostencils} we have used the name \textsc{iterate} for this function. However, as the name \textsc{update} reflects its meaning in a more concrete way, we have chosen to rename it.} shown in Algorithm~\ref{alg:state-transition-update}, which returns a state tuple that contains the expression for computing an updated approximate solution as its first entry.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{update}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
+		\Function{update}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $Z_{h/2}$)}
 			\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
-			\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
+			\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $Z_{h/2}$) 
 		\EndFunction
 	\end{algorithmic}
  \caption{Approximate Solution Update}
 \label{alg:state-transition-update}
 %\caption{Iteration}
 \end{algorithm}
-In addition to the mere application of a correction term, this function also includes a relaxation factor $\omega$ and partitioning operator $P$, which enables the formulation of an underrelaxed, overrelaxed, and colored version of each operation, as described in Section~\ref{sec:rb-gs}.
-The second possibility to apply an operator to the current residual is in the form of the restriction expression $c_{2h} = I_{h}^{2h} r_h$.
+In addition to the actual correction term, this function also includes a relaxation factor $\omega$ and a partitioning operator $P$, which enable the formulation of an underrelaxed, overrelaxed, and colored version of each operation, as described in Section~\ref{sec:smoothing}.
+The second possibility of applying an operator to the current residual is in the form of the restriction expression $c_{2h} = I_{h}^{2h} r_h$.
 As denoted by the subscript, the result of this operation is an expression on a coarser grid of step size $2h$.
-To construct the coarse-grid error equation $A_{2h} x_{2h} = I_{h}^{2h} r_h$, we have to assign this expression to the right-hand side $b_{2h}$ that is contained in the corresponding state tuple.
-Furthermore, as discussed in the last section, before we can transition to a state on the next coarser grid, we have to store the previous state as the fourth component of the resulting tuple.
-The resulting state transition is implemented in the function \textsc{cycle} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that a new cycle is initiated on the next coarser grid which is completed as soon as the computed coarse-grid correction has been applied.
+To construct the coarse-grid error equation 
+\begin{equation*}
+A_{2h} x_{2h} = I_{h}^{2h} r_h,
+\end{equation*} 
+we have to assign this expression to the right-hand side $b_{2h}$ that is contained in the corresponding state tuple.
+Furthermore, as discussed in the last section, before we can transition to a state on the next coarser grid, we have to store the previous state in the fourth entry of the resulting tuple.
+The resulting state transition is implemented in the function \textsc{cycle} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that a new cycle is initiated on the next coarser grid.
+Note that the application of a coarse-grid correction computed on the next lower completes this cycle. 
 \begin{algorithm}
 	\begin{algorithmic}
-	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
 		\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
-		\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
-		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+		\State $Z_h \gets$ ($\tilde{x}_{h}$, $b_{h}$, $\lambda$, $Z_{h/2}$)
+		\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $Z_h$)
 	\EndFunction
 	\end{algorithmic}
  \caption{Cycle Initiation}
 \label{alg:state-transition-cycle}
 \end{algorithm}
-Note that within this function, we already construct an expression for the initial residual
-\begin{equation}
+Within this function, we already construct an expression for the initial residual
+\begin{equation*}
 	r_{2h} = b_{2h} - A_{2h} x_{2h}^0,
-\end{equation} 
-and include it as a correction term in the newly created state tuple, where, without any loss of generality, we assume that the initial approximate solution $x^0_{2h}$ has already been set to zero.
+\end{equation*} 
+and include it as a correction term in the newly created state tuple, where we assume that the initial approximate solution $x^0_{2h}$ has already been set to zero.
 The reasoning behind this is that performing a coarse-grid correction with $x^0_{2h}$ is not expected to lead to any improvement, and thus, computing the residual always represents the first computational step on the coarse grid.
 Finally, after deriving an expression $\tilde{x}_{2h}$ for computing the approximate solution of the error equation on the coarse grid, we have to transfer this term back to the fine grid, where it can then be applied as a correction term to improve the approximate solution on this level.
 We, therefore, first need to restore the previous state on the next finer level, including the current approximate solution, right-hand side, and the preceding state.
@@ -311,86 +315,89 @@ The resulting state transition is implemented in the function \textsc{cgc} shown
 Note that the complete coarse-grid correction step is obtained through subsequent application of the \textsc{update} function, which updates the approximate solution with the correction term returned by the \textsc{cgc} function.
 \begin{algorithm}
 	\begin{algorithmic}
-		\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, S_{h})$}
-		\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+		\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, Z_{h})$}
+		\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $Z_{h/2}$) $\gets Z_{h}$
 		\State $c_h \gets I_{2h}^{h} \cdot \tilde{x}_{2h}$
-		\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+		\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $Z_{h/2}$)
 		\EndFunction
 	\end{algorithmic}
- \label{alg:state-transition-cgc}
 \caption{Coarse-Grid Correction}
-
+ \label{alg:state-transition-cgc}
 \end{algorithm}
 %TODO describe coarse-grid solver A_{4h}^{-1}
-As it has been described in this section, the application of each of these functions corresponds to a certain transition between the possible states of a multigrid solver, and hence, for any multigrid method, a sequence of function applications can be constructed.
+As it has been described in this section, the application of each of these functions corresponds to a particular transition between multigrid states, and hence, for any multigrid method, a sequence of function applications can be derived.
 Furthermore, note that the evaluation of this sequence leads to a state whose first component $\tilde{x}_h$ contains an expression that corresponds to the stepwise execution of all steps of the method.
-The functions described in this section, therefore, can be considered as a \emph{language} for the formal representation of multigrid methods, which is, again, summarized in Table~\ref{table:grammar-semantics}.
+The functions described in this section, therefore, can be considered as a \emph{language} for the formal representation of multigrid methods. 
+The main components of this language are summarized in Table~\ref{table:grammar-semantics}.
 \begin{table}
-	\caption{State transition functions}
+	\caption{Summary of the multigrid state transition functions.}
 	\label{table:grammar-semantics}
 	\begin{algorithmic}
-	\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, S_{h/2})$}
+	\Function{residual}{$A_h$, $(\tilde{x}_h, b_h, \lambda, Z_{h/2})$}
 	\State $c_h \gets b_h - A_h \tilde{x}_h$
-	\State return $(\tilde{x}_h, b_h, c_h, S_{h/2})$
+	\State return $(\tilde{x}_h, b_h, c_h, Z_{h/2})$
 	\EndFunction
 	\State
-	\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, S_h)$}
-	\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, S_h)$
+	\Function{apply}{$B_h$, $(\tilde{x}_h, b_h, c_h, Z_{h/2})$}
+	\State return $(\tilde{x}_h, b_h, B_h\cdot c_h, Z_{h/2})$
 	\EndFunction
 	\State
-	\Function{update}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $S_{h/2}$)}
+	\Function{update}{$\omega$, $P$, ($\tilde{x}_h$, $b_h$, $c_h$, $Z_{h/2}$)}
 	\State $\tilde{x}_h \gets \tilde{x}_h + \omega \cdot c_h$ with $P$
-	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $S_{h/2}$) 
+	\State return ($\tilde{x}_h$, $b_h$, $\lambda$, $Z_{h/2}$) 
 	\EndFunction
 	\State
-	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($\tilde{x}_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
 	\State $\tilde{x}_{2h} \gets x_{2h}^0$ 
 	\State $b_{2h} \gets c_{2h}$
 	\State $c_{2h} \gets b_{2h} - A_{2h} \tilde{x}_{2h}$ 
-	\State $S_h \gets$ ($\tilde{x}_{2h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
-	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+	\State $Z_h \gets$ ($\tilde{x}_{h}$, $b_{h}$, $\lambda$, $Z_{h/2}$)
+	\State return ($\tilde{x}_{2h}$, $b_{2h}$, $c_{2h}$, $Z_h$)
 	\EndFunction
 	\State
-	\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, S_{h})$}
-	\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+	\Function{cgc}{$I_{2h}^{h}$, $(\tilde{x}_{2h}, b_{2h}, \lambda, Z_{h})$}
+	\State ($\tilde{x}_h$, $f_{h}$, $c_h$, $Z_{h/2}$) $\gets Z_{h}$
 	\State $c_h \gets I_{2h}^{h} \cdot \tilde{x}_{2h}$
-	\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+	\State return ($\tilde{x}_h$, $f_{h}$, $c_h$, $Z_{h/2}$)
 	\EndFunction
 	\end{algorithmic}
 \end{table}
-Now let us revisit one of the main goals of this language: The description of methods that incorporate an arbitrary sequence of multigrid operations and, thus, can not be formulated in the classical framework of multigrid cycles.
-To achieve this goal, we have ensured that each possible state transition within a multigrid method is described by the application of a specific combination of well-defined functions. 
+
+Now let us revisit one of the main goals of this language: The description of multigrid methods that execute a unique sequence of operations on each level, which can not be formulated in the classical framework of multigrid cycles.
+To achieve this goal, we have ensured that each possible state transition within a multigrid method is described by the application of a specific sequence of well-defined functions. 
 At the same time, we have carefully avoided the inclusion of transitions spanning over multiple states, as this would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
 The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
 
 \section{A Novel Class of Multigrid Grammars}
 \label{sec:multigrid-grammar}
-\setcounter{equation}{0}
 In Section~\ref{sec:formal-languages}, we have already introduced the general grammar $G$ as the quaternary tuple 
 \begin{equation*}
 	G = \left(V, T, S, P \right),
 \end{equation*}
 where $V$ is the set of variables, $T$ the set of terminal symbols, $S \in V$ the start variable and $P$ the set of productions.
-However, before we start defining the individual components of a grammar, we need to decide which constraints we want to apply to its structure.
-As it has been discussed in Section~\ref{sec:chomsky-hierarchy}, the Chomsky hierarchy defines four grammatical levels, where each subsequent level introduces additional structural restrictions.
-While an unrestricted or type-0 grammar represents the most general model of computation, it also leads to the highest degree of complexity.
+However, before we start defining the individual components of a grammar, we need to decide which constraints we want to apply within its productions.
+As it has been discussed in Section~\ref{sec:chomsky-hierarchy}, the Chomsky hierarchy defines four grammatical levels, where each subsequent level introduces additional restrictions.
+While an unrestricted or type-0 grammar represents the most general model of computation, it also leads to the greatest complexity.
 In particular, enumerating all strings generated by an unrestricted grammar requires a Turing machine, which represents the most general model of computation available.
 The main goal of this work is to enable the automated design of multigrid methods using evolutionary program synthesis techniques.
 As we have discussed in Section~\ref{sec:gggp}, the application of tree-based grammar-guided genetic programming (G3P) requires each derivation of a grammar to be representable as a tree, which is then called a derivation tree.
 The class of grammars that fulfills this property corresponds to the type-2 category of the Chomsky hierarchy.
 Type-2 grammars are characterized by the constraint that only a single variable is allowed to be placed on the left-hand side of each production, which means that the applicability of each production is independent of the context in which the variable is embedded. 
 These grammar are, thus, said to be context-free.
-Since each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar, all operations that are required within a G3P method can be defined in a straightforward manner, which has already been shown in Section~\ref{sec:gggp-initialization} and~\ref{sec:gggp-initialization}.
-In the following, we will derive a family of context-free grammars for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-states} and~\ref{sec:multigrid-state-transitions}.
+Since each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar (CFG), all operations that are required within a G3P method can be defined in a straightforward manner, which has already been shown in Section~\ref{sec:gggp-initialization}~and~\ref{sec:gggp-mutation-and-recombination}.
+In the following, we will derive a family of CFGs for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-states}~and~\ref{sec:multigrid-state-transitions}.
 Therefore, starting from the initial state 
-\begin{equation*}
-	S^0_h = (x_h^0, b_h, \lambda, \lambda)
-\end{equation*}
-for each possible operation within a multigrid method, we need to define a production in the form of a sequence of transitions that yields the corresponding state after the operation.
+\begin{equation}
+	Z^0_h = (x_h^0, b_h, \lambda, \lambda),
+ \label{eq:initial-mg-state}
+\end{equation}
+we need to define a production for each possible operation within a multigrid method.
+Each of these productions needs to be expressed as a sequence of transitions that yields the correct state after the respective operation.
 In Section~\ref{sec:multigrid-state-transitions}, we have made the distinction between states where a new approximate solution $\tilde{x}_h$ is computed and those with the purpose of constructing a correction term $c_h$ based on the residual expression $r_h = b_h - A_h \tilde{x}_h$.
-To define the respective productions on every level of a given discretization hierarchy, we have to determine recursively how it is possible to reach the final state of a multigrid method.
-Note that in this state all computational steps of the method are combined in $\tilde{x}_h$ as a single expression.
-We represent the final state of a multigrid method as the variable $\ps{s_h}$ and, thus, obtain the initial production
+To define the respective productions on every level of a given discretization hierarchy, we need to recursively determine how the final state of a multigrid method can be reached.
+\setcounter{equation}{0}
+Note that in the final state of a multigrid method, all computational steps are combined in $\tilde{x}_h$ as a single expression.
+We represent this state as the variable $\ps{s_h}$ and, thus, obtain the initial production
 \begin{bnf}
 	\bnfprod{$S$} {
 		\bnfpn{$s_h$}
@@ -398,7 +405,7 @@ We represent the final state of a multigrid method as the variable $\ps{s_h}$ an
 \end{bnf}
 Next, we have to consider the different possibilities of deriving a new expression for the approximate solution $\tilde{x}_{h}$ on the finest level.
 According to Definition~\ref{def:elementary-multigrid-operations}, $\tilde{x}_{h}$ can either be updated by means of smoothing or by applying a coarse-grid correction.
-In the case of smoothing, the approximate solution is updated by multiplying the operator $\ps{B_h}$ with a correction term, which is contained in the current state in the form of the variable $\ps{c_h}$.
+In the case of smoothing, the approximate solution is updated with a correction term obtained by multiplying the residual expression with an operator.
 This operation can be expressed as a combination of the state transition functions $\textsc{update}$ and $\textsc{apply}$ yielding the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
@@ -406,7 +413,8 @@ This operation can be expressed as a combination of the state transition functio
 	}.
 \label{prod:smoothing}
 \end{bnf}
-Different smoothers can then be realized by expressing the generation of the operator $\ps{B_h}$ and partitioning $\ps{P}$ as two separate productions
+Here, the current state, containing the previously computed residual, is represented by the variable $\ps{c_h}$.
+Different smoothers can be realized by expressing the generation of the operator and partitioning variable, i.e., $\ps{B_h}$ and $\ps{P}$, as two separate productions
 \begin{bnf}
 	\bnfprod{$B_h$} {
 		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_h^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{h} = A_{h}^{+} + A_{h}^{-}$}
@@ -420,15 +428,15 @@ Different smoothers can then be realized by expressing the generation of the ope
 \label{prod:partitioning}
 \end{bnf}
 where the empty symbol $\lambda$ indicates that no partitioning is used. 
-On the finest level, a correction state is always obtained by computing the residual based on the current approximate solution, which leads to the production
+On the topmost level, a correction term is always obtained by computing the residual based on the current approximate solution, which leads to the production
 \begin{bnf}
 	\bnfprod{$c_h$} {
 		\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_h$}, \bnfsp \bnfpn{$s_h$}) 
 	}.
 \label{prod:residual}
 \end{bnf}
-Multiple smoothing steps can, thus, be defined through repeated applications of the Productions~\eqref{prod:residual} and~\eqref{prod:smoothing}.
-In contrast to smoothing, coarse-grid correction updates the current approximate solution with a correction term that is constructed based on an approximate solution $\tilde{x}_{2h}$ for the error equation on the next coarser level.
+Multiple smoothing steps can, thus, be realized by means of a repeated application of the Productions~\eqref{prod:residual}~and~\eqref{prod:smoothing}.
+In contrast to smoothing, a coarse-grid correction updates the current approximate solution with a correction term that is constructed based on an approximate solution for the error equation on the next lower level in the discretization hierarchy.
 We can express this operation as a combination of the \textsc{update} and \textsc{cgc} transition functions, which yields the production
 \begin{bnf}
 	\bnfprod{$s_h$} {
@@ -436,11 +444,11 @@ We can express this operation as a combination of the \textsc{update} and \texts
 	}.
 \label{prod:coarse-grid-correction}
 \end{bnf}
-Similar to Production~\eqref{prod:smoothing} the previous state that is passed as a second argument to the \textsc{cgc} function is encoded as the variable $\ps{s_{2h}}$, which means that this state is already the result of a sequence of productions.
-However, since a partitioned computation of the coarse-grid correction does not yield any benefits, in contrast to the case of smoothing, the second argument of the \textsc{update} function is intentionally left empty.
-Furthermore, note that while we have specified the prolongation operator as a terminal symbol, it would as well be possible to specify its choice in the form of a separate production, as in the case of the smoothing operator $\ps{B_h}$.
-Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, which corresponds to a state on the next-coarser level with step size $2h$, we next have to consider the different possibilities to transition to this state.
-First of all, as multigrid methods recursively apply the same operations throughout the complete hierarchy of discretizations, we can define the Productions~\eqref{prod:smoothing},~\eqref{prod:smoothing-operator},~\eqref{prod:residual} and~\eqref{prod:coarse-grid-correction} on the corresponding level which yields
+Similar to Production~\eqref{prod:smoothing}, the variable $\ps{s_{2h}}$ refers to the previous state passed as a second argument to the \textsc{cgc} function, which means that this state is already the result of a sequence of productions.
+However, since a partitioned computation of the coarse-grid correction does not yield any benefits, the second argument of the \textsc{update} function is intentionally left empty.
+Furthermore, note that while we have encoded the prolongation operator as a terminal symbol, it would equally be possible to specify its choice in the form of a separate production, as in the case of the smoothing operator $\ps{B_h}$.
+Since the right-hand side of Production~\eqref{prod:coarse-grid-correction} contains the variable $\ps{s_{2h}}$, which corresponds to the state on a coarser grid with step size $2h$, we next have to consider the different possibilities to transition to this state.
+First of all, as multigrid methods recursively apply the same operations throughout the complete hierarchy of discretizations, we can define the Productions~\eqref{prod:smoothing}, \eqref{prod:smoothing-operator}, \eqref{prod:residual} and \eqref{prod:coarse-grid-correction} on the corresponding level which yields
 \begin{bnf}
 	\bnfprod{$s_{2h}$} {
 		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfpn{$P$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfpn{$B_{2h}$}, \bnfsp \bnfpn{$c_{2h}$})) \bnfor
@@ -456,46 +464,46 @@ First of all, as multigrid methods recursively apply the same operations through
 		\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$A_{2h}^{+}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = A_{2h}^{+} + A_{2h}^{-}$}.
 	}
 \end{bnf}
-Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser level with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
-In contrast to the coarse-grid correction, which represents a transition to a state on the next finer level, we have not yet considered the opposite direction: The construction of the error equation on a coarser grid based on the state on the current level.
-While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next-coarser grid that includes the initial residual as a correction term, which yields the production
+Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser grid with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
+In contrast to a coarse-grid correction, which represents a transition to a state on the next higher level, we have not yet considered the opposite direction: The construction of the error equation on a coarser grid based on the state on the current level.
+While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next lower level that includes the initial residual as a correction term, which leads to the production
 \begin{bnf}
 \bnfprod{$c_{2h}$} {
 	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }.
 \label{prod:coarsening}
 \end{bnf}
-With the definition of this production, we are now capable of generating state transitions both in a top-down as well as a bottom-up direction within the given hierarchy of discretizations.
+With the definition of Production~\eqref{prod:coarsening}, we are now capable of generating state transitions both in a top-down as well as a bottom-up direction within the given hierarchy of discretizations.
 Finally, the remaining step for the formulation of complete grammar is the definition of the initial problem on the finest grid and the application of the coarse-grid solver on the coarsest grid.
-For the former, note that the initial problem corresponds the state $S_h^0 = (x_h^0, b_h, \lambda, \lambda)$.
-Since $S_h^0$ represents the starting point of each possible sequence of multigrid operations, we have to include it as an additional production of the variable $\ps{s_h}$
+For the former, note that the initial problem corresponds to the state $Z_h^0$, as given by Equation~\eqref{eq:initial-mg-state}.
+Since this state represents the starting point of each possible sequence of multigrid operations, we have to include it as an additional production of the variable $\ps{s_h}$
 \begin{bnf}
 	\bnfprod{$s_h$} {
-	 (\bnfts{$x_h^0$}, \bnfsp \bnfts{$b_h$},\bnfsp \bnfes, \bnfsp \bnfes)
+	 (\bnfts{$x_h^0$}, \bnfts{$b_h$}, \bnfes, \bnfes)
 	}.
 \label{prod:initial-solution}
 \end{bnf} 
 If we now consider the structure of all the productions defined so far, it becomes obvious that, with the exception of the topmost level, only the productions~\eqref{prod:smoothing-operator} and~\eqref{prod:partitioning} generate an expression that consists exclusively of terminal symbols.
 Furthermore, note that all other productions generate exactly a single variable of type $\ps{s_H}$ or $\ps{c_H}$, where $H$ is the step size on an arbitrary level in the given hierarchy of discretizations, and that starting from each of these variables there exists a sequence of productions that leads to an expression containing the variable $\ps{s_h}$.
-Based on the latter, we can then apply the production~\eqref{prod:initial-solution} to finalize the derivation process.
+Based on the latter, we can then apply the Production~\eqref{prod:initial-solution} to terminate the derivation process.
 Since each sequence of productions also starts with $\ps{s_h}$, all derivations of our grammar are of the form
 \begin{equation*}
 	\ps{S} \Rightarrow \ps{s_h} \Rightarrow \dots \Rightarrow u \, \ps{s_h} \, v \Rightarrow \, u (x_h^0, b_h, \lambda, \lambda) \, v,
 \end{equation*}
 where $u  \, (x_h^0, b_h, \lambda, \lambda) \, v$ is an arbitrary word in the language generated by our multigrid grammar.
-This word then represents a multigrid method whose computational structure is determined by the order of productions in the corresponding sequence of function applications.
-As a final step, we have to define one or multiple productions that correspond to the application of the coarse-grid solver on the lowest level, which allows us to improve the accuracy of the approximate solution on the second-lowest level.
+This word then represents a multigrid method whose computational structure is determined through the order of productions in the corresponding sequence of function applications.
+As a final step, we have to define one or multiple productions that correspond to the application of the coarse-grid solver on the lowest level, which allows us to improve the accuracy of the approximate solution on the above level.
 By utilizing a combination of the \textsc{apply} and \textsc{update} functions, we can express this operation in the form of the two production
 \begin{bnf}
 	\bnfprod{$c_{2H}$} {
 		\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$A^{-1}_{H}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{H}^{2H}$}, \bnfsp\bnfpn{$c_{H}$}))
 	} 	\label{prod:coarse-grid-solver} \\
 	\bnfprod{$s_H$}{
-		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2H}^{H}$}, \bnfsp \bnfpn{$c_{2H}$}))
+		\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2H}^{H}$}, \bnfsp \bnfpn{$c_{2H}$})).
 	} 	\label{prod:coarse-grid-solver-correction}
 \end{bnf}
-where $H$ is the step size on the second-lowest level.
-\setcounter{equation}{116}
+where $H$ is the step size on the second lowest level.
+\setcounter{equation}{122}
 Having now assembled all necessary components, we can finally specify the complete grammar for generating multigrid methods on a given hierarchy of discretizations.
 As an example, we consider a five-grid hierarchy with a uniform coarsening factor of two and a step size of $h$ on the finest grid, which means that on the coarsest grid, a step size of $16h$ is obtained.
 We, therefore, first define the set of variables 
@@ -573,10 +581,10 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 		}
 	\end{bnf*}
 \end{table}
-For the sake of simplicity, we omit the specification of all terminal symbols here, but the reader can safely assume that each symbol that occurs on the right-hand side of a production, while not being contained in the set of variables, is a terminal symbol.
-Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the topmost level, the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the lowest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be additionally included.
-While we have used a five-grid hierarchy as an example for defining the complete grammar, it is trivially possible to specify a similar grammar on a discretization hierarchy of different depth.
-Furthermore, while the maximum number of coarsening steps depends on the existence of the respective productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
+For the sake of simplicity, we omit the specification of all terminal symbols here, but the reader can safely assume that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is a terminal symbol.
+Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the topmost level, the generation of the initial state, as shown in Production~\eqref{prod:initial-solution}, and on the lowest level the application of the coarse-grid solver, as shown in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be included additionally.
+While we have used a five-grid hierarchy as an example for defining the complete grammar, it is possible to specify a similar grammar on a discretization hierarchy with a different depth.
+Furthermore, while the maximum number of coarsening steps depends on the presence of the productions on each subsequent level, we can extend the given grammar to encompass all possible multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
 For this purpose, we only have to include additional productions for the application of the coarse-grid solver on each subsequent level, which in the case of Table~\ref{table:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
@@ -619,7 +627,7 @@ Since in the context of Table~\ref{table:multigrid-grammar}, the application ord
 Until now, we have been exclusively concerned with the problem of developing a formal representation for a multigrid method that is based on its algorithmic formulation.
 However, in contrast to Figure~\ref{fig:example-three-grid-method-derivation-tree}, within an evolutionary program synthesis method, a derivation tree is usually generated by applying a sequence of productions in a randomly-chosen order, either to alter an already existing tree or to create a completely new one from scratch.
 We, therefore, have to consider the task of deriving a method's algorithmic formulation exclusively based on its representation as a derivation tree using the semantic evaluation rules that apply to each of its nodes.
-As we have seen in Section~\ref{sec:multigrid-state-transitions}, the application of each of the transition functions generated by our grammar returns a new state $S_H$ consisting of a tuple $\left( \tilde{x}_{H}, b_{H}, c_{H}, S_{H/2}\right)$, where $H$ is the discretization width on the current level.
+As we have seen in Section~\ref{sec:multigrid-state-transitions}, the application of each of the transition functions generated by our grammar returns a new state $Z_H$ consisting of a tuple $\left( \tilde{x}_{H}, b_{H}, c_{H}, Z_{H/2}\right)$, where $H$ is the discretization width on the current level.
 Starting from the initial state tuple $\left(x_{h}^0, b_{h}, \lambda, \lambda\right)$ we can, therefore, apply the respective sequence of transition functions in a bottom-up manner until we arrive at the final state $\left(\tilde{x}_{h}, b_{h}, \lambda, \lambda\right)$.
 As we have shown in Figure~\ref{fig:example-tree-grid-method-states} the first component $\tilde{x}_{h}$ of this tuple then combines all computational steps of the corresponding multigrid method in a single expression
 \begin{equation}

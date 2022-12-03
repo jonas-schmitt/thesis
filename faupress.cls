@@ -636,12 +636,16 @@
     paperwidth   =    170mm,
     paperheight  =    240mm,
     top          =     25mm,
-    bottom       =     20mm,
+    % Adapted
+    bottom       =     25mm,
+    %bottom       =     20mm,
     inner        =     25mm,
     outer        =     20mm,
     headheight   =   13.6pt, % originally 1em -> warning and automatically changed
     headsep      = 15mm-1em,
-    footskip     =    7.5mm,
+    % Adapted
+    footskip     =    12.5mm,
+    %footskip     =    7.5mm,
     %showframe,  
   }
 \fi
@@ -1763,6 +1767,7 @@
 
 \newkomafont{supervisor}{\sffamily\normalsize}
 \newkomafont{facultytitle}{\Large\bfseries}
+\newkomafont{facultysubtitle}{\large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
 
@@ -1885,6 +1890,8 @@
     \vspace*{4.8mm}
     {\usekomafont{facultytitle} \@title\par}
     \vfill
+    %{\usekomafont{facultytitle} \@subtitle\par}
+    %\vfill
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\
@@ -1911,7 +1918,7 @@
     \begin{tabular}{@{}l l}
       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
       %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
-      %Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
+      Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
     \end{tabular}
     \vskip18mm
   \end{titlepage}

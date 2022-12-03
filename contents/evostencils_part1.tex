@@ -112,7 +112,7 @@ In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical
 	\caption{IR: Stencil}
 	\label{code:ir:stencil}
 \end{listing}
-The \emph{entries} attribute of this class directly corresponds to the set $S_h$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this set in the Python programming language.
+The \emph{entries} attribute of this class directly corresponds to the set $S$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this set in the Python programming language.
 Each entry $e_i$ of this object then again represents a tuple of the form of
 \begin{equation}
 	e_i = \left(\bm{a}_i, b_i \right),
@@ -232,7 +232,7 @@ The \emph{residual} function, however, represents an exception to this statement
 Note that according to Table~\ref{table:multigrid-grammar}, every derivation ends by computing the residual with the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \emph{Approximation} and \emph{RightHandSide} object, respectively.
 In this case, we, therefore, need to pass the initial state 
 \begin{equation*}
-	S_h^0 = (x_h^0, b_h, \lambda, \lambda)
+	Z_h^0 = (x_h^0, b_h, \lambda, \lambda)
 \end{equation*} explicitly to the respective residual function.
 Since the third and fourth entry of this tuple is empty, in Python, a binary tuple is sufficient to store the respective \emph{Approximation} and \emph{RightHandSide} object.
 Even though in all subsequent computations, the first entry of this tuple then consists of a \emph{Cycle} object, for the sake of simplicity, the right-hand side is always included as a second entry, as this allows us to utilize the same \emph{residual} function within all grammar productions.
