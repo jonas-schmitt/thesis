@@ -1,5 +1,5 @@
 digraph G {  
-  ratio=0.35;
+  ratio=0.9;
   ordering=in ;
   start [texlbl="$\langle S \rangle$"];
   start -> sh_1
