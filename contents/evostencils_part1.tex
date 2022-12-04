@@ -1,26 +1,26 @@
-P\usemintedstyle{tango}
+\usemintedstyle{tango}
 \setminted[python]{fontsize=\footnotesize, breaklines}
 %\setminted[scala]{fontsize=\footnotesize, breaklines}
 In the first part of this thesis, we have established a theoretical foundation for multigrid methods, formal languages, and evolutionary program synthesis.
 In Chapter~\ref{chapter:multigrid-formal-language}, building on this foundation, we have then developed a novel formal language and grammar for the automatic generation of multigrid methods. 
-While we have already demonstrated the capabilities of this approach in alternating each individual step of a multigrid method, we could not yet demonstrate its benefits compared to the use of classical multigrid cycles, such as V-, F-, and W-cycles.
-We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the automated grammar-based design of multigrid methods.
-Using this framework, we will show how it is possible to discover novel methods that are able to solve certain PDE-based problems faster than all classical multigrid cycles.
-However, before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview of its general workflow and software architecture.
-Here, we distinguish between EvoStencils' core implementation and the functionality of the framework that builds upon external libraries.
-Since we have expressed the rules our multigrid construction rules in the form of a context-free grammar, we can apply the evolutionary program synthesis techniques presented Chapter~\ref{chapter:formal-languages-and-gp} without significant adaptions.
+While we have already demonstrated the capability of this approach to modify each individual step of a multigrid method, we could not yet demonstrate its benefits compared to classical multigrid cycles, such as V-, F-, and W-cycles.
+We aim to achieve this goal with the implementation of \emph{EvoStencils}, a prototypical Python framework for the automated grammar-based design of multigrid methods, which we have made available as open-source software\footnote{EvoStencils: \url{https://github.com/jonas-schmitt/evostencils}}.
+Using this framework, we will demonstrate the discovery of multigrid methods that are able to solve certain PDE-based problems faster than all classical multigrid cycles.
+Before we discuss EvoStencils' features and their implementation in Python, we want to provide an overview of its general workflow and software architecture.
+Here, we distinguish between EvoStencils' core implementation and functionality that builds upon external libraries.
+Since we have expressed the rules for constructing a multigrid method in the form of a context-free grammar, we can apply the evolutionary program synthesis techniques presented in Chapter~\ref{chapter:formal-languages-and-gp} without significant adaption.
 For this purpose, we employ the widely-used evolutionary computation framework DEAP\footnote{DEAP: \url{https://github.com/deap/deap}}~\cite{rainville2012deap}, which enables us to implement grammar-guided genetic programming (G3P) in a modular way.
-However, we then need to address the question of how we can evaluate each multigrid method obtained through G3P in an automatic and reproducible manner.
+However, to realize this approach, we need to evaluate each multigrid method obtained through G3P in an automatic and reproducible manner.
 As we have seen in Section~\ref{sec:grammar-based-algorithm-generation} the 
-execution of the sequence of state transition functions contained in a given derivation tree produces a computational graph in the form of Figure~\ref{fig:example-three-grid-method-computational-graph}.
-This graph can then be translated to an algorithmic representation, as demonstrated by Algorithm~\ref{alg:example-three-grid-method-generated}.
-However, while a domain expert could manually implement the corresponding multigrid solver based on this representation using a numerical software package, our framework has to perform the evaluation of each method in an automatic way without requiring any human intervention.
+evaluation of the sequence of state transitions contained in a particular derivation tree produces a computational graph in the form of Figure~\ref{fig:example-three-grid-method-computational-graph}.
+This graph can then be translated to an algorithmic representation similar to Algorithm~\ref{alg:example-three-grid-method-generated}.
+%While a domain expert could manually implement the corresponding multigrid solver based on this representation using a numerical software package, our framework has to perform the evaluation of each method in an automatic way without requiring any human intervention.
 Recently, code-generation techniques that only require the specification of a numerical solver in a high-level domain-specific language (DSL) have become increasingly powerful~\cite{kostler2020code}.
 An example of this approach is the ExaStencils framework~\cite{lengauer2020exastencils,lengauer2014exastencils}, which has been specifically designed for the automatic generation of fast and scalable implementations of multigrid-based solvers specified in a tailored DSL called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems,kuckuk2016automatic}.
-ExaSlang allows to represent a multigrid method as a sequence of high-level operations while granting the user the flexibility to apply further optimizations through the addition of code transformations and lower-level statements.
+ExaSlang represents a multigrid method as a sequence of high-level operations while granting the user the flexibility to apply further optimizations through the addition of code transformations and lower-level statements.
 To evaluate a given solver obtained from a grammar-based representation, we emit its corresponding algorithmic formulation as an ExaSlang specification, based on which we then generate a scalable C++ implementation using the capabilities of the ExaStencils framework.
 The resulting program can then be executed on a number of test cases in order to measure its desired performance characteristics.
-Finally, note that the execution of an evolutionary program synthesis approach requires the evaluation of a large number of different multigrid methods.
+Finally, note that the execution of an evolutionary program synthesis method requires the evaluation of a large number of different programs, each representing a unique numerical solver.
 Depending on the problem that one aims to solve, it can be infeasible to run this method on a single compute node, which necessitates a multi-node parallelization.
 The message passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of available supercomputing devices.
 While MPI was originally designed for the traditional scientific computing languages Fortran and C, it has recently been made available within Python~\cite{dalcin2021mpi4py}. 
@@ -55,16 +55,16 @@ With the addition of MPI as a distributed computing backend, we arrive at the fo
 \end{figure}
 In the following, we will now discuss the individual parts of this architecture in more detail, starting with the core implementation of EvoStencils, which can be considered as a separate module that does not depend on any of the other tools and libraries mentioned here.
 As a first step, we will outline the implementation of an intermediate representation (IR) for multigrid methods that can be generated in a straightforward manner based on a given derivation tree.
-This IR will then acts as a basis for all subsequent steps of solver generation and evaluation.
+This IR will then act as a basis for all subsequent steps of solver generation and evaluation.
 
 \section{Intermediate Representation}
 \label{sec:intermediate-representation}
-Before we can derive an actual representation of multigrid methods comprising their computational structure, we need to be aware of the fact that all operations of a multigrid method are defined on a grid with a certain step size.
+Before we derive an IR for each component of a multigrid method, note that each of them needs to be defined with respect to the chosen discretization.
 %Note that algebraic multigrid methods~\cite{stuben2001introduction,ruge1987algebraic}, which are not considered in this work, represent an exception to this, as they operate on sparse matrix data structures.
-In Section~\ref{sec:discretization} we have already made the assumption of discretizing the underlying PDE on a hierarchy of structured grids.
+In Section~\ref{sec:discretization}, we have already made the assumption of discretizing the underlying PDE on a hierarchy of structured grids.
 To identify a grid within this hierarchy, certain information is required, which we store in a \emph{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
-In general, a structured grid is defined by its size, i.e., the number of grid points and spacing $h$ in each dimension.
-In addition, we also include the grid's level to identify it within the discretization hierarchy.
+In general, a structured grid is defined by its \emph{spacing} $h$ in each dimension and its \emph{size}, i.e., the number of grid points.
+In addition, we also include the grid's \emph{level} to identify it within the discretization hierarchy.
 Note that in case the grid is uniform, we only need to store a single value for its spacing in each dimension, while otherwise, a value would need to be stored for each pair of grid points.
 As the problems considered in this work are all solved on a hierarchy of uniform grids, we focus on this particular case.
 \begin{listing}
@@ -72,64 +72,67 @@ As the problems considered in this work are all solved on a hierarchy of uniform
 	\caption{IR: Structured Grid}
 	\label{code:ir:grid}
 \end{listing}
-After defining a data structure that provides all relevant information about a certain grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
-For this purpose, in Listing~\ref{code:ir:abstact-base-class}, a common abstract base class is provided from which all subsequent expression classes are derived.
+After defining a data structure that provides all relevant information about a specific grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
+In Listing~\ref{code:ir:abstact-base-class}, a common abstract base class is provided from which all subsequent expression classes are derived.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/expression.py}
 	\caption{IR: Abstract Expression Base Class}
 	\label{code:ir:abstact-base-class}
 \end{listing}
-In addition to the already mentioned grid data structure, this class also defines a \emph{shape} for each expression.
-From a mathematical point of view, each expression contained in a multigrid method either computes a matrix or a vector whose shape can be derived recursively from its operands.
-The shape of the corresponding expression is then defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns, which in the given example is both $m$.
-Based on this abstract class, we can then further distinguish between predefined entities, such as the system matrix and right-hand side, and expressions that refer to the mathematical operations of a multigrid method.
-First of all, Listing~\ref{code:ir:entity} contains the implementation of the entity base class.
+In addition to the already mentioned \emph{grid} data structure, this class also defines a \emph{shape} for each expression.
+From a mathematical point of view, each expression within a multigrid method either computes a matrix or a vector whose shape can be derived recursively from its operands.
+This shape is, thus, defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns of the corresponding matrix.
+Note that a vector of size $n$ can simply be considered a matrix of shape $(n,1)$.
+Based on this abstract class, we can distinguish between predefined entities, such as the system matrix and right-hand side, and expressions that refer to the mathematical operations defined within a multigrid method.
+First of all, Listing~\ref{code:ir:entity} contains the implementation of the \emph{Entity} base class.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/entity.py}
 	\caption{IR: Entity Base Class}
 	\label{code:ir:entity}
 \end{listing}
 In addition to the previously mentioned attributes, this class is also given a \emph{name} to identify the respective entity.
-Based on this implementation, we can then further define classes for representing an approximate solution, right-hand side and operator, which are shown in the Listings~\ref{code:ir:approximation} and~\ref{code:ir:operator}.
+We can then further define classes for representing an approximate solution, right-hand side, and operator, which are shown in the Listings~\ref{code:ir:approximation}~and~\ref{code:ir:operator}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/approximation.py}
 	\caption{IR: Approximate Solution and Right-Hand Side}
 	\label{code:ir:approximation}
 \end{listing}
+The shape of each of these entities is determined by computing the product of the grid size over all dimensions.
+From a mathematical point of view, the \emph{Approximation} and \emph{RightHandSide} classes both represent vectors.
+We, thus, only implement the former and make use of inheritance to avoid unnecessary code duplication in the case of the latter.
+In addition to the attributes defined in its parent class, an \emph{Approximation} includes a \emph{predecessor} attribute.
+However, we postpone the discussion of this attribute's purpose until we implement the actual grammar.
+While the two Python classes shown in Listing~\ref{code:ir:approximation} correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given as one or multiple stencil codes.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/operator.py}
 	\caption{IR: Operator}
 	\label{code:ir:operator}
 \end{listing}
-In these cases, the shape of the respective entity is obtained by computing the grid size product across all dimensions, whereas in the case of the approximation and right-hand side, the result can be considered as a vector, whereas the shape of an operator corresponds to a quadratic matrix.
-Since the \emph{Approximation} and \emph{RightHandSide} classes, from a mathematical point of view, can be both considered as a vector, we only implement the former and then make use of inheritance to avoid unnecessary code duplication.
-In addition to the attributes defined in its parent class, an \emph{Approximation} includes a \emph{predecessor} attribute, whose meaning will be discussed later when we construct the actual grammar.
-While the other two entities discussed here correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given as one or multiple stencil codes.
-In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical notation for stencil codes in the form of Equation~\eqref{eq:stencil-definition}, which can be implemented in the Python programming language in a straightforward manner leading to the \emph{Stencil} class shown in Listing~\ref{code:ir:stencil}.
+In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical notation for stencil codes in the form of Equation~\eqref{eq:stencil-definition}, which can be implemented in a straightforward manner leading to the \emph{Stencil} class shown in Listing~\ref{code:ir:stencil}.
 %TODO introduce stencil implementation here
 \begin{listing}
 	\inputminted{python}{evostencils/ir/stencil.py}
 	\caption{IR: Stencil}
 	\label{code:ir:stencil}
 \end{listing}
-The \emph{entries} attribute of this class directly corresponds to the set $S$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this set in the Python programming language.
-Each entry $e_i$ of this object then again represents a tuple of the form of
+The \emph{entries} attribute of this class directly corresponds to the set $S$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this mathematical entity in the Python programming language.
+Each entry $e_i$ of this object, thus, represents a tuple of the form of
 \begin{equation}
 	e_i = \left(\bm{a}_i, b_i \right),
 \end{equation} 
-where $\bm{a}_i$ is the offset from the current grid point in each dimension, given as an array of integer values, and $b_i$ is the stencil value that corresponds to each offset, given as a floating point number.
-Based on this class, we can then provide implementations for all operations on stencil codes that have been defined in Section~\ref{subsec:stencil-codes}.
+where $\bm{a}_i$ is the offset from the current grid point in each dimension, given as an array of integer values, and $b_i$ the stencil value that corresponds to each offset, stored as a floating point number.
+Based on this class, we can then provide an implementation for each stencil operation defined in Section~\ref{subsec:stencil-codes}.
 %Furthermore, in accordance with Section~\ref{subsec:systems-of-pdes} and~\ref{subsec:block-smoothing}, we can extend this implementation to systems of PDEs and block smoothers, which will be briefly covered in the next Chapter of this thesis. %TODO insert ref to next chapter here or remove sentence
-Now note that in our implementation of the \emph{Operator} class in Listing~\ref{code:ir:operator} the stencil is not included directly, but instead, we provide a so-called \emph{stencil generator}.
+Now note that in our implementation of the \emph{Operator} class in Listing~\ref{code:ir:operator}, the stencil is not included directly, but instead, we provide a so-called \emph{stencil generator}.
 A stencil generator is a function that returns the discretization of an operator on a particular grid in the form of a stencil.
-For instance, the finite-difference discretization of the Laplace operator $\nabla^2$ on a two-dimensional uniform grid leads to the stencil 
+For instance, the finite-difference discretization of the Laplace operator $\Delta$ on a two-dimensional uniform grid leads to the stencil 
 \begin{equation*}
 	\begin{split}
-		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h}.
+		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h},
 	\end{split}
 \end{equation*}
 in which the value at each offset depends on the grid spacing $h$.
-Furthermore, in certain cases, it is possible to construct the higher-dimensional version of a stencil from its lower-dimensional counterparts, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
+Furthermore, in certain cases, it is possible to derive the higher-dimensional version of a stencil from its lower-dimensional counterpart, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
 Therefore, instead of storing a unique stencil for each individual operator instance, we can parametrize its generation based on the features of the applied discretization by including a reference to the respective generator function.
 Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \emph{shape} attribute.
 For this purpose, the class \emph{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \emph{Operator} class with the required functionality.

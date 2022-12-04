@@ -734,11 +734,11 @@ As a consequence, if our method incorporates $i$ smoothing steps, the total numb
 We can illustrate this expression by considering the corresponding decision tree, which is shown in Figure~\ref{fig:decision-tree} for $n = 2$.
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth]{figures/trees/decision_tree_annotated.pdf}
+	\includegraphics[width=\textwidth]{figures/trees/decision_tree.pdf}
 	\caption{Simplified decision tree - Each node has the same number of children.}
 	\label{fig:decision-tree}
 \end{figure}
-Each node in this tree corresponds to a particular choice of operations, which includes the application of either $S_1$ or $S_2$ as a smoother, optionally accompanied by coarsening or a coarse-grid correction.
+Each node in this tree corresponds to a particular choice of operations, which includes the application of either $s_1$ or $s_2$ as a smoother, optionally accompanied by coarsening or a coarse-grid correction.
 Therefore, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the multigrid method.
 Since each leaf of the tree corresponds to a structurally-different multigrid method, the total number of leaves is, thus, equal to $N_{2,i} = 6^i$.
 However, since the optimal amount of smoothing is not known beforehand, we must consider a varying number of smoothing steps.
