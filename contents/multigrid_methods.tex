@@ -205,7 +205,6 @@ For example, we can rearrange our original system, as given by Equation~\eqref{e
 \begin{equation}
 \underbrace{
 \begin{pmatrix}A_{11}&A_{12}&\cdots &A_{1m}\\A_{21}&A_{22}&\cdots &A_{2m}\\\vdots &\vdots &\ddots &\vdots \\A_{m1}&A_{m2}&\cdots &A_{mm}\end{pmatrix}}_{A}
- = 
 \underbrace{
 \begin{pmatrix}
 \bm{x}_1 \\ \bm{x}_2 \\ \vdots \\ \bm{x_m} 
@@ -349,7 +348,7 @@ In contrast, the slope of the second error component, which is relatively smooth
 \end{figure}
 Assuming that an error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and, thus, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define a coarse-grid correction 
 \begin{equation}
-	\bm{x}^{k+1}_h = \bm{x}^{k}_h + I_{2h}^h \bm{e}_{2h}.
+	\bm{x}^{(k+1)}_h = \bm{x}^{(k)}_h + I_{2h}^h \bm{e}_{2h}.
 \end{equation} 
 Now the question remains to be answered how we can compute an approximation for the error $\bm{e}_{2h}$ on the coarse grid.
 As we have pointed out above, Equation~\eqref{eq:linear-system-error-equation} is equivalent to the original system.
@@ -366,13 +365,13 @@ By bringing all these components together, we can formulate the two-level-method
 	\caption{Two-Grid Method}
 	\label{alg:two-grid-method}
 	\begin{algorithmic}
-		\State{Smooth on $A_h \bm{x}_h = \bm{b}_h$ to obtain an approximation $\tilde{\bm{x}}_h$}
-		\State{Compute the residual $\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
+		\State{Smooth on $A_h \bm{x}_h = \bm{b}_h$ to obtain an approximation $\bm{x}_h$}
+		\State{Compute the residual $\bm{r}_h = \bm{b}_h - A_h \bm{x}_h$}
 		\State{\hskip1em Obtain $A_{2h}$ through Galerkin coarsening or rediscretization}
 		\State{\hskip1em Restrict the residual $\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
 		\State{\hskip1em Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
-		\State{Perform the correction $\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \bm{x}_{2h}$}
-		\State{Smooth again on $A_h \bm{x}_h = \bm{b}_h$ now using $\tilde{\bm{x}}_h$} as an initial guess
+		\State{Perform the correction $\bm{x}_h = \bm{x}_h + I_{2h}^h \bm{x}_{2h}$}
+		\State{Smooth again on $A_h \bm{x}_h = \bm{b}_h$ now using $\bm{x}_h$} as an initial guess
 	\end{algorithmic}
 \end{algorithm}
 Note that while on the coarse grid, we are actually solving the error equation, it has been redefined as $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$.
@@ -612,25 +611,25 @@ The corresponding implementation of a \emph{multigrid cycle} in the form of the 
 	\caption{Multigrid Cycle}
 	\label{alg:multigrid-cycle}
 	\begin{algorithmic}
-		\Function{mg-cycle}{$k$, $\gamma$, $\tilde{\bm{x}}_h$, $A_h$, $\bm{b}_h$, $\nu_1$, $\nu_2$, $\omega$}
+		\Function{mg-cycle}{$k$, $\gamma$, $\bm{x}_h$, $A_h$, $\bm{b}_h$, $\nu_1$, $\nu_2$, $\omega$}
 		\For{$i = 1, \dots, \nu_1$}
-		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
+		\State{$\bm{x}_h = \bm{x}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \bm{x}_h \right)$ where $A_h = M_h + N_h$}
 		\EndFor
-		\State{$\bm{r}_h = \bm{b}_h - A_h \tilde{\bm {x}}_h$}
+		\State{$\bm{r}_h = \bm{b}_h - A_h \bm{x}_h$}
 		\State{$\bm{b}_{2h} = I_h^{2h} \bm{r}_h$}
 		\If{$k = 1$}
 		\State{ Solve $A_{2h} \bm{x}_{2h} = \bm{b}_{2h}$ for $\bm{x}_{2h}$}
 		\Else
-		\State{$\tilde{\bm{x}}_{2h} = 0$}
+		\State{$\bm{x}_{2h} = 0$}
 		\For{$i = 1, \dots, \gamma$}
-		\State{$\tilde{\bm{x}}_{2h} =  \textsc{mg-cycle}(\tilde{\bm{x}}_{2h}, A_{2h}, \bm{b}_{2h}, k-1, \gamma, \nu_1, \nu_2)$}
+		\State{$\bm{x}_{2h} =  \textsc{mg-cycle}(\bm{x}_{2h}, A_{2h}, \bm{b}_{2h}, k-1, \gamma, \nu_1, \nu_2)$}
 		\EndFor
 		\EndIf
-		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + I_{2h}^h \tilde{\bm{x}}_{2h}$}
+		\State{$\bm{x}_h = \bm{x}_h + I_{2h}^h \bm{x}_{2h}$}
 		\For{$i = 1, \dots, \nu_2$}
-		\State{$\tilde{\bm{x}}_h = \tilde{\bm{x}}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \tilde{\bm{x}}_h \right)$ where $A_h = M_h + N_h$}
+		\State{$\bm{x}_h = \bm{x}_h + \omega M_h^{-1} \left( \bm{b}_h - A_h \bm{x}_h \right)$ where $A_h = M_h + N_h$}
 		\EndFor
-		\State \Return{$\tilde{\bm{x}}_h$}
+		\State \Return{$\bm{x}_h$}
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
