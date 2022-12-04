@@ -104,7 +104,12 @@
 \colorlet{lightblue}{blue!50}
 \renewcommand\theFancyVerbLine{\footnotesize\arabic{FancyVerbLine}}
 \numberwithin{equation}{chapter}
-\newcounter{production}
+\newcounter{prodcounter}
+\newenvironment{production}{%
+\refstepcounter{prodcounter}
+\renewcommand\theequation{p\theprodcounter}
+\begin{bnf}}
+{\end{bnf}}
 
 %%%%%%%%%%%%%%%%%
 %%% META INFO %%%
