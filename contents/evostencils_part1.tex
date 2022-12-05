@@ -63,7 +63,7 @@ Before we derive an IR for each component of a multigrid method, note that each 
 %Note that algebraic multigrid methods~\cite{stuben2001introduction,ruge1987algebraic}, which are not considered in this work, represent an exception to this, as they operate on sparse matrix data structures.
 In Section~\ref{sec:discretization}, we have already made the assumption of discretizing the underlying PDE on a hierarchy of structured grids.
 To identify a grid within this hierarchy, certain information is required, which we store in a \emph{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
-In general, a structured grid is defined by its \emph{spacing} $h$ in each dimension and its \emph{size}, i.e., the number of grid points.
+In general, a structured grid is defined by its \emph{spacing} ($h$) in each dimension and its \emph{size}, i.e., the number of grid points.
 In addition, we also include the grid's \emph{level} to identify it within the discretization hierarchy.
 Note that in case the grid is uniform, we only need to store a single value for its spacing in each dimension, while otherwise, a value would need to be stored for each pair of grid points.
 As the problems considered in this work are all solved on a hierarchy of uniform grids, we focus on this particular case.
@@ -174,15 +174,16 @@ As a final step in the implementation of our intermediate representation, the \e
 	\caption{IR: Multigrid Cycle}
 	\label{code:ir:cycle}
 \end{listing}
-This class corresponds to an arbitrary computational step within a multigrid method.
+This class represents the execution of a complete multigrid cycle on a particular level.
 It, thus, computes a new value for the approximate solution $x_H$ on a particular level with spacing $H$, i.e.,
 \begin{equation*}
 	x_H = x_H + \omega c_H \; \text{with} \; P,
 \end{equation*}
 where $c_H$ is a correction term, $\omega$ the relaxation factor and $P$ a partitioning.
+Note that $x_H$ and $c_H$ contain all previous computations performed within the given cycle.
 To make the right-hand side available in subsequent steps of the method, such as for the computation of the residual, the data structure includes an additional reference to the corresponding object.
 Additionally, a reference to the previous state on the next-higher level is needed to restore the expression for the approximate solution and right-hand side after applying a coarse-grid correction.
-To better understand the purpose of these two classes, consider the example shown in Listing~\ref{code:ir:example.py}, which demonstrates the construction of a computational graph based on the IR described in this section.
+To better understand the purpose of the \emph{Residual} and \emph{Cycle} class, consider the example shown in Listing~\ref{code:ir:example.py}, which demonstrates the construction of a computational graph based on the IR described in this section.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/example.py}
 	\caption{Example Usage of the Intermediate Representation}
@@ -190,23 +191,23 @@ To better understand the purpose of these two classes, consider the example show
 \end{listing}
 Starting on the original problem on the finest grid, we first store references to the initial approximate solution and right-hand side in a \emph{Cycle} object, which itself is included as a \emph{predecessor} reference in the subsequently created coarse-grid \emph{Cycle} object.
 In order to apply the latter as a coarse-grid correction on the finest grid, the original fine-grid \emph{Cycle} object is restored, and its \emph{correction} variable is replaced by the respective expression, which is obtained by applying the prolongation operator to the approximate solution that has been previously computed on the coarse grid.
-As this example demonstrates, our IR enables us to assemble the computational graph of a multigrid method in a stepwise manner.
-However, to automate the process of generating a multigrid method from its grammar-based representation, we must be able to translate any sequence of derivations into a corresponding IR object.
-For this purpose, we will utilize the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
+As this example demonstrates, our IR enables the assembly of the computational graph in a stepwise manner.
+However, to automate the process of generating a multigrid method from its grammar-based representation, we must be able to translate any derivation of the grammar into a corresponding IR object.
+For this purpose, we utilize the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
 However, before we proceed with this task, we want to address some final remarks about the IR presented in this section.
 The main purpose of the implementation presented here is to uniquely represent the computational structure of a multigrid method in the form of a redundancy-free directed graph.
 Thus, to be able to construct such a graph in a step-wise manner based on the formal system described in Chapter~\ref{chapter:multigrid-formal-language}, each \emph{Cycle} node needs to include additional references to the current approximate solution and right-hand side.
 While this information is important for the construction of the graph, it could later be discarded by replacing each such node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{update} function in Section~\ref{sec:multigrid-state-transitions}.
-However, preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} nodes within each graph.
+Preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} objects within each graph.
 This not only enables us to easily determine the computational structure of a multigrid method by traversing the corresponding graph data structure but also facilitates the identification of potential errors in the implementation.
-We, therefore, represent each newly computed approximate solution by an \emph{Cycle} object, which is then referenced at each of its occurrences within subsequent computational steps of the method.
-Also, note that even though the transformation of a graph-based to an algorithmic representation later requires us to translate each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation.
+We, therefore, represent each newly computed approximate solution as a \emph{Cycle} object, which is then referenced in subsequent computational steps of the method.
+Also, note that even though the translation of a graph-based representation to an algorithm later requires us to transform each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation.
 
 \section{Grammar Generation}
-According to Section~\ref{sec:multigrid-grammar}, our family of context-free grammars for the generation of multigrid methods consists of three components, a set of terminals, variables, and productions, while additionally, we have to choose a starting symbol $\ps{S}$ from the set of variables.
+According to Section~\ref{sec:multigrid-grammar}, our family of context-free grammars (CFGs) for the generation of multigrid methods consists of three components, a set of terminals, variables, and productions, while additionally, we have to choose a starting symbol $\ps{S}$ from the set of variables.
 In Table~\ref{table:grammar-semantics}, we have defined the semantics of each state transition function occurring within the productions listed in Table~\ref{table:multigrid-grammar}.
-While each instance of Table~\ref{table:multigrid-grammar} has to be formulated on a specific grid hierarchy, we have already mentioned that it is possible to define a structurally-equivalent grammar on a different hierarchy of discretizations with the same number of coarsening steps.
-Therefore, by treating the number of coarsening steps as a parameter, we can automate the process of grammar generation for different problems and discretizations.
+While each instance of our grammar has to be formulated on a specific grid hierarchy, we have already mentioned that it is possible to define a structurally-equivalent grammar on a different hierarchy of discretizations with the same number of coarsening steps.
+By treating the number of coarsening steps as a parameter, we can, thus, automate the process of grammar generation for different problems and discretizations.
 For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which we encapsulate in the class \emph{Terminals} shown in Listing~\ref{code:grammar:terminals}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
