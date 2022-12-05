@@ -115,8 +115,8 @@ In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical
 	\caption{IR: Stencil}
 	\label{code:ir:stencil}
 \end{listing}
-The \emph{entries} attribute of this class directly corresponds to the set $S$ defined in Equation~\ref{eq:stencil-definition}, whereby we use a \emph{tuple} object to represent this mathematical entity in the Python programming language.
-Each entry $e_i$ of this object, thus, represents a tuple of the form of
+The \emph{entries} attribute of this class directly corresponds to our definition of a stencil, whereby we use a \emph{tuple} object to represent this mathematical entity in the Python programming language.
+Each entry $e_i$ of this object is, thus, given as
 \begin{equation}
 	e_i = \left(\bm{a}_i, b_i \right),
 \end{equation} 
@@ -125,7 +125,7 @@ Based on this class, we can then provide an implementation for each stencil oper
 %Furthermore, in accordance with Section~\ref{subsec:systems-of-pdes} and~\ref{subsec:block-smoothing}, we can extend this implementation to systems of PDEs and block smoothers, which will be briefly covered in the next Chapter of this thesis. %TODO insert ref to next chapter here or remove sentence
 Now note that in our implementation of the \emph{Operator} class in Listing~\ref{code:ir:operator}, the stencil is not included directly, but instead, we provide a so-called \emph{stencil generator}.
 A stencil generator is a function that returns the discretization of an operator on a particular grid in the form of a stencil.
-For instance, the finite-difference discretization of the Laplace operator $\Delta$ on a two-dimensional uniform grid leads to the stencil 
+For instance, the finite-difference discretization of the Laplace operator on a two-dimensional uniform grid leads to the stencil 
 \begin{equation*}
 	\begin{split}
 		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h},
@@ -134,12 +134,12 @@ For instance, the finite-difference discretization of the Laplace operator $\Del
 in which the value at each offset depends on the grid spacing $h$.
 Furthermore, in certain cases, it is possible to derive the higher-dimensional version of a stencil from its lower-dimensional counterpart, as we have shown in Section~\ref{subsec:restriction-and-prolongation} for the considered prolongation and restriction operators.
 Therefore, instead of storing a unique stencil for each individual operator instance, we can parametrize its generation based on the features of the applied discretization by including a reference to the respective generator function.
-Finally, as both prolongation and restriction transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of an operator, which, for instance, leads to a different value of the \emph{shape} attribute.
+Finally, as both prolongation and restriction operators transfer information between adjacent grids within a hierarchy of discretizations, they can be considered as a special case of a general operator, which, for instance, leads to a different value of the \emph{shape} attribute.
 For this purpose, the class \emph{InterGridOperator}, from which all restriction and prolongation operators are derived, extends the \emph{Operator} class with the required functionality.
 For the sake of brevity, the implementation of this class and the respective \emph{Restriction} and \emph{Prolongation} subclasses can be found in Section~\ref{appendix:ir} of the appendix.
 
-After discussing the implementation of the different entities upon which a multigrid method is built, we next shift our attention to the implementation of IR classes for representing the expressions that constitute its computational structure. 
-For this purpose, we first provide basic classes for representing unary and binary expressions, which are shown in the Listings~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
+After discussing the implementation of the different entities based on which a multigrid method is built, we next shift our attention to the implementation of IR classes for representing the expressions that constitute its computational structure. 
+For this purpose, we first provide basic classes for representing unary and binary expressions, which are shown in Listing~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
 	\caption{IR: Unary Expression Base Class}
@@ -150,34 +150,35 @@ For this purpose, we first provide basic classes for representing unary and bina
 	\caption{IR: Binary Expressions Base Class}
 	\label{code:ir:binary-expression}
 \end{listing}
-In both cases, all necessary properties are obtained from the expression's operands in a recursive manner.
+In both cases, all necessary properties are obtained from the operands of the expression in a recursive manner.
 However, since the result of a binary expression depends on the type of operation, we raise an error if this method is not implemented in one of the derived classes. 
 To illustrate that the majority of multigrid operations can already be expressed based on these two classes, we have included a number of specific examples in Section~\ref{appendix:ir} of the appendix.
-As discussed in Section~\ref{sec:grammar-based-algorithm-generation}, we aim to represent the computational structure of a given multigrid method as a redundancy-free directed graph. 
+As discussed in Section~\ref{sec:grammar-based-algorithm-generation}, we aim to represent the computational structure of each multigrid method as a redundancy-free directed graph. 
 While the previously defined base classes allow us to represent the arithmetic expressions that occur within the correction terms of a multigrid method, there are two operations that require special treatment.
-As we have already seen in Figure~\ref{fig:example-three-grid-method-computational-graph} it is necessary to access previously computed intermediate results on multiple occasions within a multigrid method.
+As we have already seen in Figure~\ref{fig:example-three-grid-method-computational-graph}, it is necessary to access previously computed intermediate results on multiple occasions within a multigrid method.
 In particular, each time a coarse-grid correction is performed, we have to restore the previous approximate solution and right-hand side on the respective level.
-Furthermore, whenever we compute a new residual, the current expression for both the right-hand side and approximate solution is required.
+Furthermore, whenever we compute a new residual, the current expression of both the right-hand side and the approximate solution is required.
 For this purpose, we implement the classes \emph{Residual} and \emph{Cycle}, which allow us to establish additional references to previously defined expressions within a multigrid method.
-Each of these references then corresponds to one of the subgraphs in Figure~\ref{fig:example-three-grid-method-computational-graph} with root nodes that possess multiple incoming edges, i.e., those subgraphs that have been annotated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}.
-We will later see how these references can be utilized to construct a complete graph from the grammar-based representation of a multigrid method.
-Listing~\ref{code:ir:residual} shows the implementation of the \emph{Residual} class, which contains references to the system operator $A_H$ and the expressions for computing the current approximate solution $\tilde{x}_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
-Based on these components, we can easily construct the corresponding residual expression $r_H = b_H - A_H \tilde{x}_H$.
+Each of these references then corresponds to one of the subgraphs in Figure~\ref{fig:example-three-grid-method-computational-graph} that possess root nodes with multiple incoming edges, i.e., those subgraphs that have been annotated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}.
+We will later see the complete graph of a multigrid method can be constructed based on these references.
+Listing~\ref{code:ir:residual} shows the implementation of the \emph{Residual} class, which contains references to the system operator $A_H$, the current approximate solution $x_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
+Based on these components, we can easily construct the corresponding residual expression $r_H = b_H - A_H x_H$.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/residual.py}
 	\caption{IR: Residual}
 	\label{code:ir:residual}
 \end{listing}
-As a final step in the implementation of our intermediate representation, the definition of the \emph{Cycle} class can be found in Listing~\ref{code:ir:cycle}.
+As a final step in the implementation of our intermediate representation, the \emph{Cycle} class can be found in Listing~\ref{code:ir:cycle}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/cycle.py}
 	\caption{IR: Multigrid Cycle}
 	\label{code:ir:cycle}
 \end{listing}
-This class represents one step of computing a new value for the approximate solution $\tilde{x}_H$ on a particular level with spacing $H$, i.e.,
-\begin{equation}
-	\tilde{x}_H = \tilde{x}_H + \omega c_H \; \text{with} \; P,
-\end{equation}
+This class corresponds to an arbitrary computational step within a multigrid method.
+It, thus, computes a new value for the approximate solution $x_H$ on a particular level with spacing $H$, i.e.,
+\begin{equation*}
+	x_H = x_H + \omega c_H \; \text{with} \; P,
+\end{equation*}
 where $c_H$ is a correction term, $\omega$ the relaxation factor and $P$ a partitioning.
 To make the right-hand side available in subsequent steps of the method, such as for the computation of the residual, the data structure includes an additional reference to the corresponding object.
 Additionally, a reference to the previous state on the next-higher level is needed to restore the expression for the approximate solution and right-hand side after applying a coarse-grid correction.

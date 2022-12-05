@@ -287,11 +287,11 @@ A_{2h} x_{2h} = I_{h}^{2h} r_h,
 \end{equation*} 
 we have to assign this expression to the right-hand side $b_{2h}$ that is contained in the corresponding state tuple.
 Furthermore, as discussed in the last section, before we can transition to a state on the next coarser grid, we have to store the previous state in the fourth entry of the resulting tuple.
-The resulting state transition is implemented in the function \textsc{cycle} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that a new cycle is initiated on the next coarser grid.
+The resulting state transition is implemented in the function \textsc{coarsening} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that the computation proceeds on a lower level and, thus, a coarser grid.
 Note that the application of a coarse-grid correction computed on the next lower completes this cycle. 
 \begin{algorithm}
 	\begin{algorithmic}
-	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
+	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
 		\State $x_{2h} \gets x_{2h}^0$ 
 		\State $b_{2h} \gets c_{2h}$
 		\State $c_{2h} \gets b_{2h} - A_{2h} x_{2h}$ 
@@ -299,7 +299,7 @@ Note that the application of a coarse-grid correction computed on the next lower
 		\State return ($x_{2h}$, $b_{2h}$, $c_{2h}$, $Z_h$)
 	\EndFunction
 	\end{algorithmic}
- \caption{Cycle Initiation}
+ \caption{Coarsening}
 \label{alg:state-transition-cycle}
 \end{algorithm}
 Within this function, we already construct an expression for the initial residual
@@ -347,7 +347,7 @@ The main components of this language are summarized in Table~\ref{table:grammar-
 	\State return ($x_h$, $b_h$, $\lambda$, $Z_{h/2}$) 
 	\EndFunction
 	\State
-	\Function{cycle}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
+	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
 	\State $x_{2h} \gets x_{2h}^0$ 
 	\State $b_{2h} \gets c_{2h}$
 	\State $c_{2h} \gets b_{2h} - A_{2h} x_{2h}$ 
@@ -468,10 +468,10 @@ First of all, as multigrid methods recursively apply the same operations through
 \end{production}
 Note that the right-hand side of Production~\eqref{prod:coarse-coarse-grid-correction} now contains the variable $\ps{s_{4h}}$ defined on an even coarser grid with step size $4h$, based on which we can proceed in a similar fashion to obtain a multigrid method that operates on a hierarchy of discretizations with even larger depth.
 In contrast to a coarse-grid correction, which represents a transition to a state on the next higher level, we have not yet considered the opposite direction: The construction of the error equation on a coarser grid based on the state on the current level.
-While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{cycle}$ in combination with $\textsc{apply}$ to obtain a new state on the next lower level that includes the initial residual as a correction term, which leads to the production
+While the state on the finest grid is always derived from the original system of linear equations that the method aims to solve, we can apply the state transition function $\textsc{coarsening}$ in combination with $\textsc{apply}$ to obtain a new state on the next lower level that includes the initial residual as a correction term, which leads to the production
 \begin{production}
 \bnfprod{$c_{2h}$} {
-	\bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+	\bnfts{\textnormal{\textsc{coarsening}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }.
 \label{prod:coarsening}
 \end{production}
@@ -547,8 +547,11 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			%\bnfts{\textnormal{\textsc{update}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_{2h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfpn{$s_{2h}$}) \bnfor 
 		} \\
+        \bnfmore{
+        \bnfts{\textnormal{\textsc{coarsening}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
+        } \\
 		\bnfprod{$B_{2h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{2h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{2h} = M_{2h} + N_{2h}$}
 		} \\ \\
@@ -560,8 +563,11 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			%\bnfts{\textnormal{\textsc{update}}}(\bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{2h}$}, \bnfsp \bnfpn{$c_{4h}$}), \bnfsp \bnfts{$\omega$}, \bnfsp \bnfes)
 		} \\
 		\bnfprod{$c_{4h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$x^0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfpn{$s_{4h}$}) \bnfor 
 		} \\
+          \bnfmore{
+        \bnfts{\textnormal{\textsc{coarsening}}}(\bnfts{$A_{4h}$}, \bnfsp \bnfts{$x^0_{4h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{2h}^{4h}$}, \bnfsp \bnfpn{$c_{2h}$}))
+        } \\
 		\bnfprod{$B_{4h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{4h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{4h} = M_{4h} + N_{4h}$}
 		} \\ \\
@@ -572,8 +578,11 @@ Table~\ref{table:multigrid-grammar} shows the resulting productions for the comp
 			\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{16h}^{8h}$}, \bnfsp \bnfpn{$c_{16h}$}))
 		} \\
 		\bnfprod{$c_{8h}$} {
-			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor \bnfts{\textnormal{\textsc{cycle}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$x^0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+			\bnfts{\textnormal{\textsc{residual}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfpn{$s_{8h}$}) \bnfor 
 		} \\ 
+          \bnfmore{
+        \bnfts{\textnormal{\textsc{coarsening}}}(\bnfts{$A_{8h}$}, \bnfsp \bnfts{$x^0_{8h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_{4h}^{8h}$}, \bnfsp \bnfpn{$c_{4h}$}))
+        } \\
 		\bnfprod{$B_{8h}$} {
 			\bnfts{\textnormal{\textsc{inverse}}}(\bnfts{$M_{8h}$}) \bnfsp \bnfts{\textnormal{with}} \bnfsp \bnfts{$A_{8h} = M_{8h} + N_{8h}$}
 		} \\ \\
