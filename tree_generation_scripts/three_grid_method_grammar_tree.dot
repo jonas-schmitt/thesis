@@ -4,20 +4,20 @@ digraph G {
   start [texlbl="$\langle S \rangle$"];
   start -> sh_1
   sh_1 [texlbl="$\langle s_h\rangle$"];
-  sh_1 -> iterate_1
+  sh_1 -> update_1
   sh_1 -> omega_1
   sh_1 -> lambda_1
   sh_1 -> cgc_1
   sh_1 -> prolongation_1
   sh_1 -> s2h_2
-  iterate_1 [texlbl="\textsc{iterate}"];
+  update_1 [texlbl="\textsc{update}"];
   omega_1 [texlbl="$1.0$"];
   lambda_1 [texlbl="$\lambda$"];
   cgc_1 [texlbl="\textsc{cgc}"];
   prolongation_1 [texlbl="$I_{2h}^h$"];
   s2h_2 [texlbl="$\langle s_{2h}\rangle$"];
-  s2h_2 -> iterate_2
-  iterate_2 [texlbl="\textsc{iterate}"];
+  s2h_2 -> update_2
+  update_2 [texlbl="\textsc{update}"];
   s2h_2 -> omega_2
   omega_2 [texlbl="$0.6$"];
   s2h_2 -> P_2
@@ -39,8 +39,8 @@ digraph G {
   operator_2 [texlbl="$A_{2h}$"];
   c2h_2 -> s2h_3
   s2h_3 [texlbl="$\langle s_{2h}\rangle$"]; 
-  s2h_3 -> iterate_3
-  iterate_3 [texlbl="\textsc{iterate}"];
+  s2h_3 -> update_3
+  update_3 [texlbl="\textsc{update}"];
   s2h_3 -> omega_3
   omega_3 [texlbl="$1.0$"];
   s2h_3 -> lambda_3
@@ -61,7 +61,7 @@ digraph G {
   c4h_4 -> c2h_5
   c2h_5 [texlbl="$\langle c_{2h} \rangle$"];
   c2h_5 -> coarse_cycle_5
-  coarse_cycle_5 [texlbl="\textsc{cge}"];
+  coarse_cycle_5 [texlbl="\textsc{coarsening}"];
   c2h_5 -> operator_5
   operator_5 [texlbl="$A_{2h}$"];
   c2h_5 -> solution_5
