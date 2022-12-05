@@ -310,16 +310,16 @@ For this purpose, similar to the \emph{restrict\_and\_coarsen} function, we firs
 The resulting error equation is then solved directly, which is denoted by the application of the coarse-grid solver.
 As a final step, the obtained solution is transferred to the next higher level to correct the current approximate solution.
 %TODO mention that EvoStencils includes additional functionality not mentioned here
-\subsection{Productions}
+\subsection{Translation to Strongly-Typed Genetic Programming}
 \label{sec:evostencils-part1:productions}
-Finally, to generate the actual grammar, we need to assemble the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on the terminal and state transition functions implementation presented in the last section.
+Finally, to generate the actual grammar, we need to assemble the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on the terminal and state transition function implementation presented in the last section.
 As already mentioned at the beginning of this chapter, we, therefore, make use of the genetic programming (GP) module of the DEAP framework~\cite{rainville2012deap}. 
-In principle, DEAP only offers support for untyped and strongly-typed tree-based GP and, therefore, does not allow implementing grammar-guided GP (G3P) in a direct way.
-However, as we have already discussed in Section~\ref{sec:gggp-initialization} G3P can be considered as a special variant of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
+In principle, DEAP only offers support for untyped and strongly-typed tree-based GP and, therefore, does not allow implementing grammar-guided GP (G3P) directly.
+However, as we have already discussed in Section~\ref{sec:gggp-representation}, G3P can be considered as a special variant of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
 Before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
 In DEAP, the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines the rules of how a program can be constructed based on a set of \emph{Primitive} objects.
 As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints can be generated.
-To demonstrate how a grammar can be implemented as a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, whose productions are, again, given by
+To demonstrate how a grammar can be implemented as a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, whose productions are given by
 \begin{equation*}
 	\begin{split}
 		\ps S \; \; \bnfpo & \; \; \ps E \\
@@ -336,24 +336,24 @@ Listing~\ref{code:grammar:pset-example} shows the corresponding implementation o
 	\label{code:grammar:pset-example}
 \end{listing}
 Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in Line~5--7 of Listing~\ref{code:grammar:pset-example}.
-Next, a new \emph{PrimitiveSetTyped} object is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable in the given grammar.
-We then proceed to define each of the grammar's production in the form of a \emph{Primitive} objective, which consists of a function, a list of input types, and an output type.
+Next, a new \emph{PrimitiveSetTyped} object is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable within the grammar.
+We then proceed to define each production in the form of a \emph{Primitive} objective, which consists of a function, a list of input types, and an output type.
 Counterintuitively, the output and not the input type then defines which variable is placed on the left-hand side of each production.
 To understand this contradiction, we need to revisit the process of tree initialization in G3P.
-As we have seen in Section~\ref{sec:gggp-initialization}, a new derivation tree is always generated starting with the variable $\ps{S}$ by recursively choosing productions for each leaf node of the tree that corresponds to a variable.
-Similarly, to generate a tree based on a given \emph{PrimitiveSetTyped}, a \emph{Primitive} is picked randomly from those with an output type matching the specified return type.
+As we have seen in Section~\ref{sec:gggp-initialization}, a new derivation tree is generated starting with the variable $\ps{S}$ by recursively selecting productions for each leaf node of the tree that corresponds to a variable.
+Similarly, to generate a tree based on a given \emph{PrimitiveSetTyped}, a \emph{Primitive} is picked randomly from those whose output type matches the specified return type.
 After extending the tree accordingly, the process is then continued with each of the input types of the chosen \emph{Primitive}.
-Therefore, terminating this process at a certain point within the tree requires choosing a \emph{Primitive} with an empty list of input types, which correspond to a production whose right-hand side does not contain any variables.
+Therefore, terminating this process at a certain point within the tree requires choosing a \emph{Primitive} with an empty list of input types, which corresponds to a production whose right-hand side does not contain any variables.
 In DEAP, such a \emph{Primitive} is called a \emph{Terminal}, which should not be confused with the terminals introduced in Section~\ref{sec:gggp-representation}, which simply refer to each non-variable symbol of a grammar.
 To add either a \emph{Primitive} or \emph{Terminal} object to a given \emph{PrimitiveSetTyped}, the \emph{\_add} method can be used.
-However, for the sake of convenience, the methods \emph{addPrimitive} and \emph{addTerminal} are also available.
-In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, we, therefore, include a \emph{Primitive} for each of them, using the aforementioned function and the previously defined types.
-Note that in order to define the production
+Additionally, the methods \emph{addPrimitive} and \emph{addTerminal} are also available, which are usually more convenient to use.
+In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, we, hence, include a \emph{Primitive} for each of them, using the aforementioned function and the previously defined types.
+Note that the production
 \begin{equation*}
-	\ps E \; \; \bnfpo \; \; \ps A,
+	\ps E \; \; \bnfpo \; \; \ps A
 \end{equation*}
-we utilize an identity function, which is implemented in Line~12 of Listing~\ref{code:grammar:pset-example}.
-After including each of the grammar's productions as a \emph{Primitive} object, we need to take care of the four symbols $x$, $y$, $u$, and $v$.
+is implemented based on the identity function defined in Line~12 of Listing~\ref{code:grammar:pset-example}.
+After adding a \emph{Primitive} object for each of the grammar's productions, we need to take care of the four symbols $x$, $y$, $u$, and $v$.
 We can represent these symbols as objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} object without any arguments and, thus, an empty list of input types.
 Optionally, a \emph{Terminal} object may also refer to a Python symbol, which can be triggered by setting the \emph{symbolic} argument accordingly.
 If we assume that each of the four symbols represents an argument to a Python function generated by our grammar, we additionally have to append it to the list of arguments of the corresponding \emph{PrimitiveSetTyped} object.
@@ -366,28 +366,29 @@ As a consequence, our implementation includes two additional productions
 which are not part of the original grammar.
 The reason for this adaption is that DEAP's implementation of the \emph{grow} operator, as described in Section~\ref{sec:gggp-initialization}, expects the availability of at least one \emph{Terminal} and \emph{Primitive} object for each type within a \emph{PrimitiveSetTyped}.
 In the given case, we only need to include additional \emph{Terminal} objects for the type \emph{E}, as the condition is already fulfilled for all other types.
-While the example considered here does not require significant adaptions in the structure of the grammar since the type \emph{E} can already be converted to \emph{A} using the identity function, in general, this is not the case.
-In particular, for the majority of the variables of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}, only non-terminal productions, i.e., productions that generate strings with at least one variable, are available.
-To handle grammars that violate the requirement of having at least one terminal production for each of its variables, we, thus, need to adapt DEAP's implementation of the \emph{grow} operator.
+While the example considered here does not require significant adjustments to the structure of the grammar as the type \emph{E} can already be converted to \emph{A} using the identity function, in general, this is not the case.
+In particular, according to Table~\ref{table:multigrid-grammar}, for the majority of the variables of our multigrid grammar, only non-terminal productions, i.e., productions that generate strings with at least one variable, are available.
+To handle grammars that violate the requirement of having at least one terminal production for each of its variables, we need to adapt DEAP's implementation of the \emph{grow} operator.
 We will cover this adaptation briefly at the end of this section.
 Finally, after constructing a \emph{PrimitiveSetTyped} object that corresponds to our example grammar, we can construct a random derivation tree using the \emph{genGrow} function, which corresponds to the aforementioned \emph{grow} initialization operator.
 Based on the resulting tree, a function object is then generated using DEAP's \emph{compile} function, which can be executed similarly to any other Python function by providing a value for each of its arguments.
 %Similar to \emph{Primitive} objects, a \emph{Terminal} can be added to an existing \emph{PrimitiveSetTyped} using the \emph{addTerminal} method.
 
+\subsection{Variable Encoding}
 After introducing the functionality of DEAP's GP module, we can proceed with the actual implementation of the productions of our multigrid grammar, as defined in Table~\ref{table:multigrid-grammar}.
 However, before we define a function for constructing the corresponding \emph{PrimitiveSetTyped}, we need to consider the unique structure of our grammar.
 As we have discussed in Section~\ref{sec:multigrid-grammar}, Table~\ref{table:multigrid-grammar} is obtained by repeating the same productions on each level for the corresponding set of variables.
-In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all required terminals for a certain level of the discretization hierarchy.
-Therefore, instead of constructing a \emph{PrimitiveSetTyped} including the complete set of productions in Table~\ref{table:multigrid-grammar} all at once, we can instead add the respective \emph{Primitive} objects on a per-level basis.
+In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all required terminals for a particular level of the discretization hierarchy.
+Therefore, instead of initializing a \emph{PrimitiveSetTyped} with the complete set of productions, we can instead add the respective \emph{Primitive} objects on a per-level basis.
 Furthermore, note that Table~\ref{table:multigrid-grammar} is defined for a specific number of coarsening steps.
-We can, therefore, implement a function that iteratively constructs a multigrid grammar independent of the total number of coarsening steps.
-This allows us to employ the same function for the generation of different multigrid grammars defined on varying discretization hierarchies.
+We can, thus, implement a function that iteratively constructs a multigrid grammar independent of the total number of coarsening steps.
+This allows us to deploy the same function for the generation of multigrid grammars defined on different discretization hierarchies, for instance, with a different number of coarsening steps.
 As in the above example, we first need to generate a unique type for each variable that is defined on a certain level of our grammar.
-While in Listing~\ref{code:grammar:pset-example}, we have encoded each of the grammar's variables by an actual Python type, at this point, we have to introduce an additional constraint that prevents us from pursuing the same approach.
+While in Listing~\ref{code:grammar:pset-example}, we have encoded each variable by an actual Python type, at this point, we have to introduce an additional constraint that prevents us from pursuing the same approach.
 In order to store the state of a program in the form of a serialized binary format, Python provides the \emph{Pickle} module.
 This module enables the serialization of arbitrary Python objects, which can then be restored at a later point in time.
 In our implementation, object serialization serves multiple purposes.
-First of all, we want to be able to store the current state of our evolutionary search method such that, for instance in case of a hardware failure, we can continue the search at the same position.
+First of all, we want to be able to store the current state of our evolutionary search method such that, for instance, in case of a hardware failure, we can continue the search at the same position.
 Furthermore, parallelizing certain parts of the optimization on a distributed computing system, for instance, using the Message Passing Library (MPI), requires us to transfer arbitrary Python objects via a communication network.
 The pickle module provides a simple and portable solution to this problem.
 Unfortunately, pickle enforces a number of additional constraints on the serializability of a Python object.
@@ -426,6 +427,7 @@ We, therefore, only have to generate a unique type for each variable once, which
 For the sake of simplicity, Python strings are used as \emph{identifier} for a \emph{Type} object. 
 In contrast to the types that need to be defined on each level, the \emph{Partitioning} and \emph{RelaxationFactorIndex} attributes are level-independent variables, and, thus, in both cases, only a single type needs to be defined for the whole grammar, which is shown in Line~36 and~37.
 
+\subsection{Productions}
 With the implementation of a type system that allows us to express each production as a mapping between input and output types, we are now finally at the point where we can bring everything together.
 Similar to the example shown in Listing~\ref{code:grammar:pset-example}, we first have to create a \emph{PrimitiveSetTyped} to which we can then add the respective \emph{Terminal} and \emph{Primitive} objects in an iterative manner.
 The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}.
