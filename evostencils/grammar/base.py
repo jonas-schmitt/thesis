@@ -13,7 +13,7 @@ def update(relaxation_factor_index, partitioning, cycle):
     x_h, b_h = cycle, cycle.rhs
     return x_h, b_h
 
-def initiate_cycle(A_2h, x_2h, cycle):
+def coarsening(A_2h, x_2h, cycle):
     r_2h = base.Residual(A_2h, x_2h, cycle.correction)
     new_cycle = base.Cycle(x_2h, cycle.correction, r_2h)
     new_cycle.predecessor = cycle
