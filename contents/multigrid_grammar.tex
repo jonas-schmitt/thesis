@@ -288,7 +288,6 @@ A_{2h} x_{2h} = I_{h}^{2h} r_h,
 we have to assign this expression to the right-hand side $b_{2h}$ that is contained in the corresponding state tuple.
 Furthermore, as discussed in the last section, before we can transition to a state on the next coarser grid, we have to store the previous state in the fourth entry of the resulting tuple.
 The resulting state transition is implemented in the function \textsc{coarsening} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that the computation proceeds on a lower level and, thus, a coarser grid.
-Note that the application of a coarse-grid correction computed on the next lower completes this cycle. 
 \begin{algorithm}
 	\begin{algorithmic}
 	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
