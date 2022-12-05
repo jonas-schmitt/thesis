@@ -306,9 +306,9 @@ We can, therefore, combine the complete process of updating the current approxim
 	\caption{State Transition: Coarse-Grid Solver}
 	\label{code:grammar:coarse-grid-solver}
 \end{listing}
-For this purpose, similar to the \emph{initiate\_cycle} function, we first restrict the correction term of a given \texttt{Cycle} object.
-However, in contrast to all other levels, the resulting error equation is solved directly, which is denoted by the application of the coarse-grid solver.
-Then, as a final step, the obtained solution is transferred to the next higher level to correct the current approximate solution.
+For this purpose, similar to the \emph{restrict\_and\_coarsen} function, we first restrict the correction term of a given \texttt{Cycle} object.
+The resulting error equation is then solved directly, which is denoted by the application of the coarse-grid solver.
+As a final step, the obtained solution is transferred to the next higher level to correct the current approximate solution.
 %TODO mention that EvoStencils includes additional functionality not mentioned here
 \subsection{Productions}
 \label{sec:evostencils-part1:productions}
