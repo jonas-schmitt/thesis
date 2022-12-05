@@ -215,42 +215,50 @@ For this purpose, we first need to generate the set of terminals that is defined
 	\label{code:grammar:terminals}
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
-First of all, since, at least in the applications considered in this work, each smoother is derived directly from the system operator, it can be generated automatically within the grammar.
-Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and, thus, be provided by the user.
-The implementation of a Python class for representing the coarse-grid solver can be found in Section~\ref{appendix:ir} of the appendix.
-Note that each object of this class may additionally contain an expression, again given in the form of an IR object representing a multigrid method.
+First of all, since each smoother considered in this work is derived from the system operator, it can be generated automatically within the grammar.
+Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and, thus, might be provided by the user.
+The implementation of a Python class for representing the coarse-grid solver can be found in Listing~\ref{code:ir:coarse-grid-solver}.
+\begin{listing}
+	\inputminted{python}{evostencils/ir/coarse_grid_solver.py}
+	\caption{IR: Coarse-Grid Solver}
+	\label{code:ir:coarse-grid-solver}
+\end{listing}
+Note that each object of this class may additionally contain an expression that represents a complete multigrid method whose finest grid coincides with the coarsest grid of the original method.
 This enables the construction of multigrid methods in a hierarchical manner, which means that after obtaining a multigrid method on a certain hierarchy of discretizations, we can employ it as a coarse-grid solver for another multigrid method formulated on top of our original discretization hierarchy.
 
 \subsection{State Transition Functions}
 \label{sec:evostencils:state-transition-functions}
-As a second step, based on the \emph{Terminals} class, we can implement the state transition functions defined in Section~\ref{sec:multigrid-state-transitions} to construct the IR object that corresponds to a particular grammar derivation tree.
+As a second step, based on the \emph{Terminals} class, we can implement the state transition functions defined in Section~\ref{sec:multigrid-state-transitions} to construct the IR object of a particular grammar derivation tree.
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
 	\caption{State Transition: Basic Functions}
 	\label{code:grammar:basic-functions}
 \end{listing}
-While each of these functions is semantically equivalent to their original definition, due to the properties of the \emph{Cycle} class, as given by Listing~\ref{code:ir:cycle}, certain adaptions are required.
+While each of these implementations is semantically equivalent to the corresponding function definition, certain adaptions are required due to the properties of the \emph{Cycle} class.
 In Section~\ref{sec:intermediate-representation}, we have already discussed the advantages of storing the current state of a multigrid method directly within each \emph{Cycle} object.
 As a consequence, the application of each state transition function either alters a given \emph{Cycle} object or returns a new object of this type.
-The \emph{residual} function, however, represents an exception to this statement, since it expects a \emph{state} variable containing an \emph{Approximation} and \emph{RightHandSide} object as its argument.
-Note that according to Table~\ref{table:multigrid-grammar}, every derivation ends by computing the residual with the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \emph{Approximation} and \emph{RightHandSide} object, respectively.
+The \emph{residual} function, however, represents an exception to this rule since it expects a \emph{state} variable containing an \emph{Approximation} and \emph{RightHandSide} object as its argument.
+Note that according to Table~\ref{table:multigrid-grammar}, every derivation ends with computing the residual based on the initial approximate solution $x_h^0$ and right-hand side $b_h$, given in the form of an \emph{Approximation} and \emph{RightHandSide} object, respectively.
 In this case, we, therefore, need to pass the initial state 
 \begin{equation*}
 	Z_h^0 = (x_h^0, b_h, \lambda, \lambda)
-\end{equation*} explicitly to the respective residual function.
+\end{equation*} explicitly to the \emph{residual} function.
 Since the third and fourth entry of this tuple is empty, in Python, a binary tuple is sufficient to store the respective \emph{Approximation} and \emph{RightHandSide} object.
-Even though in all subsequent computations, the first entry of this tuple then consists of a \emph{Cycle} object, for the sake of simplicity, the right-hand side is always included as a second entry, as this allows us to utilize the same \emph{residual} function within all grammar productions.
-The \emph{update} function, therefore, needs to be adapted accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object, which computes a new approximate solution, and the current right-hand side, is returned.
-Finally, as the second argument of the \emph{coarse\_grid\_correction} function results from an application of the \emph{update} function, and, thus, again represents a binary tuple, its first entry needs to be extracted to obtain the \emph{Cycle} object representing the current approximate solution on the coarse grid.
-The second main difference is the implementation of the \emph{update} function compared to its original definition in Table~\ref{table:grammar-semantics} function.
+Even though in all subsequent computations, the first entry of this tuple then consists of a \emph{Cycle} object, for the sake of simplicity, the right-hand side is always included as a second entry.
+This decision allows us to employ the same \emph{residual} function within all grammar productions.
+As a consequence, also the \emph{update} function needs to be adapted accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object for computing a new approximate solution, and the current right-hand side, is returned.
+Finally, since the \emph{state} argument of the \emph{coarse\_grid\_correction} function results from an application of the \emph{update} function, it also represents a binary tuple.
+We, therefore, need to extract the first entry of this tuple to obtain the corresponding \emph{Cycle} object.
+The second main difference is in the implementation of the \emph{update} function compared to its original definition in Table~\ref{table:grammar-semantics} function.
 Here we represent the relaxation factor as an index within a uniformly-sampled interval that is included in the respective \emph{Terminal} object.
 While we could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
-Assume we want to encode a certain derivation tree in a string-based format, which then later needs to be decoded in a different environment to restore the original information.
+Assume we want to encode a certain derivation tree in a string-based format.
+This format then later needs to be decoded in a different environment to restore the original information.
 If each relaxation factor is stored as a floating point number, we need to ensure that each number is stored with the same accuracy in both environments.
 In contrast, an index can always be accurately represented in the form of a single positive integer value.
 
-While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation of arbitrarily-structured multigrid methods, the majority of the productions shown in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
+While Listing~\ref{code:grammar:basic-functions} provides us with the basic functionality to generate an IR representation of arbitrarily-structured multigrid methods, the majority of the productions defined in Table~\ref{table:multigrid-grammar} consists of a combination of two different state transition functions.
 For instance, smoothing is performed by means of the consecutive application of \textsc{apply} and \textsc{update}.
 We can, thus, simplify the process of grammar generation by identifying the set of possible combinations of state transitions on each level, each of which we can then be implemented in a single Python function.
 In Definition~\ref{def:elementary-multigrid-operations}, we have already identified the three elementary multigrid operations \emph{smoothing}, \emph{coarsening}, and \emph{coarse-grid correction}.
