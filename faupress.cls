@@ -1766,7 +1766,7 @@
 %%% DEFINE FONTS TO BE USED FOR META INFO %%%
 
 \newkomafont{supervisor}{\sffamily\normalsize}
-\newkomafont{facultytitle}{\Large\bfseries}
+\newkomafont{facultytitle}{\LARGE\bfseries}
 \newkomafont{facultysubtitle}{\large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
@@ -1890,8 +1890,10 @@
     \vspace*{4.8mm}
     {\usekomafont{facultytitle} \@title\par}
     \vfill
-    %{\usekomafont{facultytitle} \@subtitle\par}
-    %\vfill
+    %\vspace{6mm}
+    {\usekomafont{facultysubtitle} \@subtitle\par}
+    \vfill
+    %\vspace{12mm}
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\

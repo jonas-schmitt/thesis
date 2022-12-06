@@ -310,7 +310,7 @@ For this purpose, similar to the \emph{restrict\_and\_coarsen} function, we firs
 The resulting error equation is then solved directly, which is denoted by the application of the coarse-grid solver.
 As a final step, the obtained solution is transferred to the next higher level to correct the current approximate solution.
 %TODO mention that EvoStencils includes additional functionality not mentioned here
-\subsection{Translation to Strongly-Typed Genetic Programming}
+\subsection{Genetic Programming in DEAP}
 \label{sec:evostencils-part1:productions}
 Finally, to generate the actual grammar, we need to assemble the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on the terminal and state transition function implementation presented in the last section.
 As already mentioned at the beginning of this chapter, we, therefore, make use of the genetic programming (GP) module of the DEAP framework~\cite{rainville2012deap}. 
