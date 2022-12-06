@@ -16,9 +16,11 @@ def init_grammar(generator, x_h, b_h, max_level, samples, coarsest=False):
     pset = PrimitiveSetTyped("main", [], types.S_h)
     pset.addTerminal((x_h, b_h), types.S_guard_h, 'initial_state')
 
+    # Relaxation factors
     for i in range(0, samples):
         pset.addTerminal(i, types.RelaxationFactorIndex)
 
+    # Partitionings
     pset.addTerminal(terminals.no_partitioning, types.Partitioning, terminals.no_partitioning.get_name())
     for p in terminals.partitionings:
         pset.addTerminal(p, types.Partitioning, p.get_name())
