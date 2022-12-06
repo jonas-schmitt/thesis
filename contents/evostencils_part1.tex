@@ -465,7 +465,7 @@ Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for e
 \end{listing}
 In line~2, we first make use of the function \emph{add\_terminals}, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to add all terminals that are required on the respective level to the given \emph{PrimitiveSetTyped}.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/add_terminals.py}
+	\inputminted{python}{evostencils/grammar/add_terminals.py}
 	\caption{Terminal Generation per Level}
 	\label{code:grammar:add-terminals}
 \end{listing}
@@ -489,11 +489,14 @@ This function generates a \emph{PrimitiveSetTyped} for discretization hierarchie
 	\label{code:grammar:generate-grammar}
 \end{listing}
 %TODO maybe clarify the meaning of max_level in comparison to earlier sections
-In We first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
+In line~8--10, we first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
 In case the given discretization hierarchy consists of at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
-For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~10--20, which are then passed to \emph{add\_level} in order to include all required \emph{Primitive} and \emph{Terminal} objects.
-After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
-In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar, based on the given PDE-based problem, to the synthesis of an optimal program within an \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
+For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~10--20, which are then passed to \emph{add\_level} in order to generate all required \emph{Primitive} and \emph{Terminal} objects.
+After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned at the end of the function precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
+
+\section{Evolutionary Program Synthesis}
+\label{sec:evostencils-part1:evolutionary-program-synthesis}
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar, based on the given PDE-based problem, to the synthesis of an optimal program in the \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
 	\caption{Optimizer class}
@@ -503,8 +506,6 @@ In addition to the generated \emph{PrimitiveSetTyped} object, this class relies 
 Based on the functionality of these two components, which, in the following, will be described in detail, we can implement a \emph{run} method, which first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary program synthesis that yields a population of individuals representing efficient multigrid methods for the given problem.
 Note that within this procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
 
-\section{Evolutionary Program Synthesis}
-\label{sec:evostencils-part1:evolutionary-program-synthesis}
 After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system, we can now make use of the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
 However, before we can define each operator, we first need to implement a data structure for storing a derivation tree generated based on the rules of our grammar.
 For this purpose, DEAP provides the \emph{PrimitiveTree} class, which represents each tree as a list of \emph{Primitive} and \emph{Terminal} objects stored in depth-first order.
