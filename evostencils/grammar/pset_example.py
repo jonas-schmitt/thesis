@@ -6,6 +6,7 @@ def generate_grammar(x, y, u, v):
     A = type("A", (object,), {})
     B = type("B", (object,), {})
     pset = gp.PrimitiveSetTyped("main", [], ret_type=E)
+
     # <E> := if <B> then <E> else <E> | <A>
     pset.addPrimitive(lambda b, e1, e2: e1 if b else e2, [B, E, E], E, name="if_then_else")
     pset.addPrimitive(lambda _: _, [A], E, name="id")

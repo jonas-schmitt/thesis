@@ -3,6 +3,7 @@ def add_level(pset, terminals, types, depth, coarsest=False):
     def add_primitive(pset, f, fixed_types, input_types, output_types, name):
         for t1, t2 in zip(input_types, output_types):
             pset.addPrimitive(f, fixed_types + [t1], t2, name)
+
     # Productions
     add_primitive(pset, residual, [], [types.S_h, types.S_guard_h], [types.C_h, types.C_guard_h], f"residual_{depth}")
     add_primitive(pset, jacobi, [types.RelaxationFactorIndex, types.Partitioning], [types.C_h, types.C_guard_h], [types.S_h, types.S_guard_h], f"jacobi_{depth}")
