@@ -438,10 +438,10 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 	\label{code:grammar:init-grammar}
 \end{listing}
 In line~6--14, we first construct the respective \emph{Terminals} and \emph{Types} data structures on the finest grid of the given discretization hierarchy.
-Based on these data structures, we proceed with the creation of the \emph{PrimitiveSetTyped} object in line~15.
-In line~16--21, we then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and a number of level-independent terminals.
+Based on these data structures, we proceed with the creation of the \emph{PrimitiveSetTyped} object in line~16.
+In line~17--26, we then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and all level-independent terminals.
 For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves the required information automatically from a domain-specific representation of the problem.
-All other \emph{Terminal} and \emph{Primitive} objects are then included in line~23 using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
+All other \emph{Terminal} and \emph{Primitive} objects are then included in line~28 using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
 
 At this point, we now need to come back to the definition of the \emph{Type} class, which includes an additional \emph{guard} attribute.
 The purpose of this attribute is to enforce additional constraints that are not present in the productions in Table~\ref{table:multigrid-grammar}.
@@ -455,7 +455,7 @@ It is, thus, important to define the minimal requirements a sequence of operatio
 While the optimal amount of smoothing and coarse-grid corrections might differ for each case, we consider it essential to apply the coarse-grid solver at least once to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
 We can enforce this requirement with the mentioned \emph{guard} attribute of the \emph{Type} class.
 As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
-For this purpose, we set the output type of the respective \emph{Terminal} object in line~16 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
+For this purpose, we set the output type of the respective \emph{Terminal} object in line~17 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
 We then define all remaining productions in such a way that all possible derivations include the function \emph{update\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
 Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for each level within a discretization hierarchy of arbitrary depth.
 \begin{listing}
@@ -473,7 +473,7 @@ To facilitate the process of generating  \emph{Primitive} objects, we implement 
 This function can generate multiple instances of the same \emph{Primitive} using different input and output types, which we utilize to include each type as a guarded and unguarded version.
 Now note that each derivation starts with \emph{S\_h} and ends with the type \emph{S\_guard\_h}.
 According to the productions in Table~\ref{table:multigrid-grammar}, only four unique primitives are required on each level, except for the definition of different smoothers.
-For each of the \emph{Primitive} objects generated lines~9--17 whose list of input types contains only unguarded types, the output type is also unguarded.
+For each of the \emph{Primitive} objects generated in line~9--17 whose list of input types contains only unguarded types, the output type is also unguarded.
 Consequently, so far, with none of the generated \emph{Primitive} objects, a transition from an unguarded to a guarded type is possible.
 We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~20.
 Since this transition represents the only way to reach the final state, the application of the \emph{update\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
