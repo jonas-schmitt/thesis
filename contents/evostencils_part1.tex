@@ -474,22 +474,23 @@ This function can generate multiple instances of the same \emph{Primitive} using
 Now note that each derivation starts with \emph{S\_h} and ends with the type \emph{S\_guard\_h}.
 According to the productions in Table~\ref{table:multigrid-grammar}, only four unique primitives are required on each level, except for the definition of different smoothers.
 For each of the \emph{Primitive} objects generated lines~9--17 whose list of input types contains only unguarded types, the output type is also unguarded.
-Consequently, so far, with none of the generated \emph{Primitives}, a transition from an unguarded to a guarded type is possible.
+Consequently, so far, with none of the generated \emph{Primitive} objects, a transition from an unguarded to a guarded type is possible.
 We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~20.
 Since this transition represents the only way to reach the final state, the application of the \emph{update\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
 Note that we only want to add this production on the lowest level, where it replaces the respective productions for the coarsening and coarse-grid correction steps.
 We, therefore, have to check whether we have reached the lowest level of the discretization hierarchy, which is done in line~15 of Listing~\ref{code:grammar:add-level}.
 Since we generate the respective \emph{Primitive} additionally with an unguarded input type, similar to most other productions, the coarse-grid solver can be applied multiple times within each derivation.
 
-Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can implement the Python function \emph{generate\_grammar}, which generates a \emph{PrimitiveSetTyped} for discretization hierarchies of variable depth, which is shown in Listing~\ref{code:grammar:generate-grammar}.
+Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can define the Python function \emph{generate\_grammar}, whose implementation is shown in Listing~\ref{code:grammar:generate-grammar}. 
+This function generates a \emph{PrimitiveSetTyped} for discretization hierarchies of variable depth.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/generate_grammar.py}
 	\caption{Grammar Generation}
 	\label{code:grammar:generate-grammar}
 \end{listing}
 %TODO maybe clarify the meaning of max_level in comparison to earlier sections
-Here, we first construct an initial \emph{PrimitiveSetTyped} object to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest level using the previously defined function \emph{init\_grammar}.
-In case the given discretization hierarchy comprises at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
+In We first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
+In case the given discretization hierarchy consists of at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
 For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~10--20, which are then passed to \emph{add\_level} in order to include all required \emph{Primitive} and \emph{Terminal} objects.
 After we have traversed all levels in this manner, our \emph{PrimitiveSetTyped} object, returned at the end of the function, precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
 In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar, based on the given PDE-based problem, to the synthesis of an optimal program within an \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
