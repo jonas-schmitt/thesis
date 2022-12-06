@@ -1,7 +1,6 @@
 import numpy as np
 
 def generate_grammar(generator, max_level, depth, samples=37):
-
     coarsest = False
     if depth == 1:
         coarsest = True
