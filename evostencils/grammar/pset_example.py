@@ -10,7 +10,6 @@ def generate_grammar(x, y, u, v):
     # <E> := if <B> then <E> else <E> | <A>
     pset.addPrimitive(lambda b, e1, e2: e1 if b else e2, [B, E, E], E, name="if_then_else")
     pset.addPrimitive(lambda _: _, [A], E, name="id")
-
     # <A> :=
     pset.addPrimitive(operator.neg, [A], A)         # -<A> |
     pset.addPrimitive(operator.add, [A, A], A)      # <A> + <A> |
@@ -18,7 +17,6 @@ def generate_grammar(x, y, u, v):
     pset.addPrimitive(operator.mul, [A, A], A)      # <A> * <A> |
     pset.addPrimitive(operator.truediv, [A, A], A)  # <A> / <A> |
     pset.addPrimitive(operator.pow, [A, A], A)      # <A>^<A>
-
     # <B> :=
     pset.addPrimitive(operator.not_, [B], B)        # not <B> |
     pset.addPrimitive(operator.and_, [B, B], B)     # <B> and <B> |
@@ -35,7 +33,6 @@ def generate_grammar(x, y, u, v):
     add_argument(pset, y, [E, A])
     add_argument(pset, u, [B])
     add_argument(pset, v, [B])
-
     return pset
 
 pset = generate_grammar("x", "y", "u", "v")
