@@ -10,8 +10,8 @@ def init_grammar(generator, x_h, b_h, max_level, samples, coarsest=False):
     CGS_2h = CoarseGridSolver("CGS", A_2h)
     relaxation_factor_interval = np.linspace(0.1, 1.9, samples)
     terminals = Terminals(x_h, A_h, A_2h, restriction_operators, prolongation_operators, CGS_2h, relaxation_factor_interval, partitionings)
-
     types = Types(0)
+
     pset = PrimitiveSetTyped("main", [], types.S_h)
     pset.addTerminal((x_h, b_h), types.S_guard_h, 'initial_state')
     pset.addTerminal(terminals.no_partitioning, types.Partitioning, terminals.no_partitioning.get_name())
