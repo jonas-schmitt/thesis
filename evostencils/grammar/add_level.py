@@ -1,5 +1,6 @@
 def add_level(pset, terminals, types, depth, coarsest=False):
     add_terminals(pset, terminals, types, depth, coarsest)
+
     def add_primitive(pset, f, fixed_types, input_types, output_types, name):
         for t1, t2 in zip(input_types, output_types):
             pset.addPrimitive(f, fixed_types + [t1], t2, name)
