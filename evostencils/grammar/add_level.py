@@ -18,4 +18,4 @@ def add_level(pset, terminals, types, depth, coarsest=False):
     else:
         # Add transition C_guard_h <- S_h to enable derivation termination
         add_primitive(pset, update_with_coarse_grid_solver, [types.RelaxationFactorIndex, types.P_2h, types.CGS_2h, types.R_h], [types.C_h, types.C_guard_h], [types.S_h, types.S_h], f'update_with_coarse_grid_solver_{depth}')
-        pset.addTerminal(terminals.CGS_2h, types.CGS_2h, f'CGS_{depth + 1}')
+        pset.addTerminal(terminals.CGS_2h, types.CGS_2h, f'CGS_{depth+1}')
