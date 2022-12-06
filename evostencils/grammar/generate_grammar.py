@@ -7,7 +7,7 @@ def generate_grammar(generator, max_level, depth, samples=37):
     x_h = generator.get_approximation(max_level)
     b_h = generator.get_rhs(max_level)
     pset, terminals, types = init_grammar(x_h, b_h, max_level, samples, coarsest=coarsest)
-
+    # Iteratively add productions per level
     for i in range(1, depth):
         level = max_level - i
         x_h = generator.get_approximation(level)
