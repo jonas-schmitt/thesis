@@ -437,7 +437,7 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 	\caption{Grammar Initialization}
 	\label{code:grammar:init-grammar}
 \end{listing}
-In line~6--13, we first construct the respective \emph{Terminals} and \emph{Types} data structures on the finest grid of the given discretization hierarchy.
+In line~6--14, we first construct the respective \emph{Terminals} and \emph{Types} data structures on the finest grid of the given discretization hierarchy.
 Based on these data structures, we proceed with the creation of the \emph{PrimitiveSetTyped} object in line~15.
 In line~16--21, we then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and a number of level-independent terminals.
 For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves the required information automatically from a domain-specific representation of the problem.
