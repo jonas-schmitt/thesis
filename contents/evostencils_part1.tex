@@ -473,12 +473,12 @@ To facilitate the process of generating  \emph{Primitive} objects, we implement 
 This function can generate multiple instances of the same \emph{Primitive} using different input and output types, which we utilize to include each type as a guarded and unguarded version.
 Now note that each derivation starts with \emph{S\_h} and ends with the type \emph{S\_guard\_h}.
 According to the productions in Table~\ref{table:multigrid-grammar}, only four unique primitives are required on each level, except for the definition of different smoothers.
-For each of the \emph{Primitive} objects generated in line~9--17 whose list of input types contains only unguarded types, the output type is also unguarded.
+For each of the \emph{Primitive} objects generated in line~9--14 whose list of input types contains only unguarded types, the output type is also unguarded.
 Consequently, so far, with none of the generated \emph{Primitive} objects, a transition from an unguarded to a guarded type is possible.
-We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~20.
+We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~17.
 Since this transition represents the only way to reach the final state, the application of the \emph{update\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
 Note that we only want to add this production on the lowest level, where it replaces the respective productions for the coarsening and coarse-grid correction steps.
-We, therefore, have to check whether we have reached the lowest level of the discretization hierarchy, which is done in line~15 of Listing~\ref{code:grammar:add-level}.
+We, therefore, have to check whether we have reached the lowest level of the discretization hierarchy, which is done in line~12 of Listing~\ref{code:grammar:add-level}.
 Since we generate the respective \emph{Primitive} additionally with an unguarded input type, similar to most other productions, the coarse-grid solver can be applied multiple times within each derivation.
 
 Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can define the Python function \emph{generate\_grammar}, whose implementation is shown in Listing~\ref{code:grammar:generate-grammar}. 
@@ -489,9 +489,9 @@ This function generates a \emph{PrimitiveSetTyped} for discretization hierarchie
 	\label{code:grammar:generate-grammar}
 \end{listing}
 %TODO maybe clarify the meaning of max_level in comparison to earlier sections
-In line~8--10, we first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
+In line~7--9, we first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
 In case the given discretization hierarchy consists of at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
-For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~10--20, which are then passed to \emph{add\_level} in order to generate all required \emph{Primitive} and \emph{Terminal} objects.
+For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~14--24, which are then passed to \emph{add\_level} in order to generate all required \emph{Primitive} and \emph{Terminal} objects.
 After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned at the end of the function precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
 
 \section{Evolutionary Program Synthesis}
