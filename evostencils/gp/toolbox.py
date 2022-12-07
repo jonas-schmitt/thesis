@@ -10,7 +10,6 @@ def init_toolbox(self, pset, min_height, max_height, multi_objective=True):
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
 
     self.toolbox = deap.base.Toolbox()
-
     # Population Initialization
     self.toolbox.register("generate_tree", genGrow, pset=pset, min_height=min_height, max_height=max_height)
     self.toolbox.register("generate_individual", tools.initIterate, creator.Individual, self.toolbox.generate_tree)
