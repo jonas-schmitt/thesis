@@ -313,13 +313,13 @@ As a final step, the obtained solution is transferred to the next higher level t
 \subsection{Genetic Programming in DEAP}
 \label{sec:evostencils-part1:productions}
 Finally, to generate the actual grammar, we need to assemble the respective subexpressions for each of the productions contained in Table~\ref{table:multigrid-grammar} based on the terminal and state transition function implementation presented in the last section.
-As already mentioned at the beginning of this chapter, we, therefore, make use of the genetic programming (GP) module of the DEAP framework~\cite{rainville2012deap}. 
+As already mentioned at the beginning of this chapter, we utilize the genetic programming (GP) module of the DEAP framework~\cite{rainville2012deap}. 
 In principle, DEAP only offers support for untyped and strongly-typed tree-based GP and, therefore, does not allow implementing grammar-guided GP (G3P) directly.
 However, as we have already discussed in Section~\ref{sec:gggp-representation}, G3P can be considered as a special variant of strongly-typed GP, whereby each variable that is placed on the left-hand side of a production encodes a unique type.
 Before we discuss how the productions in Table~\ref{table:multigrid-grammar} can be mapped to unique types, we need to introduce the relevant constructs already implemented in the framework.
-In DEAP, the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines the rules of how a program can be constructed based on a set of \emph{Primitive} objects.
-As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints can be generated.
-To demonstrate how a grammar can be implemented as a \emph{PrimitiveSetTyped}, we consider the same example grammar used in Section~\ref{sec:gggp-representation}, whose productions are given by
+In DEAP, the main data structure to represent a typed GP system is the class \emph{PrimitiveSetTyped}, which defines how a program can be constructed based on a set of \emph{Primitive} objects.
+As each operation must adhere to these rules, it is ensured that only individuals fulfilling the specified type constraints are generated.
+To demonstrate how a grammar can be implemented in the form of a \emph{PrimitiveSetTyped}, we consider the example grammar from Section~\ref{sec:gggp-representation}, whose productions are given by
 \begin{equation*}
 	\begin{split}
 		\ps S \; \; \bnfpo & \; \; \ps E \\
@@ -335,26 +335,26 @@ Listing~\ref{code:grammar:pset-example} shows the corresponding implementation o
 	\caption{Grammar Generation with DEAP}
 	\label{code:grammar:pset-example}
 \end{listing}
-Here, the first step is to generate a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in line~5--7 of Listing~\ref{code:grammar:pset-example}.
-Next, in line~8, a new \emph{PrimitiveSetTyped} object is created, in which we set the return type to $\ps{E}$, similar to the choice of the start variable within the grammar.
+Here, the first step is to create a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in line~5--7 of Listing~\ref{code:grammar:pset-example}.
+Next, a new \emph{PrimitiveSetTyped} object is created in line~8, in which we set the return type to $\ps{E}$, similar to the choice of the start variable within the grammar.
 In line~11--23, we then proceed with defining each production in the form of a \emph{Primitive} objective, which consists of a function, a list of input types, and an output type.
-Counterintuitively, the output and not the input type then defines which variable is placed on the left-hand side of each production.
+Counterintuitively, the output and not the input type defines which variable is placed on the left-hand side of each production.
 To understand this contradiction, we need to revisit the process of tree initialization in G3P.
 As we have seen in Section~\ref{sec:gggp-initialization}, a new derivation tree is generated starting with the variable $\ps{S}$ by recursively selecting productions for each leaf node of the tree that corresponds to a variable.
 Similarly, to generate a tree based on a given \emph{PrimitiveSetTyped}, a \emph{Primitive} is picked randomly from those whose output type matches the specified return type.
-After extending the tree accordingly, the process is then continued with each of the input types of the chosen \emph{Primitive}.
+After extending the tree accordingly, the process is continued with each of the input types of the chosen \emph{Primitive}.
 Therefore, terminating this process at a certain point within the tree requires choosing a \emph{Primitive} with an empty list of input types, which corresponds to a production whose right-hand side does not contain any variables.
-In DEAP, such a \emph{Primitive} is called a \emph{Terminal}, which should not be confused with the terminals introduced in Section~\ref{sec:gggp-representation}, which simply refer to each non-variable symbol of a grammar.
+In DEAP, such a \emph{Primitive} is called a \emph{Terminal}, which should not be confused with the terminals introduced in Section~\ref{sec:gggp-representation} that simply refer to each non-variable symbol of a grammar.
 To add either a \emph{Primitive} or \emph{Terminal} object to a given \emph{PrimitiveSetTyped}, the \emph{\_add} method can be used.
-Additionally, the methods \emph{addPrimitive} and \emph{addTerminal} are also available, which are usually more convenient to use.
-In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, we, hence, include a \emph{Primitive} for each of them, using the aforementioned function and the previously defined types.
+Additionally, the methods \emph{addPrimitive} and \emph{addTerminal} are also available, which are more convenient to use.
+In order to make the productions of our example grammar available to the created \emph{PrimitiveSetTyped} object, we hence include a \emph{Primitive} for each of them, using the aforementioned function and the previously defined types.
 Note that the production
 \begin{equation*}
 	\ps E \; \; \bnfpo \; \; \ps A
 \end{equation*}
 is implemented based on the identity function defined in line~12 of Listing~\ref{code:grammar:pset-example}.
 After adding a \emph{Primitive} object for each of the grammar's productions, we need to take care of the four symbols $x$, $y$, $u$, and $v$.
-We can represent these symbols as objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} object without any arguments and, thus, an empty list of input types.
+We can represent these symbols as objects of the \emph{Terminal} class, which corresponds to a \emph{Primitive} object without any arguments, and thus an empty list of input types.
 Optionally, a \emph{Terminal} object may also refer to a Python symbol, which can be triggered by setting the \emph{symbolic} argument accordingly.
 If we assume that each of the four symbols represents an argument to a Python function generated by our grammar, we additionally have to append it to the list of arguments of the corresponding \emph{PrimitiveSetTyped} object.
 For this purpose, we define the local function \emph{add\_argument} in line~25--30, which is then utilized in line~32--35 to include each of the four symbols as an argument. 
@@ -439,7 +439,7 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 \end{listing}
 In line~6--14, we first construct the respective \emph{Terminals} and \emph{Types} data structures on the finest grid of the given discretization hierarchy.
 Based on these data structures, we proceed with the creation of the \emph{PrimitiveSetTyped} object in line~16.
-In line~17--26, we then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and all level-independent terminals.
+We then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and all level-independent terminals in line~17--26.
 For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves the required information automatically from a domain-specific representation of the problem.
 All other \emph{Terminal} and \emph{Primitive} objects are then included in line~28 using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
 
@@ -478,7 +478,7 @@ Consequently, so far, with none of the generated \emph{Primitive} objects, a tra
 We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~17.
 Since this transition represents the only way to reach the final state, the application of the \emph{update\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
 Note that we only want to add this production on the lowest level, where it replaces the respective productions for the coarsening and coarse-grid correction steps.
-We, therefore, have to check whether we have reached the lowest level of the discretization hierarchy, which is done in line~12 of Listing~\ref{code:grammar:add-level}.
+We, therefore, have to check whether we have arrived at the coarsest grid of the discretization hierarchy, which is done in line~12 of Listing~\ref{code:grammar:add-level}.
 Since we generate the respective \emph{Primitive} additionally with an unguarded input type, similar to most other productions, the coarse-grid solver can be applied multiple times within each derivation.
 
 Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can define the Python function \emph{generate\_grammar}, whose implementation is shown in Listing~\ref{code:grammar:generate-grammar}. 
@@ -489,9 +489,9 @@ This function generates a \emph{PrimitiveSetTyped} for discretization hierarchie
 	\label{code:grammar:generate-grammar}
 \end{listing}
 %TODO maybe clarify the meaning of max_level in comparison to earlier sections
-In line~7--9, we first construct an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar}.
+We first create an initial \emph{PrimitiveSetTyped} to which we add all required \emph{Terminal} and \emph{Primitive} objects on the finest grid using the previously defined function \emph{init\_grammar} in line~9.
 In case the given discretization hierarchy consists of at least three levels, we iteratively extend our \emph{PrimitiveSetTyped} using the \emph{add\_level} function.
-For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~14--24, which are then passed to \emph{add\_level} in order to generate all required \emph{Primitive} and \emph{Terminal} objects.
+For this purpose, we only have to create the respective \emph{Terminals} and \emph{Types} data structures, as shown in lines~22 and~24, which are then passed to \emph{add\_level} in line~25 to generate all required \emph{Primitive} and \emph{Terminal} objects.
 After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned at the end of the function precisely replicates the functionality of Table~\ref{table:multigrid-grammar} formulated on the given hierarchy of discretizations.
 
 \section{Evolutionary Program Synthesis}
@@ -502,31 +502,32 @@ In order to provide an accessible interface to EvoStencils' functionality, we im
 	\caption{Optimizer class}
 	\label{code:optimization:optimizer}
 \end{listing}
-In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the given PDE-based problem, for instance, in the form of the respective operators.
-Based on the functionality of these two components, which, in the following, will be described in detail, we can implement a \emph{run} method, which first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary program synthesis that yields a population of individuals representing efficient multigrid methods for the given problem.
+In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the underlying problem, for instance, in the form of the respective operators.
+Based on the functionality of these two components, we can define the \emph{run} method of the \emph{Optimizer} class, whose implementation is shown in line~23--34 of Listing~\ref{code:optimization:optimizer}.
+This method first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary search that yields a population of individuals representing efficient multigrid methods for the given problem.
 Note that within this procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
 
 After translating our class of multigrid grammars introduced in Section~\ref{sec:multigrid-grammar} into a strongly-typed GP system, we can now make use of the functionality of DEAP's GP module to implement the evolutionary search operators introduced in Section~\ref{sec:gggp}.
-However, before we can define each operator, we first need to implement a data structure for storing a derivation tree generated based on the rules of our grammar.
+However, before we can define the individual operators, we first need to implement a data structure for storing each derivation tree generated based on the rules of our grammar.
 For this purpose, DEAP provides the \emph{PrimitiveTree} class, which represents each tree as a list of \emph{Primitive} and \emph{Terminal} objects stored in depth-first order.
-Each entry of this list, thus, corresponds to the choice of a particular production in the form of a \emph{Primitive} or \emph{Terminal} object, while its return type refers to the respective variable on the left-hand side.
-Therefore, each node of the tree this list represents refers to a certain variable and its children within the derivation tree.
+Each entry of this list corresponds to the choice of a particular production in the form of a \emph{Primitive} or \emph{Terminal} object, while its return type refers to the respective variable on the left-hand side.
+Therefore, each entry in this list refers to a certain variable and its children within the derivation tree.
 After obtaining a suitable data structure for the representation of each derivation tree generated by our grammar, the next step is the randomized creation of an initial population.
-As we have already discussed in Section~\ref{sec:gggp-initialization}, the \emph{full} initialization operator~\cite{koza1994genetic,poli2008field} is only applicable in cases where a grammar enables the termination of unfinished branches at any given point in the derivation by invoking a terminal production.
-However, as it can be seen in Table~\ref{table:multigrid-grammar}, not all variables of our grammar fulfill this condition.
+As we have already discussed in Section~\ref{sec:gggp-initialization}, the \emph{full} initialization operator~\cite{koza1994genetic,poli2008field} is only applicable in cases where a grammar allows the termination of unfinished branches at any given point in the derivation by invoking a terminal production.
+However, according to Table~\ref{table:multigrid-grammar}, not all variables of our grammar fulfill this condition.
 For instance, the variable $\ps{c_h}$ always yields a residual expression containing $\ps{s_h}$.
 In contrast, the \emph{grow} operator is a suitable initialization operator in the given case, as it supports the generation of trees with branches of variable length. 
-The DEAP framework implements random tree generation in the \emph{generate} function, which constructs a tree based on a given \emph{PrimitiveSetTyped} object while enforcing that the length of each of its branches satisfies a certain depth limit.
+The DEAP framework implements the generation of random trees in the \emph{generate} function, which constructs a tree based on the provided \emph{PrimitiveSetTyped} object while enforcing that the length of each of its branches satisfies a certain depth limit.
 If a certain branch satisfies this limit, this function always tries to pick a \emph{Terminal} object among the available productions to finish the growth at the respective branch. 
 Note that these productions are given in the form of a list of \emph{Primitive} and \emph{Terminal} objects whose output types match with the input type of the node from which the current branch should be grown further.
 Unfortunately, the specified limit is applied in a strict sense, and thus, the \emph{generate} function fails if a \emph{Terminal} object is erroneously expected to be available for a certain type.
 To resolve this issue, we, therefore, need to adapt DEAP's implementation of the \emph{generate} function, such that the specified limit is only applied whenever possible.
-In order to circumvent cases where the constraint of choosing only \emph{Terminal} objects can not be satisfied, we simply ignore it for the current step, which means that we extend the given node with a random \emph{Primitive}.
-We then proceed with the current branch while choosing a \emph{Terminal} object whenever possible until the growth finally ends.
+In order to circumvent cases where the constraint of choosing only \emph{Terminal} objects can not be satisfied, we simply ignore it in the current step, which means that we extend the given node with a random \emph{Primitive}.
+We then proceed with the current branch while choosing a \emph{Terminal} object whenever possible until the growth ends.
 As an additional option, we also allow the insertion of an existing branch into the generated tree, which corresponds to the \emph{subtree insertion} operator already discussed in Section~\ref{sec:gggp-mutation-and-recombination}.
 Based on the \emph{generate} function, we can then finally implement the \emph{grow} operator in the form of the function \emph{genGrow}, which chooses the maximum depth of a tree randomly from an interval defined by the parameters \emph{min\_height} and \emph{max\_height}.
 The resulting implementation is shown in Listing~\ref{code:gp:grow}, while the \emph{generate} function can be found in Section~\ref{appendix:gp} of the appendix.
-\begin{listing}[!htb]
+\begin{listing}
 	\inputminted{python}{evostencils/gp/grow.py}
 	\caption{GP: Grow operator}
 	\label{code:gp:grow}
@@ -536,7 +537,7 @@ Therefore, if a generated tree does not fulfill this constraint, we repeat the p
 
 \subsection{Evolutionary Operators}
 Based on our implementation of the \emph{generate} function and DEAP's built-in functionality, we can now define all remaining components of an evolutionary program synthesis method.
-To facilitate the utilization of different operator choices within the context of an evolutionary search method, DEAP provides the \emph{Toolbox} container for the creation of unified interfaces.
+To facilitate the utilization of different operator choices within the context of an evolutionary algorithm, DEAP provides the \emph{Toolbox} container for the creation of unified interfaces.
 Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for the given case.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
@@ -546,8 +547,8 @@ Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for 
 First of all, we define a data structure for the fitness of each individual based on DEAP's built-in \emph{Fitness} class.
 Here, the \emph{weights} attribute determines the number of objectives, while a negative value means that the respective objective is to be minimized.
 As we will later come back to the definition of the optimization objectives, at this point, the reader can just assume that either a single or a multi-objective minimization is performed.
-Next, as we have already discussed previously, we represent each \emph{Individual} as a \emph{PrimitiveTree}, whereby we set the \emph{fitness} attribute to the previously defined data structure.
-To facilitate the implementation of both the \emph{Fitness} and \emph{Individual} class, in lines~6--10, we make use of DEAP's \emph{creator} module.
+Next, we represent each \emph{Individual} as a \emph{PrimitiveTree}, whereby we set the \emph{fitness} attribute to the previously defined data structure.
+To facilitate the implementation of both the \emph{Fitness} and \emph{Individual} class, in line~6--10, we make use of DEAP's \emph{creator} module.
 For a detailed description of the functionality of this module, the reader is referred to the documentation of the DEAP framework\footnote{DEAP Creator Module: \url{https://deap.readthedocs.io/en/master/api/creator.html}}.
 Based on the definition of these two classes, we can then create the actual \emph{Toolbox} object together with all evolutionary operators.
 To generate a random individual, we apply our custom \emph{genGrow} function, as described above.
