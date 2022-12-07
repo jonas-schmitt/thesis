@@ -557,7 +557,7 @@ Next, we implement suitable crossover and mutation operators for our tree-based 
 For the former, we apply subtree crossover for which an implementation is already available in the form of the function \emph{cxOnePoint} of DEAP's GP module.
 To implement subtree replacement and insertion within a single function, we, again, utilize our custom \emph{generate} function, which already provides the required functionality.
 The resulting implementation of the function \emph{mutateSubtree} is shown in Listing~\ref{code:gp:mutate}.
-\begin{listing}[!htb]
+\begin{listing}
 	\inputminted{python}{evostencils/gp/mutate.py}
 	\caption{GP: Subtree mutation operator}
 	\label{code:gp:mutate}
