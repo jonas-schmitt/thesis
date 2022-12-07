@@ -7,8 +7,8 @@ def init_toolbox(self, pset, min_height, max_height, multi_objective=True):
         creator.create("Fitness", base.Fitness, weights=(-1.0, -1.0))
     else:
         creator.create("Fitness", base.Fitness, weights=(-1.0,))
-
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
+
     self.toolbox = deap.base.Toolbox()
 
     # Population Initialization
