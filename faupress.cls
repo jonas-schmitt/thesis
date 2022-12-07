@@ -1766,8 +1766,8 @@
 %%% DEFINE FONTS TO BE USED FOR META INFO %%%
 
 \newkomafont{supervisor}{\sffamily\normalsize}
-\newkomafont{facultytitle}{\LARGE\bfseries}
-\newkomafont{facultysubtitle}{\large\bfseries}
+\newkomafont{facultytitle}{\huge\bfseries}
+\newkomafont{facultysubtitle}{\Large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
 
@@ -1880,6 +1880,50 @@
   \end{titlepage}%
 }
 % Titlepage of the faculty %%% BIS JETZT NUR FUER TECHFAK
+% \newcommand{\makefacultytitle}{
+%   \begin{titlepage}
+%     \setlength{\parindent}{\z@}
+%     \setlength{\parskip}{\z@}
+%     \onehalfspacing
+%     \typeout{Typesetting the faculty titlepage!}
+%     \centering
+%     \vspace*{4.8mm}
+%     {\usekomafont{facultytitle} \@title\par}
+%     \vfill
+%     {\usekomafont{facultysubtitle} \@subtitle\par}
+%     \vfill
+%     {\usekomafont{faculty}
+%       Der Technischen Fakultät \\
+%       der Friedrich-Alexander-Universität\\
+%       Erlangen-Nürnberg \par}
+%     \vspace{6mm}
+%     {\usekomafont{faculty}
+%       zur \\
+%       Erlangung des Doktorgrades Dr.-Ing.\par}
+%     \vspace{34mm}
+%     {\usekomafont{faculty} vorgelegt von \par}
+%       \vspace{6.2mm}
+%     {\usekomafont{faculty} \@firstname\ \@lastname \par}
+%       \vspace{6.2mm}
+%     {\usekomafont{faculty} aus \@origin \par}
+%     \vskip38mm
+%     \next@tpage
+%     \raggedright
+%     \normalfont\normalsize
+%     \phantom{M}\vfill
+%     { Als Dissertation genehmigt \\
+%       von der Technischen Fakultät \\
+%       der Friedrich-Alexander-Universität Erlangen-Nürnberg\par}
+%     \vspace{16mm}
+%     \begin{tabular}{@{}l l}
+%       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
+%       %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
+%       Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
+%     \end{tabular}
+%     \vskip18mm
+%   \end{titlepage}
+% }
+
 \newcommand{\makefacultytitle}{
   \begin{titlepage}
     \setlength{\parindent}{\z@}
@@ -1888,25 +1932,22 @@
     \typeout{Typesetting the faculty titlepage!}
     \centering
     \vspace*{4.8mm}
-    {\usekomafont{facultytitle} \@title\par}
-    \vfill
-    %\vspace{6mm}
+    {\usekomafont{facultytitle} Automating the Design of Multigrid Methods with Evolutionary \\ Program Synthesis\par}
+    \vspace{7.5mm}
     {\usekomafont{facultysubtitle} \@subtitle\par}
-    \vfill
-    %\vspace{12mm}
+    \vspace{40mm}
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\
       Erlangen-Nürnberg \par}
-    \vspace{6mm}
+    \vspace{10mm}
     {\usekomafont{faculty}
-      zur \\
-      Erlangung des Doktorgrades Dr.-Ing.\par}
-    \vspace{34mm}
+      zur Erlangung des \\ Doktorgrades Dr.-Ing.\par}
+    \vspace{10mm}
     {\usekomafont{faculty} vorgelegt von \par}
-      \vspace{6.2mm}
+    \vspace{2.5mm}
     {\usekomafont{faculty} \@firstname\ \@lastname \par}
-      \vspace{6.2mm}
+    \vspace{2.5mm}
     {\usekomafont{faculty} aus \@origin \par}
     \vskip38mm
     \next@tpage
@@ -1925,7 +1966,6 @@
     \vskip18mm
   \end{titlepage}
 }
-
 
 \AtEndPreamble{
   \iffaupress@acronym

@@ -496,13 +496,13 @@ After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned
 
 \section{Evolutionary Program Synthesis}
 \label{sec:evostencils-part1:evolutionary-program-synthesis}
-In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of a grammar, based on the given PDE-based problem, to the synthesis of an optimal program in the \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
+In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of the grammar, based on the given PDE-based problem, to the synthesis of an optimal program in the \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
 	\caption{Optimizer class}
 	\label{code:optimization:optimizer}
 \end{listing}
-In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the underlying problem, for instance, in the form of the respective operators.
+In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the underlying problem.
 Based on the functionality of these two components, we can define the \emph{run} method of the \emph{Optimizer} class, whose implementation is shown in line~23--34 of Listing~\ref{code:optimization:optimizer}.
 This method first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary search that yields a population of individuals representing efficient multigrid methods for the given problem.
 Note that within this procedure, the evaluation of each generated solver relies on an \emph{evaluate} method, which returns suitable metrics for assessing its quality.
@@ -524,16 +524,16 @@ Unfortunately, the specified limit is applied in a strict sense, and thus, the \
 To resolve this issue, we, therefore, need to adapt DEAP's implementation of the \emph{generate} function, such that the specified limit is only applied whenever possible.
 In order to circumvent cases where the constraint of choosing only \emph{Terminal} objects can not be satisfied, we simply ignore it in the current step, which means that we extend the given node with a random \emph{Primitive}.
 We then proceed with the current branch while choosing a \emph{Terminal} object whenever possible until the growth ends.
-As an additional option, we also allow the insertion of an existing branch into the generated tree, which corresponds to the \emph{subtree insertion} operator already discussed in Section~\ref{sec:gggp-mutation-and-recombination}.
-Based on the \emph{generate} function, we can then finally implement the \emph{grow} operator in the form of the function \emph{genGrow}, which chooses the maximum depth of a tree randomly from an interval defined by the parameters \emph{min\_height} and \emph{max\_height}.
+As an additional option, we also allow the insertion of an existing branch into the generated tree, which corresponds to the \emph{subtree insertion} operator introduced in Section~\ref{sec:gggp-mutation-and-recombination}.
+Based on the \emph{generate} function, we can finally implement the \emph{grow} operator in the form of the function \emph{genGrow}, which chooses the maximum depth of a tree randomly from an interval defined by the parameters \emph{min\_height} and \emph{max\_height}.
 The resulting implementation is shown in Listing~\ref{code:gp:grow}, while the \emph{generate} function can be found in Section~\ref{appendix:gp} of the appendix.
 \begin{listing}
 	\inputminted{python}{evostencils/gp/grow.py}
 	\caption{GP: Grow operator}
 	\label{code:gp:grow}
 \end{listing}
-In order to prevent the random generation of excessively large expressions, the \emph{genGrow} function additionally enforces a size limit, which, by default, is set to 150.
-Therefore, if a generated tree does not fulfill this constraint, we repeat the process, again starting from scratch, until the requirement is met for one of the resulting trees.
+In order to prevent the generation of excessively large expressions, the \emph{genGrow} function additionally enforces a size limit, which is set to 150 by default.
+Therefore, if a generated tree does not fulfill this constraint, we repeat the process, again starting from scratch, until the requirement is met.
 
 \subsection{Evolutionary Operators}
 Based on our implementation of the \emph{generate} function and DEAP's built-in functionality, we can now define all remaining components of an evolutionary program synthesis method.
@@ -547,14 +547,14 @@ Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for 
 First of all, we define a data structure for the fitness of each individual based on DEAP's built-in \emph{Fitness} class.
 Here, the \emph{weights} attribute determines the number of objectives, while a negative value means that the respective objective is to be minimized.
 As we will later come back to the definition of the optimization objectives, at this point, the reader can just assume that either a single or a multi-objective minimization is performed.
-Next, we represent each \emph{Individual} as a \emph{PrimitiveTree}, whereby we set the \emph{fitness} attribute to the previously defined data structure.
-To facilitate the implementation of both the \emph{Fitness} and \emph{Individual} class, in line~6--10, we make use of DEAP's \emph{creator} module.
-For a detailed description of the functionality of this module, the reader is referred to the documentation of the DEAP framework\footnote{DEAP Creator Module: \url{https://deap.readthedocs.io/en/master/api/creator.html}}.
-Based on the definition of these two classes, we can then create the actual \emph{Toolbox} object together with all evolutionary operators.
+Next, we represent each \emph{Individual} as a \emph{PrimitiveTree}, whose \emph{fitness} attribute is set to the previously defined data structure.
+To facilitate the implementation of both the \emph{Fitness} and \emph{Individual} class, in line~6 -- 10, we make use of DEAP's \emph{creator} module.
+For a detailed description of this module's functionality, the reader is referred to the documentation of the DEAP framework\footnote{DEAP Creator Module: \url{https://deap.readthedocs.io/en/master/api/creator.html}}.
+Based on the definition of the \emph{Fitness} and \emph{Individual} class, we can then create the actual \emph{Toolbox} object together with the evolutionary operators.
 To generate a random individual, we apply our custom \emph{genGrow} function, as described above.
-A complete population can then be generated by utilizing DEAP's \emph{initIterate} and \emph{initRepeat} functions~\footnote{DEAP Evolutionary Tools: \url{https://deap.readthedocs.io/en/master/api/tools.html}}.
+A complete population is then generated by utilizing DEAP's \emph{initIterate} and \emph{initRepeat} functions~\footnote{DEAP Evolutionary Tools: \url{https://deap.readthedocs.io/en/master/api/tools.html}}.
 Next, we implement suitable crossover and mutation operators for our tree-based G3P method, as defined in Section~\ref{sec:gggp-mutation-and-recombination}.
-For the former, we apply subtree crossover for which an implementation is already available in the form of the function \emph{cxOnePoint} of DEAP's GP module.
+For the former, we apply subtree crossover for which an implementation is already provided by DEAP in the form of the function \emph{cxOnePoint}.
 To implement subtree replacement and insertion within a single function, we, again, utilize our custom \emph{generate} function, which already provides the required functionality.
 The resulting implementation of the function \emph{mutateSubtree} is shown in Listing~\ref{code:gp:mutate}.
 \begin{listing}[ht]
@@ -562,46 +562,47 @@ The resulting implementation of the function \emph{mutateSubtree} is shown in Li
 	\caption{GP: Subtree mutation operator}
 	\label{code:gp:mutate}
 \end{listing}
-Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the newly generated subtree is chosen.
-To prevent the size of the inserted subtree from exceeding the size of the original tree, usually, a smaller interval is chosen than for the \emph{genGrow} function, for instance, with only half the size.
+Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the randomly generated subtree is chosen.
+To prevent the size of the inserted subtree from exceeding that of the original tree, an interval that is smaller than that of the \emph{genGrow} function should usually be chosen.
 Now before we can implement the actual evolutionary search method, we need to address the problem of selecting promising individuals for recombination and mutation.
 Therefore, we first need to find a way to accurately evaluate the quality of a multigrid method in an automatic manner.
 
 \subsection{Fitness Evaluation and Selection}
 \label{sec:fitness-evaluation-and-selection}
 In Section~\ref{sec:grammar-based-algorithm-generation},
-we have already demonstrated that it is possible to obtain the algorithmic representations of a multigrid method based on a computational graph similar to the one shown in Figure~\ref{fig:example-three-grid-method-computational-graph}.
-In Section~\ref{sec:intermediate-representation}, we have then introduced an intermediate representation (IR) for multigrid methods that stores each computational graph as a hierarchical composition of \emph{Cycle} objects, as demonstrated by the example shown in Listing~\ref{code:ir:example.py}.
-Consequently, similar to the discussion in Section~\ref{sec:grammar-based-algorithm-generation}, we can translate each multigrid method, given as a \emph{Cycle} object generated by the respective grammar, to an algorithmic representation.
-This translation is performed by traversing the given hierarchy of IR objects in a recursive bottom-up manner.
-However, we still need to address the question of how we can evaluate a multigrid method based on this representation, which requires us to define one or multiple metrics for assessing its quality.
-For this purpose, we first have to revisit the general notion of an iterative method, as defined in Section~\ref{sec:basic-iterative-methods}.
-In principle, an iterative method for solving the linear system $A \bm{x} = \bm{b}$ is characterized by the repeated application of a number of well-defined computational steps, whereby each step has the purpose of computing an improved approximation $\tilde{\bm{x}}$ for the solution of the system based on the previous one.
-If we execute an iterative solver on a given computing system, usually the goal is to approximate the solution of the target problem up to a certain accuracy in as little time as possible, which we define as the \emph{solving time} $T_{\varepsilon}$, where $\varepsilon$ is the desired reduction of the initial error. 
-Furthermore, if we assume that an iterative method performs the same sequence of computations in each of its iterations, we can define the solving time as
+we have already demonstrated that it is possible to translate a computational graph in the form of Figure~\ref{fig:example-three-grid-method-computational-graph} into the algorithmic representations of a multigrid method.
+In Section~\ref{sec:intermediate-representation}, we have introduced an intermediate representation (IR) for multigrid methods that stores each computational graph as a hierarchical composition of \emph{Cycle} objects, as demonstrated by the example shown in Listing~\ref{code:ir:example.py}.
+Consequently, similar to the discussion in Section~\ref{sec:grammar-based-algorithm-generation}, we can translate each \emph{Cycle} object generated by the respective grammar to an algorithmic representation of the corresponding multigrid method.
+This transformation is achieved by traversing the given hierarchy of IR objects in a recursive bottom-up manner.
+However, we still need to figure out a way to evaluate each multigrid method based on this representation, which requires us to define one or multiple metrics for assessing their quality.
+For this purpose, we first have to revisit the general definition of an iterative method, as provided in Section~\ref{sec:basic-iterative-methods}.
+In principle, an iterative method for solving the linear system $A \bm{x} = \bm{b}$ is characterized by the repeated application of a number of well-defined computational steps, whereby each step has the purpose of computing an improved approximation of this system's solution based on the previous one.
+If we execute an iterative solver on a particular computing system, usually the goal is to approximate the solution of the target problem up to a certain accuracy in as little time as possible, which we define as the \emph{solving time} $T_{\varepsilon}$, where $\varepsilon$ is the desired reduction of the initial error. 
+If we assume that an iterative method performs the same sequence of computations in each of its iterations, the solving time can be defined as
 \begin{equation}
 	T_{\varepsilon} = t \cdot n_{\varepsilon},
 	\label{eq:solving-time-basic}
 \end{equation} 
 where $t$ is the execution time of each iteration of the method and $n_{\varepsilon}$ the number of iterations required to achieve an error reduction of $\varepsilon$.
-Note that in contrast to $n_{\varepsilon}$, the execution time $t$ solely depends on the amount of computations performed within each iteration and is, hence, independent of $\varepsilon$.
-Next, similar to Section~\ref{sec:basic-iterative-methods}, we define the \emph{convergence factor} of an iterative method as the limit of the sequence
+Note that in contrast to $n_{\varepsilon}$, the execution time $t$ solely depends on the amount of computation performed within each iteration and is thus independent of $\varepsilon$.
+Similar to Section~\ref{sec:basic-iterative-methods}, we next define the \emph{convergence factor} of an iterative method as the limit of the sequence
 \begin{equation*}
 	\rho = \lim \limits_{n \to  \infty} \Bigg( \underbrace{ \max \limits_{x^{(0)} \in \mathbb{R}^{n}} \frac{\norm{\bm{x}^{(n)} - \bm{x}^{*}}}{\norm{\bm{x}^{(0)} - \bm{x}^{*}}} }_{\varepsilon_n} \Bigg)^{\frac{1}{n}},
 \end{equation*}
 where $\varepsilon_n$  is the minimum error reduction after $n$ iterations of the method.
-Similarly, we can define the iteration-dependent convergence factor
+Similarly, we can define an iteration-dependent convergence factor
 \begin{equation}
 	\rho_n = \left( \varepsilon_n \right)^{\frac{1}{n}}.
 	\label{eq:iteration-dependent-convergence-factor}
 \end{equation} 
-Now assume that our goal is to achieve an error reduction $\varepsilon$.
-Therefore, we can set $\varepsilon_n = \varepsilon$ and apply the natural logarithm to both sides of Equation~\eqref{eq:iteration-dependent-convergence-factor} which yields
+Now assume that our goal is to achieve an error reduction of $\varepsilon$.
+We can set $\varepsilon_n = \varepsilon$ and apply the natural logarithm to both sides of Equation~\eqref{eq:iteration-dependent-convergence-factor} which yields
 \begin{equation*}
 	n = \frac{\ln \varepsilon}{\ln \rho_n},
 \end{equation*} 
 where $n$ now represents the required number of iterations to achieve an error reduction of $\varepsilon$.
-Since, for a given convergence factor $\rho_n$, the number of iterations $n$ can now be considered as a function of $\varepsilon$, we can insert the resulting term into Equation~\eqref{eq:solving-time-basic} and obtain
+For a particular convergence factor $\rho_n$, the number of iterations $n$ can now be considered as a function of $\varepsilon$. 
+We can, thus, insert the resulting term into Equation~\eqref{eq:solving-time-basic} and obtain
 \begin{equation*}
 	T_{\varepsilon} = t \cdot n_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho_{n_{\varepsilon}}}.
 \end{equation*} 
@@ -610,27 +611,27 @@ If we additionally assume that $\rho_{n_{\varepsilon}} \approx \rho$ for a suffi
 	T_{\varepsilon} = t \cdot n_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho}.
 	\label{eq:solving-time}
 \end{equation} 
-Now note that since the negative value of the natural logarithm decreases between zero and one, a smaller convergence factor leads to a faster solving time.
-For example assume achieving an error reduction of $\varepsilon = 10^{-6}$ using an iterative method with a convergence factor of $\rho = 0.5$ would require 20 iterations, while with a convergence factor of $\rho = 0.1$ the same accuracy could be achieved in only six iterations.
-Consequently, there are, in principle, two possibilities to improve upon an existing solver by reducing its execution time $t$ or convergence factor $\rho$. 
+Note that since the negative value of the natural logarithm decreases between zero and one, a smaller convergence factor leads to a faster solving time.
+For example, achieving an error reduction of $\varepsilon = 10^{-6}$ with a convergence factor of $\rho = 0.5$ would require 20 iterations, while with a convergence factor of $\rho = 0.1$, the same accuracy is achieved in only six iterations.
+Consequently, there are two possibilities to improve upon an existing solver: Reducing its execution time $t$ or convergence factor $\rho$. 
 However, as we have discussed in Section~\ref{sec:multigrid-cycles}, the choice of each method usually represents a compromise between a lower number of computations and, thus, a faster execution time and a faster convergence, which usually requires more computations.
 
-While we have now discussed how to assess the quality of an iterative method, we have not yet answered how to choose one or multiple optimization objectives based on these metrics.
+While we have now derived suitable metrics for assessing the quality of an iterative method, we have not yet answered how to choose one or multiple optimization objectives based on this information.
 In addition to achieving a fast solving time, the main goal of automated algorithm design is \emph{generalization}, which means that we aim to find multigrid methods that are robust in solving problems with similar characteristics.
 Theoretically, we could simply execute a solver on each individual problem instance of interest and then measure its solving time.
-However, due to the high computational demands of solving PDEs in many domains, this approach is often infeasible.
-One way to mitigate this issue is the application of \emph{predictive models} to obtain an estimation without the need to actual execute the solver on any problem.
-While the latter approach is usually faster to execute, its application to non-standard multigrid cycles, as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is not well-researched.
+However, due to the high computational demands of many PDE-based problems, this approach is often infeasible.
+One way to mitigate this issue is the application of \emph{predictive models} to obtain an estimation of each objective without needing to execute the solver.
+While this approach is usually faster to execute, its application to non-standard multigrid cycles, as the one shown in Figure~\ref{fig:non-traditional-multigrid-cycle}, is not well researched.
 Due to the entirely different nature of the two performance-guiding metrics $t$ and $\rho$, we need to consider them separately.
-First of all, note that the execution time $t$ of each step of an iterative method depends entirely on the amount of computations and their execution efficiency on the given compute platform.
+First of all, note that the execution time $t$ of each step of an iterative method depends entirely on the amount of computation and its execution efficiency on the given computing platform.
 In contrast, the convergence factor $\rho$ is linked to the mathematical properties of the solver, for instance, its capability to quickly reduce certain error components, as we have discussed in Section~\ref{sec:multigrid-methods}. 
 While the availability of performance models for modern computer architectures, as the roofline~\cite{williams2009roofline} and execution-cache memory model~\cite{hager2016exploring}, enables predictions in an automated and deterministic manner, analyzing the mathematical properties of a solver is often difficult.
 Local Fourier analysis (LFA)~\cite{wienands2004practical} represents a promising approach for predicting the convergence behavior of an iterative solver in a resolution-independent manner.
-Even though LFA has already been applied successfully to numerous applications~\cite{rodrigo2017validity}, only recently software tools that automate its execution have become available~\cite{rittich2018extending,kahl2020automated}.
+Even though LFA has been applied successfully to numerous applications~\cite{rodrigo2017validity}, only recently software tools that automate its execution have become available~\cite{rittich2018extending,kahl2020automated}.
 In~\cite{schmitt2020constructing,hoefer2020comparing}, we have performed a number of experiments to test whether the library LFA Lab~\footnote{LFA Lab: \url{https://github.com/hrittich/lfa-lab}} is suitable for the automated convergence estimation of grammar-generated multigrid methods.
-While LFA Lab yields reliable predictions for many model problems and common multigrid cycles, unfortunately, we could not obtain the same degree of accuracy for many non-standard cycles and more complicated problems, such as systems of PDEs.
+While LFA Lab yields reliable predictions for many model problems and common multigrid cycles, unfortunately, we could not obtain the same degree of accuracy for non-standard cycles and more complicated problems, such as systems of PDEs.
 
-A second option to decrease the cost of the evaluation is to estimate the quality of a given solver by measuring its characteristics on a number of proxy problems that are faster to solve than the original problem while possessing similar mathematical properties.
+A second option to decrease the evaluation cost is to estimate the quality of a given solver by measuring its characteristics on a number of proxy problems that are faster to solve than the original problem while possessing similar mathematical properties.
 One of the main features of multigrid is that, if properly constructed, these methods can achieve $h$-independent convergence, which means that we can apply the same solver to a larger instance of the same problem without slowing down its convergence~\cite{trottenberg2000multigrid}.
 Therefore, in case our goal is to solve a certain PDE discretized on a grid with step size $h$, we can instead consider an instance of the same PDE on a similar grid with lower resolution and, thus, a larger spacing of the grid points.
 If a given multigrid method is able to achieve $h$-independent convergence on a sequence of increasingly finer resolved instances of the same PDE, there is a high probability that the method also generalizes to other problem instances.
