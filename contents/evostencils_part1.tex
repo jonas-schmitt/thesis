@@ -66,14 +66,14 @@ Note that in case the grid is uniform, we only need to store a single value for 
 As the problems considered in this work are all solved on a hierarchy of uniform grids, we focus on this particular case.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/grid.py}
-	\caption{IR: Structured Grid}
+	\caption{IR -- Grid Data Structure}
 	\label{code:ir:grid}
 \end{listing}
 After defining a data structure that provides all relevant information about a specific grid within the discretization hierarchy, we can start defining expressions that operate on this data structure.
 In Listing~\ref{code:ir:abstact-base-class}, a common abstract base class is provided from which all subsequent expression classes are derived.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/expression.py}
-	\caption{IR: Abstract Expression Base Class}
+	\caption{IR -- Abstract Expression}
 	\label{code:ir:abstact-base-class}
 \end{listing}
 In addition to the already mentioned \emph{grid} data structure, this class also defines a \emph{shape} for each expression.
@@ -84,14 +84,14 @@ Based on this abstract class, we can distinguish between predefined entities, su
 First of all, Listing~\ref{code:ir:entity} contains the implementation of the \emph{Entity} base class.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/entity.py}
-	\caption{IR: Entity Base Class}
+	\caption{IR -- Entity}
 	\label{code:ir:entity}
 \end{listing}
 In addition to the previously mentioned attributes, this class is also given a \emph{name} to identify the respective entity.
 We can then further define classes for representing an approximate solution, right-hand side, and operator, which are shown in the Listings~\ref{code:ir:approximation}~and~\ref{code:ir:operator}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/approximation.py}
-	\caption{IR: Approximate Solution and Right-Hand Side}
+	\caption{IR -- Approximate Solution and Right-Hand Side}
 	\label{code:ir:approximation}
 \end{listing}
 The shape of each of these entities is determined by computing the product of the grid size over all dimensions.
@@ -102,14 +102,14 @@ However, we postpone the discussion of this attribute's purpose until we impleme
 While the two Python classes shown in Listing~\ref{code:ir:approximation} correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given as one or multiple stencil codes.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/operator.py}
-	\caption{IR: Operator}
+	\caption{IR -- Operator}
 	\label{code:ir:operator}
 \end{listing}
 In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical notation for stencil codes in the form of Equation~\eqref{eq:stencil-definition}, which can be implemented in a straightforward manner leading to the \emph{Stencil} class shown in Listing~\ref{code:ir:stencil}.
 %TODO introduce stencil implementation here
 \begin{listing}
 	\inputminted{python}{evostencils/ir/stencil.py}
-	\caption{IR: Stencil}
+	\caption{IR -- Stencil}
 	\label{code:ir:stencil}
 \end{listing}
 The \emph{entries} attribute of this class directly corresponds to our definition of a stencil, whereby we use a \emph{tuple} object to represent this mathematical entity in the Python programming language.
@@ -139,12 +139,12 @@ After discussing the implementation of the different entities based on which a m
 For this purpose, we first provide basic classes for representing unary and binary expressions, which are shown in Listing~\ref{code:ir:unary-expression} and~\ref{code:ir:binary-expression}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/unary_expression.py}
-	\caption{IR: Unary Expression Base Class}
+	\caption{IR -- Unary Expression}
 	\label{code:ir:unary-expression}
 \end{listing}
 \begin{listing}
 	\inputminted{python}{evostencils/ir/binary_expression.py}
-	\caption{IR: Binary Expressions Base Class}
+	\caption{IR -- Binary Expressions}
 	\label{code:ir:binary-expression}
 \end{listing}
 In both cases, all necessary properties are obtained from the operands of the expression in a recursive manner.
@@ -162,13 +162,13 @@ Listing~\ref{code:ir:residual} shows the implementation of the \emph{Residual} c
 Based on these components, we can easily construct the corresponding residual expression $r_H = b_H - A_H x_H$.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/residual.py}
-	\caption{IR: Residual}
+	\caption{IR -- Residual}
 	\label{code:ir:residual}
 \end{listing}
 As a final step in the implementation of our intermediate representation, the \emph{Cycle} class can be found in Listing~\ref{code:ir:cycle}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/cycle.py}
-	\caption{IR: Multigrid Cycle}
+	\caption{IR -- Cycle}
 	\label{code:ir:cycle}
 \end{listing}
 This class represents the execution of a complete multigrid cycle on a particular level.
@@ -208,7 +208,7 @@ By treating the number of coarsening steps as a parameter, we can, thus, automat
 For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which we encapsulate in the class \emph{Terminals} shown in Listing~\ref{code:grammar:terminals}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
-	\caption{Terminals defined on each level.}
+	\caption{Terminals}
 	\label{code:grammar:terminals}
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
@@ -217,7 +217,7 @@ Also, while so far we have abstractly represented the application of the coarse-
 The implementation of a Python class for representing the coarse-grid solver can be found in Listing~\ref{code:ir:coarse-grid-solver}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/coarse_grid_solver.py}
-	\caption{IR: Coarse-Grid Solver}
+	\caption{IR -- Coarse-Grid Solver}
 	\label{code:ir:coarse-grid-solver}
 \end{listing}
 Note that each object of this class may additionally contain an expression that represents a complete multigrid method whose finest grid coincides with the coarsest grid of the original method.
@@ -229,7 +229,7 @@ As a second step, based on the \emph{Terminals} class, we can implement the stat
 Listing~\ref{code:grammar:basic-functions} contains the implementation of each of the five state transition functions defined in Table~\ref{table:grammar-semantics}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/base.py}
-	\caption{State Transition: Basic Functions}
+	\caption{Basic State Transition Functions}
 	\label{code:grammar:basic-functions}
 \end{listing}
 While each of these implementations is semantically equivalent to the corresponding function definition, certain adaptions are required due to the properties of the \emph{Cycle} class.
@@ -271,7 +271,7 @@ Therefore, we can implement its generation within the function \emph{generate\_s
 The generation of the actual smoothing expression is then performed in the function \emph{smoothing}, which is shown in Listing~\ref{code:grammar:smoothing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/smoothing.py}
-	\caption{State Transition: Smoothing}
+	\caption{State Transition -- Smoothing}
 	\label{code:grammar:smoothing}
 \end{listing}
 Similar to Production~\eqref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the function \emph{generate\_smoother}.
@@ -279,7 +279,7 @@ To realize different smoothers, we, thus, only need to provide a generator funct
 For instance, Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/jacobi.py}
-	\caption{Example for generating Jacobi-based smoothers}
+	\caption{Example for Generating Jacobi-Based Smoothers}
 	\label{code:grammar:jacobi}
 \end{listing}
 The second basic multigrid operation \emph{coarsening} is realized in a similar way by combining the functions \textsc{apply} and \textsc{coarsening}.
@@ -290,7 +290,7 @@ We can realize this behavior by additionally applying the \textsc{update} functi
 Listing~\ref{code:grammar:inter-grid-operations} shows the implementation of Production~\eqref{prod:coarsening} and~\ref{prod:coarse-grid-correction} in the form of the Python functions \emph{restrict\_and\_coarsen} and \emph{update\_with\_coarse\_grid\_correction}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/inter_grid_operations.py}
-	\caption{State Transition: Inter-Grid Operations}
+	\caption{State Transition -- Inter-Grid Operations}
 	\label{code:grammar:inter-grid-operations}
 \end{listing}
 In the case of the latter, we have included the prefix \emph{update\_with} to make its implementation distinguishable from the respective state transition function.
@@ -300,7 +300,7 @@ However, note that only a single production is available for the variable $\ps{c
 We can, therefore, combine the complete process of updating the current approximate solution based on the coarse-grid solver in a single Python function \emph{update\_with\_coarse\_grid\_solver}, whose implementation is shown in Listing~\ref{code:grammar:coarse-grid-solver}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/coarse_grid_solver.py}
-	\caption{State Transition: Coarse-Grid Solver}
+	\caption{State Transition -- Coarse-Grid Solver}
 	\label{code:grammar:coarse-grid-solver}
 \end{listing}
 For this purpose, similar to the \emph{restrict\_and\_coarsen} function, we first restrict the correction term of a given \texttt{Cycle} object.
@@ -329,7 +329,7 @@ To demonstrate how a grammar can be implemented in the form of a \emph{Primitive
 Listing~\ref{code:grammar:pset-example} shows the corresponding implementation of the function \emph{generate\_grammar}, which generates a \emph{PrimitiveSetTyped} object.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/pset_example.py}
-	\caption{Grammar Generation with DEAP}
+	\caption{Example Grammar Generation with DEAP}
 	\label{code:grammar:pset-example}
 \end{listing}
 Here, the first step is to create a unique type for each symbol that is contained in the set of variables $V = \left\{\ps{E}, \ps{A}, \ps{B} \right\}$, which can be accomplished using Python's builtin \emph{type} function as shown in line~4--6 of Listing~\ref{code:grammar:pset-example}.
@@ -395,7 +395,7 @@ Unfortunately, dynamic types can not be defined at the top-level domain of the c
 To resolve this issue, we propose a custom \emph{Type} class which is defined in Listing~\ref{code:grammar:typing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/typing.py}
-	\caption{Type Wrapper}
+	\caption{Type Encoding}
 	\label{code:grammar:typing}
 \end{listing}
 Since the instances of this class are regular Python objects, a pickle-based serialization can be achieved without any further adaption.
@@ -412,7 +412,7 @@ Based on this tailored type representation, we can now implement a data structur
 The implementation of this data structure in the form of the \emph{Types} class is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
   	\inputminted[linenos]{python}{evostencils/grammar/types.py}
-  	\caption{Data Structure for Variable Types}
+  	\caption{Types Data Structure}
   	\label{code:grammar:types}
 \end{listing}
 %TODO include line numbers at the respective text positions
@@ -457,13 +457,13 @@ We then define all remaining productions in such a way that all possible derivat
 Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for each level within a discretization hierarchy of arbitrary depth.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
-	\caption{Terminal and Primitive Generation per Level}
+	\caption{Add Terminals and Primitives per Level}
 	\label{code:grammar:add-level}
 \end{listing}
 In line~2, we first make use of the function \emph{add\_terminals}, whose implementation is shown in Listing~\ref{code:grammar:add-terminals}, to add all terminals that are required on the respective level to the given \emph{PrimitiveSetTyped}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/add_terminals.py}
-	\caption{Terminal Generation per Level}
+	\caption{Add Terminals per Level}
 	\label{code:grammar:add-terminals}
 \end{listing}
 To facilitate the process of generating  \emph{Primitive} objects, we implement the helper function \emph{add\_primitive} in line~3--5.
@@ -496,7 +496,7 @@ After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned
 In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of the grammar, based on the given PDE-based problem, to the synthesis of an optimal program in the \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
 \begin{listing}
     \inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
-	\caption{Optimizer class}
+	\caption{Optimizer Class}
 	\label{code:optimization:optimizer}
 \end{listing}
 In addition to the generated \emph{PrimitiveSetTyped} object, this class relies on two main components, a \emph{Toolbox} object for the execution of the evolutionary program synthesis and a \emph{ProgramGenerator} object, which enables the generation and evaluation of solver implementations while also providing an interface to all required information about the underlying problem.
@@ -504,7 +504,7 @@ Based on the functionality of these two components, we can define the \emph{run}
 The implementation of this class is shown in line~8--19 of Listing~\ref{code:optimization:optimizer}, while we additionally define a data structure for storing its parameters in Listing~\ref{code:optimization:parameters}.
 \begin{listing}
     \inputminted{python}{evostencils/optimization/parameters.py}
-	\caption{Parameters of the Optimizer class}
+	\caption{Parameters of the Optimizer Class}
 	\label{code:optimization:parameters}
 \end{listing}
 This method first generates a \emph{PrimitiveSetTyped} and then, based on the initialized \emph{Toolbox} object, performs an evolutionary search that yields a population of individuals representing efficient multigrid methods for the given problem.
@@ -532,7 +532,7 @@ Based on the \emph{generate} function, we can finally implement the \emph{grow} 
 The resulting implementation is shown in Listing~\ref{code:gp:grow}, while the \emph{generate} function can be found in Section~\ref{appendix:gp} of the appendix.
 \begin{listing}
 	\inputminted{python}{evostencils/gp/grow.py}
-	\caption{GP: Grow operator}
+	\caption{Grow Operator for Tree-Based GP}
 	\label{code:gp:grow}
 \end{listing}
 In order to prevent the generation of excessively large expressions, the \emph{genGrow} function additionally enforces a size limit, which is set to 150 by default.
@@ -544,7 +544,7 @@ To facilitate the utilization of different operator choices within the context o
 Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for the given case.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
-	\caption{GP: Toolbox initialization}
+	\caption{Toolbox Initialization}
 	\label{code:gp:toolbox}
 \end{listing}
 First of all, we define a data structure for the fitness of each individual based on DEAP's built-in \emph{Fitness} class.
@@ -562,7 +562,7 @@ To implement subtree replacement and insertion within a single function, we, aga
 The resulting implementation of the function \emph{mutateSubtree} is shown in Listing~\ref{code:gp:mutate}.
 \begin{listing}[ht]
 	\inputminted{python}{evostencils/gp/mutate.py}
-	\caption{GP: Subtree mutation operator}
+	\caption{Subtree Mutation Operator}
 	\label{code:gp:mutate}
 \end{listing}
 Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the randomly generated subtree is chosen.
@@ -665,7 +665,7 @@ To illustrate this approach, Listing~\ref{code:exaslang-example} shows an ExaSla
 % \end{lstlisting}
 \begin{listing}
 	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/code_generation/three_grid_example.exa3}
-	\caption{Three grid example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
+	\caption{Three-Grid Example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
 	\label{code:exaslang-example}
 \end{listing}
 As this example demonstrates, ExaSlang enables the formulation of the same operations on different levels of a discretization hierarchy based on so-called \emph{level declarations}\footnote{In case no level declaration is provided, ExaStencils assumes that the operation is applied on the current level.}.
@@ -683,7 +683,7 @@ Based on the functionality provided by the \emph{ProgramGenerator} class, we can
 The implementation of this method is shown in Listing~\ref{code:optimization:evaluate}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evaluate.py}
-	\caption{Evaluate method of the Optimizer class}
+	\caption{Optimizer Class -- Evaluate Method}
 	\label{code:optimization:evaluate}
 \end{listing}
 It provides a high-level interface to the evaluation of an arbitrary individual generated based on the provided \emph{PrimitiveSetTyped} object.
@@ -713,7 +713,7 @@ Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we
 Listing~\ref{code:optimization:selection} shows the example initialization of a \emph{Toolbox} object with the widely-used NSGA-II selection operator~\cite{deb2002fast}. 
 \begin{listing}
 	\inputminted{python}{evostencils/optimization/selection.py}
-	\caption{Example for Multi-Objective Selection}
+	\caption{Toolbox Initialization with the NSGA-II Selection Operator}
 	\label{code:optimization:selection}
 \end{listing}
 In a similar manner, we can initialize a \emph{Toolbox} object with other selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
@@ -726,7 +726,7 @@ For this purpose, we store the previously assembled \emph{Toolbox} object within
 The resulting implementation of the \emph{evolutionary\_search} method can be found in Listing~\ref{code:optimization:evolutionary_search}. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
-	\caption{Evolutionary Search Method}
+	\caption{Optimizer Class -- Evolutionary Search Method}
 	\label{code:optimization:evolutionary_search}
 \end{listing}
 Note that each part of this implementation corresponds to a particular step in our general description of an evolutionary program synthesis method in Algorithm~\ref{alg:genetic-programming}.
@@ -736,7 +736,7 @@ The new population is then selected from the combined set of parent and child in
 For the sake of simplicity, we implement the evaluation of a list of individuals and the creation of offspring using mutation and crossover in two separate functions, which are shown in Listing~\ref{code:optimization:evaluate-and-create-offspring}.
 \begin{listing}
 	\inputminted{python}{evostencils/optimization/evolutionary_search_helper.py}
-	\caption{Auxiliary functions for creating and evaluating offspring}
+	\caption{Auxiliary Functions for Creating and Evaluating Offspring}
 	\label{code:optimization:evaluate-and-create-offspring}
 \end{listing}
 To enforce the creation of novel individuals, which have not already been obtained within previous generations of the method, we check whether they are already present in the cache.
