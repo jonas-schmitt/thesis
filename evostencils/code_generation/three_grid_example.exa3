@@ -14,4 +14,3 @@ Function VCycle@finest {
   // Prolongation and Coarse-Grid Correction
   x += P@coarser * x@coarser
 }
-
