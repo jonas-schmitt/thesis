@@ -241,12 +241,12 @@ In this case, we, therefore, need to pass the initial state
 \begin{equation*}
 	Z_h^0 = (x_h^0, b_h, \lambda, \lambda)
 \end{equation*} explicitly to the \emph{residual} function.
-Since the third and fourth entry of this tuple is empty, in Python, a binary tuple is sufficient to store the respective \emph{Approximation} and \emph{RightHandSide} object.
-Even though in all subsequent computations, the first entry of this tuple then consists of a \emph{Cycle} object, for the sake of simplicity, the right-hand side is always included as a second entry.
+Since the third and fourth entry of this state is empty, in Python, a binary \emph{tuple} is sufficient to store the respective \emph{Approximation} and \emph{RightHandSide} object.
+Even though in all subsequent computations, the first entry of this \emph{tuple} then consists of a \emph{Cycle} object, for the sake of simplicity, the right-hand side is always included as a second entry.
 This decision allows us to employ the same \emph{residual} function within all grammar productions.
-As a consequence, also the \emph{update} function needs to be adapted accordingly, such that the respective binary state tuple, in the form of a \emph{Cycle} object for computing a new approximate solution, and the current right-hand side, is returned.
-Finally, since the \emph{state} argument of the \emph{coarse\_grid\_correction} function results from an application of the \emph{update} function, it also represents a binary tuple.
-We, therefore, need to extract the first entry of this tuple to obtain the corresponding \emph{Cycle} object.
+As a consequence, also the \emph{update} function needs to be adapted accordingly, such that the respective binary state, in the form of a \emph{Cycle} object for computing a new approximate solution, and the current right-hand side, is returned.
+Finally, since the \emph{state} argument of the \emph{coarse\_grid\_correction} function results from an application of the \emph{update} function, it also represents a binary \emph{tuple}.
+We, therefore, need to extract the first entry of this \emph{tuple} to obtain the corresponding \emph{Cycle} object.
 The second main difference is in the implementation of the \emph{update} function compared to its original definition in Table~\ref{table:grammar-semantics} function.
 Here we represent the relaxation factor as an index within a uniformly-sampled interval that is included in the respective \emph{Terminal} object.
 While we could explicitly store the relaxation factor as a floating point number, its representation accuracy then depends on the underlying floating point format.
@@ -436,7 +436,7 @@ The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}
 \end{listing}
 In line~5--12, we first construct the respective \emph{Terminals} and \emph{Types} data structures on the finest grid of the given discretization hierarchy.
 Based on these data structures, we proceed with the creation of the \emph{PrimitiveSetTyped} object in line~13.
-We then include the initial state as a tuple consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and all level-independent terminals in line~14--21.
+We then include the initial state as a \emph{tuple} consisting of the respective \emph{Approximation} and \emph{RightHandSide} object and all level-independent terminals in line~14--21.
 For the sake of simplicity, we assume that it is possible to generate all required \emph{Approximation}, \emph{RightHandSide} and \emph{Operator} objects using a predefined \emph{Generator} class, which retrieves the required information automatically from a domain-specific representation of the problem.
 All other \emph{Terminal} and \emph{Primitive} objects are then included in line~22 using the \emph{add\_level} function shown in Listing~\ref{code:grammar:add-level}.
 
@@ -683,44 +683,44 @@ Based on the functionality provided by the \emph{ProgramGenerator} class, we can
 The implementation of this method is shown in Listing~\ref{code:optimization:evaluate}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evaluate.py}
-	\caption{Optimizer: Evaluate Method}
+	\caption{Evaluate method of the Optimizer class}
 	\label{code:optimization:evaluate}
 \end{listing}
 It provides a high-level interface to the evaluation of an arbitrary individual generated based on the provided \emph{PrimitiveSetTyped} object.
 In order to prevent the repeated evaluation of structurally-equal individuals, the \emph{Optimizer} class implements a caching mechanism that keeps track of all previously evaluated individuals.
-Therefore, we first check whether the given individual has already been evaluated before, in which case we simply return the cached objective function value.
-Otherwise, we utilize the \emph{generate\_and\_evaluate} method of the \emph{ProgramGenerator} class to generate a C++ implementation of the corresponding solver using the ExaStencils compiler, which is then executed on a proxy problem.
+Therefore, in line~6, we first check whether the given individual has already been evaluated before, in which case we simply return the cached objective function value in line~7.
+Otherwise, we utilize the \emph{generate\_and\_evaluate} method of the \emph{ProgramGenerator} class in line~10 to generate a C++ implementation of the corresponding solver using the ExaStencils compiler, which is then executed on a proxy problem.
 As a result, we obtain three metrics, the total solving time $T_\varepsilon$, the convergence factor $\rho$, and the number of iterations $n_\varepsilon$, whereby the desired error reduction $\varepsilon$ is usually determined by the given ExaStencils specification of the problem.
-As, in general, the solution of the given PDE is not known in advance, we approximate the convergence factor using the formula
+Since in general, the solution of the given PDE is not known in advance, we approximate the convergence factor using the formula
 \begin{equation}\label{eq:asymptotic_convergence_factor}
 	\rho \approx \left(\prod_{i=1}^{n}\tilde{\rho}_i \right)^{1/n},
 \end{equation} where $n$ is the number of iterations until convergence and
-\begin{equation*}
+\begin{equation}
 	\tilde{\rho}_{i} = \frac{\norm{b_h - A_h x_{h}^i }}{\norm{b_h - A_h x^{i-1}_{h}}}
-\end{equation*}
+\end{equation}
 is the L2-norm of the residual reduction in every iteration of the solver~\cite{trottenberg2000multigrid}.
 To determine the execution time per iteration $t$ of the method, we simply divide the total solving time by the number of iterations.
 To reduce potential hardware-based variations in the execution of each solver, $T_\varepsilon$ is obtained as an average over multiple evaluations of the same individual.
 Note that, at this point, we assume that a multi-objective optimization is performed, as the returned \emph{Fitness} object includes two objectives.
 However, it is also possible to implement a similar function that returns a single-objective fitness value, for instance, in the form of the total solving time.
-Finally, the method enables the adaption of certain parameters of the underlying PDE for the current evaluation.
-For this purpose, a mapping from each parameter to the respective value can be provided in the form of a Python dictionary.
+Finally, the method enables the adaption of certain parameters of the underlying PDE for the solver evaluation.
+For this purpose, a mapping from each parameter to the respective value can be provided in the form of a Python \emph{dictionary}.
 
 After successfully obtaining a \emph{Fitness} object for each individual, we can complete our collection of evolutionary operators with the definition of suitable selection and elitism methods.
-As we have discussed in Section~\ref{sec:gggp-evaluation-and-selection}, in contrast to initialization, mutation, and crossover, the selection of individuals within an evolutionary algorithm is independent of their underlying representation, but solely depends on the definition of their fitness.
+As we have discussed in Section~\ref{sec:gggp-evaluation-and-selection}, in contrast to initialization, mutation, and crossover, the selection of individuals within an evolutionary algorithm is independent of their representation as a data structure but solely depends on the definition of their fitness.
 Therefore, different selection operators have been proposed for single and multi-objective evolutionary algorithms, of which many are already available within the DEAP framework.  
-Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object, by using its \emph{register} method.
-Listing~\ref{code:optimization:selection} shows the example initialization of a \emph{Toolbox} object using the widely-used NSGA-II selection operator~\cite{deb2002fast}. 
+Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object using its \emph{register} method.
+Listing~\ref{code:optimization:selection} shows the example initialization of a \emph{Toolbox} object with the widely-used NSGA-II selection operator~\cite{deb2002fast}. 
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/optimization/selection.py}
+	\inputminted{python}{evostencils/optimization/selection.py}
 	\caption{Example for Multi-Objective Selection}
 	\label{code:optimization:selection}
 \end{listing}
-In a similar manner, we can initialize a \emph{Toolbox} object with arbitrary different single- and multi-objective selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
+In a similar manner, we can initialize a \emph{Toolbox} object with other selection operators and evaluation functions based on the definition of the \emph{Fitness} class and the functionality of the \emph{evaluate} method of our \emph{Optimizer} class.
 
 \subsection{Search Algorithm}
 \label{sec:evostencils-part1:search-algorithm}
-Finally, we have now assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
+We have now finally assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
 Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator as a method of the \emph{Optimizer} class. 
 For this purpose, we store the previously assembled \emph{Toolbox} object within the respective attribute of this class.
 The resulting implementation of the \emph{evolutionary\_search} method can be found in Listing~\ref{code:optimization:evolutionary_search}. 
