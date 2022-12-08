@@ -1766,7 +1766,7 @@
 %%% DEFINE FONTS TO BE USED FOR META INFO %%%
 
 \newkomafont{supervisor}{\sffamily\normalsize}
-\newkomafont{facultytitle}{\huge\bfseries}
+\newkomafont{facultytitle}{\LARGE\bfseries}
 \newkomafont{facultysubtitle}{\Large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
@@ -1932,10 +1932,11 @@
     \typeout{Typesetting the faculty titlepage!}
     \centering
     \vspace*{4.8mm}
-    {\usekomafont{facultytitle} Automating the Design of Multigrid Methods with Evolutionary \\ Program Synthesis\par}
+    {\usekomafont{facultytitle} \@title \par}
     \vspace{7.5mm}
     {\usekomafont{facultysubtitle} \@subtitle\par}
-    \vspace{40mm}
+    %\vspace{35mm}
+    \vfill
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\
