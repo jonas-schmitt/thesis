@@ -1,6 +1,6 @@
 from deap import gp
 
-# Implemented as a class method of Optimizer
+# Implemented as a method of the Optimizer class
 def evaluate(self, individual, pset, min_level, max_level, evaluation_samples=3, pde_parameter_values=None):
     if pde_parameter_values is None:
         pde_parameter_values = {}
