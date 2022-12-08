@@ -331,7 +331,7 @@ To demonstrate how a grammar can be implemented in the form of a \emph{Primitive
 \end{equation*}
 Listing~\ref{code:grammar:pset-example} shows the corresponding implementation of the function \emph{generate\_grammar}, which generates a \emph{PrimitiveSetTyped} object.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/pset_example.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/grammar/pset_example.py}
 	\caption{Grammar Generation with DEAP}
 	\label{code:grammar:pset-example}
 \end{listing}
@@ -414,7 +414,7 @@ The resulting implementation can be found in Section~\ref{appendix:gp} of the ap
 Based on this tailored type representation, we can now implement a data structure that incorporates the type of each variable defined on a given level.
 The implementation of this data structure in the form of the \emph{Types} class is shown in Listing~\ref{code:grammar:types}.
 \begin{listing}
-  	\inputminted[linenos]{python}{evostencils/grammar/types.py}
+  	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/grammar/types.py}
   	\caption{Data Structure for Variable Types}
   	\label{code:grammar:types}
 \end{listing}
@@ -433,7 +433,7 @@ With the implementation of a type system that allows expressing each production 
 Similar to the example shown in Listing~\ref{code:grammar:pset-example}, we first have to create a \emph{PrimitiveSetTyped} to which we can then add the respective \emph{Terminal} and \emph{Primitive} objects in an iterative manner.
 The resulting implementation is shown in Listing~\ref{code:grammar:init-grammar}.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/init_grammar.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/grammar/init_grammar.py}
 	\caption{Grammar Initialization}
 	\label{code:grammar:init-grammar}
 \end{listing}
@@ -459,7 +459,7 @@ For this purpose, we set the output type of the respective \emph{Terminal} objec
 We then define all remaining productions in such a way that all possible derivations include the function \emph{update\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
 Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for each level within a discretization hierarchy of arbitrary depth.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/add_level.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/grammar/add_level.py}
 	\caption{Terminal and Primitive Generation per Level}
 	\label{code:grammar:add-level}
 \end{listing}
@@ -484,7 +484,7 @@ Since we generate the respective \emph{Primitive} additionally with an unguarded
 Finally, using the functions \emph{init\_grammar} and \emph{add\_level}, we can define the Python function \emph{generate\_grammar}, whose implementation is shown in Listing~\ref{code:grammar:generate-grammar}. 
 This function generates a \emph{PrimitiveSetTyped} for discretization hierarchies of variable depth.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/grammar/generate_grammar.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/grammar/generate_grammar.py}
 	\caption{Grammar Generation}
 	\label{code:grammar:generate-grammar}
 \end{listing}
@@ -498,7 +498,7 @@ After we have traversed all levels, the \emph{PrimitiveSetTyped} object returned
 \label{sec:evostencils-part1:evolutionary-program-synthesis}
 In order to provide an accessible interface to EvoStencils' functionality, we implement all steps from the construction of the grammar, based on the given PDE-based problem, to the synthesis of an optimal program in the \emph{Optimizer} class, whose basic implementation is shown in Listing~\ref{code:optimization:optimizer}.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/optimization/optimizer.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False,stepnumber=13]{python}{evostencils/optimization/optimizer.py}
 	\caption{Optimizer class}
 	\label{code:optimization:optimizer}
 \end{listing}
@@ -540,7 +540,7 @@ Based on our implementation of the \emph{generate} function and DEAP's built-in 
 To facilitate the utilization of different operator choices within the context of an evolutionary algorithm, DEAP provides the \emph{Toolbox} container for the creation of unified interfaces.
 Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for the given case.
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/gp/toolbox.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/gp/toolbox.py}
 	\caption{GP: Toolbox initialization}
 	\label{code:gp:toolbox}
 \end{listing}
@@ -628,20 +628,38 @@ In contrast, the convergence factor $\rho$ is linked to the mathematical propert
 While the availability of performance models for modern computer architectures, as the roofline~\cite{williams2009roofline} and execution-cache memory model~\cite{hager2016exploring}, enables predictions in an automated and deterministic manner, analyzing the mathematical properties of a solver is often difficult.
 Local Fourier analysis (LFA)~\cite{wienands2004practical} represents a promising approach for predicting the convergence behavior of an iterative solver in a resolution-independent manner.
 Even though LFA has been applied successfully to numerous applications~\cite{rodrigo2017validity}, only recently software tools that automate its execution have become available~\cite{rittich2018extending,kahl2020automated}.
-In~\cite{schmitt2020constructing,hoefer2020comparing}, we have performed a number of experiments to test whether the library LFA Lab~\footnote{LFA Lab: \url{https://github.com/hrittich/lfa-lab}} is suitable for the automated convergence estimation of grammar-generated multigrid methods.
+In~\cite{schmitt2020constructing,hoefer2020comparing}, we have performed a number of experiments to test whether the library LFA Lab\footnote{LFA Lab: \url{https://github.com/hrittich/lfa-lab}} is suitable for the automated convergence estimation of grammar-generated multigrid methods.
 While LFA Lab yields reliable predictions for many model problems and common multigrid cycles, unfortunately, we could not obtain the same degree of accuracy for non-standard cycles and more complicated problems, such as systems of PDEs.
 
 A second option to decrease the evaluation cost is to estimate the quality of a given solver by measuring its characteristics on a number of proxy problems that are faster to solve than the original problem while possessing similar mathematical properties.
 One of the main features of multigrid is that, if properly constructed, these methods can achieve $h$-independent convergence, which means that we can apply the same solver to a larger instance of the same problem without slowing down its convergence~\cite{trottenberg2000multigrid}.
 Therefore, in case our goal is to solve a certain PDE discretized on a grid with step size $h$, we can instead consider an instance of the same PDE on a similar grid with lower resolution and, thus, a larger spacing of the grid points.
-If a given multigrid method is able to achieve $h$-independent convergence on a sequence of increasingly finer resolved instances of the same PDE, there is a high probability that the method also generalizes to other problem instances.
-However, the application of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics on each proxy problem.
-For this purpose, we must be able to automate the process of generating a solver implementation based on its algorithmic representation.
-Recently, code generation techniques that grant us this capability have become available~\cite{kostler2020code,schmitt2018automating}.
+If a given multigrid method is able to achieve $h$-independent convergence on a sequence of increasingly finer-resolved instances of the same PDE, there is a high probability that the method also generalizes to other problem instances.
+However, the execution of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics on each proxy problem.
+For this purpose, we need to automate the process of generating a solver implementation based on its algorithmic representation.
+Recently, code generation techniques that grant us this ability have become available~\cite{kostler2020code,schmitt2018automating}.
 ExaStencils\footnote{ExaStencils: \url{https://www.exastencils.fau.de}} is a code generation framework, implemented in the Scala programming language, that has been specifically designed for the automatic generation of scalable multigrid solver implementations on modern parallel computing hardware~\cite{lengauer2014exastencils,lengauer2020exastencils}.
 It enables the formulation of multigrid methods in a discretization-independent domain-specific language (DSL) called ExaSlang~\cite{schmitt2014exaslang,schmitt2016systems}, which is almost indistinguishable from the textbook-like description of an algorithm.
 Based on this DSL specification, the framework is able to generate highly-optimized C++ code for different problem sizes and computer architectures.
 To illustrate this approach, Listing~\ref{code:exaslang-example} shows an ExaSlang implementation of the three-grid method formulated in Algorithm~\ref{alg:example-three-grid-method}.
+% \begin{lstlisting}[language=ExaSlang3]
+% Function VCycle@finest {
+%   r = b - A * x
+%   x@coarser = 0.0
+%   // Restriction
+%   b@coarser = R * r
+%   r@coarser = b@coarser - A@coarser * x@coarser
+%   x@(coarser-1) = 0.0
+%   b@(coarser-1) = R@coarser * r@coarser
+%   // Apply the Coarse-Grid Solver
+%   VCycle@(coarser-1)
+%   x@coarser += P@(coarser-1) * x@(coarser-1)
+%   // Smoothing with damped Jacobi
+%   x@coarser += 0.6 * diag_inv(A@coarser) * ( b@coarser - A@coarser * x@coarser )
+%   // Prolongation and Coarse-Grid Correction
+%   x += P@coarser * x@coarser
+% }
+% \end{lstlisting}
 \begin{listing}
 	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/code_generation/three_grid_example.exa3}
 	\caption{Three grid example from Algorithm~\ref{alg:example-three-grid-method} in ExaSlang}
@@ -691,7 +709,7 @@ Therefore, different selection operators have been proposed for single and multi
 Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object, by using its \emph{register} method.
 Listing~\ref{code:optimization:selection} shows the example initialization of a \emph{Toolbox} object using the widely-used NSGA-II selection operator~\cite{deb2002fast}. 
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/optimization/selection.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/optimization/selection.py}
 	\caption{Example for Multi-Objective Selection}
 	\label{code:optimization:selection}
 \end{listing}
@@ -704,7 +722,7 @@ Since each component has been registered to the respective \emph{Toolbox} object
 For this purpose, we store the previously assembled \emph{Toolbox} object within the respective attribute of this class.
 The resulting implementation of the \emph{evolutionary\_search} method can be found in Listing~\ref{code:optimization:evolutionary_search}. 
 \begin{listing}
-	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
+	\inputminted[linenos,numbersep=5pt,numberblanklines=False]{python}{evostencils/optimization/evolutionary_search.py}
 	\caption{Evolutionary Search Method}
 	\label{code:optimization:evolutionary_search}
 \end{listing}

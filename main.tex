@@ -97,6 +97,29 @@
 \usepackage{backnaur}
 \usepackage{hyperref}
 \usepackage{minted}
+% \usepackage{listings}
+% \usepackage{color}
+% \setminted[python]{fontfamily=\ttfamily}
+
+% \ifdefined\PRINTVERSION
+%  \definecolor{keywordColor}{RGB}{0,0,0}
+%  \definecolor{commentColor}{RGB}{111,111,111}
+%  \definecolor{stringColor}{RGB}{69,69,69}
+% \else
+%  % cf http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+%  \definecolor{keywordColor}{RGB}{117,112,179}
+%  \definecolor{commentColor}{RGB}{27,158,119}
+%  \definecolor{stringColor}{RGB}{217,95,2}
+% \fi
+
+% \newcommand{\lineNumberStyle}{\tiny\color{gray}}
+
+% \ifdefined\FAUPRESS
+%  \newcommand{\deflstxmargin}{0em} %{1.6em}
+% \else
+%  \newcommand{\deflstxmargin}{2.2em}
+% \fi
+
 % Defs and adaptions
 \newcommand{\ps}[1]{\langle #1 \rangle}
 \newcommand{\bps}[1]{ \ps{\bm{#1}} }
@@ -104,7 +127,7 @@
 \colorlet{lightred}{red!50}
 \colorlet{lightblue}{blue!50}
 \renewcommand{\floatpagefraction}{.75}
-\renewcommand\theFancyVerbLine{\footnotesize\arabic{FancyVerbLine}}
+\renewcommand\theFancyVerbLine{\scriptsize \texttt{\arabic{FancyVerbLine}}}
 \numberwithin{equation}{chapter}
 \newcounter{prodcounter}
 \newenvironment{production}{%
@@ -112,6 +135,31 @@
 \renewcommand\theequation{p\theprodcounter}
 \begin{bnf}}
 {\end{bnf}}
+
+% \lstdefinelanguage{ExaSlang3}
+% {
+%   basicstyle=\ttfamily\small,
+%   keywords={[2]
+%     ApplicationHint, ApplicationHints, Array, Bool, Boolean, Cell, center, Complex, Domain, Double, Equation, Expr, Expression, Face\_x, Face\_y, Face\_z, Field, Float, Func, FuncTemplate, Function, FunctionTemplate, Globals, Inst, Instantiate, Int, Integer, Knowledge, L2, L4Hint, L4Hints, Neumann, Node, None, Operator, Real, Stencil, String, Unit, Val, Value, Var, Variable, all, and, append, array, as, bc, bool, boolean, bottom, boundary, but, cell, coarser, coarsest, color, complex, count, current, default, double, east, else, face\_x, face\_y, face\_z, false, finer, finest, float, for, from, generate, i0, i1, i2, if, import, in, int, integer, jacobi, locally, loopBase, modifiers, node, north, not, of, on, or, override, prepend, prolongation, real, relax, repeat, replace, restriction, return, smootherHint, smootherStage, solve, solveFor, solver, south, string, times, to, top, true, unit, until, west, where, while, with, x, y, z
+%   },
+%   keywordstyle={[2]\color{keywordColor}}, %\bfseries},
+%   commentstyle=\color{commentColor}, % style of comments
+%   stringstyle=\color{stringColor}, % style of strings
+%   showstringspaces=false,
+%   sensitive=true, % keywords are case-sensitive
+%   morecomment=[l]{//}, % l is for line comment
+%   morecomment=[s]{/*}{*/}, % s is for start and end delimiter
+%   morestring=[b]{'}, % defines that strings are enclosed in single quotes
+%   morestring=[b]{"}, % defines that strings are enclosed in double quotes
+%   literate={
+%     {\@}{@}1
+%   },
+%   numbers=left,
+%   numberstyle=\lineNumberStyle,
+%   xleftmargin=\deflstxmargin,
+%   captionpos=b,
+%   escapechar={`}
+% }
 
 %%%%%%%%%%%%%%%%%
 %%% META INFO %%%
