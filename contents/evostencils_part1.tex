@@ -672,13 +672,13 @@ As this example demonstrates, ExaSlang enables the formulation of the same opera
 Similar to the specification of the grid spacing as a subscript in Algorithm~\ref{alg:example-three-grid-method}, we can utilize this notation to formulate each operation within a multigrid method relative to the \emph{finest} grid.
 Since the ExaSlang specification of a multigrid method is, thus, independent of the actual discretization, the ExaStencils compiler is able to generate implementations of the same solver for different grid sizes.
 Furthermore, as ExaSlang supports the formulation of each multigrid operation in a high-level mathematics-like syntax, we can apply the same solver to different problems only by changing the definitions of the individual operators, such as the system, prolongation, and restriction operator.
-Therefore, ExaStencils is ideally suited for the automatic generation and evaluations of multigrid methods within our evolutionary program synthesis approach.
+Therefore, ExaStencils is ideally suited for the automatic generation and evaluation of multigrid methods within our evolutionary program synthesis approach.
 While ExaStencils is implemented in the Scala programming language and can, thus, not be accessed directly within Python code, it provides simple configuration files, which allow us to adapt certain problem characteristics, such as the grid spacing and the number of coarsening steps.
 Furthermore, additional code generation options, such as compiler-based performance optimizations, can be en- or disabled.
-To encapsulate the usage of the ExaStencils compiler, EvoStencils provides the \emph{ProgramGenerator} class.
+To encapsulate the usage of the ExaStencils compiler, EvoStencils provides a \emph{ProgramGenerator} class\footnote{Due to the vast and complicated implementation of this class, it is omitted in this thesis, while its functionality is described informally.}.
 In addition to the automatic adaption of the respective configuration files and the actual execution of the code generation process, this class also includes functionality for extracting the required information about a given problem based on an existing ExaSlang specification. 
-Therefore, if this specification contains all the necessary information for the generation of the respective multigrid grammar, it allows us to integrate EvoStencils directly into ExaStencils' solver generation workflow.
-This approach, furthermore, enables the application of our evolutionary program synthesis method to many of the problems that are already available within ExaStencils.
+Therefore, in case this specification contains all the necessary information for generating the corresponding multigrid grammar, it allows us to integrate EvoStencils directly into ExaStencils' solver generation workflow.
+Moreover, this approach enables the application of our evolutionary program synthesis method to many of the problems already available within ExaStencils.
 Based on the functionality provided by the \emph{ProgramGenerator} class, we can implement an evaluation function in the form of the \emph{evaluate} method of the previously mentioned \emph{Optimizer} class.
 The implementation of this method is shown in Listing~\ref{code:optimization:evaluate}.
 \begin{listing}
