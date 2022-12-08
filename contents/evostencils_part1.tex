@@ -682,12 +682,12 @@ Moreover, this approach enables the application of our evolutionary program synt
 Based on the functionality provided by the \emph{ProgramGenerator} class, we can implement an evaluation function in the form of the \emph{evaluate} method of the previously mentioned \emph{Optimizer} class.
 The implementation of this method is shown in Listing~\ref{code:optimization:evaluate}.
 \begin{listing}
-	\inputminted[fontsize=\footnotesize,breaklines]{scala}{evostencils/optimization/evaluate.py}
-	\caption{}
+	\inputminted[linenos]{python}{evostencils/optimization/evaluate.py}
+	\caption{Optimizer: Evaluate Method}
 	\label{code:optimization:evaluate}
 \end{listing}
 It provides a high-level interface to the evaluation of an arbitrary individual generated based on the provided \emph{PrimitiveSetTyped} object.
-First of all, in order to prevent the repeated evaluation of structurally-equal individuals, the \emph{Optimizer} class implements a caching mechanism that keeps track of all previously evaluated individuals.
+In order to prevent the repeated evaluation of structurally-equal individuals, the \emph{Optimizer} class implements a caching mechanism that keeps track of all previously evaluated individuals.
 Therefore, we first check whether the given individual has already been evaluated before, in which case we simply return the cached objective function value.
 Otherwise, we utilize the \emph{generate\_and\_evaluate} method of the \emph{ProgramGenerator} class to generate a C++ implementation of the corresponding solver using the ExaStencils compiler, which is then executed on a proxy problem.
 As a result, we obtain three metrics, the total solving time $T_\varepsilon$, the convergence factor $\rho$, and the number of iterations $n_\varepsilon$, whereby the desired error reduction $\varepsilon$ is usually determined by the given ExaStencils specification of the problem.
