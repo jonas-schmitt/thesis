@@ -22,7 +22,7 @@ x_H = Approximation("x_H", coarse_grid)
 b_H = Multiplication(Restriction("I_hH", grid, coarse_grid), r_h)
 r_H = Residual(A_H, x_H, b_H)
 
-# Define a complete cycle on the coarse level
+# Define a complete Cycle on the coarse level
 x_H = Cycle(x_H, b_H, r_H, predecessor=x_h)
 # Restore the state on the fine level
 x_h = x_H.predecessor
