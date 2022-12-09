@@ -1,16 +1,16 @@
 Function VCycle@finest {
   r = b - A * x
-  x@coarser = 0.0
+  x@(coarser) = 0.0
   // Restriction and coarsening
-  b@coarser = R * r
-  r@coarser = b@coarser - A@coarser * x@coarser
+  b@(coarser) = R * r
+  r@(coarser) = b@(coarser) - A@(coarser) * x@(coarser)
   x@(coarser-1) = 0.0
-  b@(coarser-1) = R@coarser * r@coarser
+  b@(coarser-1) = R@(coarser) * r@(coarser)
   // Apply the coarse-grid solver
   VCycle@(coarser-1)
-  x@coarser += P@(coarser-1) * x@(coarser-1)
+  x@(coarser) += P@(coarser-1) * x@(coarser-1)
   // Smoothing with damped Jacobi
-  x@coarser += 0.6 * diag_inv(A@coarser) * ( b@coarser - A@coarser * x@coarser )
+  x@(coarser) += 0.6 * diag_inv(A@(coarser)) * (b@(coarser) - A@(coarser) * x@(coarser))
   // Prolongation and coarse-grid correction
-  x += P@coarser * x@coarser
+  x += P@(coarser) * x@(coarser)
 }
