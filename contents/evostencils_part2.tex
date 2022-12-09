@@ -117,7 +117,7 @@ However, an essential issue that has not been addressed yet is how we can adapt 
 For this purpose, we need to return to the original formulation of our multigrid grammar, whose productions are shown in Table~\ref{table:multigrid-grammar}.
 Note that the level of each variable and terminal, unless it is level-independent, is denoted by its subscript.
 Each of these terms is an expression whose value depends on $h$, i.e., the spacing of the finest grid.
-In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with step size $h$ to a different one of similar depth but with a step size of $H$, we only have to replace each occurrence of $h$ by the value of $H$.
+In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with the step size $h$ to a different one of similar depth but with a step size of $H$, we only have to replace each occurrence of $h$ with the value of $H$.
 Now recall that in our implementation, each derivation tree is represented as a \emph{PrimitiveTree} object of DEAP's GP module, which internally stores a list of its nodes in depth-first order.
 Listing~\ref{code:gp:primitive} contains a reduced implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
 \begin{listing}
@@ -125,28 +125,29 @@ Listing~\ref{code:gp:primitive} contains a reduced implementation of the \emph{P
 	\caption{GP: Primitive and Terminal class}
 	\label{code:gp:primitive}
 \end{listing}
-According to this implementation, each \emph{Primitive} and \emph{Terminal} object is identified by three attributes - its argument types, return type, and name.
+According to this implementation, each \emph{Primitive} and \emph{Terminal} object is identified by three attributes - its \emph{name}, argument types (\emph{args}), and return type (\emph{ret}).
 Note that a \emph{Terminal} object does not possess any input types, and if the \emph{terminal} argument of its \emph{\_\_init\_\_} method is provided as a string, the \emph{terminal} and \emph{name} attributes are identical.
-From the definition of these classes follows that a \emph{PrimitiveTree} does not contain the complete information required for its compilation to executable Python code, but we, additionally, need to provide the respective \emph{PrimitiveSetTyped} object.
-This then allows us to construct a sequence of function applications according to the order of nodes within the tree.  
-As a consequence, in case two different \emph{PrimitiveSetTyped} objects are structurally equal and employ the same name string for each of their primitives and terminals, both can be used to compile the same \emph{PrimitiveTree} object.
-Now note that in Listing~\ref{code:grammar:add-terminals}, and~\ref{code:grammar:add-level}, we generate the name string for each \emph{Primitive} and \emph{Terminal} using the problem-independent naming convention together with a subscript that corresponds to its depth in the discretization hierarchy.
-As the latter is independent of the actual step size of the grid, each \emph{PrimitiveTree} generated based on a \emph{PrimitiveSetTyped} object returned by our \emph{generate\_grammar} function can be compiled by any other \emph{PrimitiveSetTyped} object that has been obtained using the same value for the \emph{depth} argument\footnote{The structural equality of both objects also requires us to provide the same value for the \emph{samples} argument}.
-While this provides us with a way to compile a given \emph{PrimitiveTree} after replacing our previous \emph{PrimitiveSetTyped} object with a new one, we have not yet addressed the questions of how this affects the generation of new individuals by means of mutation and crossover.
-In the case of both operators, the construction of new individuals is subject to the type constraints defined within each of its \emph{Primitive} and \emph{Terminal} objects.
-Therefore, if we aim to construct new individuals based on existing ones that have been generated using a different \emph{PrimitiveSetTyped} object, the types of the respective \emph{Terminal} and \emph{Primitive} object need to match.
-If we consider the initialization of each type in the respective method of the \emph{Types} class, as shown in Listing~\ref{code:grammar:types}, we can see that this condition is fulfilled since all types are created as a function of the \emph{depth} argument.
-Each type is, thus, independent of the details of the discretization hierarchy based on which a \emph{PrimitiveSetTyped} object is constructed.
-Therefore, we can summarize the previous discussion with the observation that while each individual contains the computational structure of the corresponding multigrid method, all required information to apply this individual to a certain discretization hierarchy is contained in the respective \emph{PrimitiveSetTyped} object.
-This means that whenever we want to increase the problem size within our evolutionary program synthesis procedure, we only have to generate a new \emph{PrimitiveSetTyped} object based on which we then update all operations registered at the current \emph{Toolbox} object.
+However, neither of the classes incorporates the necessary information for its compilation to executable Python code.
+Therefore, in addition to the given \emph{PrimitiveTree}, the respective \emph{PrimitiveSetTyped} object needs to be provided, which then enables constructing a sequence of function applications according to the order of the tree nodes.  
+As a consequence, in case two different \emph{PrimitiveSetTyped} objects are structurally equal and employ the same name string for each of their \emph{Primitive} and \emph{Terminal} objects, they enable the compilation of the same \emph{PrimitiveTree} objects.
+Now note that we generate the \emph{name} of each \emph{Primitive} and \emph{Terminal} in Listing~\ref{code:grammar:add-level} and~\ref{code:grammar:add-terminals} using the same problem-independent naming convention.
+Since the subscript included in each name specifies the current level within the discretization hierarchy only symbolically, each \emph{PrimitiveTree} generated based on a \emph{PrimitiveSetTyped} object returned by our \emph{generate\_grammar} function can be compiled by any other \emph{PrimitiveSetTyped} object that has been obtained using the same value for the \emph{depth} argument.
+While this provides us with a way to compile a given \emph{PrimitiveTree} after replacing our previous \emph{PrimitiveSetTyped} object with a new one, we have not yet addressed the question of how this affects the generation of new individuals through mutation and crossover.
+In the case of both operators, the creation of new individuals is subject to the type constraints specified within the \emph{Primitive} and \emph{Terminal} objects of the parent individuals.
+Therefore, whenever a modification is to be applied at a specific position within a \emph{PrimitiveTree}, the types of the respective \emph{Primitive} and \emph{Terminal} objects need to match.
+If we consider the initialization of each type in the respective method of the \emph{Types} class defined in Listing~\ref{code:grammar:types}, we can see that each \emph{Type} object is created as a function of the \emph{depth} argument.
+It is independent of the details of the discretization hierarchy based on which a \emph{PrimitiveSetTyped} object is constructed.
+Therefore, exchanging a \emph{PrimitiveSetTyped} with one of similar \emph{depth} does not affect the semantics of each \emph{Type} object, which means that the same mutation and crossover operators can be applied without further adaption.
+We can conclude the previous discussion by stating that while each \emph{PrimitiveTree} contains the computational structure of the corresponding multigrid method, all required information to interpret it with respect to a particular discretization hierarchy is contained in the supplied \emph{PrimitiveSetTyped} object.
+Therefore, whenever we want to increase the problem size within our evolutionary program synthesis procedure, we only have to generate a new \emph{PrimitiveSetTyped} object based on which we then update all operations registered at the current \emph{Toolbox} object.
 At the same time, all individuals in the population remain unchanged and only need to be reevaluated on the updated problem instance.
-We can implement the resulting steps in the following method of the \emph{Optimizer} class, which is shown in Listing~\ref{code:optimization:adapt-problem-size}.
+The resulting steps can then be implemented in the form of an additional method of the \emph{Optimizer} class, which is shown in Listing~\ref{code:optimization:adapt-problem-size}.
 \begin{listing}
 	\inputminted{python}{evostencils/optimization/adapt_problem_size.py}
-	\caption{Problem size adaption during the evolutionary search}
+	\caption{Optimizer Class -- Problem Size Adaption}
 	\label{code:optimization:adapt-problem-size}
 \end{listing}
-What now remains is the integration of this method into the implementation of our evolutionary search method, as shown in Listing~\ref{code:optimization:evolutionary_search}.
+What now remains is the integration of this method into the implementation of our evolutionary algorithm defined in Listing~\ref{code:optimization:evolutionary_search}.
 However, we postpone this step until we have described the next major extension of our basic implementation, which is the distributed parallelization of our approach using the message-passing interface (MPI).
 
 \section{Distributed Parallelization}
