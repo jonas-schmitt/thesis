@@ -20,7 +20,7 @@ In each generation, new individuals are created by applying mutation and crossov
 However, only a limited number of individuals, chosen from the combined set of child and parent individuals, are allowed to enter the new population.
 Whether an individual is accepted for the next generation solely depends on its fitness, as defined by one or multiple objectives.
 Therefore, to achieve generalization, it is crucial that we define the fitness of an individual in a way that maximizes the probability that the optimum, according to our criterion $T_{\varepsilon}$, is contained in the final population.
-We thus have to prevent the eviction of this individual from the population at any point in the algorithm.
+We thus have to prevent the eviction of this individual from the population at any point during the execution of our algorithm.
 
 \subsection{Objective Function Definition}
 \label{sec:generalization:objective-function-definition}
@@ -28,44 +28,43 @@ As we have shown in Section~\ref{sec:fitness-evaluation-and-selection} the solvi
 \begin{equation*}
 	T_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho},
 \end{equation*}
-where $t$ is the execution time per iteration and $\rho$ the (asymptotic) convergence factor of the solver.
-Therefore, based on this formulation, there are two ways to define the fitness of an individual:
+where $t$ is the execution time per iteration and $\rho$ the (asymptotic) convergence factor of the iterative solver.
+Therefore, there are two ways to define the fitness of an individual based on this metric:
 \begin{enumerate}
 	\item Single-objective: $T_{\varepsilon}$
 	\item Multi-objective:  $t$ and $\rho$
 \end{enumerate}
-The main difference here is that while a single-objective evaluation always returns a single individual as the optimum, a multi-objective evaluation instead identifies a set of Pareto-optimal individuals, i.e., individuals which do not \emph{dominate} each other, which means that they are unable to achieve a better value in both objectives.
-Since, in the given case, an improvement in either of the two objectives, $t$ and $\rho$, necessarily leads to a faster solving time $T_{\varepsilon}$, the single-objective optimum is always contained in the Pareto-front obtained from a multi-objective evaluation of the same individuals.
-Therefore, the major question for generalization is whether the individual with the fastest solving time $T_{\varepsilon}$ for our target problem will be consistently selected as an optimum when it is evaluated on smaller instances of the same problem.
-Unfortunately, the solving time $T_{\varepsilon}$, as a single objective, does not lead to the same ranking of individuals for each problem instance.
-While the convergence factor $\rho$ of a functioning multigrid method is expected to be constant, its execution time per iteration $t$ is drastically affected by hardware effects.
+The main difference here is that while a single-objective evaluation always returns a single individual as the optimum, a multi-objective evaluation instead identifies a set of Pareto-optimal individuals, i.e., individuals that do not \emph{dominate} each other, which means that they are unable to achieve a better value in both objectives.
+Since in the given case, an improvement in either of the two objectives, $t$ and $\rho$, necessarily leads to a faster solving time $T_{\varepsilon}$, the single-objective optimum is always contained in the Pareto-front obtained from a multi-objective evaluation of the same individuals.
+Therefore, the main question regarding generalization is whether the individual with the fastest solving time $T_{\varepsilon}$ for our target problem will be consistently selected as an optimum when it is evaluated on smaller instances of the same problem.
+First of all, note that the solving time $T_{\varepsilon}$, as a single objective, does not necessarily lead to the same ranking of individuals for each problem instance.
+While the convergence factor $\rho$ of a functioning multigrid method executed as an iterative solver is expected to be constant, its execution time per iteration $t$ is drastically affected by hardware effects.
 For instance, if the memory requirement for a certain problem size exceeds the capacity of the cache, the execution time is expected to increase substantially compared to a problem instance that still fits into the cache\footnote{This is only true for memory-bound computations. A property that is, however, fulfilled for the majority of stencil operations.}.
-As a consequence, the execution time per iteration of a multigrid method that achieves the fastest solving time for a small problem might drastically increase for a larger problem instance, which means that the solver might no longer be optimal for that problem size.
+As a consequence, the execution time per iteration of a multigrid method that achieves the fastest solving time for a small problem might drastically increase for a larger problem instance, which means that the solver might no longer be optimal.
 %On the downside, if we consider the solver that achieves the fastest solving time for a certain problem instance.
 %While this method might no longer be optimal with respect to its solving time for problems of smaller size, there is a high probability that it is still contained in the Pareto-front obtained through a multi-objective evaluation.
 %In general, faster convergence is either achieved by applying a higher number of smoothing or coarse-grid correction steps.
 
-Now consider the following example of two different non-dominating multigrid V-cycles.
-The first one achieves a convergence factor of 0.15 and an execution time per iteration of one millisecond using a total number of two smoothing steps per level on a grid with step size $h$, while the other one achieves a convergence factor of 0.1 and an execution time of 1.5 milliseconds using three smoothing steps per level.
-If we now execute both methods on a smaller grid with step size $2h$, it is very unlikely that the first method achieves faster convergence than the second one.
-On the other hand, three smoothing steps per level will also lead to a larger execution time per iteration for a smaller problem.
+Now consider an example of two different non-dominating multigrid V-cycles.
+The first cycle uses two smoothing steps per level leading to a convergence factor of 0.15 and an execution time per iteration of one millisecond on a grid with step size $h$, while the second one achieves a convergence factor of 0.1 and an execution time of 1.5 milliseconds using three smoothing steps per level.
+If we now execute both methods on a smaller grid with step size $2h$, it is very unlikely that the first cycle will converge faster than the second one.
+Likewise, three smoothing steps per level will also lead to a higher execution time per iteration for a smaller problem.
 As a consequence, the dominance relation between both methods is preserved.
-In contrast, assume that the second method achieves a slightly faster solving time on the larger grid.
-Since it is impossible to predict the order of magnitude of change in the value of $t$ for both methods without actually executing them, we can not be sure whether this is still the case for a smaller grid.
-While treating the search for a generalizable multigrid method as a multi-objective optimization problem, therefore, increases the probability that the final population contains the fastest solver for our target problem instance, this approach still has limitations.
-If we consider different choices for each smoothing and coarse-grid correction step, our assumption that a certain sequence of operations also leads to a faster execution time for a smaller problem size is no longer true for each case, as certain operations might have lower complexity and, thus, could lead to a smaller decrease in the execution time on a smaller grid.
-A simple example of such an operation is line smoothing which becomes significantly more expensive on a larger grid on~\cite{trottenberg2000multigrid}.
-One caveat for this problem that has already been mentioned in Section~\ref{sec:fitness-evaluation-and-selection} is to incorporate performance models into the evaluation, which can yield a prediction for a method's execution time on a larger grid.
-However, within the scope of this work, we only consider operations whose complexity is independent of the grid size, i.e., pointwise smoothers and block smoothers with blocks of fixed size. 
-Therefore, the execution time per iteration measured on a certain grid size provides a sufficient prediction for its value on a larger grid.
+In contrast, assume that the second method achieves a slightly faster solving time on the larger problem.
+Since it is impossible to predict the order of magnitude of change in the value of $t$ for both methods without actually executing them, we can not be sure whether this is still the case for a smaller problem.
+While treating the design of a generalizable multigrid method as a multi-objective optimization problem increases the probability that the final population contains the fastest solver, this approach still has limitations.
+If we consider different choices for each smoothing and coarse-grid correction step, our assumption that a certain sequence of operations also leads to a faster execution time for a smaller problem size is no longer a certainty, as some operations might possess a different computational complexity.
+A simple example of such an operation is line smoothing which becomes significantly more expensive when it is applied to larger problems~\cite{trottenberg2000multigrid}.
+One caveat for this issue, which has already been mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, is to predict the execution time of a solver with a performance model~\cite{williams2009roofline,hager2016exploring}.
+However, since in this work, we only consider operations whose complexity is independent of the problem size, i.e., pointwise smoothers and block smoothers with blocks of fixed size, the measured execution time per iteration provides a sufficient prediction for larger instances of the same problem.
 
 \subsection{Generalization Procedure}
 \label{sec:generalization-procedure}
-Based on these observations, we can now formulate an evolutionary search method for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:generalization-procedure}.
+Based on the observations made in the last section, we can now formulate an extension of our evolutionary algorithm for the systematic generalization of multigrid methods to a given problem class, which is summarized in Algorithm~\ref{alg:generalization-procedure}.
 \begin{algorithm}
 	\caption{Generalization Procedure}
 	\label{alg:generalization-procedure}
-	\begin{algorithmic}[1] % The number tells where the line numbering should start
+	\begin{algorithmic} % The number tells where the line numbering should start
 		\State \textbf{Construct} the grammar $G_0$ for the initial problem
 		\State \textbf{Initialize} the population $P_0$ based on $G_0$
 		\State \textbf{Evaluate} $P_0$ on the initial problem with respect to $t$ and $\rho$
@@ -86,48 +85,49 @@ Based on these observations, we can now formulate an evolutionary search method 
 		\State \textbf{Identify the best solver} by evaluating $P_{n}$ on the target problem
 	\end{algorithmic}
 \end{algorithm}
-Within this procedure, the search begins by choosing an initial problem size.
-Since, at this point, the majority of the individuals in the population, which are generated through random initialization, are expected to represent inefficient multigrid methods, the choice of a small problem size enables the fast evaluation of a large number of individuals.
-However, as the search progresses and the average quality of the individuals in the population improves, the problem size can then be iteratively increased toward the target size.
-While each problem size adaption increases the required time to evaluate each method found within the search, it also improves the accuracy of evaluation with respect to both objectives.
-As discussed in Section~\ref{sec:generalization:objective-function-definition}, we can, furthermore, test the $h$-independent convergence of a given method by evaluating it on a sequence of increasingly-larger instances of the same problem.
-Also, note that if there is only a small difference between the execution times per iteration of non-dominating solvers, even slight hardware-based fluctuations in the measurements might perturb the outcome of an evaluation.
-This effect can again be reduced by considering a larger instance of the same problem, as the relative magnitude of these fluctuations decreases compared to the overall evaluation time.
-At the end of Algorithm~\ref{alg:generalization-procedure} we obtain a population that contains a set of non-dominated individuals according to the largest problem size considered within the search.
-We can, thus, identify the fastest solver for our target problem instance by only considering those individuals contained in the first non-dominated front, i.e., the population subset in which none of the individuals is dominated by any of those encountered within the search.
+The first step of this procedure is the choice of an initial problem size, which should be small enough to enable the fast evaluation of a large number of randomly generated and thus often inefficient solvers.
+As the search progresses and the average quality of the individuals in the population improves, the problem size can then be iteratively increased toward the target size.
+While each problem size adaption increases the required time to evaluate each solver, it also improves the accuracy of evaluation with respect to both objectives.
+As discussed in Section~\ref{sec:generalization:objective-function-definition}, evaluating a multigrid-based solver on a sequence of increasingly larger instances of the same problem allows us to assess whether the choice of the grid spacing $h$ affects its convergence.
+Also, note that if there is only a small difference between the execution times of two non-dominating solvers, even slight hardware-based fluctuations in the measurements might perturb the outcome of an evaluation.
+Considering a larger instance of the same problem reduces the relative magnitude of these fluctuations compared to the overall evaluation time.
+At the end of Algorithm~\ref{alg:generalization-procedure}, we obtain a population that has evolved against a sequence of problem instances that iteratively approaches the size of the target instance.
+We thus identify the fastest solver by only considering those individuals contained in the first non-dominated front of this population, i.e., the subset in which none of the individuals is dominated by any of those present in the population.
 
-Finally, note that so far, we have only considered increasing the problem size within the search.
+Finally, note that so far, we have only considered increasing the problem size while evolving the population.
 However, in certain cases, a PDE contains additional parameters which need to be adapted accordingly.
-One prominent example, which we consider in this work, is the indefinite Helmholtz equation, as given by
+One prominent example that we consider in this thesis is the indefinite Helmholtz equation, as given by
 \begin{equation}
 	-(\nabla^{2} + k^{2})u = f,
 	\label{eq:helmholtz}
 \end{equation}
 where $\nabla^{2}$ is the Laplace operator, $k$ the \emph{wavenumber} and $f$ the source term.
-In general, the difficulty of solving this problem increases with the value of the wavenumber $k$.
-However, many applications, for instance, require the discretization width $h$ to fulfill an accuracy requirement of $h k \leq 0.625$. 
-As a consequence, in order to solve this problem on a smaller grid, we also need to adapt the wavenumber accordingly, which results in a sequence of problem instances not only increasing in size but also in their difficulty.
-In Chapter~\ref{chapter:experiments}, we will demonstrate that our generalization procedure yields efficient multigrid methods for Helmholtz problems of varying size and difficulty.
+In general, the difficulty of solving this problem increases with the value of $k$.
+However, many applications require the discretization width $h$ to fulfill an accuracy requirement, such as $h k \leq 0.625$. 
+As a consequence, in order to solve this problem on a coarser grid, we also need to adapt the wavenumber accordingly, which results in a sequence of problem instances not only increasing in size but also in difficulty.
+In Chapter~\ref{chapter:experiments}, we will demonstrate that our generalization procedure can cope with this challenge, yielding efficient multigrid methods for Helmholtz problems of varying size and difficulty.
 
 \subsection{Implementation}
 After we have now both motivated and described a procedure for the grammar-based design of generalizable multigrid methods, the remaining step is its successful implementation within the EvoStencils framework.
 First of all, note that the individual evolutionary operators, i.e., initialization, mutation, crossover, and selection, are all implemented based on the created \emph{PrimitiveSetTyped} object. 
-Their application is, thus, independent of the underlying problem size, but we only have to register them to the respective \emph{Toolbox} object, as shown in Listing~\ref{code:gp:toolbox}.
-Furthermore, we can easily generate a grammar for different problem sizes with a discretization hierarchy of similar depth by utilizing the \emph{generate\_grammar} function, as shown in Listing~\ref{code:grammar:generate-grammar}, while providing a different value for the argument \emph{max\_level}.
-However, the essential question that has not been answered yet is how we then adapt the current population to the resulting new grammar, as it is formulated in Line~9 of Algorithm~\ref{alg:generalization-procedure}.
-To address this issue, we need to return to the original formulation of our multigrid grammar, as shown in Table~\ref{table:multigrid-grammar}.
-Note that while the level of each variable and certain terminal symbols is denoted by its subscript, each of these terms is an expression whose value depends on the step size $h$ of the finest grid.
-In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with step size $h$ and fixed depth to a different hierarchy of similar depth but with a step size of $H$, we only have to substitute the value of both step sizes in each subscript.
-Now recall that in our implementation, each derivation tree is represented by a \emph{PrimitiveTree} object of DEAP's GP module, which internally stores a list of its nodes in depth-first order.
-Listing~\ref{code:gp:primitive} shows a reduced implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
+Their application is thus independent of the underlying problem size, and we only have to attach each operator to the respective \emph{Toolbox} object, as shown in Listing~\ref{code:gp:toolbox}.
+We can generate a grammar for grid hierarchies with varying step size $h$ but the same number of coarsening steps by utilizing the \emph{generate\_grammar} function defined in Listing~\ref{code:grammar:generate-grammar}.
+For this purpose, we only need to provide a different value for the argument \emph{max\_level}.
+However, an essential issue that has not been addressed yet is how we can adapt the current population to a new grammar.
+For this purpose, we need to return to the original formulation of our multigrid grammar, whose productions are shown in Table~\ref{table:multigrid-grammar}.
+Note that the level of each variable and terminal, unless it is level-independent, is denoted by its subscript.
+Each of these terms is an expression whose value depends on $h$, i.e., the spacing of the finest grid.
+In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with step size $h$ to a different one of similar depth but with a step size of $H$, we only have to replace each occurrence of $h$ by the value of $H$.
+Now recall that in our implementation, each derivation tree is represented as a \emph{PrimitiveTree} object of DEAP's GP module, which internally stores a list of its nodes in depth-first order.
+Listing~\ref{code:gp:primitive} contains a reduced implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
 \begin{listing}
 	\inputminted{python}{evostencils/gp/primitive.py}
 	\caption{GP: Primitive and Terminal class}
 	\label{code:gp:primitive}
 \end{listing}
-According to this implementation, each \emph{Primitive} and \emph{Terminal} object is identified by three attributes: Its argument types, return type, and name.
-Note that a \emph{Terminal} object does not possess any input types, and if the second argument for its initialization is provided as a string, the \emph{terminal} and \emph{name} attributes are identical.
-Therefore, a \emph{PrimitiveTree} does not contain the complete information required for its compilation to executable Python code, but we, additionally, need to provide the respective \emph{PrimitiveSetTyped} object.
+According to this implementation, each \emph{Primitive} and \emph{Terminal} object is identified by three attributes - its argument types, return type, and name.
+Note that a \emph{Terminal} object does not possess any input types, and if the \emph{terminal} argument of its \emph{\_\_init\_\_} method is provided as a string, the \emph{terminal} and \emph{name} attributes are identical.
+From the definition of these classes follows that a \emph{PrimitiveTree} does not contain the complete information required for its compilation to executable Python code, but we, additionally, need to provide the respective \emph{PrimitiveSetTyped} object.
 This then allows us to construct a sequence of function applications according to the order of nodes within the tree.  
 As a consequence, in case two different \emph{PrimitiveSetTyped} objects are structurally equal and employ the same name string for each of their primitives and terminals, both can be used to compile the same \emph{PrimitiveTree} object.
 Now note that in Listing~\ref{code:grammar:add-terminals}, and~\ref{code:grammar:add-level}, we generate the name string for each \emph{Primitive} and \emph{Terminal} using the problem-independent naming convention together with a subscript that corresponds to its depth in the discretization hierarchy.
