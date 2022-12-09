@@ -19,7 +19,7 @@ which is discretized using the three-point stencil
 		\label{eq:1D-laplace-stencil}
 \end{equation} 
 Figure~\ref{fig:different-error-components} shows the impact of applying the Jacobi and Gauss-Seidel method to different periodic error components.
-\begin{figure}
+\begin{figure}[ht!]
 	\centering
 	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
@@ -311,7 +311,7 @@ However, we have already observed that if a certain error exclusively consists o
 This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, which shows the discretization of two error components with different frequencies on one-dimensional uniform grids with decreasing step size.
 Here, the first error component, which possesses a higher frequency, can not be accurately represented on the coarsest grid with step size $h = 2^{-5}$.
 In contrast, the slope of the second error component, which is relatively smooth, is still clearly visible on this grid. 
-\begin{figure}
+\begin{figure}[ht]
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_16pi_level7.pdf}
