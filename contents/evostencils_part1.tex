@@ -19,7 +19,7 @@ To evaluate a given solver obtained from a grammar-based representation, we emit
 The resulting program can then be executed on a number of test cases in order to measure its desired performance characteristics.
 Finally, note that the execution of an evolutionary program synthesis method requires the evaluation of a large number of different programs, each representing a unique numerical solver.
 Depending on the problem that one aims to solve, it can be infeasible to run this method on a single compute node, which necessitates a multi-node parallelization.
-The message passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of available supercomputing devices.
+The message-passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of available supercomputing devices.
 While MPI was originally designed for the traditional scientific computing languages Fortran and C, it has recently been made available within Python~\cite{dalcin2021mpi4py}. 
 With the addition of MPI as a distributed computing backend, we arrive at the following high-level view of EvoStencils' software architecture, which is shown in Figure~\ref{fig:evostencils-architecture}.
 \begin{figure}
@@ -386,7 +386,7 @@ In order to store the state of a program in the form of a serialized binary form
 This module enables the serialization of arbitrary Python objects, which can then later be restored.
 Object serialization has multiple purposes in our implementation.
 First of all, we want to be able to store the current state of our evolutionary algorithm such that, for instance, in case of a hardware failure, we can continue at the same position.
-Furthermore, parallelizing certain parts of our implementation on a distributed computing system using the Message Passing Library (MPI) requires us to transfer arbitrary Python objects via a communication network.
+Furthermore, parallelizing certain parts of our implementation on a distributed computing system using the message-passing interface (MPI) requires us to transfer arbitrary Python objects via a communication network.
 The pickle module provides a simple and portable solution to this problem.
 Unfortunately, pickle enforces a number of additional constraints on the serializability of a Python object.
 In particular, Python types can only be serialized if they are defined at the top-level domain of a module.
@@ -395,7 +395,7 @@ Unfortunately, dynamic types can not be defined at the top-level domain of the c
 To resolve this issue, we propose a custom \emph{Type} class which is defined in Listing~\ref{code:grammar:typing}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/typing.py}
-	\caption{Type Encoding}
+	\caption{Variable Encoding}
 	\label{code:grammar:typing}
 \end{listing}
 Since the instances of this class are regular Python objects, a pickle-based serialization can be achieved without any further adaption.
@@ -706,7 +706,7 @@ However, it is also possible to implement a similar function that returns a sing
 Finally, the method enables the adaption of certain parameters of the underlying PDE for the solver evaluation.
 For this purpose, a mapping from each parameter to the respective value can be provided in the form of a Python \emph{dictionary}.
 
-After successfully obtaining a \emph{Fitness} object for each individual, we can complete our collection of evolutionary operators with the definition of suitable selection and elitism methods.
+After successfully obtaining a \emph{Fitness} object for each individual, we can complete our collection of evolutionary operators with the definition of suitable selection and elitism procedures.
 As we have discussed in Section~\ref{sec:gggp-evaluation-and-selection}, in contrast to initialization, mutation, and crossover, the selection of individuals within an evolutionary algorithm is independent of their representation as a data structure but solely depends on the definition of their fitness.
 Therefore, different selection operators have been proposed for single and multi-objective evolutionary algorithms, of which many are already available within the DEAP framework.  
 Similar to the other evolutionary operators in Listing~\ref{code:gp:toolbox}, we can add a certain selection operator to a given \emph{Toolbox} object using its \emph{register} method.
@@ -722,7 +722,7 @@ In a similar manner, we can initialize a \emph{Toolbox} object with other select
 \label{sec:evostencils-part1:search-algorithm}
 We have now finally assembled all components that are required to implement an evolutionary search method for the grammar-based optimization of multigrid methods.
 Since each component has been registered to the respective \emph{Toolbox} object, we can utilize the resulting interface to implement a search method that is independent of the actual implementation of each operator as a method of the \emph{Optimizer} class. 
-For this purpose, we store the previously assembled \emph{Toolbox} object within the respective attribute of this class.
+For this purpose, we store the previously assembled \emph{Toolbox} object in the respective attribute of this class.
 The resulting implementation of the \emph{evolutionary\_search} method can be found in Listing~\ref{code:optimization:evolutionary_search}. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search.py}
@@ -739,20 +739,20 @@ For the sake of simplicity, we implement the evaluation of a list of individuals
 	\caption{Auxiliary Functions for Creating and Evaluating Offspring}
 	\label{code:optimization:evaluate-and-create-offspring}
 \end{listing}
-To enforce the creation of novel individuals, which have not already been obtained within previous generations of the method, we check whether they are already present in the cache.
+To enforce the creation of novel individuals, which have not already been discovered in previous generations, we check whether individuals created through mutation or crossover are already present in the cache.
 If this condition is fulfilled for at least one of the two children created from each pair of parent individuals, we repeat the application of the respective mutation or crossover operator until two suitable children are obtained.
 To initiate the search with a sufficiently diverse population, the number of initially-generated individuals can be set higher than $\mu$, which is controlled by the parameter \emph{initial\_population\_size}.
-As a next step, in line~7 of Listing~\ref{code:optimization:evolutionary_search}, $\mu$ individuals are selected for the first generation, using the registered \emph{elitism} operator.
+In line~3, we then randomly generate an initial population, which is evaluated in line~5.
+As a next step, $\mu$ individuals are selected for the first generation using the registered \emph{elitism} operator in line~5.
 The actual search is then performed for a predefined number of generations.
-As a fallback solution, we additionally implement a simple random search, whereby in each generation, we randomly generate $\lambda$ individuals.
-The implementation of this approach can be found in line~11 of Listing~\ref{code:optimization:evolutionary_search}.
-In contrast, within the evolutionary algorithm, we first select $\lambda$ individuals for crossover and mutation, using the \emph{select} operator, as shown in line~14.
-As mutation represents a modifying operation, we first create an identical copy of each selected parent individual, based on which then either crossover or mutation is applied using the previously-mentioned \emph{create\_offspring} method.
-Finally, in line~18--22, the resulting newly created individuals are evaluated, and a new elitist population of size $\mu$ is obtained from the combined set of parent and child individuals.
+As a fallback solution, we additionally implement a simple random search in line~11, where we randomly generate $\lambda$ individuals in each generation.
+Within the evolutionary algorithm, we first select $\lambda$ individuals for crossover and mutation, using the \emph{select} operator in line~14.
+As mutation represents a modifying operation, we first create an identical copy of each selected parent individual in line~15, based on which then either crossover or mutation is applied using the previously-mentioned \emph{create\_offspring} method in line~16.
+Finally, in line~18--22, the resulting newly created individuals are evaluated, and a new elitist population of size $\mu$ is selected from the combined set of parent and child individuals.
 Note that this step is identical to the random search variant of our implementation.
 
-With the implementation of this method, we have now assembled all components required to automatically design multigrid methods for solving PDE-based problems.
-However, before we evaluate the effectiveness of our approach on a number of benchmark problems, in the next chapter, we will discuss a few important extensions of the basic implementation presented in this chapter.
+With the definition of this method, we have now completed our implementation for the automated grammar-based design of multigrid methods for solving PDE-based problems.
+Before we evaluate the effectiveness of our approach on a number of benchmark problems, we will discuss a few important extensions of this basic implementation in the next chapter.
 In particular, we will present an extension of the evolutionary search method shown in Listing~\ref{code:optimization:evolutionary_search} that enables the systematic generalization of a population of multigrid methods to a sequence of increasingly-difficult instances of the same problem.
 Furthermore, in order to accelerate the evaluation of the large number of individuals required to obtain competitive solvers for many PDEs, we demonstrate how our implementation can be parallelized on multi-node systems using the message-passing interface (MPI).
 %TODO include again if systems of PDEs are covered in the next section
