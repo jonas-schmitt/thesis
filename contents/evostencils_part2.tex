@@ -1,26 +1,26 @@
-In the following, we will discuss two extensions of the basic implementation of our evolutionary program synthesis framework described in the last chapter, which are crucial for the effective application of our approach to many applications: \emph{Generalization} and \emph{parallelization}.  
-First of all, our goal is the systematic generalization of an evolved population of multigrid methods to different instances of a PDE.
-For this purpose, we will, therefore, derive an adapted version of our original search method that utilizes the special properties of multigrid methods.
-Furthermore, since the successful application of this method requires the code generation-based evaluation of a large number of individuals, we will present a distributed parallelization scheme, which allows us to execute our implementation on current multi-node computing systems.
+In the following, we will discuss two extensions of the evolutionary program synthesis framework described in the last chapter, which are crucial for the effective application of our approach to many applications: \emph{Generalization} and \emph{parallelization}.  
+First of all, to discover multigrid methods that are capable of solving different instances of a PDE, we are concerned with their generalizability.
+For this purpose, we will derive an adapted version of our original evolutionary algorithm that utilizes the special properties of multigrid methods.
+Furthermore, since the successful application of this method requires the code generation-based evaluation of a large number of individuals, we will present a distributed parallelization scheme, which enables the execution of our implementation on current multi-node computing systems.
 In the final chapter of this thesis, we will then demonstrate how the implementation described here can be successfully applied to different PDEs, yielding multigrid-based solvers that are competitive with hand-optimized methods. 
 
 \section{Generalization}
 \label{sec:generalization}
-As we have already briefly mentioned in Section~\ref{sec:fitness-evaluation-and-selection}, if properly constructed, the convergence of a multigrid method is independent of the discretization width $h$, which is usually described with the term $h$-independent convergence.
+As we have briefly discussed in Section~\ref{sec:fitness-evaluation-and-selection}, if properly constructed, the error reduction capabilities of a multigrid method are independent of the discretization width $h$, which is usually described with the term $h$-independent convergence.
 Therefore, the same method can often be successfully applied to different systems that arise from similar discretizations of the same PDE.
-We have already introduced the idea of evaluating each multigrid method on a number of proxy applications that possess similar properties as the problem that we are actually interested in solving.
+We have already introduced the idea of evaluating each multigrid method on a number of proxy applications whose properties are similar to the problem that we actually aim to solve.
 The motivation for this idea is that, while we are usually interested in solving a problem instance of a specific size, the evaluation of each solver on this instance requires an excessive amount of computational resources.
-As a remedy, in many cases, it is possible to construct such a set of proxy applications by discretizing the same PDE on the given domain with varying step sizes $h$.
+In many cases, it is possible to construct such a set of proxy applications by discretizing the same PDE with varying step sizes $h$.
 If we are able to design a solver that achieves $h$-independent convergence, it can be expected to solve each of these proxy applications using the same number of operations per grid point.
-However, beyond this requirement, we want to find the solver that leads to the fastest solving time $T_\varepsilon$ for the target problem with a discretization width of $h$.
-The main challenge is, thus, to identify this method among the set of candidates found within the search while performing the majority of evaluations on smaller problem instances with a discretization width $H > h$.
-Note that since evolutionary algorithms are usually not guaranteed to find the global optimum, we restrict ourselves to identifying the optimum within the space of individuals sampled throughout the search.
-First of all, recall that our evolutionary algorithm, whose implementation can be found in Listing~\ref{code:optimization:evolutionary_search}, performs a search by evolving a population of individuals for a specified number of generations.
-In each generation, new individuals are created by means of mutation and crossover.
+In addition to this requirement, we want to identify the method that leads to the fastest solving time $T_\varepsilon$ for the target problem with a discretization width of $h$.
+The main challenge is thus to identify this method within the evolved population while performing the majority of evaluations on smaller problem instances with a discretization width $H > h$.
+Note that since evolutionary algorithms are usually not guaranteed to find the global optimum, we restrict ourselves to identifying the optimum among the individuals discovered while evolving the population.
+%First of all, recall that our evolutionary algorithm, whose implementation can be found in Listing~\ref{code:optimization:evolutionary_search}, performs a search by evolving a population of individuals for a specified number of generations.
+In each generation, new individuals are created by applying mutation and crossover.
 However, only a limited number of individuals, chosen from the combined set of child and parent individuals, are allowed to enter the new population.
-Whether an individual is accepted for the next generation within this process solely depends on its fitness, as defined by one or multiple objectives.
-To achieve generalization, it is, therefore, crucial that we define the fitness of an individual in a way that maximizes the probability that the optimum, according to our criterion $T_{\varepsilon}$, is contained in the final population.
-On the downside, this means that we have to prevent this individual from getting evicted from the population at any point within the search.
+Whether an individual is accepted for the next generation solely depends on its fitness, as defined by one or multiple objectives.
+Therefore, to achieve generalization, it is crucial that we define the fitness of an individual in a way that maximizes the probability that the optimum, according to our criterion $T_{\varepsilon}$, is contained in the final population.
+We thus have to prevent the eviction of this individual from the population at any point in the algorithm.
 
 \subsection{Objective Function Definition}
 \label{sec:generalization:objective-function-definition}
