@@ -382,13 +382,13 @@ We can, thus, implement a function that iteratively constructs a multigrid gramm
 This allows us to deploy the same function for the generation of multigrid grammars defined on different discretization hierarchies, for instance, with a different number of coarsening steps.
 As in the above example, we first need to generate a unique type for each variable that is defined on a certain level of our grammar.
 While in Listing~\ref{code:grammar:pset-example}, we have encoded each variable with an actual Python type, at this point, we have to introduce an additional constraint that prevents us from pursuing the same approach.
-In order to store the state of a program in the form of a serialized binary format, Python provides the \emph{pickle} module.
+In order to store the state of a program in the form of a serialized binary format, Python provides the \emph{Pickle} module.
 This module enables the serialization of arbitrary Python objects, which can then later be restored.
 Object serialization has multiple purposes in our implementation.
 First of all, we want to be able to store the current state of our evolutionary algorithm such that, for instance, in case of a hardware failure, we can continue at the same position.
 Furthermore, parallelizing certain parts of our implementation on a distributed computing system using the message-passing interface (MPI) requires us to transfer arbitrary Python objects via a communication network.
-The pickle module provides a simple and portable solution to this problem.
-Unfortunately, pickle enforces a number of additional constraints on the serializability of a Python object.
+The Pickle module provides a simple and portable solution to this problem.
+Unfortunately, Pickle enforces a number of additional constraints on the serializability of a Python object.
 In particular, Python types can only be serialized if they are defined at the top-level domain of a module.
 Since our goal is to create a \emph{PrimitiveSetTyped} object adapted to the properties of a grammar that is only provided during program execution, we need to create the respective types dynamically.
 Unfortunately, dynamic types can not be defined at the top-level domain of the corresponding Python module, which renders their serialization impossible.
@@ -398,7 +398,7 @@ To resolve this issue, we propose a custom \emph{Type} class which is defined in
 	\caption{Variable Encoding}
 	\label{code:grammar:typing}
 \end{listing}
-Since the instances of this class are regular Python objects, a pickle-based serialization can be achieved without any further adaption.
+Since the instances of this class are regular Python objects, a Pickle-based serialization can be achieved without any further adaption.
 To distinguish different \emph{Type} objects within a \emph{PrimitiveSetTyped}, the \emph{identifier} attribute is provided.
 In addition, the class also includes a \emph{guard} attribute in the form of a boolean variable, whose purpose will be discussed later in this section. 
 To enable type equivalence checking in an automatic manner, we provide a custom \emph{\_\_eq\_\_} method.
