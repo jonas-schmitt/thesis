@@ -3,7 +3,7 @@ import random
 def evolutionary_search(self, params, use_random_search=False, generalization_interval=None):
     if generalization_interval is None:
         generalization_interval = params.generations
-    # Generate and evaluate initial population
+    # Generate and evaluate the initial population
     n = params.initial_population_size / self.nprocs
     population = self.toolbox.population(n)
     invalid_ind = [ind for ind in population]
