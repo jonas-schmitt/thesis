@@ -1,4 +1,4 @@
-In the following, we will discuss two extensions of the evolutionary program synthesis framework described in the last chapter, which are crucial for the effective application of our approach to many applications: \emph{Generalization} and \emph{parallelization}.  
+In the following, we will discuss two extensions of the evolutionary program synthesis framework described in the last chapter, which are crucial for the effective application of our approach to many applications - \emph{generalization} and \emph{parallelization}.  
 First of all, to discover multigrid methods that are capable of solving different instances of a PDE, we are concerned with their generalizability.
 For this purpose, we will derive an adapted version of our original evolutionary algorithm that utilizes the special properties of multigrid methods.
 Furthermore, since the successful application of this method requires the code generation-based evaluation of a large number of individuals, we will present a distributed parallelization scheme, which enables the execution of our implementation on current multi-node computing systems.
@@ -13,7 +13,7 @@ The motivation for this idea is that, while we are usually interested in solving
 In many cases, it is possible to construct such a set of proxy applications by discretizing the same PDE with varying step sizes $h$.
 If we are able to design a solver that achieves $h$-independent convergence, it can be expected to solve each of these proxy applications using the same number of operations per grid point.
 In addition to this requirement, we want to identify the method that leads to the fastest solving time $T_\varepsilon$ for the target problem with a discretization width of $h$.
-The main challenge is thus to identify this method within the evolved population while performing the majority of evaluations on smaller problem instances with a discretization width $H > h$.
+The main challenge is thus to identify this method within the evolved population while performing the majority of evaluations on smaller problem instances with a discretization width $H$ greater than $h$.
 Note that since evolutionary algorithms are usually not guaranteed to find the global optimum, we restrict ourselves to identifying the optimum among the individuals discovered while evolving the population.
 %First of all, recall that our evolutionary algorithm, whose implementation can be found in Listing~\ref{code:optimization:evolutionary_search}, performs a search by evolving a population of individuals for a specified number of generations.
 In each generation, new individuals are created by applying mutation and crossover.
