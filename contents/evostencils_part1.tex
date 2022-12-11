@@ -548,7 +548,7 @@ Listing~\ref{code:gp:toolbox} demonstrates how we generate such a container for 
 	\label{code:gp:toolbox}
 \end{listing}
 First of all, we define a data structure for the fitness of each individual based on DEAP's built-in \emph{Fitness} class.
-Here, the \emph{weights} attribute determines the number of objectives, while a negative value means that the respective objective is to be minimized.
+Here the \emph{weights} attribute determines the number of objectives, while a negative value means that the respective objective is to be minimized.
 As we will later come back to the definition of the optimization objectives, at this point, the reader can just assume that either a single or a multi-objective minimization is performed.
 Next, we represent each \emph{Individual} as a \emph{PrimitiveTree}, whose \emph{fitness} attribute is set to the previously defined data structure.
 To facilitate the implementation of both the \emph{Fitness} and \emph{Individual} class, in line~5--9, we make use of DEAP's \emph{creator} module.

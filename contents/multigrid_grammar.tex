@@ -328,8 +328,8 @@ As it has been described in this section, the application of each of these funct
 Furthermore, note that the evaluation of this sequence leads to a state whose first component $x_h$ contains an expression that corresponds to the stepwise execution of all steps of the method.
 The functions described in this section, therefore, can be considered as a \emph{language} for the formal representation of multigrid methods. 
 The main components of this language are summarized in Table~\ref{table:grammar-semantics}.
-\begin{table}
-	\caption{Summary of the multigrid state transition functions.}
+\begin{table}[ht]
+	\caption{Summary of the multigrid state transition functions}
 	\label{table:grammar-semantics}
 	\begin{algorithmic}
 	\Function{residual}{$A_h$, $(x_h, b_h, \lambda, Z_{h/2})$}
@@ -519,8 +519,8 @@ Therefore, we first define the set of variables
 \end{equation}
 for each of which we can then specify the list of productions available on the respective level. 
 Table~\ref{table:multigrid-grammar} shows the resulting productions for the complete discretization hierarchy.
-\begin{table}
-	\caption{Productions for generating five-grid methods.}
+\begin{table}[ht]
+	\caption{Productions for generating five-grid methods}
 	\label{table:multigrid-grammar}
 	\begin{bnf*}
 		\bnfprod{$S$} {
@@ -743,7 +743,7 @@ We can illustrate this expression by considering the corresponding decision tree
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/trees/decision_tree.pdf}
-	\caption{Simplified decision tree - Each node has the same number of children.}
+	\caption{Simplified decision tree -- Each node has the same number of children.}
 	\label{fig:decision-tree}
 \end{figure}
 Each node in this tree corresponds to a particular choice of operations, which includes the application of either $s_1$ or $s_2$ as a smoother, optionally accompanied by coarsening or a coarse-grid correction.

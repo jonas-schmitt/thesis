@@ -176,7 +176,7 @@ In order to estimate the expected speedup of a parallel implementation of each o
 As a representative example, we consider Poisson's equation on the unit square $\left[0,1\right]^2$ with Dirichlet boundary conditions. 
 We discretize this equation using a uniform grid with step size $h = 1/2^{11}$ and the common five-point stencil
 \begin{equation*}
-	\Delta_h = 
+	\nabla^2_h = 
 	\frac{1}{h^2} \begin{bmatrix}
 		0 & 1 & 0\\
 		1 & -4 & 1 \\
@@ -185,7 +185,7 @@ We discretize this equation using a uniform grid with step size $h = 1/2^{11}$ a
 \end{equation*} 
 which leads to a system of linear equations with $4\,190\,209$ unknowns.
 The complete specification of this test problem can be found in Section~\ref{sec:poisson-equation}.
-In order to obtain representative measurements for each of the four steps of our evolutionary algorithm, we execute it in the form of the \emph{run} method defined in Listing~\ref{code:optimization:optimizer} for a total number of 250 generations on a single socket of the \emph{Meggie} compute cluster of the Erlangen National High-Performance Computing Center\footnote{As an exception, the child evaluation step is performed in parallel on multiple sockets of the same type. Since the order of evaluation does not change the behavior of our algorithm, this decision does not affect the measurements.}.
+In order to obtain representative measurements for each of the four steps of our evolutionary algorithm, we execute it in the form of the \emph{run} method defined in Listing~\ref{code:optimization:optimizer} for a total number of 250 generations on a single socket of the \emph{Meggie} compute cluster of the Erlangen National High-Performance Computing Center (NHR)\footnote{As an exception, the child evaluation step is performed in parallel on multiple sockets of the same type. Since the order of evaluation does not change the behavior of our algorithm, this decision does not affect the measurements.}.
 Note that we do not apply the generalization procedure introduced in Section~\ref{sec:generalization} here, which means that the problem size is kept constant throughout the execution of our evolutionary algorithm.
 In each generation, we select $\lambda = 256$ individuals from the current population, based on which we create $\lambda$ children.
 A new population of $\mu = 256$ individuals is then obtained from the combined set of $512$ individuals using the NSGA-II non-dominated sorting procedure described in~\cite{deb2002fast}.
@@ -238,12 +238,12 @@ However, an island-based parallelization can be considered a viable extension fo
 
 \subsection{Implementation}
 After deriving a suitable parallelization approach, we can now proceed with its implementation as an extension of our previously defined \emph{Optimizer} class shown in Listing~\ref{code:optimization:optimizer}.
-For this purpose, we utilize the message-passing interface (MPI), which is available in the form of the Python package \emph{MPI4Py}.
-While MPI only defines interfaces for the C and Fortran programming languages, MPI4Py provides an additional layer of abstractions that enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
+For this purpose, we utilize the message-passing interface (MPI), which is available in the form of the Python package \emph{mpi4py}.
+While MPI only defines interfaces for the C and Fortran programming languages, mpi4py provides an additional layer of abstractions that enables the exchange of arbitrary Python objects between different processes using Python's Pickle library.
 As we have already discussed in Section~\ref{sec:evostencils-part1:productions}, Pickle provides a unified way to serialize and deserialize objects based on a portable binary format, which can then be transmitted using the core functionality provided by MPI.
 Since MPI represents the de facto standard for distributed computing and is thus supported on the majority of high-performance computing systems, its usage facilitates the portability of our implementation.
 Furthermore, the availability of highly-optimized MPI implementations, which are often developed in cooperation with hardware manufacturers, enables communication between different processors in a highly-efficient manner.
-As a first step towards the parallelization of our evolutionary program synthesis method with MPI4Py, we extend the previously defined \emph{Optimizer} class found in Listing~\ref{code:optimization:optimizer-mpi} by providing an interface to all required MPI operations. 
+As a first step towards the parallelization of our evolutionary program synthesis method with mpi4py, we extend the previously defined \emph{Optimizer} class found in Listing~\ref{code:optimization:optimizer-mpi} by providing an interface to all required MPI operations. 
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/optimizer_mpi.py}
 	\caption{Optimizer Class -- MPI Extension}

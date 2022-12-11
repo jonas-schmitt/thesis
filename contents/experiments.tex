@@ -1,15 +1,15 @@
 As a first step in the evaluation of our evolutionary program synthesis method, we consider two PDE-based model problems, Poisson's equation and a linear elastic boundary value problem, which can already be solved efficiently by applying common multigrid cycles iteratively.
-Here, our goal is, first of all, to demonstrate that our approach is able to reliably find functioning multigrid cycles in a number of randomized independent experiments.
-Furthermore, since the known multigrid cycles already provide a strong baseline for these problems, we can investigate whether the methods designed with our approach are able to achieve a similar degree of efficiency.
-In addition, by considering both two- and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different types.
+Here our goal is to demonstrate that our approach is able to reliably find functioning multigrid cycles in a number of randomized experiments.
+Furthermore, since classical multigrid cycles already provide a strong baseline for these problems, we can investigate whether the methods designed with our approach are able to achieve a similar degree of efficiency.
+In addition, by considering both two and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different types.
 \section{Automating the Design of Multigrid Cycles for Common PDEs}
 \label{sec:experiments-part1}
-As it has been mentioned above, the goal of this section is to evaluate the effectiveness of our evolutionary program synthesis method for the automated design of multigrid cycles that are able to quickly reduce the error of a given discretized PDE.
+The goal of this section is to evaluate the effectiveness of our evolutionary program synthesis method for the automated design of multigrid cycles that are used as an iterative method for solving a discretized PDE.
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
-This is reflected in the fact that common multigrid cycles, as described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
+This is reflected in the fact that common multigrid cycles, as those described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
 We begin this section by introducing the considered problem instances and their mathematical formulation.
-At this point, we want to emphasize that all results presented in this section have been originally published as part of the paper~\cite{schmitt2021evostencils}.
-However, this thesis complements this work with an additional analysis of the multigrid solvers obtained by our evolutionary search method.
+At this point, we want to emphasize that all results presented in this section have originally been published within the paper~\cite{schmitt2021evostencils}.
+However, this thesis complements this work with an additional analysis of the multigrid solvers discovered by our evolutionary algorithm.
 \subsection{Problem Formulation}
 \subsubsection{Poisson's Equation}
 \label{sec:poisson-equation}
@@ -23,6 +23,7 @@ Poisson's equation is an elliptic PDE that occurs in the study of many physical 
 \end{equation}
 In our experimental evaluation, we consider two different instances of Poisson's equation with Dirichlet boundary conditions, which are summarized in Table~\ref{table:poisson-problems}.
 \begin{table}
+	\caption{Considered instances of Poisson's equation}
 	\begin{tabular}{r l l}
 		\toprule
 		Problem & 2D Poisson & 3D Poisson \\
@@ -34,10 +35,9 @@ In our experimental evaluation, we consider two different instances of Poisson's
 		$g(\bm{x}) = $ & $\cos(\pi x) - \sin(\pi y)$ & $0$ \\
 		\bottomrule
 	\end{tabular}
-	\caption{Poisson problem instances.}
 	\label{table:poisson-problems}
 \end{table}
-Note that in Section~\ref{sec:execution-time-analysis}, we have employed the same two-dimensional instance of Poisson's equation to estimate the relative cost of each operation within our evolutionary search method.
+Note that in Section~\ref{sec:execution-time-analysis}, we have employed the same two-dimensional instance of Poisson's equation to estimate the relative cost of each operation within our evolutionary algorithm.
 We discretize the Laplace operator $\nabla^{2}$ with finite differences on a uniform cartesian grid with step size $h = 1/2^{l_{max}}$, which yields the five-point stencil
 \begin{equation*}
 	\nabla^2_h = 
@@ -94,9 +94,9 @@ From a physical point of view, this system can be interpreted as a two-dimension
 	\caption{Visualization of the considered linear elastic boundary value problem. A two-dimensional rectangular body undergoes an elastic deformation into the y-direction.}
 	\label{fig:visualization-linear-elasticity}
 \end{figure}
-We discretize Equation \eqref{eq:linear-elasticity} with finite differences on a cartesian grid using a step size $h = 1/2^{l_{max}}$ with $l_{max} = 10$, which yields a system of linear equations $\bm{A} \bm{u} = \bm{f}$ with 
+We discretize Equation \eqref{eq:linear-elasticity} with finite differences on a cartesian grid using a step size $h = 1/2^{l_{max}}$ with $l_{max} = 10$, which yields a system of linear equations $A \bm{u} = \bm{f}$ with 
 \begin{equation*}
-	\bm{A} =
+	A =
 	\begin{pmatrix}
 		(\alpha + \beta) \frac{\partial^2}{\partial x^2} + \alpha \nabla^2 & (\alpha + \beta) \frac{\partial^2}{\partial x \partial y} \\
 		(\alpha + \beta) \frac{\partial^2}{\partial x \partial y} & (\alpha + \beta) \frac{\partial^2}{\partial y^2} +  \alpha \nabla^2
@@ -150,18 +150,21 @@ whereby the differential operators $\nabla^2$, $\frac{\partial^2}{\partial x^2}$
 Similar to the above case, we employ a uniform cartesian grid with a step size $h = 1/2^{l_{max}}$ with $l_{max} = 10$, such that the resulting system of linear equations contains $2\,093\,058$ unknowns.
 \subsection{Multigrid Configuration}
 \label{sec:experiments1-multigrid-configuration}
-To design an efficient multigrid method, we consider each of the given problems on a grid hierarchy consisting of five discretization levels $l \in \left[l_{max} - 4, l_{max}\right]$, where the grid spacing on each level is given by the formula $h = 1/2^l$.
+To design an efficient multigrid method, we consider each of the given problems on a grid hierarchy consisting of five discretization levels 
+\begin{equation*}
+    l \in \left[l_{max} - 4, l_{max}\right],
+\end{equation*} where the grid spacing on each level is given by the formula $h = 1/2^l$.
 We then obtain the respective operator on each level by applying the same discretization method as on the finest grid.
 Therefore, the resulting grammar is structurally similar to the one shown in Table~\ref{table:multigrid-grammar}.
-Within each grammar production rule, we consider the following components:
+Within each grammar production, we consider the following components:
 \begin{description}
 	\item[\textbf{Smoothers}:] Decoupled / Collective Jacobi and red-black Gauss-Seidel (RB-GS), block Jacobi with rectangular blocks up to a maximum number of six terms~\cite{trottenberg2000multigrid}.
 	\item[\textbf{Restriction}:] Full-weighting restriction.
 	\item[\textbf{Prolongation}:] Bilinear interpolation.
 	\item[\textbf{Relaxation factors}:] $\omega \in \left( 0.1 + 0.05i \right)_{i = 0}^{36} = \left(0.1, 0.15, 0.2, \dots, 1.9 \right)$
-	\item[\textbf{Coarse-grid solver}:] Conjugate gradient method for $l = l_{max} - 4$.
+	\item[\textbf{Coarse-grid solver}:] Conjugate gradient method, in case $l = l_{max} - 4$.
 \end{description}
-Here, we generate block Jacobi smoothers by defining a splitting $A = L + D + U$ where $D$ is a block diagonal matrix of the form
+Here we generate block Jacobi smoothers by defining a splitting $A = L + D + U$ where $D$ is a block diagonal matrix of the form
 \begin{equation*}
 	D = 
 		\begin{pmatrix}A_{11}&0&\cdots &0\\
@@ -169,22 +172,22 @@ Here, we generate block Jacobi smoothers by defining a splitting $A = L + D + U$
 			\vdots &\vdots &\ddots &\vdots \\0&0&\cdots &A_{mm}\end{pmatrix},
 \end{equation*}
 where each matrix $A_{ij}$ corresponds to a set of adjacent grid points contained in the respective rectangular block, as it has been discussed in Section~\ref{subsec:block-smoothing}.
-A more detailed treatment of block relaxation methods can be found in~\cite{trottenberg2000multigrid}.
+A more detailed treatment of block smoothers can be found in~\cite{trottenberg2000multigrid}.
 For each smoothing and coarse-grid correction step, the relaxation factor $\omega$ can be chosen from the above interval.
 As a baseline for assessing the efficiency and generalizability of the designed multigrid solvers, we consider a number of common multigrid cycles with RB-GS smoothing and optimized relaxation factors.
-We, therefore, formulate these methods on the same five-grid hierarchy using the same restriction, prolongation operators, and coarse-grid solver.
+We thus formulate these methods on the same five-grid hierarchy using the same restriction, prolongation operators, and coarse-grid solver.
 In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
 
 \subsection{Experimental Settings and Evaluation Platform}
 \label{sec:optimization-settings}
 After specifying the operator and parameter choices considered within the construction of each multigrid solver, we next describe the settings under which we perform each experiment.
-Here, we utilize the EvoStencils framework, whose implementation has been described in detail in Chapter~\ref{chapter:evostencils-1} and~\ref{chapter:evostencils-2}.
+Here we utilize the EvoStencils framework, whose implementation has been described in detail in Chapter~\ref{chapter:evostencils-1} and~\ref{chapter:evostencils-2}.
 The goal of each experiment is to evolve a set of non-dominated individuals according to the two objectives convergence factor $\rho$ and execution time per iteration $t$, as described in Section~\ref{sec:fitness-evaluation-and-selection}, which are evaluated by applying each multigrid cycle as an iterative solver to the respective test problem.
 The resulting individuals are then subject to a subsequent evaluation and comparison with the available reference methods. 
 Table~\ref{table:gp-parameters} gives an overview of the algorithmic configuration used within each experiment.
 \begin{table}
 	\centering
-	\caption{Summary of G3P configuration parameters.}
+	\caption{Summary of the G3P configuration parameters}
 	\label{table:gp-parameters}
 	\begin{tabular}{l c}
 		\toprule
@@ -218,22 +221,23 @@ Table~\ref{table:gp-parameters} gives an overview of the algorithmic configurati
 		\bottomrule
 	\end{tabular}
 \end{table}
-Within each run, starting with a randomly generated population of 2048 individuals, we perform an evolutionary search for 250 generations.
+In each run, we perform an evolutionary search for 250 generations starting with a randomly generated population of 2048 individuals.
 In each generation, we create new individuals by first selecting $\lambda = 256$ candidates from the current population.
-We then apply mutation and crossover to each pair of selected candidates to create two child individuals, whereby the crossover probability is set to $2/3$, and in case of mutation, we choose a terminal symbol with a probability of $1/3$.
+We then apply mutation and crossover to each pair of selected candidates to create two child individuals, whereby the crossover probability is set to $2/3$, and in the case of mutation, we choose a terminal symbol with a probability of $1/3$.
 As a mutation operator, we employ subtree insertion whenever possible. Otherwise, the respective subtree is completely replaced by a randomly-created one, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
 The resulting individuals are then evaluated according to the two objectives by generating a parallel C++ solver implementation using the ExaStencils framework, which is applied to the respective problem as described above.
 Hereby we distribute the evaluation of all 256 individuals to 64 MPI processes, such that each process is responsible for the evaluation of four individuals.
-The resulting fitness values are distributed to all 64 processes, such that each of them possesses an identical copy of each child individual together with its fitness value, as it has been described in Chapter~\ref{sec:distributed-parallelization}.
+The resulting fitness values are distributed to all 64 processes, such that they possess an identical copy of each child individual together with its fitness value, as it has been described in Chapter~\ref{sec:distributed-parallelization}.
 Finally, we select $\mu = 256$ individuals as a population for the next generation from the combined set of parent and child individuals using the NSGA-II non-dominated sorting procedure~\cite{deb2002fast}.
 
-As an evaluation platform for running each experiment, we employ 32 nodes of the Meggie compute cluster of the Erlangen National High-Performance Computing Center (NHR), where each node of the system consists of two sockets, each with ten physical CPU cores.
-Therefore, each process is pinned and executed on a dedicated socket, while for the evaluation of each solver, we employ a thread-based parallelization using ten OpenMP threads, whereby each tread is pinned to a distinct physical compute core on the respective socket.
-For the parallelization of each nested loop, we employ static scheduling based on the outer-loop range, such that each thread processes a consecutive chunk of iterations.
-To generate a thread-parallel executable for each solver, we employ the GCC 9.3.0 compiler with the -O3 optimization level.
+As an evaluation platform for running each experiment, we employ 32 nodes of the Meggie compute cluster of the Erlangen National High-Performance Computing Center (NHR), where each node of the system consists of two sockets with ten physical CPU cores.
+Each process is thus pinned and executed on a dedicated socket. 
+For the evaluation of each solver, we employ a thread-based parallelization using ten OpenMP threads, whereby each tread is pinned to a distinct physical compute core on the respective socket.
+For the parallelization of each nested loop within the generated solver implementation, we employ static scheduling based on the outer-loop range, such that each thread processes a consecutive chunk of iterations.
+To generate a thread-parallel executable of each solver, we employ the GCC 9.3.0 compiler with the -O3 optimization level.
 To reduce statistical variations between individual evaluation runs, we execute each solver three times and then compute the average for both objectives.
 
-\subsection{Algorithm Behavior Analysis}
+\subsection{Analysis of the Evolutionary Algorithm}
 \label{sec:experiments1-algorithm-behavior-analysis}
 As a first step towards a quantitative evaluation of our evolutionary program synthesis method, we assess whether our algorithm is able to effectively find good solutions with respect to our two optimization objectives.
 For this purpose, we measure the minimum of each of the two objectives within the population throughout each of the ten experiments for all three test problems.
@@ -253,7 +257,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:poisson-2D-minimum-execution-time}
 	\end{subfigure}
-	\caption{2D Poisson - Mean and standard deviation of the minimum objective function values during the optimization.}
+	\caption{2D Poisson -- Mean and standard deviation of the minimum objective function values during the optimization.}
 	\label{fig:poisson-2D-minimum-objectives}
 \end{figure}
 \begin{figure}
@@ -271,7 +275,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:poisson-3D-minimum-execution-time}
 	\end{subfigure}
-	\caption{3D Poisson - Mean and standard deviation of the minimum objective function values during the optimization.}
+	\caption{3D Poisson -- Mean and standard deviation of the minimum objective function values during the optimization.}
 	\label{fig:poisson-3D-minimum-objectives}
 \end{figure}
 \begin{figure}
@@ -289,7 +293,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:linear-elasticity-2D-minimum-execution-time}
 	\end{subfigure}
-	\caption{2D Linear Elasticity - Mean and standard deviation of the minimum objective function values during the optimization.}
+	\caption{2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values during the optimization.}
 	\label{fig:linear-elasticity-2D-minimum-objectives}
 \end{figure}
 First of all, we can conclude that in all three cases, our algorithm is able to quickly reduce the minimum value of both objectives within the population.
@@ -297,42 +301,45 @@ If we compare the slope of the two objectives for the three different problems, 
 However, the algorithm still significantly improves upon the current minimum of $\rho$ beyond the first 50 generations, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor},~\ref{fig:poisson-3D-minimum-convergence-factor} and~\ref{fig:linear-elasticity-2D-minimum-convergence-factor}.
 For the second objective $t$, the majority of improvement happens within the first 50--70 generations, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}.
 Note that while the convergence factor is constant for each execution of the same solver, $t$ is obtained by measuring its execution time on the respective compute node.
-Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive optimization runs.
+Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive runs.
 Consequently, even though the algorithm is able to reduce the second objective faster, this effect induces a larger deviation between the individual experiments and, thus, an overall higher standard deviation.
 
-Furthermore, by considering the absolute value of the minimum convergence factor attained in each of the three different cases, we can assess the difficulty of the underlying problem.
+As a next step, we can assess the difficulty of the underlying problem by considering the absolute value of the minimum convergence factor attained in each of the three different cases.
 While the execution time per iteration $t$ is solely determined by the computational complexity of each solver and the properties of the given computer architecture, a smaller convergence factor indicates that the underlying problem is easier to solve.
 Poisson's equation represents an often-studied model problem whose strong ellipticity enables its easy solution by multigrid~\cite{trottenberg2000multigrid}.
 As a consequence, our method consistently discovers multigrid methods that achieve fast convergence, with minimum convergence factors of less than 0.005, for both the two and three-dimensional instances of this equation, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor} and~\ref{fig:poisson-3D-minimum-convergence-factor}.
-In the case of the linear elastic boundary value problem, both the mean and standard deviation remain higher for the first objective throughout each experiment.
-However, on average, our method is still able to discover multigrid methods that achieve a convergence factor of 0.01 or less, which equates to outstandingly fast convergence.
+In the case of the linear elastic boundary value problem, both the mean and standard deviation of the first objective remains higher throughout each experiment.
+However, on average, our method is still able to discover multigrid methods that achieve a convergence factor of 0.01 or less, leading to extremely quick convergence.
 In summary, we can conclude that our evolutionary program synthesis method consistently yields multigrid cycles that represent satisfactory minima for both objectives in all three test cases considered.
 
 To further analyze the behavior of our multi-objective evolutionary algorithm, we consider the distribution of non-dominated individuals at the end of all experiments, which is shown in Figure~\ref{fig:pareto-front-2D-poisson},~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity}.
 \begin{figure}
-	\includegraphics[width=\columnwidth]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
-	\caption{2D Poisson - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+\centering
+	\includegraphics[scale=0.7]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
+	\caption{2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-poisson}
 \end{figure}
 \begin{figure}
-	\includegraphics[width=\columnwidth]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
-	\caption{3D Poisson - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+\centering
+\includegraphics[scale=0.7]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
+	\caption{3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-3D-poisson}
 \end{figure}
 \begin{figure}
-	\includegraphics[width=\columnwidth]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
-	\caption{2D Linear Elasticity - Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+\centering
+\includegraphics[scale=0.7]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
+	\caption{2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-linear-elasticity}
 \end{figure}
-Here the red line denotes the combined front, while the color density of the distribution indicates where most of the solutions are located at the end of all experiments. 
-In all three cases, the majority of non-dominated solutions obtained within each experiment can be found close to the combined front.
-While in Figure~\ref{fig:pareto-front-2D-poisson}, the number of solutions that are distinctly located outside of the front is slightly higher than in the other two cases, their distance to the red line is still comparably small compared to the complete objective space.
+Here the red line denotes the combined front, while the color density of the distribution indicates where most of the individuals are located at the end of all experiments. 
+In all three cases, the majority of non-dominated individuals obtained within each experiment can be found close to the combined front.
+While in Figure~\ref{fig:pareto-front-2D-poisson}, the number of individuals that are distinctly located outside of the front is slightly higher than in the other two cases, their distance to the red line is still comparably small compared to the complete objective space.
 Again we can attribute part of this effect to variations in the execution time on different compute nodes.
-Furthermore, note that throughout most of the objective space, but especially in the center, the solutions are evenly distributed alongside the front.
-Here only the left-upper part of Figure~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity} represents a noteworthy exception, where our approach struggles to discover the same solutions within each experiment.
-An explanation for this effect is that the solutions located in this part of the space are characterized by an extremely fast convergence.
-Since the convergence of a multigrid method can primarily be accelerated with the addition of smoothing and coarse-grid correction steps, discovering the same non-dominated solutions with fast convergence requires us to construct the same large expressions starting from different random initializations.
-Recently, the impaired capabilities of NSGA-II to evolve large non-dominated expressions have been demonstrated in~\cite{liu2022evolvability}, which similarly explains why our implementation struggles to consistently discover the same fast-converging solutions.
+In the majority of the objective space, but especially in its center, the individuals are evenly distributed alongside the front.
+Here only the left-upper part of Figure~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity} represents a noteworthy exception, where our approach struggles to discover the same individuals within each experiment.
+An explanation for this effect is that the individuals located in this part of the space are characterized by an extremely fast convergence.
+Since the convergence of a multigrid method can primarily be accelerated with the addition of smoothing and coarse-grid correction steps, discovering the same non-dominated individuals with fast convergence requires us to construct the same large expressions starting from different random initializations.
+Recently, the impaired capabilities of NSGA-II to evolve large non-dominated expressions have been analyzed in~\cite{liu2022evolvability}, which similarly explains why our implementation struggles to discover the same fast-converging solvers consistently.
 
 \subsection{Comparison with Reference Methods}
 Finally, in order to investigate whether our evolutionary program synthesis method yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
@@ -543,7 +550,7 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 \end{table}
 In general, we can conclude that in all three cases, our evolutionary program synthesis method was consistently able to discover well-functioning multigrid methods, leading to fast solving times for both problem sizes.
 Furthermore, in the case of the two-dimensional Poisson equation and linear elasticity, our approach yields multigrid methods that achieve an even higher error reduction efficiency than the best reference cycle.
-Here, the fastest discovered method for the two-dimensional Poisson equation, ES-10, leads to a $9 \%$ solving time improvement compared to the V(2,2)-cycle on both architectures, while for linear elasticity the ES-2 method achieves an even larger speedup of 17--27 \% compared to the V(3,3)-cycle.
+Here the fastest discovered method for the two-dimensional Poisson equation, ES-10, leads to a $9 \%$ solving time improvement compared to the V(2,2)-cycle on both architectures, while for linear elasticity the ES-2 method achieves an even larger speedup of 17--27 \% compared to the V(3,3)-cycle.
 %Interestingly, in contrast to the other two cases, for the two-dimensional Poisson equation, all solvers achieve faster execution times on the older Ivy Bridge computer architecture.
 %Further investigating this phenomenon would require us to perform an in-depth analysis of the generated code.
 %However, since our focus is a comparison of the relative performance of different multigrid methods on the same architecture, we have not yet performed such an analysis.
@@ -1009,13 +1016,13 @@ All three discovered multigrid methods included in Figure~\ref{fig:helmholtz-sol
 In particular, the overall best preconditioner EP-5 leads to a consistent improvement of 20 \% to the V(0,1) cycle.
 
 Next, we need to address the question of why our evolutionary program synthesis did not consistently discover multigrid-based preconditioners that achieve the same degree of efficiency and generalizability in each experiment.
-For this purpose, we again consider the space of non-dominated solutions at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
+For this purpose, we again consider the space of non-dominated individuals at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
 \begin{figure}
 	\includegraphics[width=\textwidth]{figures/pareto-front.pdf}
-	\caption{Distribution of non-dominated solutions at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
+	\caption{Distribution of non-dominated individuals at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
 	\label{fig:pareto-front-helmholtz}
 \end{figure}
-First of all, note that the number of non-dominated solutions is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
+First of all, note that the number of non-dominated individuals is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}.
 However, this is clearly expected due to the smaller population size, which is only half as large as in our previous experiments.
 Furthermore, as we iteratively increase the problem size and difficulty, the algorithm is forced to adapt the current population to the new characteristics of the problem within only 50 generations, which increases the difficulty of evolving the same number of non-dominated individuals. 
 However, despite this fact, our evolutionary algorithm achieves a high degree of consistency in finding individuals that are located on the right half of the objective function space.
