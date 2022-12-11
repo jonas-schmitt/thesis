@@ -357,7 +357,7 @@
   date		= {2000}
 }
 
-@Misc{		  co2021evolving,
+@Article{		  co2021evolving,
   title		= {Evolving Reinforcement Learning Algorithms},
   url		= {http://arxiv.org/abs/2101.03958},
   abstract	= {We propose a method for meta-learning reinforcement
@@ -826,7 +826,7 @@
   langid	= {english}
 }
 
-@Misc{		  frazier2018tutorial,
+@Article{		  frazier2018tutorial,
   title		= {A Tutorial on Bayesian Optimization},
   url		= {http://arxiv.org/abs/1807.02811},
   abstract	= {Bayesian optimization is an approach to optimizing
@@ -1194,32 +1194,19 @@
 
 
 @Article{	  hsieh2019learning,
-  title		= {Learning Neural {PDE} Solvers with Convergence
-		  Guarantees},
-  rights	= {{arXiv}.org perpetual, non-exclusive license},
-  url		= {https://arxiv.org/abs/1906.01200},
-  doi		= {10.48550/ARXIV.1906.01200},
-  abstract	= {Partial differential equations ({PDEs}) are widely used
-		  across the physical and computational sciences. Decades of
-		  research and engineering went into designing fast iterative
-		  solution methods. Existing solvers are general purpose, but
-		  may be sub-optimal for specific classes of problems. In
-		  contrast to existing hand-crafted solutions, we propose an
-		  approach to learn a fast iterative solver tailored to a
-		  specific domain. We achieve this goal by learning to modify
-		  the updates of an existing solver using a deep neural
-		  network. Crucially, our approach is proven to preserve
-		  strong correctness and convergence guarantees. After
-		  training on a single geometry, our model generalizes to a
-		  wide variety of geometries and boundary conditions, and
-		  achieves 2-3 times speedup compared to state-of-the-art
-		  solvers.},
-  author	= {Hsieh, Jun-Ting and Zhao, Shengjia and Eismann, Stephan
-		  and Mirabella, Lucia and Ermon, Stefano},
-  urldate	= {2022-12-02},
-  date		= {2019},
-  note		= {Publisher: {arXiv} Version Number: 1}
+	title = {Learning Neural {PDE} Solvers with Convergence Guarantees},
+	url = {http://arxiv.org/abs/1906.01200},
+	abstract = {Partial differential equations ({PDEs}) are widely used across the physical and computational sciences. Decades of research and engineering went into designing fast iterative solution methods. Existing solvers are general purpose, but may be sub-optimal for specific classes of problems. In contrast to existing hand-crafted solutions, we propose an approach to learn a fast iterative solver tailored to a specific domain. We achieve this goal by learning to modify the updates of an existing solver using a deep neural network. Crucially, our approach is proven to preserve strong correctness and convergence guarantees. After training on a single geometry, our model generalizes to a wide variety of geometries and boundary conditions, and achieves 2-3 times speedup compared to state-of-the-art solvers.},
+	number = {{arXiv}:1906.01200},
+	publisher = {{arXiv}},
+	author = {Hsieh, Jun-Ting and Zhao, Shengjia and Eismann, Stephan and Mirabella, Lucia and Ermon, Stefano},
+	urldate = {2022-12-11},
+	date = {2019-06-04},
+	eprinttype = {arxiv},
+	eprint = {1906.01200 [cs, stat]},
+	keywords = {Mathematics - Numerical Analysis, Statistics - Computation, Statistics - Machine Learning},
 }
+
 
 @Article{	  huang2021learning,
   title		= {Learning Optimal Multigrid Smoothers via Neural Networks},
@@ -1451,41 +1438,17 @@
 }
 
 @Article{	  kharazmi2019variational,
-  title		= {Variational Physics-Informed Neural Networks For Solving
-		  Partial Differential Equations},
-  rights	= {{arXiv}.org perpetual, non-exclusive license},
-  url		= {https://arxiv.org/abs/1912.00873},
-  doi		= {10.48550/ARXIV.1912.00873},
-  abstract	= {Physics-informed neural networks ({PINNs}) [31] use
-		  automatic differentiation to solve partial differential
-		  equations ({PDEs}) by penalizing the {PDE} in the loss
-		  function at a random set of points in the domain of
-		  interest. Here, we develop a Petrov-Galerkin version of
-		  {PINNs} based on the nonlinear approximation of deep neural
-		  networks ({DNNs}) by selecting the \{{\textbackslash}em
-		  trial space\} to be the space of neural networks and the
-		  \{{\textbackslash}em test space\} to be the space of
-		  Legendre polynomials. We formulate the
-		  {\textbackslash}textit\{variational residual\} of the {PDE}
-		  using the {DNN} approximation by incorporating the
-		  variational form of the problem into the loss function of
-		  the network and construct a
-		  {\textbackslash}textit\{variational physics-informed neural
-		  network\} ({VPINN}). By integrating by parts the integrand
-		  in the variational form, we lower the order of the
-		  differential operators represented by the neural networks,
-		  hence effectively reducing the training cost in {VPINNs}
-		  while increasing their accuracy compared to {PINNs} that
-		  essentially employ delta test functions. For shallow
-		  networks with one hidden layer, we analytically obtain
-		  explicit forms of the {\textbackslash}textit\{variational
-		  residual\}. We demonstrate the performance of the new
-		  formulation for several examples that show clear advantages
-		  of {VPINNs} over {PINNs} in terms of both accuracy and speed.},
-  author	= {Kharazmi, E. and Zhang, Z. and Karniadakis, G. E.},
-  urldate	= {2022-12-10},
-  date		= {2019},
-  note		= {Publisher: {arXiv} Version Number: 1}
+	title = {Variational Physics-Informed Neural Networks For Solving Partial Differential Equations},
+	url = {http://arxiv.org/abs/1912.00873},
+	abstract = {Physics-informed neural networks ({PINNs}) [31] use automatic differentiation to solve partial differential equations ({PDEs}) by penalizing the {PDE} in the loss function at a random set of points in the domain of interest. Here, we develop a Petrov-Galerkin version of {PINNs} based on the nonlinear approximation of deep neural networks ({DNNs}) by selecting the \{{\textbackslash}em trial space\} to be the space of neural networks and the \{{\textbackslash}em test space\} to be the space of Legendre polynomials. We formulate the {\textbackslash}textit\{variational residual\} of the {PDE} using the {DNN} approximation by incorporating the variational form of the problem into the loss function of the network and construct a {\textbackslash}textit\{variational physics-informed neural network\} ({VPINN}). By integrating by parts the integrand in the variational form, we lower the order of the differential operators represented by the neural networks, hence effectively reducing the training cost in {VPINNs} while increasing their accuracy compared to {PINNs} that essentially employ delta test functions. For shallow networks with one hidden layer, we analytically obtain explicit forms of the {\textbackslash}textit\{variational residual\}. We demonstrate the performance of the new formulation for several examples that show clear advantages of {VPINNs} over {PINNs} in terms of both accuracy and speed.},
+	number = {{arXiv}:1912.00873},
+	publisher = {{arXiv}},
+	author = {Kharazmi, E. and Zhang, Z. and Karniadakis, G. E.},
+	urldate = {2022-12-11},
+	date = {2019-11-27},
+	eprinttype = {arxiv},
+	eprint = {1912.00873 [physics, stat]},
+	keywords = {Mathematics - Numerical Analysis, Statistics - Machine Learning, Computer Science - Machine Learning, Computer Science - Neural and Evolutionary Computing, Physics - Computational Physics},
 }
 
 @Article{	  kharazmi2021hp,
@@ -1730,85 +1693,31 @@
 }
 
 @Article{	  li2020fourier,
-  title		= {Fourier Neural Operator for Parametric Partial
-		  Differential Equations},
-  rights	= {{arXiv}.org perpetual, non-exclusive license},
-  url		= {https://arxiv.org/abs/2010.08895},
-  doi		= {10.48550/ARXIV.2010.08895},
-  abstract	= {The classical development of neural networks has primarily
-		  focused on learning mappings between finite-dimensional
-		  Euclidean spaces. Recently, this has been generalized to
-		  neural operators that learn mappings between function
-		  spaces. For partial differential equations ({PDEs}), neural
-		  operators directly learn the mapping from any functional
-		  parametric dependence to the solution. Thus, they learn an
-		  entire family of {PDEs}, in contrast to classical methods
-		  which solve one instance of the equation. In this work, we
-		  formulate a new neural operator by parameterizing the
-		  integral kernel directly in Fourier space, allowing for an
-		  expressive and efficient architecture. We perform
-		  experiments on Burgers' equation, Darcy flow, and
-		  Navier-Stokes equation. The Fourier neural operator is the
-		  first {ML}-based method to successfully model turbulent
-		  flows with zero-shot super-resolution. It is up to three
-		  orders of magnitude faster compared to traditional {PDE}
-		  solvers. Additionally, it achieves superior accuracy
-		  compared to previous learning-based solvers under fixed
-		  resolution.},
-  author	= {Li, Zongyi and Kovachki, Nikola and Azizzadenesheli,
-		  Kamyar and Liu, Burigede and Bhattacharya, Kaushik and
-		  Stuart, Andrew and Anandkumar, Anima},
-  urldate	= {2022-12-02},
-  date		= {2020},
-  note		= {Publisher: {arXiv} Version Number: 3}
+	title = {Fourier Neural Operator for Parametric Partial Differential Equations},
+	url = {http://arxiv.org/abs/2010.08895},
+	abstract = {The classical development of neural networks has primarily focused on learning mappings between finite-dimensional Euclidean spaces. Recently, this has been generalized to neural operators that learn mappings between function spaces. For partial differential equations ({PDEs}), neural operators directly learn the mapping from any functional parametric dependence to the solution. Thus, they learn an entire family of {PDEs}, in contrast to classical methods which solve one instance of the equation. In this work, we formulate a new neural operator by parameterizing the integral kernel directly in Fourier space, allowing for an expressive and efficient architecture. We perform experiments on Burgers' equation, Darcy flow, and Navier-Stokes equation. The Fourier neural operator is the first {ML}-based method to successfully model turbulent flows with zero-shot super-resolution. It is up to three orders of magnitude faster compared to traditional {PDE} solvers. Additionally, it achieves superior accuracy compared to previous learning-based solvers under fixed resolution.},
+	number = {{arXiv}:2010.08895},
+	publisher = {{arXiv}},
+	author = {Li, Zongyi and Kovachki, Nikola and Azizzadenesheli, Kamyar and Liu, Burigede and Bhattacharya, Kaushik and Stuart, Andrew and Anandkumar, Anima},
+	urldate = {2022-12-11},
+	date = {2021-05-16},
+	eprinttype = {arxiv},
+	eprint = {2010.08895 [cs, math]},
+	keywords = {Mathematics - Numerical Analysis, Computer Science - Machine Learning},
 }
 
 @Article{	  li2021physics,
-  title		= {Physics-Informed Neural Operator for Learning Partial
-		  Differential Equations},
-  rights	= {{arXiv}.org perpetual, non-exclusive license},
-  url		= {https://arxiv.org/abs/2111.03794},
-  doi		= {10.48550/ARXIV.2111.03794},
-  abstract	= {In this paper, we propose physics-informed neural
-		  operators ({PINO}) that uses available data and/or physics
-		  constraints to learn the solution operator of a family of
-		  parametric Partial Differential Equation ({PDE}). This
-		  hybrid approach allows {PINO} to overcome the limitations
-		  of purely data-driven and physics-based methods. For
-		  instance, data-driven methods fail to learn when data is of
-		  limited quantity and/or quality, and physics-based
-		  approaches fail to optimize on challenging {PDE}
-		  constraints. By combining both data and {PDE} constraints,
-		  {PINO} overcomes all these challenges. Additionally, a
-		  unique property that {PINO} enjoys over other hybrid
-		  learning methods is its ability to incorporate data and
-		  {PDE} constraints at different resolutions. This allows us
-		  to combine coarse-resolution data, which is inexpensive to
-		  obtain from numerical solvers, with higher resolution {PDE}
-		  constraints, and the resulting {PINO} has no degradation in
-		  accuracy even on high-resolution test instances. This
-		  discretization-invariance property in {PINO} is due to
-		  neural-operator framework which learns mappings between
-		  function spaces and allows evaluation at different
-		  resolutions without the need for re-training. Moreover,
-		  {PINO} succeeds in the purely physics setting, where no
-		  data is available, while other approaches such as the
-		  Physics-Informed Neural Network ({PINN}) fail due to
-		  optimization challenges, e.g. in multi-scale dynamic
-		  systems such as Kolmogorov flows. This is because {PINO}
-		  learns the solution operator by optimizing {PDE}
-		  constraints on multiple instances while {PINN} optimizes
-		  {PDE} constraints of a single {PDE} instance. Further, in
-		  {PINO}, we incorporate the Fourier neural operator ({FNO})
-		  architecture which achieves orders-of-magnitude speedup
-		  over numerical solvers and also allows us to compute
-		  explicit gradients on function spaces efficiently.},
-  author	= {Li, Zongyi and Zheng, Hongkai and Kovachki, Nikola and
-		  Jin, David and Chen, Haoxuan and Liu, Burigede and
-		  Azizzadenesheli, Kamyar and Anandkumar, Anima},
-  urldate	= {2022-12-10},
-  date		= {2021},
-  note		= {Publisher: {arXiv} Version Number: 2}
+	title = {Physics-Informed Neural Operator for Learning Partial Differential Equations},
+	url = {http://arxiv.org/abs/2111.03794},
+	abstract = {In this paper, we propose physics-informed neural operators ({PINO}) that uses available data and/or physics constraints to learn the solution operator of a family of parametric Partial Differential Equation ({PDE}). This hybrid approach allows {PINO} to overcome the limitations of purely data-driven and physics-based methods. For instance, data-driven methods fail to learn when data is of limited quantity and/or quality, and physics-based approaches fail to optimize on challenging {PDE} constraints. By combining both data and {PDE} constraints, {PINO} overcomes all these challenges. Additionally, a unique property that {PINO} enjoys over other hybrid learning methods is its ability to incorporate data and {PDE} constraints at different resolutions. This allows us to combine coarse-resolution data, which is inexpensive to obtain from numerical solvers, with higher resolution {PDE} constraints, and the resulting {PINO} has no degradation in accuracy even on high-resolution test instances. This discretization-invariance property in {PINO} is due to neural-operator framework which learns mappings between function spaces and allows evaluation at different resolutions without the need for re-training. Moreover, {PINO} succeeds in the purely physics setting, where no data is available, while other approaches such as the Physics-Informed Neural Network ({PINN}) fail due to optimization challenges, e.g. in multi-scale dynamic systems such as Kolmogorov flows. This is because {PINO} learns the solution operator by optimizing {PDE} constraints on multiple instances while {PINN} optimizes {PDE} constraints of a single {PDE} instance. Further, in {PINO}, we incorporate the Fourier neural operator ({FNO}) architecture which achieves orders-of-magnitude speedup over numerical solvers and also allows us to compute explicit gradients on function spaces efficiently.},
+	number = {{arXiv}:2111.03794},
+	publisher = {{arXiv}},
+	author = {Li, Zongyi and Zheng, Hongkai and Kovachki, Nikola and Jin, David and Chen, Haoxuan and Liu, Burigede and Azizzadenesheli, Kamyar and Anandkumar, Anima},
+	urldate = {2022-12-11},
+	date = {2022-11-13},
+	eprinttype = {arxiv},
+	eprint = {2111.03794 [cs, math]},
+	keywords = {Mathematics - Numerical Analysis, Computer Science - Machine Learning},
 }
 
 @Book{		  linz2006introduction,
@@ -2244,7 +2153,7 @@
   date		= {2020}
 }
 
-@Misc{		  pfaff2020learning,
+@Article{		  pfaff2020learning,
   title		= {Learning Mesh-Based Simulation with Graph Networks},
   url		= {http://arxiv.org/abs/2010.03409},
   abstract	= {Mesh-based simulations are central to modeling complex
@@ -2432,7 +2341,7 @@
   date		= {2020-07-13}
 }
 
-@Misc{		  reed2022generalist,
+@Article{		  reed2022generalist,
   title		= {A Generalist Agent},
   url		= {http://arxiv.org/abs/2205.06175},
   abstract	= {Inspired by progress in large-scale language modeling, we
@@ -2522,23 +2431,17 @@
 }
 
 @Article{	  rodrigo2017validity,
-  title		= {On the validity of the local Fourier analysis},
-  rights	= {{arXiv}.org perpetual, non-exclusive license},
-  url		= {https://arxiv.org/abs/1710.00408},
-  doi		= {10.48550/ARXIV.1710.00408},
-  abstract	= {Local Fourier analysis ({LFA}) is a useful tool in
-		  predicting the convergence factors of geometric multigrid
-		  methods ({GMG}). As is well known, on rectangular domains
-		  with periodic boundary conditions this analysis gives the
-		  exact convergence factors of such methods. In this work,
-		  using the Fourier method, we extend these results by
-		  proving that such analysis yields the exact convergence
-		  factors for a wider class of problems.},
-  author	= {Rodrigo, Carmen and Gaspar, Francisco J. and Zikatanov,
-		  Ludmil T.},
-  urldate	= {2022-12-10},
-  date		= {2017},
-  note		= {Publisher: {arXiv} Version Number: 2}
+	title = {On the validity of the local Fourier analysis},
+	url = {http://arxiv.org/abs/1710.00408},
+	abstract = {Local Fourier analysis ({LFA}) is a useful tool in predicting the convergence factors of geometric multigrid methods ({GMG}). As is well known, on rectangular domains with periodic boundary conditions this analysis gives the exact convergence factors of such methods. In this work, using the Fourier method, we extend these results by proving that such analysis yields the exact convergence factors for a wider class of problems.},
+	number = {{arXiv}:1710.00408},
+	publisher = {{arXiv}},
+	author = {Rodrigo, Carmen and Gaspar, Francisco J. and Zikatanov, Ludmil T.},
+	urldate = {2022-12-11},
+	date = {2017-10-07},
+	eprinttype = {arxiv},
+	eprint = {1710.00408 [math]},
+	keywords = {Mathematics - Numerical Analysis},
 }
 
 @collection{ryan2018handbook,
@@ -2705,7 +2608,7 @@
   langid	= {english}
 }
 
-@Misc{		  schrodi2022towards,
+@Article{		  schrodi2022towards,
   title		= {Towards Discovering Neural Architectures from Scratch},
   url		= {http://arxiv.org/abs/2211.01842},
   abstract	= {The discovery of neural architectures from scratch is the
