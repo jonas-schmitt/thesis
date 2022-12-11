@@ -2,10 +2,9 @@ import random
 from inspect import isclass
 
 def generate(pset, min_height, max_height, condition, return_type=None, subtree=None):
-    if return_type is None:
+    type_ = return_type
+    if type_ is None:
         type_ = pset.ret
-    else:
-        type_ = return_type
     expression = []
     height = random.randint(min_height, max_height)
     stack = [(0, type_)]
