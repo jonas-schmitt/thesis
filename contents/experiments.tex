@@ -342,18 +342,18 @@ Since the convergence of a multigrid method can primarily be accelerated with th
 Recently, the impaired capabilities of NSGA-II to evolve large non-dominated expressions have been analyzed in~\cite{liu2022evolvability}, which similarly explains why our implementation struggles to discover the same fast-converging solvers consistently.
 
 \subsection{Comparison with Reference Methods}
-Finally, in order to investigate whether our evolutionary program synthesis method yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
-In both cases, each compute node consists of two sockets with 20 physical CPU cores and a cache-coherent NUMA architecture.
-In order to assess the solving speed of the methods evolved, we consider two different problem sizes for each of the three test cases.
-While in the first case, a problem size identical to the one employed within the evolutionary search is chosen, in the second case, we obtain a larger one by doubling the number of grid points in each dimension.
+Finally, in order to investigate whether our evolutionary program synthesis approach yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
+In both cases each compute node consists of two sockets with 20 physical CPU cores and a cache-coherent NUMA architecture.
+In order to assess the solving speed of the discovered methods, we consider two different problem sizes for each of the three test cases.
+While in the first case, the problem size is identical to the one employed within our evolutionary algorithm, in the second case, we consider a larger problem instance by doubling the number of grid points in each dimension.
 To measure the solving speed of each method, we execute it on a dedicated node using a thread-based parallelization with 20 OpenMP threads, whereby we pin each thread to a unique physical core and employ the same parallelization approach as described in Section~\ref{sec:optimization-settings}.
-Even though the evaluation of generalizability is not the focus of this section, it is still worthwhile to investigate whether the methods discovered with our approach are capable of solving larger instances of the same problem.
-For comparison, we consider a number of different V-cycles with at most four RB-GS pre and post-smoothing steps.
+Even though generalizability is not the focus of this section, it is still worthwhile to investigate whether the methods discovered with our approach are capable of solving larger instances of the same problem.
+For comparison, we consider a number of different V-cycles with at most four RB-GS pre- and post-smoothing steps.
 With the exception of full-multigrid (FMG) methods, which require a different formulation than the one considered here, these cycles are known to be the fastest multigrid-based solvers for Poisson's equation~\cite{trottenberg2000multigrid}.
 As we have already investigated in~\cite{schmitt2020constructing}, the same is true for the linear elastic boundary value problem considered here.
-To achieve a fair comparison, we empirically choose the optimum relaxation factor $\omega$ for each test case from the same interval considered within our experiments, which leads to $\omega = 1.15$ for the two-dimensional Poisson equation and $\omega = 1.25$ both for the three-dimensional Poisson equation and the linear elastic boundary value problem.
-Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-methods} and~\ref{table:linear-elasticity-2D-reference-methods} contains the resulting solving times and the number of iterations required to achieve the desired defect reduction for the respective test case.
-Here, for instance, the abbreviation V(2,1) denotes a V-cycle with two pre and one post-smoothing step with RB-GS.
+To achieve a fair comparison, we determine the optimum relaxation factor $\omega$ for each test case from the same interval considered within our experiments, which leads to $\omega = 1.15$ for the two-dimensional Poisson equation and $\omega = 1.25$ both for the three-dimensional Poisson equation and the linear elastic boundary value problem.
+Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-methods} and~\ref{table:linear-elasticity-2D-reference-methods} contain the resulting solving times and the number of iterations required to achieve the desired defect reduction for each test case.
+Here, for instance, the abbreviation V(2,1) denotes a V-cycle with two pre- and one post-smoothing step of RB-GS.
 First of all, as we can expect from a functioning multigrid method, the number of iterations stays constant for both problem sizes, only with the exception of the V(1,0)-cycle, where we can observe a slight increase for the linear elastic boundary value problem.
 Overall, we can conclude that while the V(2,2)-cycle represents the fastest solver for both cases of Poisson's equation, the V(3,3) cycle leads to the fastest solving time for the linear elastic boundary value problem.
 \begin{table}
@@ -442,15 +442,15 @@ Overall, we can conclude that while the V(2,2)-cycle represents the fastest solv
 	\end{tabular}
 \end{table}
 
-Finally, we evaluate the multigrid methods obtained with our evolutionary program synthesis method in each of the ten experiments under the same conditions.
-As the number of non-dominated individuals within the population at the end of each experiment is unrestricted and can, therefore, be too high for a direct evaluation, we heuristically identify the 50 most promising individuals by sorting them according to the metric
-\begin{equation}
-	T_{\varepsilon} = \frac{\log(\varepsilon)}{\log(\rho)} \cdot t,
-\end{equation}
+Finally, we evaluate the multigrid methods obtained with our evolutionary program synthesis approach in each of the ten experiments under the same conditions.
+As the number of non-dominated individuals within the population at the end of each experiment is unrestricted and can thus be too large for a direct evaluation, we heuristically identify the 50 most promising individuals by sorting them according to the metric
+\begin{equation*}
+	T_{\varepsilon} = t \cdot \frac{\log(\varepsilon)}{\log(\rho)},
+\end{equation*}
 where $\varepsilon = 10^{-12}$ is the desired defect reduction factor and $\rho$ and $t$ the attained objective function values.
-Each of the resulting multigrid methods is then executed as a solver for the respective test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores, whereby we employ the same problem size as within each experiment.
-Note that while both the problem size and computer architecture are identical, increasing the number of CPU cores leads to a higher degree of parallelism and, thus, a smaller execution time per iteration.
-After we have identified the method that leads to the fastest solver in each case, we execute it on both problem sizes and evaluation platforms, as described above.
+The resulting multigrid methods are then executed as a solver for the respective test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores, whereby we employ the same problem size as within each experiment.
+Note that while both the problem size and the computer architecture is identical, increasing the number of CPU cores leads to a higher degree of parallelism, and thus a smaller execution time per iteration.
+After we have identified the multigrid method that leads to the fastest solver in each case, we execute it on both problem sizes and evaluation platforms, as described above.
 Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contain the resulting measured solving times for each case.
 \begin{table}
 	\caption{2D Poisson - Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
@@ -548,20 +548,20 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 		\bottomrule
 	\end{tabular}
 \end{table}
-In general, we can conclude that in all three cases, our evolutionary program synthesis method was consistently able to discover well-functioning multigrid methods, leading to fast solving times for both problem sizes.
+In general, we can conclude that in all three cases, our evolutionary algorithm was consistently able to discover well-functioning multigrid methods, leading to fast solving times for both problem sizes.
 Furthermore, in the case of the two-dimensional Poisson equation and linear elasticity, our approach yields multigrid methods that achieve an even higher error reduction efficiency than the best reference cycle.
-Here the fastest discovered method for the two-dimensional Poisson equation, ES-10, leads to a $9 \%$ solving time improvement compared to the V(2,2)-cycle on both architectures, while for linear elasticity the ES-2 method achieves an even larger speedup of 17--27 \% compared to the V(3,3)-cycle.
+Here the fastest discovered method for the two-dimensional Poisson equation, ES-10, leads to a $9 \%$ solving-time improvement compared to the V(2,2)-cycle on both architectures, while for linear elasticity the ES-2 method achieves an even larger speedup of 17--27 \% compared to the V(3,3)-cycle.
 %Interestingly, in contrast to the other two cases, for the two-dimensional Poisson equation, all solvers achieve faster execution times on the older Ivy Bridge computer architecture.
 %Further investigating this phenomenon would require us to perform an in-depth analysis of the generated code.
 %However, since our focus is a comparison of the relative performance of different multigrid methods on the same architecture, we have not yet performed such an analysis.
 While in the case of the three-dimensional Poisson, the methods discovered with our approach still represent competitive solvers, they are not able to achieve the same degree of efficiency in solving both problem sizes.
-In particular, with the exception of the ES-8 and ES-9 methods, we observe a slight increase in the number of iterations for the larger instance of this problem, which leads to a larger increase in the solving times compared to the reference cycles.
-This effect indicates that not all multigrid methods obtained for a particular instance of this test problem can be generalized to larger problem instances without further adaption.
+In particular, with the exception of the ES-8 and ES-9 methods, we observe a slight increase in the number of iterations for the larger instance of this problem, which leads to worse solving times compared to the reference cycles.
+This effect indicates that not all multigrid methods obtained for a particular instance of this test problem can be generalized to larger instances without further adaption.
 In Section~\ref{sec:generalization}, we have already addressed this issue by proposing a multigrid-specific generalization scheme, whose effectiveness will be investigated in the next section of this chapter.   
 %we have already presented an adapted version of our multi-objective evolutionary algorithm that aims to overcome these limitations by iteratively increasing the problem size during the search.
 %In the next section of this chapter, we will, thus, investigate the effectiveness of this approach on the indefinite Helmholtz equation, a problem of substantially higher difficulty than those considered within this section.
 
-To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} contains a graphical representation of the discovered multigrid method that achieves the fastest solving time for the larger problem instance of two and three-dimensional Poisson equation, respectively. 
+To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical-representation:2D} and~\ref{fig:evolved-methods-graphical-representation:3D} contain a graphical representation of the discovered multigrid method that achieves the fastest solving time for the larger problem instance of two and three-dimensional Poisson equation, respectively. 
 \begin{figure}
 	%2D Poisson
  \captionsetup[subfigure]{justification=centering}
@@ -682,17 +682,18 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
 The first observation that can be made from investigating the computational structure of these methods is that none of them can be clearly characterized as a V-, F- or W-cycle.
-It is, therefore, impossible to formulate each of them within the framework of classical multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
-While, for instance, the first part of Figure~\ref{fig:evolved-methods-graphical-representation:2D} can be characterized as a V-cycle, the method then proceeds with an additional coarse-grid correction step that is based on a purely smoothing-based error reduction on the coarser levels.
-Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts off in a similar fashion but then applies an additional three-grid V-cycle on the third-finest level with a step size of $4h$, before it transfers the computed correction back to the finest level.
-The analysis performed in the recent work by Avnat and Yavneh already suggests that employing cycles of non-classical structure can lead to a significantly higher degree of efficiency in solving certain PDEs~\cite{avnat2022recursive}. 
-However, in addition to their non-classical structure, both multigrid methods employ a different number of smoothings steps on each level using a wide range of different relaxation factors, whereby, in general, on certain levels, significantly more smoothing is performed than on others.
-In particular, smoothing on the third-finest level seems to be exceptionally effective in reducing the most significant error components, and hence, the number of smoothing steps on this level is higher than on any other level.
+It is, therefore, impossible to formulate them within the framework of classical multigrid cycles, as shown in Algorithm~\ref{alg:multigrid-cycle}.
+While, for instance, the first part of Figure~\ref{fig:evolved-methods-graphical-representation:2D} can be characterized as a V-cycle, the method proceeds with an additional coarse-grid correction step that is based on a purely smoothing-based error reduction on lower levels.
+Figure~\ref{fig:evolved-methods-graphical-representation:3D} starts off in a similar fashion but then applies an additional three-grid V-cycle on the third level with a step size of $4h$, before it transfers the computed correction back to the finest grid.
+An analysis performed in the recent work by Avnat and Yavneh already suggests that employing cycles of non-classical structure can lead to a significantly higher degree of efficiency in solving certain PDEs~\cite{avnat2022recursive}. 
+However, in addition to their non-classical structure, both multigrid methods discovered with our approach employ a different number of smoothing steps on each level using a wide range of different relaxation factors. 
+Moreover, significantly more smoothing is performed on certain levels.
+In particular, smoothing on the third level ($4h$) seems to be exceptionally effective in reducing the most significant error components, and hence, the number of smoothing steps on this level is larger than on any other level.
 While both methods predominantly employ RB-GS as a smoother, Figure~\ref{fig:evolved-methods-graphical-representation:3D} also includes individual pointwise and block Jacobi steps.
 Finally, the even more complicated computational structure of the methods discovered for the linear elastic boundary prevents us from including their graphical representations similar to Figure~\ref{fig:evolved-methods-graphical-representation}.
-However, if we consider the evolved method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the methods shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
-In particular, the method applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
-Furthermore, with the exception of a single Jacobi step on the second-coarsest level, the method employs exclusively RB-GS smoothing.
+However, if we consider the method ES-2, which leads to the fastest solving time for the larger instance of the linear elastic boundary value problem with $l_{max} = 11$, we can observe a number of structural similarities with the ones shown in Figure~\ref{fig:evolved-methods-graphical-representation}.
+In particular, ES-2 applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
+Furthermore, with the exception of a single Jacobi step on the second-coarsest level, it employs exclusively RB-GS smoothing.
 
 \section{Discovering Generalizable Multigrid-Based Preconditioners for the Helmholtz Equation}
 While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated design of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
@@ -909,13 +910,13 @@ However, since in the given case, we apply the same iterative solver to each pro
 For instance, a multigrid cycle that is able to compute an improved approximation of the solution of the preconditioning system, as given by Equation~\eqref{eq:helmholtz-test-problem-preconditioning}, reduces the number of iterations required for solving the preconditioned system, which, however, might come at the prize of a higher computational cost.
 The second quality metric that we aim to investigate in this section is the capability of each multigrid preconditioner to generalize to different instances of the same problem.
 Therefore, we consider three different wavenumbers $k = 160, 320$, and $640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
-As a multigrid-based preconditioner, we then consider different V, W, and F-cycles with up to five pre and post-smoothing steps based on the configuration space described in Section~\ref{sec:solver-configuration-helmholtz}.
+As a multigrid-based preconditioner, we then consider different V, W, and F-cycles with up to five pre- and post-smoothing steps based on the configuration space described in Section~\ref{sec:solver-configuration-helmholtz}.
 As in previous works on multigrid-based preconditioners for the indefinite Helmholtz equation~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
 To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and, hence, worst conditioned problem with $k = 640$.
 However, since none of the available configuration options led to a converging solver for this case, we instead employ the next smaller problem size with a wavenumber of $k = 320$ to find out which pair of smoother and relaxation factor leads to the fastest solving time for each multigrid cycle.
 In general, according to our experimental evaluation RB-GS represents the single most efficient smoother for the given case, while Jacobi-type smoothers only lead to a converging solver for wavenumbers of at most $k = 160$, with, however, less efficiency in all cases than the former.
 Therefore, Table~\ref{table:reference-methods-helmholtz} shows the resulting average solving times for each multigrid cycle with RB-GS smoothing and an optimum relaxation factor for $k = 320$, where the omission of a number means that convergence could not be achieved within 20,000 iterations. 
-Since the use of more than three pre and post-smoothing steps did not yield any additional benefit, we have omitted all multigrid cycles with a higher number of smoothing steps.
+Since the use of more than three pre- and post-smoothing steps did not yield any additional benefit, we have omitted all multigrid cycles with a higher number of smoothing steps.
 \begin{table}
 	\caption{Reference methods - Optimum relaxation factors $\omega$ for $k = 320$, number of iterations, and the average time required for solving a problem with the particular wavenumber.}
 	\label{table:reference-methods-helmholtz}
