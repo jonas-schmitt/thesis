@@ -9,5 +9,5 @@ with open(f'references/{input_file}.bib', 'r') as input_file:
     with open(f'references/{output_file}.bib', 'w') as output_file:
         # Write the processed line to the output file
         for line in input_file:
-            if not "isbn" in line:
+            if not "editor" in line:
                 output_file.write(line)
