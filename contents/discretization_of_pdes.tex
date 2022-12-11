@@ -47,10 +47,9 @@ Assuming $h$ is sufficiently small, the first-order approximation
 is obtained.
 Furthermore, we can derive an approximation for the second-order partial derivative $\dv[2]{x}$ by considering
 \begin{equation}
-	u(x + h) = u(x) + h \dv{x} u(x) + \frac{h^2}{2} \dv[2]{x} u(x) + \mathcal{O}(h^3)
+	u(x + h) = u(x) + h \dv{x} u(x) + \frac{h^2}{2} \dv[2]{x} u(x) + \mathcal{O}(h^3),
 	\label{eq:taylor-forward}
 \end{equation}
-and 
 \begin{equation}
 	u(x - h) = u(x) - h \dv{x} u(x) + \frac{h^2}{2} \dv[2]{x} u(x) + \mathcal{O}(h^3).
 	\label{eq:taylor-backward}
