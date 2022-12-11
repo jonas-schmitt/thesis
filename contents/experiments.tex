@@ -87,14 +87,14 @@ where $\Omega = (0,1)^2$, $\alpha = 195$, $\beta = 130$ and
 \begin{equation*}
 	g(x,y) = 0.4 \, (1 - x) \, x y \, \sin(\pi x).
 \end{equation*}
-From a physical point of view, this system can be interpreted as a two-dimensional rectangular body that undergoes an elastic deformation into the y-direction, as it can be seen in Figure~\ref{fig:visualization-linear-elasticity}.
+From a physical point of view, this system represents a two-dimensional rectangular body that undergoes an elastic deformation into the y-direction, as it can be seen in Figure~\ref{fig:visualization-linear-elasticity}.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{figures/visualization-linear-elasticity1}
 	\caption{Visualization of the considered linear elastic boundary value problem. A two-dimensional rectangular body undergoes an elastic deformation into the y-direction.}
 	\label{fig:visualization-linear-elasticity}
 \end{figure}
-We discretize Equation \eqref{eq:linear-elasticity} with finite differences on a cartesian grid using a step size $h = 1/2^{l_{max}}$ with $l_{max} = 10$, which yields a system of linear equations $A \bm{u} = \bm{f}$ with 
+We discretize Equation \eqref{eq:linear-elasticity} with finite differences on a cartesian grid using a step size $h = 1/2^{10}$ such that $l_{max} = 10$, which yields a system of linear equations $A \bm{u} = \bm{f}$ with 
 \begin{equation*}
 	A =
 	\begin{pmatrix}
