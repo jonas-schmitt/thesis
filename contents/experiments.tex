@@ -8,7 +8,7 @@ The goal of this section is to evaluate the effectiveness of our evolutionary pr
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
 This is reflected in the fact that common multigrid cycles, as those described in Section~\ref{sec:multigrid-cycles}, are able to quickly converge to the correct solution of each of the resulting systems of linear equations.
 We begin this section by introducing the considered problem instances and their mathematical formulation.
-At this point, we want to emphasize that all results presented in this section have originally been published within the paper~\cite{schmitt2021evostencils}.
+At this point, we want to emphasize that all results presented in this section have originally been published in~\cite{schmitt2021evostencils}.
 However, this thesis complements this work with an additional analysis of the multigrid solvers discovered by our evolutionary algorithm.
 \subsection{Problem Formulation}
 \subsubsection{Poisson's Equation}
@@ -678,7 +678,7 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	\caption{3D Poisson: ES-9}
 	\label{fig:evolved-methods-graphical-representation:3D}
 	\end{subfigure}
-	\caption{Computational structure of the evolved multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
+	\caption{Computational structure of the discovered multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
 	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
 The first observation that can be made from investigating the computational structure of these methods is that none of them can be clearly characterized as a V-, F- or W-cycle.
@@ -705,21 +705,20 @@ The Helmholtz equation, whose basic form is given as
 	\label{eq:helmholtz}
 \end{equation} 
 is a famously-difficult test problem for the application of numerical methods that also has practical relevance for many real-world applications, such as~\cite{versteeg1994marmousi,martin2006marmousi2,billette20052004,gray1995migration}.
-The main difficulty in solving this equation is that the system of linear equations resulting from its discretization becomes highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
-If we, for instance, assume the use of ten grid points per wavelength\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = 2 \pi/\lambda$ }, as it is common in geophysical applications~\cite{erlangga2006multigrid}, on the dimensionless unit square, a second-order accuracy requirement of $kh = 0.625$ must be fulfilled.
+The main difficulty in solving this equation is that the system of linear equations resulting from its discretization becomes indefinite and highly ill-conditioned for large values of the wavenumber $k$~\cite{ernst2012difficult}.
+For instance, a discretization with ten grid points per wavelength\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = 2 \pi/\lambda$ }, as it is common in geophysical applications~\cite{erlangga2006multigrid}, requires us to fulfill a second-order accuracy requirement of $kh = 0.625$.
 Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
 \begin{figure}
-		\centering
-		\includegraphics[width=\textwidth]{figures/cond.pdf}
+		\includegraphics[scale=0.7]{figures/cond.pdf}
 		\caption{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$}
 		\label{fig:condition-number-helmholtz}
 \end{figure}
 The condition number gives us a measure of how much an initial approximation error is magnified by the application of the operator $A$.
-As we can see in Figure~\ref{fig:condition-number-helmholtz} for larger values of $k$, the condition number of $A$ increases dramatically, which leads to an extreme accumulation of numerical errors. 
+As Figure~\ref{fig:condition-number-helmholtz} illustrates, the condition number of $A$ increases dramatically for larger values of $k$, which leads to an extreme accumulation of numerical errors. 
 The necessity to handle these errors makes the design of an efficient or even functioning numerical method for the indefinite Helmholtz equation outstandingly difficult.
-In particular, without any modification, classical multigrid methods can not effectively be applied as a numerical solver for indefinite Helmholtz problems~\cite{ernst2012difficult}.
+In particular, the use of classical multigrid methods as an iterative solver for indefinite Helmholtz problems is often infeasible~\cite{ernst2012difficult}.
 One multigrid-based approach that mitigates this problem is the application of the method as a preconditioner instead of applying it to the discretized Helmholtz system directly.
-In general, preconditioning has the purpose of modifying a given system of linear equations by applying a so-called preconditioning matrix $M$ in order to obtain a new system that is then easier to solve.
+In general, preconditioning has the purpose of modifying a given system of linear equations by applying a so-called preconditioning matrix $M$ to obtain a new system that is easier to solve.
 For instance, right-preconditioning the system $A \bm{x} = \bm{b}$ with the matrix $M$ results in
 \begin{equation}
 	A M^{-1} \bm{y} = \bm{b},
@@ -727,17 +726,18 @@ For instance, right-preconditioning the system $A \bm{x} = \bm{b}$ with the matr
 \end{equation}
 with $M \bm{x} = \bm{y}$. 
 The main consequence of this formulation is that we now have to solve an additional system of linear equations in the form of $M \bm{x} = \bm{y}$ whenever the operator $A$ is applied within our original solution method.
-If we consider the extreme choice of $M$ as the original operator $A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $I \bm{y} = \bm{b}$, however, with the consequence that the system $M \bm{x} = \bm{y}$ becomes just as ill-conditioned as the original one.
+If we consider the extreme choice of $M = A$, this means that Equation~\eqref{eq:right-preconditioning} reduces to $\bm{y} = \bm{b}$, which, however, means that the system $M \bm{x} = \bm{y}$ becomes just as ill-conditioned as the original one.
 Therefore, the choice of the preconditioning matrix $M$ usually represents a compromise between the accurate approximation of the original matrix $A$ and the ease of solvability of $M \bm{x} = \bm{y}$~\cite{benzi2002preconditioning}.
-Since its invention by Erlangga et al.~\cite{erlangga2004preconditioner}, the choice of $M$ as a complex-shifted version of the original operator has proven its effectiveness for indefinite Helmholtz problems~\cite{erlangga2008advances,cocquet2017shift,umetami2009multigrid,cools2013analysis}, which leads to
+Since its invention by Erlangga et al.~\cite{erlangga2004preconditioner}, the choice of $M$ as a complex-shifted version of the original operator, which leads to
 \begin{equation*}
-	M = -\nabla ^{2} - (k^{2} + i \varepsilon).
+	M = -\nabla ^{2} - (k^{2} + i \varepsilon),
 \end{equation*}
+has proven its effectiveness for solving indefinite Helmholtz problems numerically~\cite{erlangga2008advances,cocquet2017shift,umetami2009multigrid,cools2013analysis}.
 %TODO include all suitable citations
 As it has been shown in~\cite{cocquet2017shift}, a shift $\varepsilon \approx \mathcal{O}(k^2)$ enables the efficient inversion of $M$ by multigrid, whereas the choice of a smaller shift increases the preconditioning effectiveness.
-Since the resulting linear system, $A M^{-1} \bm{y} = \bm{b}$ is often complex-symmetric but non-hermitian, it is commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGSTAB~\cite{saad2003iterative}.
+Since the resulting linear system is often complex-symmetric but non-hermitian, it is commonly solved using a suitable Krylov subspace method, such as GMRES and BiCGSTAB~\cite{saad2003iterative}.
 \subsection{Problem Formulation}
-After introducing the indefinite Helmholtz equation and the difficulties its solution comprises in a general manner, we can now proceed by defining a representative instance of this equation for the evaluation of our grammar-based approach for the automated design of multigrid methods.
+After introducing the indefinite Helmholtz equation and the difficulties its solution involves, we can now proceed with defining a representative instance of this equation for the evaluation of our grammar-based approach for the automated design of multigrid methods.
 For this purpose, we consider the two-dimensional Helmholtz equation on a unit square with Dirichlet boundary conditions at the top and bottom and Robin radiation conditions at the left and right, as given by
 \begin{equation}
 	\label{eq:helmholtz-test-problem}
@@ -759,7 +759,7 @@ We discretize this equation on a uniform Cartesian grid using the classical five
 \end{equation*}
 In addition, $\delta(\bm{x})$ is approximated with a second-order Zenger correction~\cite{koestler2004extrapolation}.
 The spacing $h$ of the grid is chosen to fulfill the second-order accuracy requirement $h k = 0.625$ as described above.
-Finally, we apply the shifted-Laplace
+Finally, we apply the shifted Laplace operator
 \begin{equation*}
 	M = -\nabla^{2} - (k^{2} + 0.5 i k^{2}),
 \end{equation*}
