@@ -328,7 +328,7 @@ As it has been described in this section, the application of each of these funct
 Furthermore, note that the evaluation of this sequence leads to a state whose first component $x_h$ contains an expression that corresponds to the stepwise execution of all steps of the method.
 The functions described in this section, therefore, can be considered as a \emph{language} for the formal representation of multigrid methods. 
 The main components of this language are summarized in Table~\ref{table:grammar-semantics}.
-\begin{table}[ht]
+\begin{table}[ht!]
 	\caption{Summary of the multigrid state transition functions}
 	\label{table:grammar-semantics}
 	\begin{algorithmic}
@@ -519,7 +519,7 @@ Therefore, we first define the set of variables
 \end{equation}
 for each of which we can then specify the list of productions available on the respective level. 
 Table~\ref{table:multigrid-grammar} shows the resulting productions for the complete discretization hierarchy.
-\begin{table}[ht]
+\begin{table}[ht!]
 	\caption{Productions for generating five-grid methods}
 	\label{table:multigrid-grammar}
 	\begin{bnf*}
