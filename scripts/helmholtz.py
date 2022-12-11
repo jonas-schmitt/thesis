@@ -62,7 +62,7 @@ sns.set_style('ticks', {'font.family': 'serif', 'font.serif': 'Times New Roman'}
 ax = sns.lineplot(x=x, y=y, marker="s")
 # plt.xscale('log')
 # plt.yscale('log')
-plt.xlabel("Wavenumber (k)")
+plt.xlabel("Wavenumber")
 plt.ylabel("Condition Number")
 ax.set_xlim(0, 165)
 plt.tight_layout()
