@@ -22,11 +22,10 @@ digraph G {
   B11 -> B112
   B11 -> B113
   B21[texlbl="FNO"];
-  B211[texlbl="[73]"];
-  B212[texlbl="[42]"];
+  B211[texlbl="[42]"];
+  B212[texlbl="[73]"];
   B21 -> B211
   B21 -> B212
-  B21 -> B213
   B22[texlbl="DeepONet"];
   B221[texlbl="[78]"];
   B22 -> B221
