@@ -11,7 +11,8 @@ class BlockDiagonal(UnaryExpression):
         super().__init__(operand)
 
     def generate_stencil(self):
-        return stencils.multiple.block_diagonal(self.operand.generate_stencil(), self.block_size)
+        operand_stencil = self.operand.generate_stencil()
+        return stencils.multiple.block_diagonal(operand_stencil, self.block_size)
 
     @property
     def block_size(self):
