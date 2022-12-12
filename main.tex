@@ -137,8 +137,9 @@
 {\end{bnf}}
 
 \usemintedstyle{tango}
-\setminted[python]{fontsize=\footnotesize, breaklines, numbersep=7.5pt, numberblanklines=False}
-\setminted[scala]{fontsize=\footnotesize, breaklines, numbersep=7.5pt, numberblanklines=False}
+\setminted[python]{fontsize=\footnotesize, breaklines, frame=lines, numbersep=7.5pt, numberblanklines=False}
+\setminted[scala]{fontsize=\footnotesize, breaklines, frame=lines, numbersep=7.5pt, numberblanklines=False}
+\AtBeginDocument{\RenewCommandCopy\qty\SI}
 
 % \lstdefinelanguage{ExaSlang3}
 % {

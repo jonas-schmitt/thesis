@@ -861,7 +861,7 @@
   \def\bibasterisk{The 2nd (3rd) author names the supervisor; the last author
     is head of the institute.}%
 }
-
+\RequirePackage{minted}
 % The csquotes package allows to set quotation marks depending on the currently
 % selected language. Usage is recommended by BibLaTeX when using babel or
 % polyglossia. Further package options can be passed to it in the usual way by

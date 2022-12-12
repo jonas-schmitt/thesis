@@ -41,7 +41,7 @@
 \clearpage
 \section{Full-Approximation Scheme}
 \label{appendix:fas}
-\begin{bnf}
+\begin{bnf*}
 \bnfprod{$s_{h}$} {
 	\bnfts{\textnormal{\textsc{update}}}(\bnfts{$\omega$}, \bnfsp \bnfes, \bnfsp \bnfts{\textnormal{\textsc{cgc}}}(\bnfts{$I_{2h}^{h}$}, \bnfts{$I_{h}^{2h}$}, \bnfsp \bnfpn{$s_{2h}$}))
  }
@@ -53,7 +53,7 @@
 \bnfprod{$c_{2h}$} {
 	\bnfts{\textnormal{\textsc{coarsening}}}(\bnfts{$A_{2h}$}, \bnfsp \bnfts{$x^0_{2h}$}, \bnfsp \bnfts{\textnormal{\textsc{apply}}}(\bnfts{$I_h^{2h}$}, \bnfsp \bnfpn{$c_h$}))
 }
-\end{bnf}
+\end{bnf*}
 \begin{table}[!htb]
 	%\caption{State transition functions adapted for FAS}
 	%\label{table:fas-grammar-semantics}
