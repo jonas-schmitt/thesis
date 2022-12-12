@@ -782,6 +782,7 @@
 
 \addto\captionsenglish{%
   \def\prefacename{Preface}            % unchanged, original: Preface
+  \def\abstractname{Abstract}
   \def\refname{References}             % unchanged, original: References
   \def\abstractname{Abstract}          % unchanged, original: Abstract
   \def\bibname{Bibliography}           % unchanged, original: Bibliography
@@ -1046,6 +1047,8 @@
 
 % Custom chapters
 \newenvironment{preface}{\chapter*{\prefacename}\label{ch:preface}}{}
+\newenvironment{abstract}{\chapter*{\abstractname}\label{ch:abstract}}{}
+\newenvironment{zusammenfassung}{\chapter*{Zusammenfassung}\label{ch:zusammenfassung}}{}
 \newenvironment{introduction}{\chapter{\introductionname}\label{ch:intro}}{}
 
 \RedeclareSectionCommand[
