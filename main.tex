@@ -97,35 +97,13 @@
 \usepackage{backnaur}
 \usepackage{hyperref}
 \usepackage{minted}
-% \usepackage{listings}
-% \usepackage{color}
-% \setminted[python]{fontfamily=\ttfamily}
-
-% \ifdefined\PRINTVERSION
-%  \definecolor{keywordColor}{RGB}{0,0,0}
-%  \definecolor{commentColor}{RGB}{111,111,111}
-%  \definecolor{stringColor}{RGB}{69,69,69}
-% \else
-%  % cf http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
-%  \definecolor{keywordColor}{RGB}{117,112,179}
-%  \definecolor{commentColor}{RGB}{27,158,119}
-%  \definecolor{stringColor}{RGB}{217,95,2}
-% \fi
-
-% \newcommand{\lineNumberStyle}{\tiny\color{gray}}
-
-% \ifdefined\FAUPRESS
-%  \newcommand{\deflstxmargin}{0em} %{1.6em}
-% \else
-%  \newcommand{\deflstxmargin}{2.2em}
-% \fi
 
 % Defs and adaptions
 \newcommand{\ps}[1]{\langle #1 \rangle}
 \newcommand{\bps}[1]{ \ps{\bm{#1}} }
 \newcommand{\state}[3]{( #1 )}
-\colorlet{lightred}{red!50}
-\colorlet{lightblue}{blue!50}
+\colorlet{lightred}{red!33}
+\colorlet{lightblue}{blue!33}
 \renewcommand{\floatpagefraction}{.7}
 \renewcommand\theFancyVerbLine{\scriptsize \texttt{\arabic{FancyVerbLine}}}
 \numberwithin{equation}{chapter}
@@ -249,10 +227,10 @@ Prof. Dr. Dietmar Fey}
 \chapter{A Formal Language for Multigrid Methods}
 \label{chapter:multigrid-formal-language}
   \input{contents/multigrid_grammar.tex}
-\chapter{The EvoStencils Framework - Part 1: Core Implementation}
+\chapter{The EvoStencils Framework -- Part 1: Core Implementation}
 \label{chapter:evostencils-1}
   \input{contents/evostencils_part1.tex}
-\chapter{The EvoStencils Framework - Part 2: Generalization and Parallelization}
+\chapter{The EvoStencils Framework -- Part 2: Generalization and Parallelization}
   \label{chapter:evostencils-2}
   \input{contents/evostencils_part2.tex}
 \chapter{Experiments and Discussion}

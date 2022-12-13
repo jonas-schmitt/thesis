@@ -1,8 +1,8 @@
 As a first step in the evaluation of our evolutionary program synthesis method, we consider two PDE-based model problems, Poisson's equation and a linear elastic boundary value problem, which can already be solved efficiently by applying common multigrid cycles iteratively.
 Here our goal is to demonstrate that our approach is able to reliably find functioning multigrid cycles in a number of randomized experiments.
 Furthermore, since classical multigrid cycles already provide a strong baseline for these problems, we can investigate whether the methods designed with our approach are able to achieve a similar degree of efficiency.
-In addition, by considering both two and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different types.
-\section{Automating the Design of Multigrid Cycles for Common PDEs}
+In addition, by considering both two- and three-dimensional problems as well as a system of PDEs, we can demonstrate that our implementation is able to handle PDEs of different types.
+\section{Multigrid Cycles for Solving Common Partial Differential Equations}
 \label{sec:experiments-part1}
 The goal of this section is to evaluate the effectiveness of our evolutionary program synthesis method for the automated design of multigrid cycles that are used as an iterative method for solving a discretized PDE.
 Therefore, the problem instances considered in this section are chosen in a way that facilitates their efficient solution by multigrid.
@@ -148,7 +148,7 @@ whereby the differential operators $\nabla^2$, $\frac{\partial^2}{\partial x^2}$
 	\end{bmatrix}.
 \end{equation*}
 Similar to the above case, we employ a uniform cartesian grid with a step size $h = 1/2^{l_{max}}$ with $l_{max} = 10$, such that the resulting system of linear equations contains $2\,093\,058$ unknowns.
-\subsection{Multigrid Configuration}
+\subsection{Solver Configuration}
 \label{sec:experiments1-multigrid-configuration}
 To design an efficient multigrid method, we consider each of the given problems on a grid hierarchy consisting of five discretization levels 
 \begin{equation*}
@@ -341,7 +341,7 @@ An explanation for this effect is that the individuals located in this part of t
 Since the convergence of a multigrid method can primarily be accelerated with the addition of smoothing and coarse-grid correction steps, discovering the same non-dominated individuals with fast convergence requires us to construct the same large expressions starting from different random initializations.
 Recently, the impaired capabilities of NSGA-II to evolve large non-dominated expressions have been analyzed in~\cite{liu2022evolvability}, which similarly explains why our implementation struggles to discover the same fast-converging solvers consistently.
 
-\subsection{Evaluation of the Evolved Multigrid-Based Solvers}
+\subsection{Evaluation of the Evolved Multigrid Methods}
 Finally, in order to investigate whether our evolutionary program synthesis approach yields multigrid methods that are competitive with well-known multigrid cycles, we consider two different multi-core CPU architectures for evaluation: Intel Xeon E5-2630v4 (Broadwell) and Intel Xeon 2660v2 (Ivy Bridge).
 In both cases, each compute node consists of two sockets with 20 physical CPU cores and a cache-coherent NUMA architecture.
 In order to assess the solving speed of the discovered methods, we consider two different problem sizes for each of the three test cases.
@@ -695,7 +695,7 @@ However, if we consider the method ES-2, which leads to the fastest solving time
 In particular, ES-2 applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, it employs exclusively RB-GS smoothing.
 
-\section{Discovering Generalizable Preconditioners for the Helmholtz Equation}
+\section{Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
 While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated design of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in the case of a problem that is difficult to solve numerically, we consider the indefinite Helmholtz equation.
 At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.
@@ -908,7 +908,7 @@ To parallelize our evolutionary algorithm, we utilize the message-passing interf
 We, therefore, create 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
 Each process then creates and evaluates two new individuals per generation, which are executed on the respective island using an OpenMP-based shared-memory parallelization with 12 threads.
 
-\subsection{Evaluation of the Evolved Multigrid-Based Preconditioners}
+\subsection{Evaluation of the Evolved Multigrid Method}
 To assess whether our evolutionary program synthesis method can discover competitive multigrid-based preconditioners for the indefinite Helmholtz equation, we first need to investigate the preconditioning efficiency of classical multigrid cycles.
 As in previous evaluations, we consider the time required to achieve a certain error reduction as a measure of the efficiency of a solver.
 However, since in the given case, we apply the same iterative solver to each problem instance and only vary the multigrid cycle used for preconditioning, this metric instead relates to the efficiency of the latter.
@@ -1267,7 +1267,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\caption{EP-4}
 		\label{fig:ep-4}
 	\end{subfigure}
-	\caption{Computational structure of the discovered multigrid preconditioners EP-2, EP-3, EP-8 and EP-4. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
+	\caption{Algorithmic structure of the discovered multigrid preconditioners EP-2, EP-3, EP-8 and EP-4. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
 	\label{fig:structure-evolved-preconditioners1}
 \end{figure}
 \begin{figure}
@@ -1395,7 +1395,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\caption{EP-10}
 		\label{fig:ep-10}
 	\end{subfigure}
-	\caption{Computational structure of the discovered multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
+	\caption{Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
  }
 	\label{fig:structure-evolved-preconditioners2}
 \end{figure}
