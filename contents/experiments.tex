@@ -678,7 +678,7 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	\caption{3D Poisson: ES-9}
 	\label{fig:evolved-methods-graphical-representation:3D}
 	\end{subfigure}
-	\caption{Computational structure of the discovered multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
+	\caption{Algorithmic structure of the discovered multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
 	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
 The first observation that can be made from investigating the computational structure of these methods is that none of them can be clearly characterized as a V-, F- or W-cycle.
