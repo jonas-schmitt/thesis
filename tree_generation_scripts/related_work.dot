@@ -44,7 +44,7 @@ digraph G {
   D111[texlbl="[119]"];
   D11 -> D111
   D12[texlbl="GNN"];
-  D121[texlbl="[88"];
+  D121[texlbl="[88]"];
   D12 -> D121
   D2[texlbl="Hybrid"];
   D2 -> D21
