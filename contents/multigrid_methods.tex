@@ -277,7 +277,6 @@ Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a singl
 In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which can be computed with a constant number of operations per grid point.
 While we here only provide a brief introduction to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
 Finally, it is also possible to define overlapping block smoothers, which means that multiple blocks contain the same grid point as an unknown~\cite{trottenberg2000multigrid}.
-\pagebreak
 \subsection{The Coarse-Grid Correction Scheme}
 The core idea behind multigrid methods is to reduce the oscillatory components of an error by computing an approximation of the same problem on a coarser grid.
 As we have illustrated in Figure~\ref{fig:low-frequency-error-component-coarse}, these components can then be efficiently reduced using the same smoothing techniques already employed on the fine grid.
@@ -311,7 +310,7 @@ However, we have already observed that if a certain error exclusively consists o
 This is illustrated in Figure~\ref{fig:error-on-multiple-levels}, which shows the discretization of two error components with different frequencies on one-dimensional uniform grids with decreasing step size.
 Here, the first error component, which possesses a higher frequency, can not be accurately represented on the coarsest grid with step size $h = 2^{-5}$.
 In contrast, the slope of the second error component, which is relatively smooth, is still clearly visible on this grid. 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\begin{subfigure}[b]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_16pi_level7.pdf}

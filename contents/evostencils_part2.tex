@@ -113,7 +113,7 @@ Their application is thus independent of the underlying problem size, and we onl
 We can generate a grammar for grid hierarchies with varying step size $h$ but the same number of coarsening steps by utilizing the \emph{generate\_grammar} function defined in Listing~\ref{code:grammar:generate-grammar}.
 For this purpose, we only need to provide a different value for the argument \emph{max\_level}.
 However, an essential issue that has not been addressed yet is how we can adapt the current population to a new grammar.
-For this purpose, we need to return to the original formulation of our multigrid grammar, whose productions are shown in Table~\ref{table:multigrid-grammar}.
+For this purpose, we need to return to the original formulation of our multigrid grammar, whose productions are shown in Algorithm~\ref{table:multigrid-grammar}.
 Note that the level of each variable and terminal, unless it is level-independent, is denoted by its subscript.
 Each of these terms is an expression whose value depends on $h$, i.e., the spacing of the finest grid.
 In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with the step size $h$ to a different one of similar depth but with a step size of $H$, we only have to replace each occurrence of $h$ with the value of $H$.
@@ -259,7 +259,7 @@ As a final step, we can now utilize this interface to implement a parallel versi
 The resulting Python implementation is shown in Listing~\ref{code:optimization:evolutionary-search-mpi}.
 \begin{listing}
 	\inputminted[linenos]{python}{evostencils/optimization/evolutionary_search_mpi.py}
-	\caption{Evolutionary Search Method}
+	\caption{Evolutionary Search Method with Generalization and Parallelization}
 	\label{code:optimization:evolutionary-search-mpi}
 \end{listing}
 Since most of the required functionality is already implemented within the \emph{adapt\_problem\_size} and \emph{allgather} methods, only a few adaptions of our original implementation are required.
