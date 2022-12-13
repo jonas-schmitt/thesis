@@ -15,22 +15,22 @@ digraph G {
   B2 -> B21
   B2 -> B22
   B11[texlbl="PINN"];
-  B111[texlbl="[60]"];
-  B112[texlbl="[61]"];
-  B113[texlbl="[92]"];
+  B111[texlbl="[61]"];
+  B112[texlbl="[62]"];
+  B113[texlbl="[93]"];
   B11 -> B111
   B11 -> B112
   B11 -> B113
   B21[texlbl="FNO"];
-  B211[texlbl="[42]"];
-  B212[texlbl="[73]"];
+  B211[texlbl="[43]"];
+  B212[texlbl="[74]"];
   B21 -> B211
   B21 -> B212
   B22[texlbl="DeepONet"];
-  B221[texlbl="[78]"];
+  B221[texlbl="[79]"];
   B22 -> B221
   B12[texlbl="PINO"];
-  B121[texlbl="[74]"];
+  B121[texlbl="[75]"];
   B12 -> B121
   C -> D
   C -> E
@@ -41,10 +41,10 @@ digraph G {
   D1 -> D11
   D1 -> D12
   D11[texlbl="CNN"];
-  D111[texlbl="[118]"];
+  D111[texlbl="[119]"];
   D11 -> D111
   D12[texlbl="GNN"];
-  D121[texlbl="[87]"];
+  D121[texlbl="[88"];
   D12 -> D121
   D2[texlbl="Hybrid"];
   D2 -> D21
@@ -52,15 +52,15 @@ digraph G {
   D21 -> D211
   D21 -> D212
   D211[texlbl="Prolongation"];
-  D2111[texlbl="[41]"];
-  D2112[texlbl="[59]"];
-  D2113[texlbl="[80]"];
+  D2111[texlbl="[42]"];
+  D2112[texlbl="[60]"];
+  D2113[texlbl="[81]"];
   D211 -> D2111
   D211 -> D2112
   D211 -> D2113
   D212[texlbl="Smoothing"];
   D2121[texlbl="[30]"];
-  D2122[texlbl="[54]"];
+  D2122[texlbl="[55]"];
   D212 -> D2121
   D212 -> D2122
   E[texlbl="Algorithm Design"];
@@ -72,15 +72,15 @@ digraph G {
   E2 -> E21
   E11[texlbl="Combinatorial"];
   E111[texlbl="[12]"];
-  E112[texlbl="[86]"];
-  E113[texlbl="[116]"];
+  E112[texlbl="[87]"];
+  E113[texlbl="[117]"];
   E11 -> E111
   E11 -> E112
   E11 -> E113
   E21[texlbl="Grammar-Based"];
-  E211[texlbl="[105]"];
-  E212[texlbl="[106]"];
-  E213[texlbl="[107]"];
+  E211[texlbl="[106]"];
+  E212[texlbl="[107]"];
+  E213[texlbl="[108]"];
   E21 -> E211
   E21 -> E212
   E21 -> E213
