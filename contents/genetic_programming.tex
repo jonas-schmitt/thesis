@@ -181,7 +181,7 @@ In the theory of evolutionary computation, this property is referred to as \emph
 %In fact, we can easily obtain the corresponding expression tree by applying a bottom-up replacement of each variable node by a vertex that represents a combination of its direct leafs.
 To describe the use of derivation trees as a genotype representation within GP, the term tree-based \emph{grammar-guided genetic-programming} (G3P) has been introduced~\cite{mckay2010grammar,whigham1995grammatically}.
 Since tree-based G3P combines the advantage of ensuring automatic type correctness with a high locality between genotype and phenotype, it represents a widely-used GP variant~\cite{mckay2010grammar}.
-Furthermore, within the last decades, \emph{grammatical evolution} (GE) has been established as a valid alternative, where the genotype is encoded as a dynamically-sized array of integers. 
+Furthermore, within the last decades, \emph{grammatical evolution} (GE) has been established as a valid alternative~\cite{oneill2001grammatical,zz_ge1,zz_ge2}, where the genotype is encoded as a dynamically-sized array of integers. 
 Each entry of this array then corresponds to the choice of a particular production.
 GE offers the advantage of having a simpler typesafe genotype representation, which, however, comes at the price of requiring additional steps for the genotype-to-phenotype mapping.
 Furthermore, a small change in the genotype of a GE program does not necessarily result in a small phenotypic change since the interpretation of each array entry depends on its predecessors.
@@ -214,6 +214,7 @@ instead of
 \end{equation*}
 which means that all subsequent entries are now interpreted as productions starting from $\ps A$.
 This example clearly illustrates that even slight changes in the genotype of a GE representation can have a dramatic effect on its phenotypic expression.
+However, it needs to be mentioned that newer GE variants mitigate this issue by learning a statistical distribution about the effect of each production on the fitness of an individual~\cite{zz_ge1,zz_ge2}.
 Since tree-based G3P and GE both represent a different tradeoff between the simplicity and locality of their genotype representation, in general, it is impossible to predict which variant will lead to a better outcome.
 Furthermore, we have to mention that, in addition to tree-based GP and GE, numerous other variants have been proposed since the original invention of GP~\cite{poli2008field}, the most prominent ones being linear GP~\cite{brameier2007linear} and cartesian GP~\cite{miller2008cartesian}. 
 However, since the implementation presented in this thesis is based on tree-based G3P, we will exclusively focus on this variant in our subsequent treatment of mutation, crossover, and fitness evaluation.
