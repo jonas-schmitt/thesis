@@ -20,7 +20,7 @@
 
 \DeclareAcronym{GCC}{
   short = GCC,
-  long =  GNU C Compiler
+  long =  GNU Compiler Collection
 }
 
 \DeclareAcronym{PDE}{
@@ -91,7 +91,7 @@
 
 \DeclareAcronym{NSGA-II}{
   short = NSGA-II,
-  long = Non-dominated Sorting Genetic Algorithm II
+  long = Non-Dominated Sorting Genetic Algorithm II
 }
 
 \DeclareAcronym{BiCGSTAB}{
