@@ -44,7 +44,7 @@ Figure~\ref{fig:different-error-components} shows the impact of applying the Jac
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_32pi.pdf}
 	\caption{Error after applying GS}
 	\end{subfigure}
-	\caption{Different error components on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
+	\caption[Different error components on a one-dimensional grid with step size $h = 2^{-9}$.]{Different error components on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 	\label{fig:different-error-components}
 \end{figure}
 Here, the first column shows the initial error discretized on a grid with step size $h = 2^{-9}$ while the second and third include the remaining error after applying 100 Jacobi and Gauss-Seidel steps, respectively.
@@ -70,7 +70,7 @@ We can further illustrate the error reduction properties of basic iterative meth
 	\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_combined.pdf}
 	\caption{Error after applying GS}
 \end{subfigure}
-	\caption{Combination of two error components discretized on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
+	\caption[Combination of two error components on a one-dimensional grid with step size $h = 2^{-9}$.]{Combination of two error components discretized on a one-dimensional grid with step size $h = 2^{-9}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 \label{fig:combined-error}
 \end{figure}
 Again, the first plot shows the initial error, while the second and third contain the reduced error after 100 iterations of Jacobi and Gauss-Seidel, respectively.
@@ -98,7 +98,7 @@ The resulting error reduction, again after 100 iterations of each method, is sho
 		\includegraphics[width=\textwidth]{figures/error_plots//final_error_gauss_seidel_4pi_coarse.pdf}
 		\caption{Error after applying GS}
 	\end{subfigure}
-	\caption{Low-frequency error component discretized on a coarser one-dimensional grid with step size $h = 2^{-6}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
+	\caption[Low-frequency error component on a coarser one-dimensional grid with step size $h = 2^{-6}$.]{Low-frequency error component discretized on a coarser one-dimensional grid with step size $h = 2^{-6}$ before and after applying 100 steps of the Jacobi or Gauss-Seidel (GS) method.}
 	\label{fig:low-frequency-error-component-coarse}
 \end{figure}
 As it can be seen, the amount of low-frequency error reduction is significantly higher for both methods than on the \emph{finer} grid with a step size of $h = 2^{-9}$.
@@ -342,7 +342,7 @@ In contrast, the slope of the second error component, which is relatively smooth
 		\includegraphics[width=\textwidth]{figures/error_plots//initial_error_2pi_level5.pdf}
 		\caption{$h = 2^{-5}$}
 	\end{subfigure}
-	\caption{Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size.}
+	\caption[Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size]{Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size.}
 	\label{fig:error-on-multiple-levels}
 \end{figure}
 Assuming that an error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and thus $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define a coarse-grid correction 

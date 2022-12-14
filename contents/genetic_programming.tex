@@ -87,7 +87,7 @@ Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression 
   \centering
 		\includegraphics[scale=0.9]{figures/trees/gp_expression_tree2.pdf}
 	\end{subfigure}
- \caption{Expression trees of the functions $f_1$ and $f_2$~\eqref{eq:gp-example-functions}, where we have simplified the if-then-else construct to a single ternary operator.}
+ \caption[Expression trees of the functions $f_1$ and $f_2$~\eqref{eq:gp-example-functions}.]{Expression trees of the functions $f_1$ and $f_2$~\eqref{eq:gp-example-functions}, where we have simplified the if-then-else construct to a single ternary operator.}
  \label{fig:gp-expression-tree-examples}
 \end{figure}
 Based on a given expression tree, we can easily restore the original expression by traversing the tree recursively in a top-down manner while generating the corresponding expression for each node as soon as each of its operands has been recursively processed or if it is available as a terminal symbol.
@@ -250,7 +250,7 @@ Consider, for instance, the tree shown in Figure~\ref{fig:gp-tree-growing-option
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.46]{figures/trees/gp_grow_tree_options.pdf}
-	\caption{Options for extending a derivation tree - An unfinished branch consisting of a variable can either be extended by applying a production that includes at least one variable (lower-right tree), or it is ended by inserting a terminal symbol as a leaf (upper-right tree).}
+	\caption[Options for extending a derivation tree]{Options for extending a derivation tree - An unfinished branch consisting of a variable can either be extended by applying a production that includes at least one variable (lower-right tree), or it is ended by inserting a terminal symbol as a leaf (upper-right tree).}
 	\label{fig:gp-tree-growing-options}
 \end{figure}
 The productions available for the variable $\ps{A}$ can be classified into two categories, which we call \emph{terminal} and \emph{non-terminal productions}.

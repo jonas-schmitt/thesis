@@ -91,7 +91,7 @@ From a physical point of view, this system represents a two-dimensional rectangu
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{figures/visualization-linear-elasticity1}
-	\caption{Visualization of the considered linear elastic boundary value problem. A two-dimensional rectangular body undergoes an elastic deformation into the y-direction.}
+	\caption[Visualization of the considered linear elastic boundary value problem]{Visualization of the considered linear elastic boundary value problem. A two-dimensional rectangular body undergoes an elastic deformation into the y-direction.}
 	\label{fig:visualization-linear-elasticity}
 \end{figure}
 We discretize Equation \eqref{eq:linear-elasticity} with finite differences on a cartesian grid using a step size $h = 1/2^{10}$ such that $l_{max} = 10$, which yields a system of linear equations $A \bm{u} = \bm{f}$ with 
@@ -257,7 +257,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:poisson-2D-minimum-execution-time}
 	\end{subfigure}
-	\caption{2D Poisson -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
+	\caption[2D Poisson -- Mean and standard deviation of the minimum objective function values]{2D Poisson -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
 	\label{fig:poisson-2D-minimum-objectives}
 \end{figure}
 \begin{figure}
@@ -275,7 +275,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:poisson-3D-minimum-execution-time}
 	\end{subfigure}
-	\caption{3D Poisson -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
+	\caption[3D Poisson -- Mean and standard deviation of the minimum objective function values]{3D Poisson -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
 	\label{fig:poisson-3D-minimum-objectives}
 \end{figure}
 \begin{figure}
@@ -293,7 +293,7 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 		\caption{Minimum Execution Time per Iteration}
 		\label{fig:linear-elasticity-2D-minimum-execution-time}
 	\end{subfigure}
-	\caption{2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
+	\caption[2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values]{2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
 	\label{fig:linear-elasticity-2D-minimum-objectives}
 \end{figure}
 First of all, we can conclude that in all three cases, our algorithm is able to quickly reduce the minimum value of both objectives within the population.
@@ -316,19 +316,19 @@ To further analyze the behavior of our multi-objective evolutionary algorithm, w
 \begin{figure}
 \centering
 	\includegraphics[scale=0.725]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
-	\caption{2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\caption[2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments]{2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-poisson}
 \end{figure}
 \begin{figure}
 \centering
 \includegraphics[scale=0.725]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
-	\caption{3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\caption[3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments]{3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-3D-poisson}
 \end{figure}
 \begin{figure}
 \centering
 \includegraphics[scale=0.725]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
-	\caption{2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
+	\caption[2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments]{2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-linear-elasticity}
 \end{figure}
 Here the red line denotes the combined front, while the color density of the distribution indicates where most of the individuals are located at the end of all experiments. 
@@ -354,7 +354,7 @@ As we have already investigated in~\cite{schmitt2020constructing}, the same is t
 To achieve a fair comparison, we determine the optimum relaxation factor $\omega$ for each test case from the same interval considered within our experiments, which leads to $\omega = 1.15$ for the two-dimensional Poisson equation and $\omega = 1.25$ both for the three-dimensional Poisson equation and the linear elastic boundary value problem.
 Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-methods} and~\ref{table:linear-elasticity-2D-reference-methods} contain the resulting solving times and the number of iterations required to achieve the desired defect reduction for each test case.
 \begin{table}
-	\caption{2D Poisson -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
+	\caption[2D Poisson -- Number of iterations and solving times of the reference methods]{2D Poisson -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-reference-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -383,7 +383,7 @@ Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-
 	%FMG for max_level = 12: 530.3038500000001 ms, 3 Iterations
 \end{table}
 \begin{table}
-	\caption{3D Poisson -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
+	\caption[3D Poisson -- Number of iterations and solving times of the reference methods]{3D Poisson -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
 	\label{table:poisson-3D-reference-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -411,7 +411,7 @@ Table~\ref{table:poisson-2D-reference-methods},~\ref{table:poisson-3D-reference-
 	\end{tabular}
 \end{table}
 \begin{table}
-	\caption{2D Linear Elasticity -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
+	\caption[2D Linear Elasticity -- Number of iterations and solving times of the reference methods]{2D Linear Elasticity -- Measured number of iterations and solving times of the reference methods on 20 cores and two sockets.}
 	\label{table:linear-elasticity-2D-reference-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -453,7 +453,7 @@ The resulting multigrid methods are then executed as a solver for each test prob
 After we have identified the multigrid method that leads to the fastest solving time in each case, we additionally evaluate it on the larger problem instance using the same settings as for the evaluation of the reference methods.
 Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contain the resulting measured solving times for each case.
 \begin{table}
-	\caption{2D Poisson -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
+	\caption[2D Poisson -- Number of iterations and solving times of the evolved methods]{2D Poisson -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
 	\label{table:poisson-2D-evolved-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -485,7 +485,7 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 	\end{tabular}
 \end{table}
 \begin{table}
-	\caption{3D Poisson -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
+	\caption[3D Poisson -- Number of iterations and solving times of the evolved methods]{3D Poisson -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
 	\label{table:poisson-3D-evolved-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -517,7 +517,7 @@ Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-meth
 	\end{tabular}
 \end{table}
 \begin{table}
-	\caption{2D Linear Elasticity -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
+	\caption[2D Linear Elasticity -- Number of iterations and solving times of the evolved methods]{2D Linear Elasticity -- Measured number of iterations and solving times of the evolved multigrid methods on 20 cores and two sockets.}
 	\label{table:linear-elasticity-2D-evolved-methods}
 	\centering
 	\begin{tabular}{l c c c c c c}
@@ -678,7 +678,7 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	\caption{3D Poisson: ES-9}
 	\label{fig:evolved-methods-graphical-representation:3D}
 	\end{subfigure}
-	\caption{Algorithmic structure of the discovered multigrid methods. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
+	\caption[Poisson -- Algorithmic structure of the discovered multigrid methods]{Algorithmic structure of the discovered multigrid methods for Poisson's Equation. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Block Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge. For block smoothers, the dimension of the block is specified on top of the respective node. If no block size is specified, pointwise smoothing is applied.}
 	\label{fig:evolved-methods-graphical-representation}
 \end{figure}
 The first observation that can be made from investigating the computational structure of these methods is that none of them can be clearly characterized as a V-, F- or W-cycle.
@@ -710,7 +710,7 @@ For instance, a discretization with ten grid points per wavelength\footnote{Usua
 Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
 \begin{figure}
 		\includegraphics[scale=0.725]{figures/cond.pdf}
-		\caption{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$.}
+		\caption[Condition number resulting from a finite-difference discretization of the two-dimensional Helmholtz equation]{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$.}
 		\label{fig:condition-number-helmholtz}
 \end{figure}
 The condition number gives us a measure of how much an initial approximation error is magnified by the application of the operator $A$.
@@ -922,7 +922,7 @@ However, since none of the available configuration options led to a converging s
 In general, according to our experimental evaluation RB-GS represents the single most efficient smoother for the given case, while Jacobi-type smoothers only lead to a converging solver for wavenumbers of at most $k = 160$, however, with less efficiency compared to RB-GS.
 Table~\ref{table:reference-methods-helmholtz} shows the resulting average solving times for each multigrid cycle with RB-GS smoothing and an optimum relaxation factor for $k = 320$, where the omission of a number means that convergence could not be achieved within 20,000 iterations. 
 \begin{table}
-	\caption{Reference methods -- Optimum relaxation factors $\omega$ for $k = 320$, number of iterations, and average time required for solving a problem with the particular wavenumber ($k$).}
+	\caption[2D Helmholtz -- Number of iterations and solving time of the reference methods]{Reference methods -- Optimum relaxation factors $\omega$ for $k = 320$, number of iterations, and average time required for solving a problem with the particular wavenumber ($k$).}
 	\label{table:reference-methods-helmholtz}
 	\centering
 	\begin{tabular}{l l l l l l}
@@ -976,7 +976,7 @@ In case none of the methods considered is able to reduce the initial residual by
 The best-performing method is then evaluated on the full set of wavenumbers, i.e., $k = 160, 320, 640$.
 Table~\ref{table:evolved-solvers} shows the required number of iterations and solving time when using the respective multigrid method as a preconditioner for Algorithm~\ref{alg:preconditioned-bicgstab}.
 \begin{table}
-	\caption{Best preconditioners according to the product of both objectives -- Number of iterations and the average time required for solving a problem with the particular wavenumber ($k$).}
+	\caption[2D Helmholtz -- Number of iterations and solving time of the best evolved methods]{Best evolved preconditioners according to the product of both objectives -- Number of iterations and the average time required for solving a problem with the particular wavenumber ($k$).}
 	\label{table:evolved-solvers}
 	\centering
 	\begin{tabular}{l l l l l l l }
@@ -1014,7 +1014,7 @@ Figure~\ref{fig:helmholtz-solving-time-comparison} shows a direct comparison of 
 \begin{figure}
 \centering
 	\includegraphics[scale=0.725]{figures/solving-time.pdf}
-	\caption{Solving time comparison of the best preconditioners according to the product of both objectives for different wavenumbers ($k$).}
+	\caption[2D Helmholtz -- Solving time comparison of the best preconditioners]{Solving time comparison of the best preconditioners according to the product of both objectives for different wavenumbers ($k$).}
 	\label{fig:helmholtz-solving-time-comparison}
 \end{figure} 
 To enhance the interpretability of the results, we have normalized each solving time by the number of grid points.
@@ -1027,7 +1027,7 @@ Similar to Section~\ref{sec:experiments1-algorithm-behavior-analysis}, we consid
 \begin{figure}
 \centering
 	\includegraphics[scale=0.725]{figures/pareto-front.pdf}
-	\caption{Distribution of non-dominated individuals at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
+	\caption[2D Helmholtz -- Distribution of non-dominated individuals at the end of all ten experiments]{Distribution of non-dominated individuals at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
 	\label{fig:pareto-front-helmholtz}
 \end{figure}
 First of all, note that the number of non-dominated individuals is smaller than in the experiments performed in Section~\ref{sec:experiments-part1}, which can be attributed to the smaller population size, which is only half as large as in our previous experiments.
@@ -1267,7 +1267,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\caption{EP-4}
 		\label{fig:ep-4}
 	\end{subfigure}
-	\caption{Algorithmic structure of the discovered multigrid preconditioners EP-2, EP-3, EP-8 and EP-4. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
+	\caption[2D Helmholtz -- Algorithmic structure of the discovered multigrid preconditioners EP-2, EP-3, EP-8 and EP-4]{Algorithmic structure of the discovered multigrid preconditioners EP-2, EP-3, EP-8 and EP-4. The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.}
 	\label{fig:structure-evolved-preconditioners1}
 \end{figure}
 \begin{figure}
@@ -1395,7 +1395,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\caption{EP-10}
 		\label{fig:ep-10}
 	\end{subfigure}
-	\caption{Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
+	\caption[2D Helmholtz -- Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10]{Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
  }
 	\label{fig:structure-evolved-preconditioners2}
 \end{figure}
@@ -1410,7 +1410,7 @@ Considering that EP-5 represents the overall most efficient preconditioner for t
 Furthermore, in contrast to classical multigrid cycles, the number of smoothing and coarse-grid correction steps is unevenly distributed over the range of levels.
 Table~\ref{table:operations-per-level} shows the average number of smoothing steps, coarse-grid correction steps, and the number of updates of the approximate solution\footnote{Note that this includes both smoothing and coarse-grid correction steps} on every level.
 \begin{table}
-	\caption{Statistics about the operations that are performed by the multigrid-based preconditioners yielding a converging solver for $k = 640$.}
+	\caption[2D Helmholtz -- Operation statistics]{Statistics about the operations that are performed by the multigrid-based preconditioners yielding a converging solver for $k = 640$.}
 	\label{table:operations-per-level}
 	\centering
 	\begin{tabular}{l c c c c c c c}
@@ -1463,7 +1463,7 @@ Figure~\ref{fig:histograms} shows the distribution of relaxation factors over al
 	\caption{Coarse-grid correction}
 	\label{fig:histogram-cgc}
 \end{subfigure}
-    \caption{Histogram of the relaxation factor distributions of the six multigrid-based preconditioners that yield a converging solver for $k = 640$.}
+    \caption[2D Helmholtz -- Histogram of the relaxation factors]{Histogram of the relaxation factor distributions of the six multigrid-based preconditioners that yield a converging solver for $k = 640$.}
     \label{fig:histograms}
 \end{figure}
 First of all, note that both for RB-GS and the coarse-grid correction, most relaxation factors are concentrated around the value one, whereby the former slightly favors higher values and thus more overrelaxation.

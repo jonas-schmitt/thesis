@@ -96,6 +96,7 @@
 \usepackage{booktabs}
 \usepackage{backnaur}
 \usepackage{hyperref}
+\usepackage[titles]{tocloft}
 \usepackage{minted}
 
 % Defs and adaptions
@@ -191,17 +192,6 @@ Prof. Dr. Dietmar Fey}
   % typeset the table of contents
   \tableofcontents
 
-  % typeset the list of symbols and/or abbreviations,
-  % settings can be tweaked via the two class options
-  % acronym and acronymlist
-  %\faupressprintacronyms
-  
-  % typeset the list of figures
-  %\listoffigures
-  
-  % typeset the list of tables
-  %\listoftables
-
 % start the mainmatter (arabic page numbering [reset],
 % arabic sectioning numbering, header)
 \mainmatter
@@ -240,18 +230,19 @@ Prof. Dr. Dietmar Fey}
   \input{contents/related_work.tex}
   \input{contents/conclusion.tex}
 
-
-% start the appendix (arabic page numbering [continued],
-% uppercase alphabetic sectioning numbering, header)
 \appendix 
-  
   %%% WRITE YOUR APPENDIX DIRECTLY HERE OR %%%%%%%%
   %%% INPUT AN EXTERNAL FILE WITH YOUR APPENDIX %%%
-  \input{contents/appendix.tex}
-    
+\input{contents/appendix.tex}
+
 % start the backmatter (arabic page numbering [continued],
 % no sectioning numbering, header)
 \backmatter
   \faupressprintbibliography
+  \begingroup
+  \listofalgorithms
+  \let\clearpage\relax
+  \listoflistings
+  \endgroup
 
 \end{document}

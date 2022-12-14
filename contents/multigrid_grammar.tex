@@ -108,7 +108,7 @@ To derive a general representation for the state of a multigrid method based on 
 		\State $ x_{2h} = x_{2h} + 0.6 \cdot D_{2h}^{-1} r_{2h}$
 		\State $x_{h} = x_{h}  + I_{2h}^h x_{2h}$
 	\end{algorithmic}
-\caption{Example for a Three-Grid V-Cycle}
+\caption{Example of a Three-Grid V-Cycle}
 \label{alg:example-three-grid-method}
 \end{algorithm}
 In each step of this sequence, either the approximate solution, right-hand side, or residual is updated on a particular level.
@@ -690,7 +690,7 @@ Note that this formulation is mathematically equivalent to the three-grid method
 		\State $ x_{2h} = x_{2h} + 0.6 \cdot D_{2h}^{-1} \left(b_{2h} - A_{2h} x_{2h}\right)$
 		\State $x_{h} = x_{h}  + I_{2h}^h x_{2h}$
 	\end{algorithmic}
-	\caption{Three-grid multigrid method generated based on Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}}
+	\caption{Example of a Three-Grid V-Cycle (Generated)}
 	\label{alg:example-three-grid-method-generated}
 \end{algorithm}
 Since we can apply the same approach to any computational graph derived from a derivation tree of our multigrid grammar, we arrive at the following three-step procedure of algorithm generation:
@@ -740,7 +740,7 @@ We can illustrate this expression by considering the corresponding decision tree
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/trees/decision_tree.pdf}
-	\caption{Simplified decision tree -- Each node has the same number of children.}
+	\caption[Simplified search space]{Simplified search space -- Each node in the decision tree has the same number of children.}
 	\label{fig:decision-tree}
 \end{figure}
 Each node in this tree corresponds to a particular choice of operations, which includes the application of either $s_1$ or $s_2$ as a smoother, optionally accompanied by coarsening or a coarse-grid correction.
