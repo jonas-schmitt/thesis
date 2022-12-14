@@ -13,7 +13,7 @@ While the formulation of an FAS method requires replacing both the smoother and 
 To illustrate this, Section~\ref{appendix:fas} shows the necessary adaptions of our original state transition functions and grammar productions for generating FAS-style multigrid methods. 
 As it can be seen there, apart from adjusting the respective productions, only the two functions \textsc{coarsening} and \textsc{cgc} need to be changed, while, additionally, a single new state transition function \textsc{cgs} for the application of the coarse-grid solver needs to be provided. 
 Note that since the application of the operator $A_h$ no longer represents a linear operation in the case of FAS, we instead denote it as a function application.
-Another promising idea would be an extension of our approach to full-multigrid (FMG) methods.
+Another promising idea would be an extension of our approach to full-multigrid methods.
 While in Section~\ref{sec:experiments-part1}, we have demonstrated that the multigrid methods designed with our approach can solve different PDEs faster than common cycles, in many linear cases, including Poisson's equation, FMG potentially represents the fastest and most efficient solver available~\cite{trottenberg2000multigrid}.
 Since FMG is based on applying multigrid cycles on different levels of a given discretization hierarchy, one possibility would be to apply our evolutionary program synthesis method to each of these individual cycles.
 While this approach would result in an even larger search space than the ones considered in this work, it could yield methods that achieve an even higher degree of efficiency in solving PDE-based problems.
