@@ -33,7 +33,7 @@ def plot_histogram(name, data):
     sns.set_context("paper")
     sns.set_style('ticks', {'font.family': 'serif', 'font.serif': 'Times New Roman'})
     data = pd.DataFrame(data)
-    ax = sns.histplot(data, binwidth=0.1, binrange=[0.0,2.0], stat="percent", legend=False)
+    ax = sns.histplot(data, binwidth=0.1, binrange=[0.0,2.0], stat="percent", legend=False, fill=False)
     ax.set_xlabel("Relaxation Factor")
     ax.set_xlim(0.0,2.0)
     ax.set_ylim(0.0,25.0)
