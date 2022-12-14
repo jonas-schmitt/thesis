@@ -119,7 +119,7 @@
 \setminted[python]{fontsize=\footnotesize, breaklines, frame=lines
 , numbersep=7.5pt, numberblanklines=False}
 \setminted[scala]{fontsize=\footnotesize, breaklines, frame=lines, numbersep=7.5pt, numberblanklines=False}
-\AtBeginDocument{\RenewCommandCopy\qty\SI}
+%\AtBeginDocument{\RenewCommandCopy\qty\SI}
 \usepackage{etoolbox}
 
 \AtBeginEnvironment{tabular}{\small}
@@ -160,7 +160,8 @@
 \supervisor{Prof. Dr. Harald Köstler}
 \oralexam{}
 \dean{}
-\reviewer{Prof. Dr. Harald Köstler \\
+\reviewer{Prof. Dr. Harald Köstler \\ 
+Prof. Dr. Penousal Machado \\
 Prof. Dr. Dietmar Fey}
 
 
@@ -239,6 +240,7 @@ Prof. Dr. Dietmar Fey}
 % no sectioning numbering, header)
 \backmatter
   \faupressprintbibliography
+   \faupressprintacronyms
   \begingroup
   \listofalgorithms
   \let\clearpage\relax

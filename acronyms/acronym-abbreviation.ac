@@ -1,9 +1,157 @@
-\DeclareAcronym{fau}{
-  short = FAU,
-  long = Friedrich-Alexander-Universät Erlangen-Nürnberg
+\DeclareAcronym{MPI}{
+  short = MPI,
+  long = Message-Passing Interface
 }
 
-\DeclareAcronym{latex}{
-  short = \LaTeX,
-  long =  Lamport \TeX
+\DeclareAcronym{DSL}{
+  short = DSL,
+  long = Domain-Specific Language
 }
+
+\DeclareAcronym{IR}{
+  short = IR,
+  long =  Intermediate Representation
+}
+
+\DeclareAcronym{GE}{
+  short = GE,
+  long =  Grammatical Evolution
+}
+
+\DeclareAcronym{GCC}{
+  short = GCC,
+  long =  GNU C Compiler
+}
+
+\DeclareAcronym{PDE}{
+  short = PDE,
+  long = Partial Differential Equation
+}
+
+\DeclareAcronym{G3P}{
+  short = G3P,
+  long = Grammar-Guided Genetic Programming
+}
+
+\DeclareAcronym{GP}{
+  short = GP,
+  long = Genetic Programming
+}
+
+\DeclareAcronym{AI}{
+  short = AI,
+  long = Artificial Intelligence
+}
+
+\DeclareAcronym{ML}{
+  short = ML,
+  long = Machine Learning
+}
+
+\DeclareAcronym{AutoML}{
+  short = AutoML,
+  long = Automated Machine Learning
+}
+
+
+\DeclareAcronym{CSG}{
+  short = CSG,
+  long = Context-Sensitive Grammar
+}
+
+\DeclareAcronym{CFG}{
+  short = CFG,
+  long = Context-Free Grammar
+}
+
+\DeclareAcronym{RG}{
+  short = RG,
+  long = Regular Grammar
+}
+
+\DeclareAcronym{DEAP}{
+  short = DEAP,
+  long = Distributed Evolutionary Algorithms in Python
+}
+
+\DeclareAcronym{OpenMP}{
+  short = OpenMP,
+  long = Open Multi-Processing
+}
+
+\DeclareAcronym{RB-GS}{
+  short = RB-GS,
+  long = Red-Black Gauss-Seidel
+}
+
+\DeclareAcronym{GS}{
+  short = GS,
+  long = Gauss-Seidel
+}
+
+\DeclareAcronym{NSGA-II}{
+  short = NSGA-II,
+  long = Non-dominated Sorting Genetic Algorithm II
+}
+
+\DeclareAcronym{BiCGSTAB}{
+  short = BiCGSTAB,
+  long = Biconjugate Gradient Stabilized Method
+}
+
+\DeclareAcronym{CG}{
+  short = CG,
+  long = Conjugate Gradient Method
+}
+
+\DeclareAcronym{GMRES}{
+  short = GMRES,
+  long = Generalized Minimal Residual Method
+}
+
+\DeclareAcronym{CGC}{
+  short = CGC,
+  long = Coarse-Grid Correction
+}
+
+\DeclareAcronym{CGS}{
+  short = CGS,
+  long = Coarse-Grid Solver
+}
+
+\DeclareAcronym{GMG}{
+  short = GMG,
+  long = Geometric Multigrid
+}
+
+\DeclareAcronym{LFA}{
+  short = LFA,
+  long = Local Fourier Analysis
+}
+
+\DeclareAcronym{AMG}{
+  short = AMG,
+  long = Algebraic Multigrid
+}
+
+\DeclareAcronym{FMG}{
+  short = FMG,
+  long = Full-Multigrid Method
+}
+
+\DeclareAcronym{FAS}{
+  short = FAS,
+  long = Full-Approximation Scheme
+}
+
+\DeclareAcronym{CPU}{
+  short = CPU,
+  long = Central Processing Unit
+}
+
+\DeclareAcronym{NUMA}{
+  short = NUMA,
+  long = Non-Uniform Memory Access
+}
+
+
