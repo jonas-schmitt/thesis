@@ -78,7 +78,7 @@ In Listing~\ref{code:ir:abstact-base-class}, a common abstract base class is pro
 \end{listing}
 In addition to the already mentioned \emph{grid} data structure, this class also defines a \emph{shape} for each expression.
 From a mathematical point of view, each expression within a multigrid method either computes a matrix or a vector whose shape can be derived recursively from its operands.
-This shape is, thus, defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns of the corresponding matrix.
+This shape is thus defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns of the corresponding matrix.
 Note that a vector of size $n$ can simply be considered a matrix of shape $(n,1)$.
 Based on this abstract class, we can distinguish between predefined entities, such as the system matrix and right-hand side, and expressions that refer to the mathematical operations defined within a multigrid method.
 First of all, Listing~\ref{code:ir:entity} contains the implementation of the \emph{Entity} base class.
@@ -96,7 +96,7 @@ We can then further define classes for representing an approximate solution, rig
 \end{listing}
 The shape of each of these entities is determined by computing the product of the grid size over all dimensions.
 From a mathematical point of view, the \emph{Approximation} and \emph{RightHandSide} classes both represent vectors.
-We, thus, only implement the former and make use of inheritance to avoid unnecessary code duplication in the case of the latter.
+We, therefore, only implement the former and make use of inheritance to avoid unnecessary code duplication in the case of the latter.
 In addition to the attributes defined in its parent class, an \emph{Approximation} includes a \emph{predecessor} attribute.
 However, we postpone the discussion of this attribute's purpose until we implement the actual grammar.
 While the two Python classes shown in Listing~\ref{code:ir:approximation} correspond to the solution and right-hand side of a discretized PDE, Listing~\ref{code:ir:operator} represents its operator, given as one or multiple stencil codes.
@@ -113,7 +113,7 @@ In Section~\ref{subsec:stencil-codes}, we have already introduced a mathematical
 	\label{code:ir:stencil}
 \end{listing}
 The \emph{entries} attribute of this class directly corresponds to our definition of a stencil, whereby we use a \emph{tuple} object to represent this mathematical entity in the Python programming language.
-Each entry $e_i$ of this object is, thus, given as
+Each entry $e_i$ of this object is thus given as
 \begin{equation}
 	e_i = \left(\bm{a}_i, b_i \right),
 \end{equation} 
@@ -172,7 +172,7 @@ As a final step in the implementation of our intermediate representation, the \e
 	\label{code:ir:cycle}
 \end{listing}
 This class represents the execution of a complete multigrid cycle on a particular level.
-It, thus, computes a new value for the approximate solution $x_H$ on a particular level with spacing $H$, i.e.,
+It thus computes a new value for the approximate solution $x_H$ on a particular level with spacing $H$, i.e.,
 \begin{equation*}
 	x_H = x_H + \omega c_H \; \text{with} \; P,
 \end{equation*}
@@ -193,18 +193,18 @@ However, to automate the process of generating a multigrid method from its gramm
 For this purpose, we utilize the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
 However, before we proceed with this task, we want to address some final remarks about the IR presented in this section.
 The main purpose of the implementation presented here is to uniquely represent the computational structure of a multigrid method in the form of a redundancy-free directed graph.
-Thus, to be able to construct such a graph in a step-wise manner based on the formal system described in Chapter~\ref{chapter:multigrid-formal-language}, each \emph{Cycle} node needs to include additional references to the current approximate solution and right-hand side.
+Therefore, to be able to construct such a graph in a step-wise manner based on the formal system described in Chapter~\ref{chapter:multigrid-formal-language}, each \emph{Cycle} node needs to include additional references to the current approximate solution and right-hand side.
 While this information is important for the construction of the graph, it could later be discarded by replacing each such node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{update} function in Section~\ref{sec:multigrid-state-transitions}.
 Preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} objects within each graph.
 This not only enables us to easily determine the computational structure of a multigrid method by traversing the corresponding graph data structure but also facilitates the identification of potential errors in the implementation.
 We, therefore, represent each newly computed approximate solution as a \emph{Cycle} object, which is then referenced in subsequent computational steps of the method.
-Also, note that even though the translation of a graph-based representation to an algorithm later requires us to transform each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and, thus, does not induce a significant overhead within the process of algorithm generation.
+Also, note that even though the translation of a graph-based representation to an algorithm later requires us to transform each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and thus does not induce a significant overhead within the process of algorithm generation.
 
 \section{Grammar Generation}
 According to Section~\ref{sec:multigrid-grammar}, our family of context-free grammars (CFGs) for the generation of multigrid methods consists of three components, a set of terminals, variables, and productions, while additionally, we have to choose a starting symbol $\ps{S}$ from the set of variables.
 In Algorithm~\ref{table:grammar-semantics}, we have defined the semantics of each state transition function occurring within the productions listed in Algorithm~\ref{table:multigrid-grammar}.
 While each instance of our grammar has to be formulated on a specific grid hierarchy, we have already mentioned that it is possible to define a structurally-equivalent grammar on a different hierarchy of discretizations with the same number of coarsening steps.
-By treating the number of coarsening steps as a parameter, we can, thus, automate the process of grammar generation for different problems and discretizations.
+By treating the number of coarsening steps as a parameter, we can hence automate the process of grammar generation for different problems and discretizations.
 For this purpose, we first need to generate the set of terminals that is defined on each level of the hierarchy, which we encapsulate in the class \emph{Terminals} shown in Listing~\ref{code:grammar:terminals}.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/terminals.py}
@@ -213,7 +213,7 @@ For this purpose, we first need to generate the set of terminals that is defined
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
 First of all, since each smoother considered in this work is derived from the system operator, it can be generated automatically within the grammar.
-Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and, thus, might be provided by the user.
+Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and hence might be provided by the user.
 The implementation of a Python class for representing the coarse-grid solver can be found in Listing~\ref{code:ir:coarse-grid-solver}.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/coarse_grid_solver.py}
@@ -275,7 +275,7 @@ The generation of the actual smoothing expression is then performed in the funct
 	\label{code:grammar:smoothing}
 \end{listing}
 Similar to Production~\eqref{prod:smoothing}, the implementation of this function consists of a combination of \textsc{apply} and \textsc{update}, whereby we generate $\ps{B_{h}}$ using the function \emph{generate\_smoother}.
-To realize different smoothers, we, thus, only need to provide a generator function for each of them.
+To realize different smoothers, we thus only need to provide a generator function for each of them.
 For instance, Listing~\ref{code:grammar:jacobi} shows how a Jacobi-based smoother can be implemented.
 \begin{listing}
 	\inputminted{python}{evostencils/grammar/jacobi.py}
@@ -378,7 +378,7 @@ As we have discussed in Section~\ref{sec:multigrid-grammar}, Algorithm~\ref{tabl
 In Listing~\ref{code:grammar:terminals}, we have already implemented a data structure that includes all required terminals for a particular level of the discretization hierarchy.
 Therefore, instead of initializing a \emph{PrimitiveSetTyped} with the complete set of productions, we can instead add the respective \emph{Primitive} objects on a per-level basis.
 Furthermore, note that Algorithm~\ref{table:multigrid-grammar} is defined for a specific number of coarsening steps.
-We can, thus, implement a function that iteratively constructs a multigrid grammar independent of the total number of coarsening steps.
+We can thus implement a function that iteratively constructs a multigrid grammar independent of the total number of coarsening steps.
 This allows us to deploy the same function for the generation of multigrid grammars defined on different discretization hierarchies, for instance, with a different number of coarsening steps.
 As in the above example, we first need to generate a unique type for each variable that is defined on a certain level of our grammar.
 While in Listing~\ref{code:grammar:pset-example}, we have encoded each variable with an actual Python type, at this point, we have to introduce an additional constraint that prevents us from pursuing the same approach.
@@ -423,7 +423,7 @@ Consequently, if we provide an existing \emph{Types} object for the initializati
 We, therefore, only have to generate a unique type for each variable once, which can then be transferred to a lower level in the form of a reference to the respective \emph{Type} object.
 For the sake of simplicity, we identify each \emph{Type} object with a Python \emph{string}. 
 The resulting generation of each \emph{Type} object and its assignment to the respective attribute is performed in line~12--31.
-In contrast to the types that need to be defined on each level, both the \emph{Partitioning} and \emph{RelaxationFactorIndex} attribute is level-independent, and, thus, only a single type needs to be created for each of them, which is shown in line~33 and~34.
+In contrast to the types that need to be defined on each level, both the \emph{Partitioning} and \emph{RelaxationFactorIndex} attribute is level-independent, and thus only a single type needs to be created for each of them, which is shown in line~33 and~34.
 
 \subsection{Productions}
 With the implementation of a type system that allows expressing each production as a mapping between input and output types, we are now finally at the point where we can bring everything together.
@@ -448,7 +448,7 @@ Consider, for instance, the derivation
 \end{equation*}
 which is valid according Algorithm~\ref{table:multigrid-grammar}.
 However, the resulting method consists only of a single statement, which returns the initial approximate solutions.
-It is, thus, important to define the minimal requirements a sequence of operations needs to fulfill to qualify as a multigrid method. 
+It is therefore important to define the minimal requirements a sequence of operations needs to fulfill to qualify as a multigrid method. 
 While the optimal amount of smoothing and coarse-grid corrections might differ for each case, we consider it essential to apply the coarse-grid solver at least once to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
 We can enforce this requirement with the mentioned \emph{guard} attribute of the \emph{Type} class.
 As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
@@ -472,7 +472,7 @@ Now note that each derivation starts with \emph{S\_h} and ends with the type \em
 According to the productions in Algorithm~\ref{table:multigrid-grammar}, only four unique primitives are required on each level, except for the definition of different smoothers.
 For each of the \emph{Primitive} objects generated in line~7--12 whose list of input types contains only unguarded types, the output type is also unguarded.
 Consequently, so far, with none of the generated \emph{Primitive} objects, a transition from an unguarded to a guarded type is possible.
-We can, thus, enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~15.
+We can thus enforce that the coarse-grid solver is applied at least once within each derivation by including the necessary transition in line~15.
 Since this transition represents the only way to reach the final state, the application of the \emph{update\_with\_coarse\_grid\_solver} function is a necessary requirement for the termination of each derivation.
 Note that we only want to add this production on the lowest level, where it replaces the respective productions for the coarsening and coarse-grid correction steps.
 We, therefore, have to check whether we have arrived at the coarsest grid of the discretization hierarchy, which is done in line~10 of Listing~\ref{code:grammar:add-level}.
@@ -605,7 +605,7 @@ We can set $\varepsilon_n = \varepsilon$ and apply the natural logarithm to both
 \end{equation*} 
 where $n$ now represents the required number of iterations to achieve an error reduction of $\varepsilon$.
 For a particular convergence factor $\rho_n$, the number of iterations $n$ can now be considered as a function of $\varepsilon$. 
-We can, thus, insert the resulting term into Equation~\eqref{eq:solving-time-basic} and obtain
+We can thus insert the resulting term into Equation~\eqref{eq:solving-time-basic} and obtain
 \begin{equation*}
 	T_{\varepsilon} = t \cdot n_{\varepsilon} = t \cdot \frac{\ln \varepsilon}{\ln \rho_{n_{\varepsilon}}}.
 \end{equation*} 
@@ -617,7 +617,7 @@ If we additionally assume that $\rho_{n_{\varepsilon}} \approx \rho$ for a suffi
 Note that since the negative value of the natural logarithm decreases between zero and one, a smaller convergence factor leads to a faster solving time.
 For example, achieving an error reduction of $\varepsilon = 10^{-6}$ with a convergence factor of $\rho = 0.5$ would require 20 iterations, while with a convergence factor of $\rho = 0.1$, the same accuracy is achieved in only six iterations.
 Consequently, there are two possibilities to improve upon an existing solver: Reducing its execution time $t$ or convergence factor $\rho$. 
-However, as we have discussed in Section~\ref{sec:multigrid-cycles}, the choice of each method usually represents a compromise between a lower number of computations and, thus, a faster execution time and a faster convergence, which usually requires more computations.
+However, as we have discussed in Section~\ref{sec:multigrid-cycles}, the choice of each method usually represents a compromise between a lower number of computations and hence a faster execution time and a faster convergence, which usually requires more computations.
 
 While we have now derived suitable metrics for assessing the quality of an iterative method, we have not yet answered how to choose one or multiple optimization objectives based on this information.
 In addition to achieving a fast solving time, the main goal of automated algorithm design is \emph{generalization}, which means that we aim to find multigrid methods that are robust in solving problems with similar characteristics.
@@ -636,7 +636,7 @@ While LFA Lab yields reliable predictions for many model problems and common mul
 
 A second option to decrease the evaluation cost is to estimate the quality of a given solver by measuring its characteristics on a number of proxy problems that are faster to solve than the original problem while possessing similar mathematical properties.
 One of the main features of multigrid is that, if properly constructed, these methods can achieve $h$-independent convergence, which means that we can apply the same solver to a larger instance of the same problem without slowing down its convergence~\cite{trottenberg2000multigrid}.
-Therefore, in case our goal is to solve a certain PDE discretized on a grid with step size $h$, we can instead consider an instance of the same PDE on a similar grid with lower resolution and, thus, a larger spacing of the grid points.
+Therefore, in case our goal is to solve a certain PDE discretized on a grid with step size $h$, we can instead consider an instance of the same PDE on a similar grid with lower resolution and thus a larger spacing of the grid points.
 If a given multigrid method is able to achieve $h$-independent convergence on a sequence of increasingly finer-resolved instances of the same PDE, there is a high probability that the method also generalizes to other problem instances.
 However, the execution of this approach requires us to generate efficient implementations for each multigrid method considered, which can then be executed to obtain the relevant quality metrics on each proxy problem.
 For this purpose, we need to automate the process of generating a solver implementation based on its algorithmic representation.
@@ -670,10 +670,10 @@ To illustrate this approach, Listing~\ref{code:exaslang-example} shows an ExaSla
 \end{listing}
 As this example demonstrates, ExaSlang enables the formulation of the same operations on different levels of a discretization hierarchy based on so-called \emph{level declarations}\footnote{In case no level declaration is provided, ExaStencils assumes that the operation is applied on the current level.}.
 Similar to the specification of the grid spacing as a subscript in Algorithm~\ref{alg:example-three-grid-method}, we can utilize this notation to formulate each operation within a multigrid method relative to the \emph{finest} grid.
-Since the ExaSlang specification of a multigrid method is, thus, independent of the actual discretization, the ExaStencils compiler is able to generate implementations of the same solver for different grid sizes.
+Since the ExaSlang specification of a multigrid method is thus independent of the actual discretization, the ExaStencils compiler is able to generate implementations of the same solver for different grid sizes.
 Furthermore, as ExaSlang supports the formulation of each multigrid operation in a high-level mathematics-like syntax, we can apply the same solver to different problems only by changing the definitions of the individual operators, such as the system, prolongation, and restriction operator.
 Therefore, ExaStencils is ideally suited for the automatic generation and evaluation of multigrid methods within our evolutionary program synthesis approach.
-While ExaStencils is implemented in the Scala programming language and can, thus, not be accessed directly within Python code, it provides simple configuration files, which allow us to adapt certain problem characteristics, such as the grid spacing and the number of coarsening steps.
+While ExaStencils is implemented in the Scala programming language and can thus not be accessed directly within Python code, it provides simple configuration files, which allow us to adapt certain problem characteristics, such as the grid spacing and the number of coarsening steps.
 Furthermore, additional code generation options, such as compiler-based performance optimizations, can be en- or disabled.
 To encapsulate the usage of the ExaStencils compiler, EvoStencils provides a \emph{ProgramGenerator} class\footnote{Due to the vast and complicated implementation of this class, it is omitted in this thesis, while its functionality is described informally.}.
 In addition to the automatic adaption of the respective configuration files and the actual execution of the code generation process, this class also includes functionality for extracting the required information about a given problem based on an existing ExaSlang specification. 

@@ -16,7 +16,7 @@ Artificial intelligence (AI) methods have demonstrated super-human performance i
 Alongside the widespread success of AI methods in these domains, techniques for automated algorithm design have achieved breakthroughs in a number of cases, such as the design of SAT-solvers~\cite{khudabukhsh2016satenstein} and mixed-integer programming~\cite{hutter2010automated}.
 In general, methods for automated algorithm design can be classified into \emph{top-down}, and \emph{bottom-up} approaches.
 Top-down approaches, often also called algorithm configuration methods, aim to represent an algorithm design space as a finite list of global parameters.
-Finding an optimal algorithm design, thus, corresponds to solving a combinatorial optimization problem, sometimes including continuous parameters, which can be tackled using classical black-box optimizers like evolutionary algorithms~\cite{back1996evolutionary} and bayesian optimization~\cite{frazier2018tutorial}.
+Finding an optimal algorithm design thus corresponds to solving a combinatorial optimization problem, sometimes including continuous parameters, which can be tackled using classical black-box optimizers like evolutionary algorithms~\cite{back1996evolutionary} and bayesian optimization~\cite{frazier2018tutorial}.
 However, a severe limitation of these approaches is that they do not allow modifying individual steps of an algorithm unless each of them is represented as a distinct global parameter.
 Bottom-up design methods aim to overcome these limitations by considering the construction of an algorithm from its fundamental building blocks.
 An algorithm is essentially a list of statements written in a formal language.
@@ -37,6 +37,6 @@ To overcome the inherent limitations of this approach, this thesis considers the
 For this purpose, a novel formal language for the automated bottom-up design of multigrid methods will be introduced.
 By levering the power of evolutionary computation, it will be demonstrated that this language enables the discovery of unique sequences of multigrid operations that can yield faster solvers than classical multigrid cycles.
 In the following, a basic understanding of the fundamental theory of multigrid methods, formal languages, and evolutionary program synthesis will be established first to give the reader the necessary background for the main part of this thesis.
-%In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and, thus, might affect multiple computational steps simultaneously. 
-%For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and, thus, leads to a globally different type of multigrid cycle.
+%In general, designing an algorithm based on a set of global parameters can be summarized under the term \emph{top-down}, as the choice of each parameter has a global effect on the method's behavior and thus might affect multiple computational steps simultaneously. 
+%For instance, choosing a different value for the parameter $\mu$ in Algorithm~\ref{alg:multigrid-cycle} influences the number of recursive descents on every level and thus leads to a globally different type of multigrid cycle.
 %In contrast, a bottom-up approach is characterized by the ability to change each computational step within an algorithm without affecting the behavior of any other.

@@ -6,7 +6,7 @@ In contrast, iterative methods compute a series of approximations for the soluti
 Even though this series often converges to the exact solution, there is usually no guarantee that the approximations will ever reach the accuracy of a solution computed by a direct method.
 Unfortunately, for many problems applying direct methods is infeasible due to their high computational complexity and memory storage requirements.
 For instance, Gaussian elimination, in general, requires $\mathcal O(n^3)$ operations for solving a system of linear equations with $n$ unknowns.
-Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, the method is based on the direct manipulation of the input matrix and, hence, usually requires storing it explicitly.
+Moreover, since the goal of Gaussian elimination is to transform a given matrix into upper-triangular form, the method is based on the direct manipulation of the input matrix and hence usually requires storing it explicitly.
 In contrast, many iterative methods only require the computation of matrix-vector products and do not manipulate the input matrix directly.
 
 As we have illustrated in Section~\ref{subsec:stencil-codes}, the discretization of many partial differential equations (PDEs) enables the representation of matrix-vector products as the application of a stencil code, whereas each stencil is directly derived from the discretization of a continuous differential operator.
@@ -69,7 +69,7 @@ Furthermore, setting $M = A$ allows us to compute the solution of the system in 
 	\label{eq:one-step-iteration}
 \end{equation}
 which leads to $\bm{x}^{(k+1)} = A^{-1}\bm b$.
-The result of this iteration $\bm{x}^{(k+1)}$ is, thus, independent of the choice of $\bm{x}^{(k)}$. 
+The result of this iteration $\bm{x}^{(k+1)}$ is thus independent of the choice of $\bm{x}^{(k)}$. 
 If we insert $\bm{x} = A^{-1}\bm b$ into Equation~\eqref{eq:general-system-of-linear-equations}, it becomes apparent that this term always represents the correct solution of the respective system of linear equations.
 Since the computation of the inverse of a general matrix $A$ is more expensive and numerically unstable than solving the system directly, the application of Equation~\eqref{eq:one-step-iteration} is, of course, impractical.
 However, this derivation already provides us with an intuition about the choice of $M$.
@@ -185,7 +185,7 @@ Remember that the iterative methods introduced in the last section can all be co
 \begin{equation*}
 	\bm{x}^{(k+1)} = \bm{x}^{(k)} + M^{-1}(\bm b - A \bm{x}^{(k)}).
 \end{equation*}
-Assuming that $\bm{e}^{(k)} = \bm{0}$, we, thus, have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
+Assuming that $\bm{e}^{(k)} = \bm{0}$, we thus have $\bm{x}^{(k)} = \bm{x}^{*}$ and the above equation is reduced to
 \begin{equation*}
 	\bm{x}^{(k+1)} = \bm{x}^{*}.
 \end{equation*}
@@ -226,7 +226,7 @@ Since we have derived Equation~\eqref{eq:stationary-iterative-method-series} fro
 \begin{equation}
 	\bm{x}^{*} = (I - M^{-1} A)^k \bm{x}^{*} + N^{(k)}\bm{b},
 \end{equation}
-is a fixed point of this sequence and, thus, subtracting by $\bm{x}^{*}$ yields
+is a fixed point of this sequence and thus subtracting by $\bm{x}^{*}$ yields
 \begin{equation}
 	\bm{x}^{(k)} - \bm{x}^{*} = (\underbrace{I - M^{-1} A}_{G})^k (\bm{x}^{(0)} - \bm{x}^{*}).
 	\label{eq:iteration-matrix-sequence}

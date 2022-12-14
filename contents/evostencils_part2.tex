@@ -92,7 +92,7 @@ As discussed in Section~\ref{sec:generalization:objective-function-definition}, 
 Also, note that if there is only a small difference between the execution times of two non-dominating solvers, even slight hardware-based fluctuations in the measurements might perturb the outcome of an evaluation.
 Considering a larger instance of the same problem reduces the relative magnitude of these fluctuations compared to the overall evaluation time.
 At the end of Algorithm~\ref{alg:generalization-procedure}, we obtain a population that has evolved against a sequence of problem instances that iteratively approaches the size of the target instance.
-We thus identify the fastest solver by only considering those individuals contained in the first non-dominated front of this population, i.e., the subset in which none of the individuals is dominated by any of those present in the population.
+We, therefore, identify the fastest solver by only considering those individuals contained in the first non-dominated front of this population, i.e., the subset in which none of the individuals is dominated by any of those present in the population.
 
 Finally, note that so far, we have only considered increasing the problem size while evolving the population.
 However, in certain cases, a PDE contains additional parameters which need to be adapted accordingly.
@@ -160,7 +160,7 @@ A common approach to accelerate the computationally intensive parts of an evolut
 An overview of different approaches for the distributed parallelization of evolutionary algorithms can be found in~\cite{gong2015distributed}.
 In principle, we can distinguish between approaches that are behaviorally equivalent to a sequential evolutionary algorithm and those that do not fulfill this property, usually in order to achieve better scalability.
 Unfortunately, which approach leads to the best outcome can not be answered in general.
-Before deciding on a specific parallelization method, we thus first need to investigate which parts of our evolutionary search method have to be parallelized to achieve good scalability.
+Before deciding on a specific parallelization method, we hence first need to investigate which parts of our evolutionary search method have to be parallelized to achieve good scalability.
 
 \subsection{Empirical Execution Time Analysis}
 \label{sec:execution-time-analysis}
@@ -212,7 +212,7 @@ Consequently, we can drastically reduce the execution time of our implementation
 Since we have to evaluate at least a single individual per compute node, the maximum achievable speedup is equal to $\lambda$, i.e., the number of children created in each generation of our method.
 Finally, we need to answer the question of whether the previous statements still hold when we apply our evolutionary program synthesis method to other PDE-based problems.
 Therefore, note that the two-dimensional Poisson equation represents a common test problem that is well known to be efficiently solvable by multigrid.
-In fact, Poisson's equation has motivated the development of multigrid methods by Fedorenko~\cite{fedorenko1962relaxation}, Brandt~\cite{brandt1977multi} et al., and thus these methods achieve the highest possible degree of efficiency in solving it.
+In fact, Poisson's equation has motivated the development of multigrid methods by Fedorenko~\cite{fedorenko1962relaxation}, Brandt~\cite{brandt1977multi} et al., and hence these methods achieve the highest possible degree of efficiency in solving it.
 For the majority of other PDE-based problems of similar size, we can expect a further increase in the execution time, which leads to an even larger relative time consumption of the evaluation step.
 Therefore, we can safely assume that our observation for the given test problem can be safely carried over to other PDE-based problems of similar or greater size and difficulty.
 

@@ -175,7 +175,7 @@ where each matrix $A_{ij}$ corresponds to a set of adjacent grid points containe
 A more detailed treatment of block smoothers can be found in~\cite{trottenberg2000multigrid}.
 For each smoothing and coarse-grid correction step, the relaxation factor $\omega$ can be chosen from the above interval.
 As a baseline for assessing the efficiency and generalizability of the designed multigrid solvers, we consider a number of common multigrid cycles with RB-GS smoothing and optimized relaxation factors.
-We thus formulate these methods on the same five-grid hierarchy using the same restriction, prolongation operators, and coarse-grid solver.
+We hence formulate these methods on the same five-grid hierarchy using the same restriction, prolongation operators, and coarse-grid solver.
 In each case, we consider the corresponding linear system as solved when the initial residual has been reduced by a factor of $10^{-12}$.
 
 \subsection{Experimental Settings and Evaluation Platform}
@@ -302,7 +302,7 @@ However, the algorithm still significantly improves upon the current minimum of 
 For the second objective $t$, the majority of improvement happens within the first 50--70 generations, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}.
 Note that while the convergence factor is constant for each execution of the same solver, $t$ is obtained by measuring its execution time on the respective compute node.
 Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive runs.
-Consequently, even though the algorithm is able to reduce the second objective faster, this effect induces a larger deviation between the individual experiments and, thus, an overall higher standard deviation.
+Consequently, even though the algorithm is able to reduce the second objective faster, this effect induces a larger deviation between the individual experiments and thus an overall higher standard deviation.
 
 As a next step, we can assess the difficulty of the underlying problem by considering the absolute value of the minimum convergence factor attained in each of the three different cases.
 While the execution time per iteration $t$ is solely determined by the computational complexity of each solver and the properties of the given computer architecture, a smaller convergence factor indicates that the underlying problem is easier to solve.
@@ -843,7 +843,7 @@ In the case of the indefinite Helmholtz equation, this strategy is infeasible du
 First of all, doubling the wavenumber requires us to use twice as many grid points in each dimension because of the requirement $kh = 0.625$.
 This means that we end up with a system of linear equations that is not only significantly worse conditioned but also has four times the number of unknowns.
 As a consequence, solving Helmholtz problems with a large wavenumber becomes tremendously expensive, which makes the evaluation of a large number of different preconditioners infeasible.
-Furthermore, our goal is to design multigrid methods that can be applied to a wide range of different problem instances, and thus, generalizability is one of our main concerns.
+Furthermore, our goal is to design multigrid methods that can be applied to a wide range of different problem instances, and hence, generalizability is one of our main concerns.
 In Section~\ref{sec:generalization-procedure}, we have already proposed a systematic procedure for the generalization of a population of individuals to multiple instances of the same problem.
 This method aims to evolve a population of generalizable multigrid methods by iteratively increasing the size of the test problem considered within the evaluation of each solver after a certain number of generations $m$.
 While the formulation of our problem based on the wavenumber-dependent grid spacing $h$ allows us to construct problem instances of larger size and difficulty in a straightforward manner, it is unclear after how many generations this operation should be performed.
@@ -917,7 +917,7 @@ The second quality metric that we aim to investigate in this section is the capa
 Therefore, we consider three different wavenumbers $k = 160, 320$, and $640$ for the evaluation of each method, which we perform on a single compute node of SuperMUC-NG using an OpenMP-based shared-memory parallelization  with 48 threads, such that each thread is executed on a dedicated CPU core.
 As multigrid-based preconditioners, we consider different V-, W-, and F-cycles with up to five pre- and post-smoothing steps based on the configuration space described in Section~\ref{sec:solver-configuration-helmholtz}.
 Similar to previous works on multigrid-based preconditioners for the indefinite Helmholtz equation~\cite{erlangga2006multigrid,erlangga2008advances,cocquet2017shift}, the same smoother and relaxation factor is applied for a fixed number of steps on each level.
-To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and hence worst conditioned problem with $k = 640$.
+To find out which combination of smoother and relaxation factor works best for each cycle, we have first tested each of them on the largest and thus worst conditioned problem with $k = 640$.
 However, since none of the available configuration options led to a converging solver for this case, we instead consider the next smaller problem size with a wavenumber of $k = 320$ to find out which pair of smoother and relaxation factor leads to the fastest solving time for each multigrid cycle.
 In general, according to our experimental evaluation RB-GS represents the single most efficient smoother for the given case, while Jacobi-type smoothers only lead to a converging solver for wavenumbers of at most $k = 160$, however, with less efficiency compared to RB-GS.
 Table~\ref{table:reference-methods-helmholtz} shows the resulting average solving times for each multigrid cycle with RB-GS smoothing and an optimum relaxation factor for $k = 320$, where the omission of a number means that convergence could not be achieved within 20,000 iterations. 
@@ -965,7 +965,7 @@ Table~\ref{table:reference-methods-helmholtz} shows the resulting average solvin
 \end{table}
 Since the use of more than three pre- and post-smoothing steps did not yield any additional benefits, we have omitted all multigrid cycles with a higher number of smoothing steps.
 To cut down the variability between individual measurements, each value contained in the table represents the average of 50 solver executions.
-As expected, a higher number of smoothing and coarse-grid correction steps increases the efficiency of the preconditioner and thus leads to a lower number of iterations until convergence.
+As expected, a higher number of smoothing and coarse-grid correction steps increases the efficiency of the preconditioner and hence leads to a lower number of iterations until convergence.
 However, if we consider the configuration that leads to the fastest solving time, which is the V(0,1), we can see that a single coarse-grid correction followed by a single step of RB-GS smoothing is the best choice for all wavenumbers considered.
 After determining the best possible configuration for each classical multigrid cycle, we can finally investigate whether the multigrid methods designed with our evolutionary program synthesis approach are able to achieve the same degree of efficiency and generalizability in preconditioning indefinite Helmholtz problems.
 

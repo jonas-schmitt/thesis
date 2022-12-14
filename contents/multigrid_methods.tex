@@ -77,7 +77,7 @@ Again, the first plot shows the initial error, while the second and third contai
 In accordance with our previous observations, the attained improvement achieved with both methods can be almost fully attributed to the reduction of the highly-oscillating component.
 Because the remaining error is more smooth than initially, basic iterative methods are often called \emph{smoothers}, and their effectiveness is measured in terms of their capability to reduce the high-frequency components of a given error. 
 
-Now observe what happens if we represent the same low-frequency error component shown in the first row of Figure~\ref{fig:different-error-components} on a grid with larger step size $h = 2^{-6}$ and, thus, a smaller number of grid points.
+Now observe what happens if we represent the same low-frequency error component shown in the first row of Figure~\ref{fig:different-error-components} on a grid with larger step size $h = 2^{-6}$ and thus a smaller number of grid points.
 Because the number of (inner) grid points $n = 1/h - 1$ is inversely proportional to the step size, we call such a grid \emph{coarser}.
 The resulting error reduction, again after 100 iterations of each method, is shown in Figure~\ref{fig:low-frequency-error-component-coarse}. 
 \begin{figure}
@@ -273,7 +273,7 @@ In both cases, we obtain a system of two linear equations
 which must be solved for each block, for instance, using a direct solver such as Gaussian elimination.
 As in the pointwise Jacobi method, each block can be solved independently, and hence operations on different blocks can be performed in parallel. 
 Considering the fact that a direct solver, in general, requires $\mathcal{O}(n_b^3)$ operations to solve each block, the overall computational cost of applying a block smoother can be estimated with $\mathcal{O}(n_b^3 \cdot n / n_b) = \mathcal{O}(n_b^2 n)$.
-Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and, hence, solve the original system using Gaussian elimination.
+Note that choosing $n_b = n$ means that we treat the whole matrix $A$ as a single block and thus solve the original system using Gaussian elimination.
 In contrast, the choice of $n_b = 1$ corresponds to the pointwise Jacobi method, which can be computed with a constant number of operations per grid point.
 While we here only provide a brief introduction to block smoothers, it must be mentioned that it is also possible to define block variants for other smoothers, such as the Gauss-Seidel and red-black Gauss-Seidel method.
 Finally, it is also possible to define overlapping block smoothers, which means that multiple blocks contain the same grid point as an unknown~\cite{trottenberg2000multigrid}.
@@ -345,7 +345,7 @@ In contrast, the slope of the second error component, which is relatively smooth
 	\caption{Oscillatory and smooth error components discretized on a hierarchy of grids with decreasing step size.}
 	\label{fig:error-on-multiple-levels}
 \end{figure}
-Assuming that an error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and, thus, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define a coarse-grid correction 
+Assuming that an error $\bm{e}_{2h}$ on the coarse grid consists exclusively of smooth components and thus $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$, we can define a coarse-grid correction 
 \begin{equation}
 	\bm{x}^{(k+1)}_h = \bm{x}^{(k)}_h + I_{2h}^h \bm{e}_{2h}.
 \end{equation} 
@@ -385,11 +385,11 @@ Since the error $\bm{e}_{2h}^{(k+1)}$ in step $k+1$ is defined as
 \begin{equation*}
 	\bm{e}_{2h}^{(k+1)} = \bm{x}_{2h}^{(k+1)} - \bm{x}_{2h}^{(k)},
 \end{equation*}
-and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose $\bm{x}_{2h}^{(0)} = I_{2h}^{h} \bm{x}_{h}^{(0)}$ and, hence, obtain the iteration
+and assuming that $\bm{x}_{h}^{(0)}$ is smooth, we can choose $\bm{x}_{2h}^{(0)} = I_{2h}^{h} \bm{x}_{h}^{(0)}$ and thus obtain the iteration
 \begin{equation}
 	\bm{x}_{2h}^{(1)} = I_{h}^{2h} \bm{x}_{h}^{(0)} + M_{2h}^{-1} ( I_{h}^{2h} \bm{b}_h - \underbrace{I_{h}^{2h} A_h I_{2h}^{h}}_{A_{2h}} I_{h}^{2h} \bm{x}_{h}^{(0)} ).
 \end{equation}
-Performing one smoothing step with an initial guess of zero on the coarse-grid error equation is, thus, similar to smoothing on the equation
+Performing one smoothing step with an initial guess of zero on the coarse-grid error equation is thus similar to smoothing on the equation
 \begin{equation}
 	I_{h}^{2h} A_h I_{2h}^h \bm{x}_{2h} = I_{h}^{2h} \bm{b}_h,
 \end{equation}
@@ -633,7 +633,7 @@ The corresponding implementation of a \emph{multigrid cycle} in the form of the 
 	\end{algorithmic}
 \end{algorithm}
 Note that this function has a number of additional parameters compared to our original two-grid method.
-First of all, $k$ defines the number of discretization levels and, thus, determines how many recursive coarsening steps need to be performed until the respective system of linear equations is solved directly.
+First of all, $k$ defines the number of discretization levels and thus determines how many recursive coarsening steps need to be performed until the respective system of linear equations is solved directly.
 Furthermore, since sometimes a single recursive application of this function is not sufficient to obtain a reasonably accurate approximation on the coarse grid, additional coarse-grid correction steps can be performed, as controlled by the parameter $\gamma$.
 Finally, the parameters $\nu_1$ and $\nu_2$ specify the number of smoothing steps before and after the coarse-grid correction is performed, respectively.
 Note that when applying multiple sweeps of smoothing or coarse-grid correction, the initial guess is replaced by the approximation obtained in the previous step.
@@ -864,7 +864,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 	\label{fig:f-cycle}
 \end{figure}
 Except for $k = 3$, in which case the F-cycle and W-cycle are equivalent, this method represents a compromise between a pure V-cycle and W-cycle.
-While the composition of a multigrid method from different cycle types represents an additional degree of freedom, the individual cycles are still derived from the rules of Algorithm~\ref{alg:multigrid-cycle} and are, thus, fully described by the aforementioned parameters.
+While the composition of a multigrid method from different cycle types represents an additional degree of freedom, the individual cycles are still derived from the rules of Algorithm~\ref{alg:multigrid-cycle} and are thus fully described by the aforementioned parameters.
 Since, according to the classical formulation of a multigrid method as in~\cite{brandt1977multi,hackbusch2013multi,trottenberg2000multigrid,briggs2000multigrid}, these parameters are considered global, adapting one of their values uniformly changes the method's behavior on each level. 
 While for many applications, this approach has demonstrated to yield efficient multigrid methods~\cite{trottenberg2000multigrid}, there are still cases where multigrid could not yet achieve its full potential~\cite{ernst2012difficult,benzi2005numerical}.
 Even though, to date, there exists a rich amount of research on the optimization of multigrid cycles based on a fixed set of global parameters, the variation of its components on an individual level has not been considered yet.

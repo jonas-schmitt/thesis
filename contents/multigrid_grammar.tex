@@ -58,7 +58,7 @@ Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-tradit
 	\caption{Example for a non-classical multigrid method.}
 	\label{fig:non-traditional-multigrid-cycle}
 \end{figure}
-While this method reaches the coarsest level twice and, hence, at first sight, looks similar to a W-cycle, it employs a unique pattern of computations that is completely different from any known multigrid cycle.
+While this method reaches the coarsest level twice and hence, at first sight, looks similar to a W-cycle, it employs a unique pattern of computations that is completely different from any known multigrid cycle.
 As a consequence, this method can not be represented within the classical framework of multigrid cycles, as formulated in Algorithm~\ref{alg:multigrid-cycle}.
 To overcome the limitations of this formulation by constructing multigrid methods with a unique sequence of computations on each discretization level, a new formal language is needed.
 The first step toward the development of such a language is to find a way to represent the state within each step of a multigrid method.
@@ -93,7 +93,7 @@ On each level except for the lowest, the following three operations can be perfo
 Except for the operators $A_h$, $I_h^{2h}$ and $I_{2h}^h$ the result of each of these operations exclusively depends on the current value of the approximate solution on subsequent levels, i.e., $x_{h}$ and $x_{2h}$, and the right-hand side $b_h$.
 However, in contrast to the coarse-grid correction step, which makes use of the current approximate solution on the coarse grid, both smoothing as well as coarsening requires us first to compute the residual $r_h = b_h - A_h x_h$, which can be considered as an intermediate step.
 While this differentiation is not strictly necessary, it leads to simpler expressions since both operations can then be split into two steps.
-Furthermore, as in practice, the error can usually not be computed directly, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and, hence, has to be computed repeatedly.
+Furthermore, as in practice, the error can usually not be computed directly, the residual is often the only available metric to investigate whether a multigrid iteration has achieved a certain amount of error reduction and hence has to be computed repeatedly.
 %The residual is then either restricted and assigned to the right-hand side $b_{2h}$ or employed to reduce the oscillatory error components of the approximate solution by computing a coarse-grid correction term of the form $\omega A_h^{-1} r_h$.
 To derive a general representation for the state of a multigrid method based on our previous observations, we next consider the sequence of operations shown in Algorithm~\ref{alg:example-three-grid-method}, which corresponds to a three-grid V-cycle that performs one step of underrelaxed Jacobi smoothing on the second finest level.
 \begin{algorithm}[t]
@@ -287,7 +287,7 @@ A_{2h} x_{2h} = I_{h}^{2h} r_h,
 \end{equation*} 
 we have to assign this expression to the right-hand side $b_{2h}$ that is contained in the corresponding state tuple.
 Furthermore, as discussed in the last section, before we can transition to a state on the next coarser grid, we have to store the previous state in the fourth entry of the resulting tuple.
-The resulting state transition is implemented in the function \textsc{coarsening} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that the computation proceeds on a lower level and, thus, a coarser grid.
+The resulting state transition is implemented in the function \textsc{coarsening} shown in Algorithm~\ref{alg:state-transition-cycle}, whose name indicates that the computation proceeds on a lower level and thus a coarser grid.
 \begin{algorithm}[h]
 	\begin{algorithmic}
 	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
@@ -364,8 +364,8 @@ The main components of this language are summarized in Algorithm~\ref{table:gram
 
 Now let us revisit one of the main goals of this language: The description of multigrid methods that execute a unique sequence of operations on each level, which can not be formulated in the classical framework of multigrid cycles.
 To achieve this goal, we have ensured that each possible state transition within a multigrid method is described by the application of a specific sequence of well-defined functions. 
-At the same time, we have carefully avoided the inclusion of transitions spanning over multiple states, as this would reduce the expressiveness of our language, and, thus, similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
-The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is, thus, the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
+At the same time, we have carefully avoided the inclusion of transitions spanning over multiple states, as this would reduce the expressiveness of our language, and thus similar to Algorithm~\ref{alg:multigrid-cycle}, restrict it to only a subset of all possible multigrid methods.
+The remaining step within the development of a formal system for the construction of arbitrary sequences of multigrid operations is thus the derivation of a formal grammar that generates the corresponding strings contained in our multigrid language, as it has been described in Section~\ref{sec:formal-languages}.
 
 \section{A Novel Class of Multigrid Grammars}
 \label{sec:multigrid-grammar}
@@ -382,7 +382,7 @@ The main goal of this work is to enable the automated design of multigrid method
 As we have discussed in Section~\ref{sec:gggp}, the application of tree-based grammar-guided genetic programming (G3P) requires each derivation of a grammar to be representable as a tree, which is then called a derivation tree.
 The class of grammars that fulfills this property corresponds to the type-2 category of the Chomsky hierarchy.
 Type-2 grammars are characterized by the constraint that only a single variable is allowed to be placed on the left-hand side of each production, which means that the applicability of each production is independent of the context in which the variable is embedded. 
-These grammar are, thus, said to be context-free.
+These grammar are thus said to be context-free.
 Since each non-terminal node of a derivation tree corresponds to a variable of the corresponding context-free grammar (CFG), all operations that are required within a G3P method can be defined in a straightforward manner, which has already been shown in Section~\ref{sec:gggp-initialization}~and~\ref{sec:gggp-mutation-and-recombination}.
 In the following, we will derive a family of CFGs for the construction of multigrid methods on discretization hierarchies of variable depth that is based on the state representation and transition rules defined in Section~\ref{sec:multigrid-states}~and~\ref{sec:multigrid-state-transitions}.
 Therefore, starting from the initial state 
@@ -395,7 +395,7 @@ Each of these productions needs to be expressed as a sequence of transitions tha
 In Section~\ref{sec:multigrid-state-transitions}, we have made the distinction between states where a new approximate solution $x_h$ is computed and those with the purpose of constructing a correction term $c_h$ based on the residual expression $r_h = b_h - A_h x_h$.
 To define the respective productions on every level of a given discretization hierarchy, we need to recursively determine how the final state of a multigrid method can be reached.
 Note that in this state, all computational steps are combined in $x_h$ as a single expression.
-We represent the final state of a multigrid method as the variable $\ps{s_h}$ and, thus, obtain the initial production
+We represent the final state of a multigrid method as the variable $\ps{s_h}$ and thus obtain the initial production
 \begin{production}
 	\bnfprod{$S$} {
 		\bnfpn{$s_h$}
@@ -430,7 +430,7 @@ On the topmost level, a correction term is always obtained by computing the resi
 	}.
 \label{prod:residual}
 \end{production}
-Multiple smoothing steps can, thus, be realized by means of a repeated application of the Productions~\eqref{prod:residual}~and~\eqref{prod:smoothing}.
+Multiple smoothing steps can thus be realized by means of a repeated application of the Productions~\eqref{prod:residual}~and~\eqref{prod:smoothing}.
 In contrast to smoothing, a coarse-grid correction updates the current approximate solution with a correction term that is constructed based on an approximate solution for the error equation on the next lower level in the discretization hierarchy.
 We can express this operation as a combination of the \textsc{update} and \textsc{cgc} transition functions, which yields the production
 \begin{production}
@@ -636,7 +636,7 @@ Until now, we have been exclusively concerned with the problem of developing a f
 However, in contrast to Figure~\ref{fig:example-three-grid-method-derivation-tree}, within an evolutionary program synthesis method, a derivation tree is usually generated by applying a sequence of productions in a randomly-chosen order, either to alter an already existing tree or to create a completely new one from scratch.
 We, therefore, have to consider the task of deriving a method's algorithmic formulation based on its representation as a derivation tree and the semantical interpretation of each of its nodes.
 As we have seen in Section~\ref{sec:multigrid-state-transitions}, the application of each transition function generated by our grammar returns a new state $Z_H$ consisting of a tuple $\left( x_{H}, b_{H}, c_{H}, Z_{H/2}\right)$, where $H$ is the grid spacing on the current level.
-Starting from the initial state tuple $\left(x_{h}^0, b_{h}, \lambda, \lambda\right)$, we can, thus, apply the respective sequence of transition functions in a bottom-up manner until we arrive at the final state $\left(x_{h}, b_{h}, \lambda, \lambda\right)$.
+Starting from the initial state tuple $\left(x_{h}^0, b_{h}, \lambda, \lambda\right)$, we can hence apply the respective sequence of transition functions in a bottom-up manner until we arrive at the final state $\left(x_{h}, b_{h}, \lambda, \lambda\right)$.
 As Figure~\ref{fig:example-tree-grid-method-states} demonstrates, the first component $x_{h}$ of this tuple then combines all computational steps of the corresponding multigrid method in a single expression
 \begin{equation}\tag{4.7}
 	\begin{split}
@@ -681,7 +681,7 @@ The expression that needs to be assigned to this variable is then generated by r
 Since the graph is traversed starting from the last operation, the algorithmic instructions are generated in reverse order. 
 To avoid redundant computations, whenever a node is reached that either corresponds to an approximate solution or a right-hand side, we have to ensure that the respective subgraph is only generated once and assigned to a separate variable, which can then be referenced in all subsequent expressions.
 Finally, the process of algorithm generation is carried out until only nodes without any outgoing edges are reached.
-For Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}, we, thus, obtain the algorithmic representation shown in Algorithm~\ref{alg:example-three-grid-method-generated}.
+For Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}, we thus obtain the algorithmic representation shown in Algorithm~\ref{alg:example-three-grid-method-generated}.
 Note that this formulation is mathematically equivalent to the three-grid method shown in Algorithm~\ref{alg:example-three-grid-method}, where the only difference is that certain intermediate expressions, such as the residual, are not assigned to a variable.
 \begin{algorithm}
 	\begin{algorithmic}[1]
@@ -716,7 +716,7 @@ While in practice often multiple smoothing steps are used, the application of a 
 To simplify the search space estimation, we, therefore, introduce the additional constraint that, on any level, the total number of smoothing steps is always greater or equal to the number of coarse-grid corrections.
 We, furthermore, enforce that coarsening and correction can only be performed after smoothing, with the exception of the topmost level, where we additionally allow coarsening to be applied as the first operation.
 Since the original system is solved on the finest grid, finding an optimal sequence of operations on this level is indespensible for the efficiency of a multigrid method.
-We, thus, want to enforce fewer constraints on the order of the individual operations.
+We, therefore, want to enforce fewer constraints on the order of the individual operations.
 Using the symbols $s$, $r$, and $p$ for smoothing, coarsening, and coarse-grid correction\footnote{For the sake of simplicity, we use the starting letters of restriction and prolongation as abbreviations for coarsening and coarse-grid correction.}, respectively, the following operations can be defined in each step:
 \begin{equation}\tag{4.8}
 \begin{split}
@@ -745,7 +745,7 @@ We can illustrate this expression by considering the corresponding decision tree
 \end{figure}
 Each node in this tree corresponds to a particular choice of operations, which includes the application of either $s_1$ or $s_2$ as a smoother, optionally accompanied by coarsening or a coarse-grid correction.
 Therefore, the depth of the tree is equal to the total number of smoothing steps $k$ applied within the multigrid method.
-Since each leaf of the tree corresponds to a structurally-different multigrid method, the total number of leaves is, thus, equal to $N_{2,i} = 6^i$.
+Since each leaf of the tree corresponds to a structurally-different multigrid method, the total number of leaves is thus equal to $N_{2,i} = 6^i$.
 However, since the optimal amount of smoothing is not known beforehand, we must consider a varying number of smoothing steps.
 Now note that each decision tree that corresponds to a certain number of smoothing steps $i$ includes all those with fewer smoothing steps as a subtree, where each of these subtrees can be obtained by performing a top-down breadth-first traversal until the depth of the tree is equal to $i$.
 Therefore, the total number of different multigrid methods with at least $i_{min}$ but at most $i_{max}$ smoothing steps is equal to the total number of leaf nodes of all subtrees of a decision tree of depth $i_{max}$ that have at least depth $i_{min}$.
@@ -776,7 +776,7 @@ Setting $i_{min} = 4$ and $i_{max} = 30$ as an upper limit for the number of smo
 It allows us to generate multigrid methods that perform a similar amount of smoothing as the majority of commonly used V-cycles, while methods comparable to less expensive W-cycle variants can also be obtained.
 Finally, the only remaining parameter is the number of different methods available for each smoothing step.
 To obtain a conservative estimate, we set $n = 2$, which means that in each step, we can only choose from two alternatives, for example, the Jacobi and red-black Gauss-Seidel method.
-Based on Equation~\eqref{eq:search-space-estimation} we, thus, obtain 
+Based on Equation~\eqref{eq:search-space-estimation} we hence obtain 
 \begin{equation}\tag{4.12}
 	N(2, 4, 30) = \sum_{i = 4}^{30} 6^i \approx 2.65 \cdot 10^{24}
 \end{equation}
