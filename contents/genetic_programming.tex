@@ -285,7 +285,7 @@ After an executable program is available in the target language, the final step 
 For instance, one simple way to assess a program's quality in solving a number of test cases is to represent its performance in each individual test case as a separate optimization objective.
 An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all test cases.
 With respect to fitness evaluation, GP algorithms can be categorized into single- and multi-objective variants.
-Similar to other evolutionary algorithms, GP treats fitness evaluation as a block box, which means that its inner workings are independent of the computational details of fitness evaluation.
+Similar to other evolutionary algorithms, GP treats fitness evaluation as a black box, which means that its inner workings are independent of the computational details of fitness evaluation.
 The search is then performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
 However, as fitness evaluation often represents the computationally most expensive part of an evolutionary algorithm, it drastically impacts to what extent the given search space can be explored.
 Since each individual represents a distinct program that can be executed on a unique set of test instances, each evaluation can be performed independently, which facilitates its concurrent execution on a multi-processor system.
