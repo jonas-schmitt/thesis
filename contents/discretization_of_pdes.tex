@@ -38,7 +38,7 @@ One possibility to approximate a certain (time-independent) PDE on a structured 
 For the sake of simplicity, we consider the one-dimensional function $u(x)$.
 To obtain an approximation for the derivatives of $u$, we can compute its Taylor expansion in the neighborhood of $x$ with a step size $h$, which yields
 \begin{equation}
-	u(x + h) = u(x) - h \dv{x} u(x) + \mathcal{O}(h^2).
+	u(x + h) = u(x) + h \dv{x} u(x) + \mathcal{O}(h^2).
 \end{equation}
 Assuming $h$ is sufficiently small, the first-order approximation 
 \begin{equation}
