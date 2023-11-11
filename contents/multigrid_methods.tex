@@ -125,9 +125,9 @@ While the Gauss-Seidel method often exhibits a superior smoothing property compa
 	(D - L) (\bm{x}^{(k+1)} - \bm{x}^{(k)}) = \bm{b} - A \bm{x}^{(k)},
 \end{equation*}
 with $D - L$ as the lower triangular part of the system matrix $A$.
-Since $U = A - (D - L)$, we can rewrite this equation to obtain
+Since $U = D - L - A$, we can rewrite this equation to obtain
 \begin{equation}
-	(D - L) \bm{x}^{(k+1)} = \bm{b} - U \bm{x}^{(k)},
+	(D - L) \bm{x}^{(k+1)} = \bm{b} + U \bm{x}^{(k)},
 \end{equation}  
 which can then be solved using forward substitution by computing
 \begin{equation}
