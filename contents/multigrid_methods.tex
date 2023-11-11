@@ -160,8 +160,8 @@ Here, the grid points are assigned to two distinct subsets, where the first repr
 We can define the RB-GS method in the following way:
 \begin{equation}
 	\begin{split}
-		& \bm{x}^{(k+1/2)} = \bm{x}^{(k)} + P_r D^{-1} (\bm{b} - A \bm{x}^{(k)}) \\
-		& \bm{x}^{(k+1)} = \bm{x}^{(k+1/2)} + P_b D^{-1} (\bm{b} - A \bm{x}^{(k+1/2)})
+		& \bm{x}^{(k+1/2)} = \bm{x}^{(k)} + P_R D^{-1} (\bm{b} - A \bm{x}^{(k)}) \\
+		& \bm{x}^{(k+1)} = \bm{x}^{(k+1/2)} + P_B D^{-1} (\bm{b} - A \bm{x}^{(k+1/2)})
 	\end{split}
 \end{equation}
 The entries of the matrices $P_R$ and $P_B$ are then defined as
@@ -359,7 +359,7 @@ We can, therefore, make use of our previously defined inter-grid transfer operat
 Note that we have again made use of the fact that in case $\bm{e}_{2h}$ is smooth, $\bm{e}_{h} \approx I_{2h}^{h} \bm{e}_{2h}$ is a reasonably accurate approximation.
 Note that in Equation~\eqref{eq:coarse-grid-error-equation}, the coarse operator $A_{2h}$ is directly obtained from the original operator $A_{2h}$, which is called \emph{Galerkin coarsening}.
 However, in cases where the operator $A_h$ can be directly discretized on a coarser grid with step size $2\bm{h}$, it is often also possible to use the resulting operator $A_{2h}$ instead.
-By bringing all these components together, we can formulate the two-level-method shown in Algorithm~\ref{alg:two-grid-method}.
+By bringing all these components together, we can formulate the two-level method shown in Algorithm~\ref{alg:two-grid-method}.
 \begin{algorithm}
 	\caption{Two-Grid Method}
 	\label{alg:two-grid-method}
