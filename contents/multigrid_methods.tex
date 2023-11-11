@@ -399,8 +399,8 @@ Because smoothing aims to remove the remaining oscillatory components of the err
 \subsection{Restriction and Prolongation}
 \label{subsec:restriction-and-prolongation}
 %TODO fix stencil notation in this section
-Before we can define an actual multigrid method, which recursively applies the techniques introduced in the last section to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{2h}^{h}$ and $I_{h}^{2h}$.
-Here, the \emph{restriction} operator $I_{2h}^{h}$ is supposed to yield an accurate approximation of the current residual on a coarser grid, while the goal of the \emph{prolongation} operator $I_{h}^{2h}$ is to transfer the computed solution of the error equation back to a finer grid.
+Before we can define an actual multigrid method, which recursively applies the techniques introduced in the last section to a hierarchy of discretizations consisting of more than two levels, we need to define suitable inter-grid operators, $I_{h}^{2h}$ and $I_{2h}^{h}$.
+Here, the \emph{restriction} operator $I_{h}^{2h}$ is supposed to yield an accurate approximation of the current residual on a coarser grid, while the goal of the \emph{prolongation} operator $I_{2h}^{h}$ is to transfer the computed solution of the error equation back to a finer grid.
 In both cases, we are, first and foremost, interested in preserving the low-frequency components, as all the others can already be quickly reduced by smoothing.
 In general, the implementation of these operators depends on the chosen method of discretization. 
 Since, as mentioned in Section~\ref{sec:discretization}, this work focuses on the discretizations of PDEs on regular grids, we do not consider inter-grid operators defined on other grid types, such as unstructured grids.
