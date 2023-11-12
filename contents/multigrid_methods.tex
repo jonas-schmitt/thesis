@@ -641,7 +641,6 @@ While, in principle, the parameters of \textsc{mg-cycle} can be freely chosen, o
 For instance, choosing $\gamma = 1$ means that only a single recursive descent is performed on each discretization level.
 Figure~\ref{fig:three-grid-cycles} and~\ref{fig:four-grid-cycles} illustrate the algorithmic structure resulting from different values of $\gamma$ on a hierarchy of three and four grids, respectively.
 Each white node corresponds to one or multiple steps of smoothing on the respective level, while a black node implies that the resulting error equation is solved directly.
-%TODO fix these figures
 \begin{figure}
 	\captionsetup{justification=centering}
    \begin{subfigure}[t!]{0.075\textwidth}
@@ -789,7 +788,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 	\label{fig:four-grid-cycles}
 \end{figure}
 Since, as it can be seen in Figure~\ref{fig:three-grid-cycles}, the choice of $\gamma = 1$ results in a V-shaped computational pattern, the corresponding multigrid method is usually called a V-cycle.
-Similarly, the computational pattern of a method with $\gamma = 2$ on a three-grid hierarchy looks like the letter W, and hence the resulting method is called a W-cycle.
+Similarly, the computational pattern of a method with $\gamma = 2$ on a three-grid hierarchy resembles the letter W, and hence the resulting method is called a W-cycle.
 As it can be seen in Figure~\ref{fig:four-grid-cycles}, the amount of computational work within a W-cycle drastically increases with the number of coarsening steps.
 While applying a V-cycle always results in significantly fewer computations, in many cases, a single coarse-grid correction step is not sufficient to reduce the low-frequency components of the initial error on the finest grid~\cite{trottenberg2000multigrid}.
 Due to the resulting drastic increase in the number of computations, values of $\gamma$ larger than two are usually impractical for multigrid methods.
@@ -872,4 +871,4 @@ Such an approach would grant the flexibility to generate multigrid cycles that c
 In this work, we aim to realize this vision by expressing each multigrid cycle as a finite sequence of instructions whose order is restricted by the rules of linear algebra and multigrid theory.
 To specify these rules in a mathematically formal way, we make use of programming language theory, such that the design of an efficient multigrid method can be treated as a program synthesis task.
 In the next section, we, therefore, provide a brief overview of programming language theory and introduce the concept of formal languages and grammars.
-We then leverage this formalism together with the theoretical background presented in this chapter to derive a grammar-based representation of multigrid cycles that enables us to automate the design of these methods using evolutionary program synthesis techniques.
+We then utilize this formalism together with the theoretical background presented in this chapter to derive a grammar-based representation of multigrid cycles that enables us to automate the design of these methods using evolutionary program synthesis techniques.
