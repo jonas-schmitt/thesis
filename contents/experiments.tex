@@ -908,7 +908,7 @@ To parallelize our evolutionary algorithm, we utilize the message-passing interf
 We, therefore, create 64 MPI processes that are distributed to eight compute nodes of the system, where each process is exclusively executed on one of the eight available islands.
 Each process then creates and evaluates two new individuals per generation, which are executed on the respective island using an OpenMP-based shared-memory parallelization with 12 threads.
 
-\subsection{Evaluation of the Evolved Multigrid Method}
+\subsection{Evaluation of the Evolved Multigrid Methods}
 To assess whether our evolutionary program synthesis method can discover competitive multigrid-based preconditioners for the indefinite Helmholtz equation, we first need to investigate the preconditioning efficiency of classical multigrid cycles.
 As in previous evaluations, we consider the time required to achieve a certain error reduction as a measure of the efficiency of a solver.
 However, since in the given case, we apply the same iterative solver to each problem instance and only vary the multigrid cycle used for preconditioning, this metric instead relates to the efficiency of the latter.
