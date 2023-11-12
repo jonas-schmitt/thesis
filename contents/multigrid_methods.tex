@@ -621,7 +621,7 @@ The corresponding implementation of a \emph{multigrid cycle} in the form of the 
 		\Else
 		\State{$\bm{x}_{2h} = 0$}
 		\For{$i = 1, \dots, \gamma$}
-		\State{$\bm{x}_{2h} =  \textsc{mg-cycle}(\bm{x}_{2h}, A_{2h}, \bm{b}_{2h}, k-1, \gamma, \nu_1, \nu_2)$}
+		\State{$\bm{x}_{2h} =  \textsc{mg-cycle}(\bm{x}_{2h}, A_{2h}, \bm{b}_{2h}, k-1, \gamma, \nu_1, \nu_2, \omega)$}
 		\EndFor
 		\EndIf
 		\State{$\bm{x}_h = \bm{x}_h + I_{2h}^h \bm{x}_{2h}$}
