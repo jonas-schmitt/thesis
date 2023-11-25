@@ -24,7 +24,7 @@ The resulting search method is summarized in Algorithm~\ref{alg:genetic-programm
 		\State \textbf{Randomly generate} an initial population $P_0$ of programs
 		\State \textbf{Evaluate} $P_0$ on the \textbf{training set} 
 		\For{$i := 1, \dots, n$}
-		\State \textbf{Select} a subset of individuals $M_i \supset P_{i-1}$ based on their \textbf{fitness}
+		\State \textbf{Select} a subset of individuals $M_i \subset P_{i-1}$ based on their \textbf{fitness}
 		\State \textbf{Generate} new programs $C_i$ based on $M_i$ with \textbf{mutation} and \textbf{crossover}
 		\State \textbf{Evaluate} $C_i$ on the \textbf{training set} 
 		\State \textbf{Select} $P_{i}$ from $C_i \cup P_{i-1}$
