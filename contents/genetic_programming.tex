@@ -71,7 +71,8 @@ Therefore, assuming both $x$ and $y$ represent real-valued numbers, we can evalu
 for a variable number of test cases.
 Next, to define operations for generating arbitrary functions $f \in L_G$, we need to choose a suitable data structure for its representation.
 While a program's structure depends on the programming language it is written in, in many cases, it is possible to represent it as a tree of program expressions.
-This is especially true for languages from the Lisp family, which were originally used by John Koza and whose work can be considered the first implementation of GP~\cite{koza1994genetic}.
+This is especially true for languages from the Lisp family, which were originally used by John Koza. 
+His work can be considered the first implementation of GP~\cite{koza1994genetic}.
 In tree-based GP, all operations are performed on program expression trees, and thus both mutation and crossover must be designed with respect to this representation.
 %TODO: Probably OK to leave out
 %Expression trees can be created in a straightforward way after rewriting each expression in postfix notation.
