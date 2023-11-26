@@ -71,7 +71,7 @@ Therefore, assuming both $x$ and $y$ represent real-valued numbers, we can evalu
 for a variable number of test cases.
 Next, to define operations for generating arbitrary functions $f \in L_G$, we need to choose a suitable data structure for its representation.
 While a program's structure depends on the programming language it is written in, in many cases, it is possible to represent it as a tree of program expressions.
-This is especially true for languages from the Lisp family, which were originally used by John Koza, whose work can be considered the first implementation of GP~\cite{koza1994genetic}.
+This is especially true for languages from the Lisp family, which were originally used by John Koza and whose work can be considered the first implementation of GP~\cite{koza1994genetic}.
 In tree-based GP, all operations are performed on program expression trees, and thus both mutation and crossover must be designed with respect to this representation.
 %TODO: Probably OK to leave out
 %Expression trees can be created in a straightforward way after rewriting each expression in postfix notation.
@@ -91,7 +91,7 @@ Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression 
  \label{fig:gp-expression-tree-examples}
 \end{figure}
 Based on a given expression tree, we can easily restore the original expression by traversing the tree recursively in a top-down manner while generating the corresponding expression for each node as soon as each of its operands has been recursively processed or if it is available as a terminal symbol.
-While expression trees can be easily generated from a given program while offering an efficient way to evaluate it, they possess an inherent limitation, which is the absence of type information.
+While expression trees can be easily generated from a given program and offer an efficient way to evaluate it, they possess an inherent limitation, which is the absence of type information.
 For a better understanding of this limitation, we again consider the context-free grammar shown in Equation~\eqref{eq:gp-example-grammar}.
 Here, all productions on the variable $\ps B$ only result in the generation of boolean expressions, while all productions starting from $\ps A$ exclusively lead to arithmetic expressions.
 As a consequence, we are not allowed to intermix expressions that are derived from $\ps A$ and $\ps B$.
