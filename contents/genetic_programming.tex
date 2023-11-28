@@ -174,7 +174,7 @@ Again, as an example, the derivation trees for $f_1$ and $f_2$ are shown in Figu
 	\label{fig:gp-derivation-tree-examples}
 \end{figure}
 If we consider the structure of these trees, the advantage of this representation becomes obvious.
-In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree stores the variable at the left-hand side of each production used for generating a certain subtree as its parent node.
+In contrast to Figure~\ref{fig:gp-expression-tree-examples}, a derivation tree stores the variable on the left-hand side of each production as a parent node of the respective subtree.
 Each variable encodes which production can be applied at a particular point within a derivation.
 Consequently, by only allowing the replacement of a certain subtree by those productions whose left-hand side matches with its parent node, we can ensure that the resulting tree will always correspond to an expression contained in $L_G$. 
 However, while derivation trees contain additional information, they are still structurally close to the expression trees originally introduced in this section, which means that a certain structural change within a derivation tree will have a comparably strong effect on the corresponding phenotypic expression.
@@ -202,7 +202,7 @@ of our example grammar, based on which we can represent $f_1$ as an array consis
 \begin{equation*}
 	\left[ 0, 0, 1, 0, 3, 4, 1, 3, 6, 6, 1, 4, 6, 7 \right].
 \end{equation*}
-Since we are always processing the leftmost variable first, each array entry corresponds to a line in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
+Since we are always processing the leftmost variable first, each array entry to a sequential form in the derivation shown in Equation~\eqref{eq:gp-derivation-f1}.
 While in this case, we have chosen each number from the available range of productions, in practice, we can always map any non-negative integer to this range by applying a modulo $n$ operation, where $n$ is the number of available productions for each variable.
 We can now investigate how changing a single array entry will affect the interpretation of all subsequent ones.
 For instance, changing the second entry to a value of one results in the choice of the production 
@@ -319,6 +319,7 @@ Since the possibilities of altering an individual depend on its genotype represe
 For this purpose, different mutation operators have been proposed for tree-based genotype representations~\cite{poli2008field,koza1994genetic}.
 The most commonly used tree-mutation operator is \emph{subtree replacement}, which replaces a certain branch with a randomly-generated subtree.
 This subtree can, for instance, be created using a similar tree-generation operator as within the population initialization~\cite{poli2008field}.
+While subtree replacement was originally defined for classical GP, it can be adapted to G3P by introducing the additional constraint that branches with a specific variable as their root node can only be replaced by subtrees with the same root node.
 The resulting mutation operator is illustrated in Figure~\ref{fig:gp-replacement-mutation}, where it is applied to the derivation tree of the function $f_2$ formulated in Equation~\eqref{eq:gp-example-functions}.
 \begin{figure}
 	\centering
@@ -326,10 +327,9 @@ The resulting mutation operator is illustrated in Figure~\ref{fig:gp-replacement
 	\caption{Subtree replacement applied to the derivation tree of the function $f_2$~\eqref{eq:gp-example-functions}.}
 	\label{fig:gp-replacement-mutation}
 \end{figure}
-While subtree replacement has originally been defined for classical GP, it can be easily adapted to G3P by introducing the additional constraint that branches with a certain variable as their root node can only be replaced by subtrees with the same root node.
 
 A second mutation operator, which can be directly derived from subtree replacement, is \emph{insertion}.
-While in subtree mutation, the original branch is replaced and thus completely evicted from the original tree, insertion only creates a partial subtree at whose end the original subtree is attached.
+In subtree mutation, the original branch is replaced and consequently removed entirely from the original tree, whereas insertion only results in the creation of a partial subtree to which the original subtree is attached.
 This operation is illustrated in Figure~\ref{fig:gp-insertion-mutation}.
 \begin{figure}
 	\centering
@@ -360,8 +360,8 @@ To obtain a similarly functioning homologous recombination operator, the \emph{o
 One-point crossover first aligns both trees by traversing them recursively until there occurs a mismatch between the arity of two non-terminal nodes of both trees at the same position.
 The crossover point is then chosen from all positions in both trees where such a mismatch occurs while the subtree exchange is performed in a similar way as in subtree crossover.
 While this operator preserves the relative position of each node within both trees, only a limited number of crossover points can be selected.
-For instance, the subtree exchange shown in Figure~\ref{fig:gp-subtree-crossover} is not a valid single-point crossover operation, as the first arity mismatch already occurs above the chosen crossover point within the respective branches of both trees.
-In general, the applicability of single-point crossover within G3P depends on the number of productions available for each variable.
+For instance, the subtree exchange shown in Figure~\ref{fig:gp-subtree-crossover} is not a valid one-point crossover operation, as the first arity mismatch already occurs above the chosen crossover point within the respective branches of both trees.
+In general, the applicability of one-point crossover within G3P depends on the number of productions available for each variable.
 In particular, if most productions generate only a single variable, the average derivation tree possesses a small branching factor, and thus, there is only a limited number of possible crossover points.
 Finally, it must be mentioned that, besides the mutation and crossover operators discussed here, a variety of alternative ones have been proposed since the invention of GP, of which an overview can be found in~\cite{poli2008field}.
 However, these operators are designed for general tree-based GP systems and hence do not take the underlying grammatical representation into account. 
@@ -371,7 +371,7 @@ After creating a number of novel individuals by means of mutation and crossover,
 Here one possibility is to completely replace the previous generation with new individuals.
 However, this approach incurs the danger of evicting individuals that are located in promising areas of the search space and thus might negatively affect the outcome of the search.
 As a remedy, many evolutionary algorithms employ \emph{elitism}, which means that individuals from the previous population are allowed to pass over to the next one in case their fitness is not surpassed by enough newly-created ones.
-While the application of elitism prevents the occurrence of fitness regressions from one generation to the next, it comprises the danger of getting stuck in local optima.
+While the application of elitism reduces the occurrence of fitness regressions from one generation to the next, it comprises the danger of getting stuck in local optima.
 Therefore, deciding upon the amount of elitism always represents a compromise between the loss of promising individuals and the danger of premature convergence to local optima.
 Options to mitigate this risk and prevent locally-optimal individuals from quickly overtaking the population are the restriction of elitism to only a subset of the population or the introduction of additional niching or diversity criteria into the selection process for the next population. 
 The latter is especially common in multi-objective evolutionary algorithms~\cite{coello2007evolutionary}.
