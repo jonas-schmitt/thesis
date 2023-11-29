@@ -112,7 +112,7 @@ To derive a general representation for the state of a multigrid method based on 
 \label{alg:example-three-grid-method}
 \end{algorithm}
 In each step of this sequence, either the approximate solution, right-hand side, or residual is updated on a particular level.
-While in practice, each of these variables corresponds to a data structure comprising numerical values, our goal is to represent the algorithmic structure of a multigrid method in the form of symbolic expressions.
+While in practice, each of these variables corresponds to a data structure containing numerical values, our goal is to represent the algorithmic structure of a multigrid method in the form of symbolic expressions.
 In this case, the value of each variable is determined by the expression that computes its value.
 Updating a variable, therefore, corresponds to assigning a new expression to the corresponding symbol.
 For this purpose, we consider the tuple
@@ -203,14 +203,14 @@ The state of a multigrid method for solving the equation $A_{h} x_{h} = b_{h}$ o
 \end{equation}
 where
 \begin{itemize}
-	\item $x_{h}$ is a mathematical expression for computing an approximate solution of the above equation,
+	\item $x_{h}$ is an expression for computing an approximate solution of the above equation,
 	\item $b_{h}$ is an expression for computing the right-hand side of the above equation,
 	\item $c_{h}$ is a correction term for improving the accuracy of the approximate solution,
 	\item $Z_{h/2}$ is either the current state on the next finer grid with a step size $h/2$ or the empty symbol $\lambda$ in case $h$ represents the topmost level in the given hierarchy of discretizations.
 \end{itemize}
 \end{definition}
 Note that in Definition~\ref{def:multigrid-state}, the third component $c_{h}$ of a multigrid state no longer has to refer to the residual but now represents an expression that corresponds to a general correction term.
-While in the classical multigrid formulation, as presented in Section~\ref{sec:multigrid-methods}, all smoothing expressions are directly derived from the residual, this is not necessarily the case for all smoothers, such as, for instance, distributive smoothing~\cite{trottenberg2000multigrid}.
+While in the classical multigrid formulation, as presented in Section~\ref{sec:multigrid-methods}, all smoothing expressions are directly derived from the residual, this is not necessarily the case for all smoothers, such as distributive smoothing~\cite{trottenberg2000multigrid}.
 Furthermore, the general notion of a correction term enables us to represent intermediate expressions that do not specifically refer to the current residual within a multigrid state.
 For instance,
 \begin{equation*}
@@ -306,7 +306,7 @@ Within this function, we already construct an expression for the initial residua
 	r_{2h} = b_{2h} - A_{2h} x_{2h}^0,
 \end{equation*} 
 and include it as a correction term in the newly created state tuple, where we assume that the initial approximate solution $x^0_{2h}$ has already been set to zero.
-The reasoning behind this is that performing a coarse-grid correction with $x^0_{2h}$ is not expected to lead to any improvement, and thus, computing the residual always represents the first computational step on the coarse grid.
+The reasoning behind this is that performing a coarse-grid correction with $x^0_{2h}$ is not expected to lead to any improvement, and thus computing the residual always represents the first computational step on the coarse grid.
 Finally, after deriving an expression $x_{2h}$ for computing the approximate solution of the error equation on the coarse grid, we have to transfer this term back to the fine grid, where it can then be applied as a correction term to improve the approximate solution on this level.
 We, therefore, first need to restore the previous state on the next finer level, including the current approximate solution, right-hand side, and the preceding state.
 To then obtain the coarse-grid correction expression, we need to apply the prolongation operator to the current approximate solution on the coarse grid.
@@ -315,9 +315,9 @@ Note that the complete coarse-grid correction step is obtained through subsequen
 \begin{algorithm}[t]
 	\begin{algorithmic}
 		\Function{cgc}{$I_{2h}^{h}$, $(x_{2h}, b_{2h}, \lambda, Z_{h})$}
-		\State ($x_h$, $f_{h}$, $c_h$, $Z_{h/2}$) $\gets Z_{h}$
+		\State ($x_h$, $b_{h}$, $\lambda$, $Z_{h/2}$) $\gets Z_{h}$
 		\State $c_h \gets I_{2h}^{h} \cdot x_{2h}$
-		\State return ($x_h$, $f_{h}$, $c_h$, $Z_{h/2}$)
+		\State return ($x_h$, $b_{h}$, $c_h$, $Z_{h/2}$)
 		\EndFunction
 	\end{algorithmic}
 \caption{Coarse-Grid Correction}
@@ -325,7 +325,7 @@ Note that the complete coarse-grid correction step is obtained through subsequen
 \end{algorithm}
 %TODO describe coarse-grid solver A_{4h}^{-1}
 As it has been described in this section, the application of each of these functions corresponds to a particular transition between multigrid states, and hence, for any multigrid method, a sequence of function applications can be derived.
-Furthermore, note that the evaluation of this sequence leads to a state whose first component $x_h$ contains an expression that corresponds to the stepwise execution of all steps of the method.
+Furthermore, note that the evaluation of this sequence leads to a state whose first component $x_h$ contains an expression that corresponds to the stepwise execution of the method.
 The functions described in this section, therefore, can be considered as a \emph{language} for the formal representation of multigrid methods. 
 The main components of this language are summarized in Algorithm~\ref{table:grammar-semantics}.
 \begin{algorithm}[ht!]
