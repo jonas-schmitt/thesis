@@ -451,7 +451,7 @@ However, the resulting method consists only of a single statement, which returns
 It is therefore important to define the minimal requirements a sequence of operations needs to fulfill to qualify as a multigrid method. 
 While the optimal amount of smoothing and coarse-grid corrections might differ for each case, we consider it essential to apply the coarse-grid solver at least once to obtain an accurate approximation of the solution of the error equation on the coarsest grid.
 We can enforce this requirement with the mentioned \emph{guard} attribute of the \emph{Type} class.
-As each derivation of our grammar ends with the generation of the initial state $\left(u_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
+As each derivation of our grammar ends with the generation of the initial state $\left(x_h^0, b_h\right)$ on the finest level, we have to prevent the application of the respective production until the coarse-grid solver has been utilized at least once.
 For this purpose, we set the output type of the respective \emph{Terminal} object in line~14 of Listing~\ref{code:grammar:init-grammar} to the \emph{S\_guard\_h} attribute of the respective \emph{Types} data structure.
 We then define all remaining productions in such a way that all possible derivations include the function \emph{update\_with\_coarse\_grid\_solver}, as shown in Listing~\ref{code:grammar:coarse-grid-solver}, at least once.
 Listing~\ref{code:grammar:add-level} demonstrates how this can be achieved for each level within a discretization hierarchy of arbitrary depth.
