@@ -157,7 +157,7 @@ In particular, each time a coarse-grid correction is performed, we have to resto
 Furthermore, whenever we compute a new residual, the current expression of both the right-hand side and the approximate solution is required.
 For this purpose, we implement the classes \emph{Residual} and \emph{Cycle}, which allow us to establish additional references to previously defined expressions within a multigrid method.
 Each of these references then corresponds to one of the subgraphs in Figure~\ref{fig:example-three-grid-method-computational-graph} that possess root nodes with multiple incoming edges, i.e., those subgraphs that have been annotated in Figure~\ref{fig:example-three-grid-method-computational-graph-annotated}.
-We will later see the complete graph of a multigrid method can be constructed based on these references.
+We will later see that the complete graph of a multigrid method can be constructed based on these references.
 Listing~\ref{code:ir:residual} shows the implementation of the \emph{Residual} class, which contains references to the system operator $A_H$, the current approximate solution $x_H$ and right-hand side $b_H$, where $H$ is the grid spacing on the current level.
 Based on these components, we can easily construct the corresponding residual expression $r_H = b_H - A_H x_H$.
 \begin{listing}
