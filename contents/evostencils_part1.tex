@@ -21,7 +21,7 @@ Finally, note that the execution of an evolutionary program synthesis method req
 Depending on the problem that one aims to solve, it can be infeasible to run this method on a single compute node, which necessitates a multi-node parallelization.
 The message-passing interface (MPI)~\cite{walker1996mpi} provides a unified interface for performing parallel computations on a distributed system that is supported by the majority of available supercomputing devices.
 While MPI was originally designed for the traditional scientific computing languages Fortran and C, it has recently been made available within Python~\cite{dalcin2021mpi4py}. 
-With the addition of MPI as a distributed computing backend, we arrive at the following high-level view of EvoStencils' software architecture, which is shown in Figure~\ref{fig:evostencils-architecture}.
+With the addition of MPI as a distributed computing backend, we arrive at the high-level view of EvoStencils' software architecture shown in Figure~\ref{fig:evostencils-architecture}.
 \begin{figure}
 	\resizebox{\columnwidth}{!}{%
 		\begin{tikzpicture}
@@ -50,7 +50,7 @@ With the addition of MPI as a distributed computing backend, we arrive at the fo
 	}\caption{Software Architecture of EvoStencils.}
 	\label{fig:evostencils-architecture}
 \end{figure}
-In the following, we will now discuss the individual parts of this architecture in more detail, starting with the core implementation of EvoStencils, which can be considered as a separate module that does not depend on any of the other tools and libraries mentioned here.
+In the following, we will discuss the individual parts of this architecture in more detail, starting with the core implementation of EvoStencils, which does not depend on any of the other tools and libraries mentioned here.
 As a first step, we will outline the implementation of an intermediate representation (IR) for multigrid methods that can be generated in a straightforward manner based on a given derivation tree.
 This IR will then act as a basis for all subsequent steps of solver generation and evaluation.
 
@@ -125,7 +125,7 @@ A stencil generator is a function that returns the discretization of an operator
 For instance, the finite-difference discretization of the Laplace operator on a two-dimensional uniform grid leads to the stencil 
 \begin{equation*}
 	\begin{split}
-		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h},
+		\Delta_{h,h} = & \; \big\{ \left( \left( 0,0 \right), 4 / h^2 \right), \left(\left(1,0\right), -1/h^2\right), \left(\left(-1,0\right), -1 / h^2\right), \\ & \left(\left(0,1\right), -1/h^2\right), \left(\left(0,-1\right), -1/h^2\right) \big\}_{h,h}
 	\end{split}
 \end{equation*}
 in which the value at each offset depends on the grid spacing $h$.
