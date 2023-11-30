@@ -212,7 +212,7 @@ For this purpose, we first need to generate the set of terminals that is defined
 	\label{code:grammar:terminals}
 \end{listing}
 Note that this class comprises a few notable differences compared to our grammar formulation in Section~\ref{sec:multigrid-grammar}.
-First of all, since each smoother considered in this work is derived from the system operator, it can be generated automatically within the grammar.
+First of all, since each smoother considered in this work is derived from the system operator, it can be generated automatically within the grammar and, thus, does not need to be included explicitly as a terminal.
 Also, while so far we have abstractly represented the application of the coarse-grid solver in the form of its multiplication with the inverse $A^{-1}_H$ on the coarsest level with spacing $H$, the coarse-grid solver itself can also be considered as a degree of freedom, and hence might be provided by the user.
 The implementation of a Python class for representing the coarse-grid solver can be found in Listing~\ref{code:ir:coarse-grid-solver}.
 \begin{listing}
