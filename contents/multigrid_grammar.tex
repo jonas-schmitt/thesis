@@ -584,7 +584,7 @@ Algorithm~\ref{table:multigrid-grammar} shows the resulting productions for the 
 For the sake of simplicity, we omit the specification of all terminal symbols here, but the reader can safely assume that each symbol that occurs on the right-hand side of a production and is not contained in the set of variables is a terminal symbol.
 Note that, as we have discussed above, the same three productions are repeated on each level of the method, while on the topmost level, the generation of the initial state, defined in Production~\eqref{prod:initial-solution}, and on the lowest level the application of the coarse-grid solver, defined in Production~\eqref{prod:coarse-grid-solver} and~\eqref{prod:coarse-grid-solver-correction}, must be included additionally.
 While we have used a five-grid hierarchy as an example for defining the complete grammar, it is possible to specify a similar grammar on a discretization hierarchy with a different number of coarsening steps.
-Furthermore, we can extend the grammar also to encompass multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
+Furthermore, we can extend the grammar to also encompass multigrid methods that employ a fewer number of coarsening steps, i.e., two-, three- and four-grid methods.
 For this purpose, we only have to include additional productions for the application of the coarse-grid solver on each subsequent level, which in the case of Algorithm~\ref{table:multigrid-grammar} leads to
 \begin{bnf*}
 	\bnfprod{$c_{2h}$} {
