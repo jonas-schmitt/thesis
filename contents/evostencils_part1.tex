@@ -76,7 +76,7 @@ In Listing~\ref{code:ir:abstact-base-class}, a common abstract base class is pro
 	\caption{IR -- Abstract Expression}
 	\label{code:ir:abstact-base-class}
 \end{listing}
-In addition to the already mentioned \emph{grid} data structure, this class also defines a \emph{shape} for each expression.
+In addition to the already mentioned grid data structure, this class also defines a \emph{shape} for each expression.
 From a mathematical point of view, each expression within a multigrid method either computes a matrix or a vector whose shape can be derived recursively from its operands.
 This shape is thus defined as a pair $(r, c)$, whose first entry $r$ corresponds to the number of rows and the second $c$ to the number of columns of the corresponding matrix.
 Note that a vector of size $n$ can simply be considered a matrix of shape $(n,1)$.
@@ -193,12 +193,12 @@ However, to automate the process of generating a multigrid method from its gramm
 For this purpose, we utilize the functionality of the evolutionary computation framework DEAP~\cite{rainville2012deap}.
 However, before we proceed with this task, we want to address some final remarks about the IR presented in this section.
 The main purpose of the implementation presented here is to uniquely represent the computational structure of a multigrid method in the form of a redundancy-free directed graph.
-Therefore, to be able to construct such a graph in a step-wise manner based on the formal system described in Chapter~\ref{chapter:multigrid-formal-language}, each \emph{Cycle} node needs to include additional references to the current approximate solution and right-hand side.
+Therefore, to enable the construction of such a graph in a step-wise manner based on the formal system described in Chapter~\ref{chapter:multigrid-formal-language}, each \emph{Cycle} node needs to include additional references to the current approximate solution and right-hand side.
 While this information is important for the construction of the graph, it could later be discarded by replacing each such node with the respective arithmetic expression for computing an updated approximate solution, as it is shown in the \textsc{update} function in Section~\ref{sec:multigrid-state-transitions}.
-Preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} objects within each graph.
-This not only enables us to easily determine the computational structure of a multigrid method by traversing the corresponding graph data structure but also facilitates the identification of potential errors in the implementation.
-We, therefore, represent each newly computed approximate solution as a \emph{Cycle} object, which is then referenced in subsequent computational steps of the method.
-Also, note that even though the translation of a graph-based representation to an algorithm later requires us to transform each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and thus does not induce a significant overhead within the process of algorithm generation.
+However, preserving these additional references has the advantage of being able to easily traverse the sequence of \emph{Cycle} objects within each graph.
+This not only lets us determine the computational structure of a multigrid method by traversing the corresponding graph data structure but also facilitates the identification of potential errors in the implementation.
+Consequently, we represent each newly computed approximate solution as a \emph{Cycle} object, which is then referenced in subsequent computational steps of the method.
+Note that even though the translation of a graph-based representation to an algorithmic one later requires us to transform each of these objects into an expression for updating the approximate solution, this operation can be performed while traversing the graph and thus does not induce a significant overhead within the process of algorithm generation.
 
 \section{Grammar Generation}
 According to Section~\ref{sec:multigrid-grammar}, our family of context-free grammars (CFGs) for the generation of multigrid methods consists of three components, a set of terminals, variables, and productions, while additionally, we have to choose a starting symbol $\ps{S}$ from the set of variables.
