@@ -566,7 +566,7 @@ The resulting implementation of the function \emph{mutateSubtree} is shown in Li
 	\label{code:gp:mutate}
 \end{listing}
 Similar to the \emph{genGrow} function, \emph{mutateSubtree} includes an interval from which the maximum depth of the randomly generated subtree is chosen.
-To prevent the size of the inserted subtree from exceeding that of the original tree, an interval that is smaller than that of the \emph{genGrow} function should usually be chosen.
+To prevent the size of the inserted subtree from exceeding that of the original tree, an interval smaller than that of the \emph{genGrow} function should be chosen.
 Now before we can implement the actual evolutionary search method, we need to address the problem of selecting promising individuals for recombination and mutation.
 Therefore, we first need to find a way to accurately evaluate the quality of a multigrid method in an automatic manner.
 
@@ -696,7 +696,7 @@ Since in general, the solution of the given PDE is not known in advance, we appr
 	\rho \approx \left(\prod_{i=1}^{n}\tilde{\rho}_i \right)^{1/n},
 \end{equation} where $n$ is the number of iterations until convergence and
 \begin{equation}
-	\tilde{\rho}_{i} = \frac{\norm{b_h - A_h x_{h}^i }}{\norm{b_h - A_h x^{i-1}_{h}}}
+	\tilde{\rho}_{i} = \frac{\norm{b_h - A_h x_{h}^{(i)} }}{\norm{b_h - A_h x^{(i-1)}_{h}}}
 \end{equation}
 is the L2-norm of the residual reduction in every iteration of the solver~\cite{trottenberg2000multigrid}.
 To determine the execution time per iteration $t$ of the method, we simply divide the total solving time by the number of iterations.
