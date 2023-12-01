@@ -211,7 +211,7 @@ Table~\ref{table:gp-parameters} gives an overview of the algorithmic configurati
 		\midrule
 		Selection operator & \cite{deb2002fast} \\ 
 		\midrule
-		Crossover operator & Single-point crossover \\
+		Crossover operator & Subtree crossover \\
 		\midrule
 		Crossover probability & $2/3$ \\
 		\midrule
@@ -448,8 +448,8 @@ As the number of non-dominated individuals within the population at the end of e
 	T_{\varepsilon} = t \cdot \frac{\log(\varepsilon)}{\log(\rho)},
 \end{equation*}
 where $\varepsilon = 10^{-12}$ is the desired defect reduction factor and $\rho$ and $t$ the attained objective function values.
-The resulting multigrid methods are then executed as a solver for each test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores.%, whereby we employ the same problem size as within each experiment.
-%Note that while the problem size is identical, increasing the number of CPU cores leads to a higher degree of parallelism and thus a smaller execution time per iteration.
+The resulting multigrid methods are then executed as a solver for each test problem on a Broadwell compute node consisting of two sockets with 20 CPU cores.
+
 After we have identified the multigrid method that leads to the fastest solving time in each case, we additionally evaluate it on the larger problem instance using the same settings as for the evaluation of the reference methods.
 Table~\ref{table:poisson-2D-evolved-methods},~\ref{table:poisson-3D-evolved-methods} and~\ref{table:linear-elasticity-2D-evolved-methods} contain the resulting measured solving times for each case.
 \begin{table}
@@ -763,7 +763,8 @@ Finally, we apply the shifted Laplace operator
 \begin{equation*}
 	M = -\nabla^{2} - (k^{2} + 0.5 i k^{2}),
 \end{equation*}
-suggested in~\cite{erlangga2008advances} as a preconditioner, which is discretized similarly to the original operator using the five-point stencil
+as a preconditioner, following the suggestion in~\cite{erlangga2008advances}.
+This operator is discretized similarly to the original one, utilizing a five-point stencil:
 \begin{equation*}
 	M_h = \frac{1}{h^2} \begin{bmatrix}
 		& -1 & \\
@@ -787,7 +788,7 @@ where $\bm{x}_h$ represents the approximate solution of Equation~\eqref{eq:helmh
 While for each of these two systems of linear equations, a functioning solver is needed, the focus of our experimental evaluation is the design of an efficient multigrid method for the approximate solution of Equation~\eqref{eq:helmholtz-test-problem-preconditioning}.
 Here, to limit the cost of preconditioning, we assume that the application of a single multigrid cycle is sufficient to compute a reasonable approximation for $M_{h}^{-1}$, as proposed in~\cite{erlangga2008advances}.
 After designing a suitable multigrid-based preconditioner, Equation~\eqref{eq:helmholtz-test-problem-discretized-and-preconditioned} is solved using the biconjugate gradient stabilized method (BiCGSTAB)~\cite{saad2003iterative}.
-The resulting iterative solution scheme is summarized in Algorithm~\ref{alg:preconditioned-bicgstab}, in which we omit the grid spacing $h$ for the sake of simplicity.
+The resulting iterative solution scheme is summarized in Algorithm~\ref{alg:preconditioned-bicgstab}, where we omit the grid spacing $h$ and parentheses in superscripts for simplicity.
 \begin{algorithm}
 	\caption{Right-Preconditioned BiCGSTAB}
 	\label{alg:preconditioned-bicgstab}
@@ -883,7 +884,7 @@ Table~\ref{table:gp-parameters-helmholtz} gives an overview of the algorithmic p
 		\midrule
 		Selection operator & \cite{deb2002fast} \\ 
 		\midrule
-		Crossover operator & Single-point crossover \\
+		Crossover operator & Subtree crossover \\
 		\midrule
 		Crossover probability & $2/3$ \\
 		\midrule
@@ -901,7 +902,7 @@ The small potential difference in this metric between two preconditioners relati
 Using the number of iterations instead as the first objective avoids this issue, while, due to the ill-conditioning of the considered problem, even a small improvement in the accuracy of the preconditioner will lead to a measurable decrease in the value of this metric.
 
 Similar to Section~\ref{sec:experiments-part1}, we select individuals for crossover and mutation using a binary tournament selection based on their dominance relation and crowding distance.
-New individuals are created using the single-point crossover operator with a probability of 2/3 and random subtree insertion with a probability of 1/3, whereby in the latter case, we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
+New individuals are created using the subtree crossover operator with a probability of 2/3 and random subtree insertion with a probability of 1/3, whereby in the latter case, we insert the generated subtree whenever possible within the selected branch and otherwise replace it completely, as described in Section~\ref{sec:gggp-mutation-and-recombination}.
 To evaluate the effectiveness of our evolutionary program synthesis approach, we perform a total number of ten experiments with a random initialization, each of which is executed on the SuperMUC-NG cluster\footnote{SuperMUC-NG: \url{https://doku.lrz.de/display/PUBLIC/SuperMUC-NG}} of the Leibniz Supercomputing Center (LRZ).
 Even though the population size, as well as the number of generations, is smaller than within our experimental evaluation in Section~\ref{sec:experiments-part1}, the time required to evaluate each solver drastically increases for larger wavenumbers, leading to an overall higher computational cost for each experiment.
 To parallelize our evolutionary algorithm, we utilize the message-passing interface (MPI) in the form of the \emph{mpi4py} library as described in Section~\ref{sec:distributed-parallelization}. 
