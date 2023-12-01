@@ -118,7 +118,7 @@ Note that the level of each variable and terminal, unless it is level-independen
 Each of these terms is an expression whose value depends on $h$, i.e., the spacing of the finest grid.
 In other words, if we want to apply a multigrid method whose derivation tree has been generated based on a discretization hierarchy with the step size $h$ to a different one of similar depth but with a step size of $H$, we only have to replace each occurrence of $h$ with the value of $H$.
 Now recall that in our implementation, each derivation tree is represented as a \emph{PrimitiveTree} object of DEAP's GP module, which internally stores a list of its nodes in depth-first order.
-Listing~\ref{code:gp:primitive} contains a reduced implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
+Listing~\ref{code:gp:primitive} contains a minimal implementation of the \emph{Primitive} and \emph{Terminal} class within DEAP.
 \begin{listing}
 	\inputminted{python}{evostencils/gp/primitive.py}
 	\caption{Primitive and Terminal Class in DEAP}
@@ -137,7 +137,7 @@ Therefore, whenever a modification is to be applied at a specific position withi
 If we consider the initialization of each type in the respective method of the \emph{Types} class defined in Listing~\ref{code:grammar:types}, we can see that each \emph{Type} object is created as a function of the \emph{depth} argument.
 It is independent of the details of the discretization hierarchy based on which a \emph{PrimitiveSetTyped} object is constructed.
 Therefore, exchanging a \emph{PrimitiveSetTyped} with one of similar \emph{depth} does not affect the semantics of each \emph{Type} object, which means that the same mutation and crossover operators can be applied without further adaption.
-We can conclude the previous discussion by stating that while each \emph{PrimitiveTree} contains the computational structure of the corresponding multigrid method, all required information to interpret it with respect to a particular discretization hierarchy is contained in the supplied \emph{PrimitiveSetTyped} object.
+We can conclude the previous discussion by stating that while each \emph{PrimitiveTree} contains the computational structure of the corresponding multigrid method, all required information for its interpretation with respect to a particular discretization hierarchy is contained in the supplied \emph{PrimitiveSetTyped} object.
 Therefore, whenever we want to increase the problem size within our evolutionary program synthesis procedure, we only have to generate a new \emph{PrimitiveSetTyped} object based on which we then update all operations registered at the current \emph{Toolbox} object.
 At the same time, all individuals in the population remain unchanged and only need to be reevaluated on the updated problem instance.
 The resulting steps can then be implemented in the form of an additional method of the \emph{Optimizer} class, which is shown in Listing~\ref{code:optimization:adapt-problem-size}.
@@ -152,7 +152,7 @@ However, we postpone this step until we have described the next major extension 
 
 \section{Distributed Parallelization}
 \label{sec:distributed-parallelization}
-As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our grammar rules makes it infeasible to evaluate every single multigrid method that can be generated based on its productions.
+As we have already discussed in Section~\ref{sec:search-space-estimation}, the size of the search space spanned by our family of grammars makes it infeasible to evaluate every single multigrid method that can be generated based on their productions.
 Even though the utilization of search heuristics in the form of an evolutionary algorithm allows us to reduce the number of considered individuals significantly, we still have to execute a large number of solvers on different problem instances.
 Furthermore, note that for the evaluation of each solver, we need to utilize the ExaStencils framework to automatically generate a C++ implementation, which then has to be compiled into an executable program.
 Both steps induce a significant overhead and hence further increase the evaluation time.
