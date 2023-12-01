@@ -11,7 +11,7 @@ Figure~\ref{fig:overview-ai-based-methods} gives an overview of the state of AI-
 	\label{fig:overview-ai-based-methods}
 \end{figure}
 First of all, we can distinguish methods that aim to solve a PDE directly in the continuous domain and those that require it to be formulated as a discrete problem, usually obtained by applying a specific discretization method.
-The currently most popular~\footnote{Here, we consider the number of citations as a popularity metric.} methods based on machine learning (ML), physics-informed neural networks~\cite{karniadakis2021physics,raissi2019physics,kharazmi2019variational,kharazmi2021hp} and neural operators~\cite{li2020fourier,guibas2021efficient,lu2021learning,li2021physics} fall into the former category.
+The currently most popular\footnote{Here, we consider the number of citations as a popularity metric.} methods based on machine learning (ML), physics-informed neural networks~\cite{karniadakis2021physics,raissi2019physics,kharazmi2019variational,kharazmi2021hp} and neural operators~\cite{li2020fourier,guibas2021efficient,lu2021learning,li2021physics} fall into the former category.
 This class of methods aims to approximate the function that represents the solution or the operator of a given PDE by exploiting the fact that neural networks can act as universal function approximators when given enough data~\cite{hornik1989multilayer}.
 Physics-informed methods try to improve over purely data-driven methods by directly incorporating the physical constraints of the given PDE into the learning process.
 Neural operators aim to achieve a higher degree of generalization by learning a representation of the operator of a PDE instead of approximating its solution.
