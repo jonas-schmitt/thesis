@@ -68,7 +68,7 @@ Therefore, assuming both $x$ and $y$ represent real-valued numbers, we can evalu
 \begin{equation*}
     f: x, y, u, v \to \mathbb{R}
 \end{equation*}
-for a variable number of validation cases.
+for a variable number of problem instances.
 Next, to define operations for generating arbitrary functions $f \in L_G$, we need to choose a suitable data structure for its representation.
 While a program's structure depends on the programming language it is written in, in many cases, it is possible to represent it as a tree of program expressions.
 This is especially true for languages from the Lisp family, which were originally used by John Koza. 
@@ -282,14 +282,14 @@ Since G3P is a program optimization technique, each individual corresponds to a 
 However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, i.e., a program in the target language.
 In many program synthesis tasks, the grammar employed within the search is either equivalent or represents a subset of that of the target programming language.
 While in such cases, a direct correspondence between the derivation and expression tree of the target programming language exists, there is also the possibility to employ multiple layers of intermediate representations before an actual program is generated, which necessitates the use of multiple code generation steps.
-After an executable program is available in the target language, the final step within fitness evaluation is to measure its performance in a number of validation cases, which is then condensed to one or multiple measures of an individual's fitness.
-For instance, one simple way to assess a program's quality in solving a number of validation cases is to represent its performance in each individual validation case as a separate optimization objective.
-An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all validation cases.
+After an executable program is available in the target language, the final step within fitness evaluation is to measure its performance in a number of problem instances, which is then condensed to one or multiple measures of an individual's fitness.
+For instance, one simple way to assess a program's quality is to represent its performance in each individual problem instance as a separate optimization objective.
+An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all considered problem instances.
 With respect to fitness evaluation, GP algorithms can be categorized into single- and multi-objective variants.
 Similar to other evolutionary algorithms, GP treats fitness evaluation as a black box, which means that its inner workings are independent of the computational details of fitness evaluation.
 The search is then performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
 However, as fitness evaluation often represents the computationally most expensive part of an evolutionary algorithm, it drastically impacts to what extent the given search space can be explored.
-Since each individual represents a distinct program that can be executed on a unique set of test instances, each evaluation can be performed independently, which facilitates its concurrent execution on a multi-processor system.
+Since each individual represents a distinct program that can be executed on a unique set of problem instances, each evaluation can be performed independently, which facilitates its concurrent execution on a multi-processor system.
 For this purpose, parallel~\cite{sudholt2015parallel} and distributed~\cite{gong2015distributed} evolutionary algorithm variants, which can be executed on recent manycore architectures and computer clusters, have been proposed.
 Due to the inherent similarity of the internal structure of Algorithm~\ref{alg:genetic-programming} to other evolutionary algorithms, these approaches are equally applicable to GP-based search methods.
 
@@ -305,8 +305,8 @@ To deal with multi-objective optimization problems, several selection operators 
 Many of these operators are based on the idea of establishing a domination hierarchy between the individuals of the population, whereby an individual is said to dominate another one if it possesses superior fitness in all objectives.
 One way to determine the dominance relation between all individuals in the population is to employ a non-dominated sorting procedure, which has been, for instance, proposed in~\cite{deb2002fast,deb2013evolutionary}.
 The actual selection is then performed using a dominance-based tournament selection, while additional diversity metrics can be incorporated to decide between non-dominating individuals~\cite{coello2007evolutionary}.
-Another recently proposed multi-objective selection operator that is especially geared towards program synthesis problems where the fitness evaluation is performed on multiple validation cases is lexicase selection.
-In lexicase selection, individuals are selected according to their performance in a randomly chosen ordering of the validation cases, whereby decreasing precedence is given to each subsequent case.
+Another recently proposed multi-objective selection operator that is especially geared towards program synthesis problems where the fitness evaluation is performed on multiple problem instances is lexicase selection.
+In lexicase selection, individuals are selected according to their performance in a randomly chosen ordering of the considered problem instances, whereby decreasing precedence is given to each subsequent instance.
 For a more detailed description of this operator, the reader is referred to~\cite{helmuth2014solving,la2016epsilon}.
  
 \subsection{Mutation and Recombination}
