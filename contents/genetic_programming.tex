@@ -15,7 +15,7 @@ Based on a program's effectiveness in solving all training cases under the given
 In evolutionary computation, the population is the set of individuals currently considered within the search and, therefore, spans a subspace within the space of solutions for the given search problem.
 Each subsequent step of the search is then performed by generating a new population based on the previous one through \emph{mutation} or recombination (often called \emph{crossover}) of the individuals contained in the current one.
 Usually, the candidates for mutation and crossover are sampled from the current population based on the fitness of each individual.
-If we repeat this procedure for a number of $n$ steps, we arrive at a final population $P_n$, which can then additionally be evaluated on a test set.
+If we repeat this procedure for a number of $n$ steps, we arrive at a final population $P_n$, which can then additionally be evaluated on a validation set.
 The resulting search method is summarized in Algorithm~\ref{alg:genetic-programming}, which gives an overview of the general structure of a GP method.
 \begin{algorithm}[t]
 	\caption{Genetic Programming}
@@ -29,7 +29,7 @@ The resulting search method is summarized in Algorithm~\ref{alg:genetic-programm
 		\State \textbf{Evaluate} $C_i$ on the \textbf{training set} 
 		\State \textbf{Select} $P_{i}$ from $C_i \cup P_{i-1}$
 		\EndFor
-		\State \textbf{Evaluate} the final population $P_{n}$ on a \textbf{test set}  to obtain the best overall program
+		\State \textbf{Evaluate} the final population $P_{n}$ on a \textbf{validation set}  to obtain the best overall program
 	\end{algorithmic}
 \end{algorithm}
 However, we have not yet defined the individual operations, such as the generation of an initial population and the creation of new individuals through mutation and crossover.
@@ -68,7 +68,7 @@ Therefore, assuming both $x$ and $y$ represent real-valued numbers, we can evalu
 \begin{equation*}
     f: x, y, u, v \to \mathbb{R}
 \end{equation*}
-for a variable number of test cases.
+for a variable number of validation cases.
 Next, to define operations for generating arbitrary functions $f \in L_G$, we need to choose a suitable data structure for its representation.
 While a program's structure depends on the programming language it is written in, in many cases, it is possible to represent it as a tree of program expressions.
 This is especially true for languages from the Lisp family, which were originally used by John Koza. 
@@ -282,9 +282,9 @@ Since G3P is a program optimization technique, each individual corresponds to a 
 However, as the search itself is performed on the genotype representation of each individual, as described in the last section, this representation first needs to be translated to the phenotype, i.e., a program in the target language.
 In many program synthesis tasks, the grammar employed within the search is either equivalent or represents a subset of that of the target programming language.
 While in such cases, a direct correspondence between the derivation and expression tree of the target programming language exists, there is also the possibility to employ multiple layers of intermediate representations before an actual program is generated, which necessitates the use of multiple code generation steps.
-After an executable program is available in the target language, the final step within fitness evaluation is to measure its performance in a number of test cases, which is then condensed to one or multiple measures of an individual's fitness.
-For instance, one simple way to assess a program's quality in solving a number of test cases is to represent its performance in each individual test case as a separate optimization objective.
-An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all test cases.
+After an executable program is available in the target language, the final step within fitness evaluation is to measure its performance in a number of validation cases, which is then condensed to one or multiple measures of an individual's fitness.
+For instance, one simple way to assess a program's quality in solving a number of validation cases is to represent its performance in each individual validation case as a separate optimization objective.
+An alternative possibility is to represent different aspects of a program's quality in the form of distinct objectives, each of which is determined from a combination of its performance in multiple or even all validation cases.
 With respect to fitness evaluation, GP algorithms can be categorized into single- and multi-objective variants.
 Similar to other evolutionary algorithms, GP treats fitness evaluation as a black box, which means that its inner workings are independent of the computational details of fitness evaluation.
 The search is then performed exclusively based on the resulting fitness landscape~\cite{pitzer2012comprehensive}.
@@ -305,8 +305,8 @@ To deal with multi-objective optimization problems, several selection operators 
 Many of these operators are based on the idea of establishing a domination hierarchy between the individuals of the population, whereby an individual is said to dominate another one if it possesses superior fitness in all objectives.
 One way to determine the dominance relation between all individuals in the population is to employ a non-dominated sorting procedure, which has been, for instance, proposed in~\cite{deb2002fast,deb2013evolutionary}.
 The actual selection is then performed using a dominance-based tournament selection, while additional diversity metrics can be incorporated to decide between non-dominating individuals~\cite{coello2007evolutionary}.
-Another recently proposed multi-objective selection operator that is especially geared towards program synthesis problems where the fitness evaluation is performed on multiple test cases is lexicase selection.
-In lexicase selection, individuals are selected according to their performance in a randomly chosen ordering of the test cases, whereby decreasing precedence is given to each subsequent case. 
+Another recently proposed multi-objective selection operator that is especially geared towards program synthesis problems where the fitness evaluation is performed on multiple validation cases is lexicase selection.
+In lexicase selection, individuals are selected according to their performance in a randomly chosen ordering of the validation cases, whereby decreasing precedence is given to each subsequent case.
 For a more detailed description of this operator, the reader is referred to~\cite{helmuth2014solving,la2016epsilon}.
  
 \subsection{Mutation and Recombination}
