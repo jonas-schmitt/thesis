@@ -58,23 +58,23 @@
 	%\caption{State transition functions adapted for FAS}
 	%\label{table:fas-grammar-semantics}
 	\begin{algorithmic}
-	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, $I_{h}^{2h}$, ($x_h$, $b_{h}$, $c_{2h}$, $S_{h/2}$)}
+	\Function{coarsening}{$A_{2h}$, $x_{2h}^0$, $I_{h}^{2h}$, ($x_h$, $b_{h}$, $c_{2h}$, $Z_{h/2}$)}
 	\State $x_{2h} \gets x_{2h}^0$ 
 	\State $b_{2h} \gets c_{2h} + A_{2h} \left( I_{h}^{2h} x_h \right) $
 	\State $c_{2h} \gets b_{2h} - A_{2h} \left( x_{2h} \right)$ 
-	\State $S_h \gets$ ($x_{h}$, $b_{h}$, $\lambda$, $S_{h/2}$)
-	\State return ($x_{2h}$, $b_{2h}$, $c_{2h}$, $S_h$)
+	\State $Z_h \gets$ ($x_{h}$, $b_{h}$, $\lambda$, $Z_{h/2}$)
+	\State return ($x_{2h}$, $b_{2h}$, $c_{2h}$, $Z_h$)
 	\EndFunction
 	\State
-	\Function{cgc}{$I_{2h}^{h}$, $I_{h}^{2h}$, $(x_{2h}, b_{2h}, \lambda, S_{h})$}
-	\State ($x_h$, $f_{h}$, $c_h$, $S_{h/2}$) $\gets S_{h}$
+	\Function{cgc}{$I_{2h}^{h}$, $I_{h}^{2h}$, $(x_{2h}, b_{2h}, \lambda, Z_{h})$}
+	\State ($x_h$, $f_{h}$, $c_h$, $Z_{h/2}$) $\gets Z_{h}$
 	\State $c_h \gets I_{2h}^{h} \cdot (x_{2h} - I_{h}^{2h} x_h)$
-	\State return ($x_h$, $f_{h}$, $c_h$, $S_{h/2}$)
+	\State return ($x_h$, $f_{h}$, $c_h$, $Z_{h/2}$)
 	\EndFunction
     \State
-	\Function{cgs}{$I_{2h}^{h}$, $A_{2h}$, $I_{h}^{2h}$, ($x_h$, $b_{h}$, $c_{h}$, $S_{h/2}$)}
+	\Function{cgs}{$I_{2h}^{h}$, $A_{2h}$, $I_{h}^{2h}$, ($x_h$, $b_{h}$, $c_{h}$, $Z_{h/2}$)}
 	\State $x_{h} \gets I_{2h}^{h} \left( A_{2h}^{-1}\left( I_{h}^{2h} c_h \right) - I_{h}^{2h} x_h \right)$ 
-	\State return ($x_{h}$, $b_{h}$, $c_{h}$, $S_{h/2}$)
+	\State return ($x_{h}$, $b_{h}$, $c_{h}$, $Z_{h/2}$)
 	\EndFunction
 	\end{algorithmic}
 \end{table}
