@@ -26,8 +26,8 @@
 % The current maintainer of this work is Markus Putnings.
 
 \documentclass[
-  paper = 17x24,
-  %paper = a5,
+  %paper = 17x24,
+  paper = a5paper,
     % 17x24 (= studienpartitur, default)
     % a5 (= a5paper)
   language = english,
@@ -121,6 +121,8 @@
 \setminted[scala]{fontsize=\footnotesize, breaklines, frame=lines, numbersep=7.5pt, numberblanklines=False}
 %\AtBeginDocument{\RenewCommandCopy\qty\SI}
 \usepackage{etoolbox}
+\usepackage{microtype}
+\overfullrule=1mm
 
 \AtBeginEnvironment{tabular}{\small}
 
@@ -139,7 +141,7 @@
 \origin{Forchheim}
 
 % publication identifiers
-\yearofpublication{2022}
+\yearofpublication{2024}
 \series{}
 \volume{}
 \doi{}
@@ -158,8 +160,8 @@
 % university and examination
 \institute{Lehrstuhl für Informatik 10}
 \supervisor{Prof. Dr. Harald Köstler}
-\oralexam{}
-\dean{}
+\oralexam{14.12.2023}
+\dean{Prof. Dr. Gerhard Wellein}
 \reviewer{Prof. Dr. Harald Köstler \\ 
 Prof. Dr. Penousal Machado \\
 Prof. Dr. Dietmar Fey}

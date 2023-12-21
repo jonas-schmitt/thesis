@@ -637,16 +637,16 @@
     paperheight  =    240mm,
     top          =     25mm,
     % Adapted
-    bottom       =     25mm,
-    %bottom       =     20mm,
+    %bottom       =     25mm,
+    bottom       =     20mm,
     inner        =     25mm,
     outer        =     20mm,
-    %headheight   =   13.6pt, % originally 1em -> warning and automatically changed
-    headheight   =   24.0pt,
+    headheight   =   13.6pt, % originally 1em -> warning and automatically changed
+    %headheight   =   24.0pt,
     headsep      = 15mm-1em,
     % Adapted
-    footskip     =    12.5mm,
-    %footskip     =    7.5mm,
+    %footskip     =    12.5mm,
+    footskip     =    7.5mm,
     %showframe,  
   }
 \fi

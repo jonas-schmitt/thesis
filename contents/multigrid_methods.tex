@@ -422,6 +422,7 @@ or equivalently using the matrix notation
 	\label{eq:full-weighting-restriction}
 \end{equation} 
 Since the application of this stencil yields a grid function of different dimensionality than the one to which it is applied, we additionally include the respective step sizes as a sub- and superscript.
+%TODO check if necessary
 If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
 	I^{2h_x, 2h_y}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
@@ -558,7 +559,8 @@ A common choice for one-dimensional prolongation is the linear interpolation ope
 	\end{bmatrix}_{2h_x}^{h_x}.
 	\label{eq:linear-interpolation}
 \end{equation}
-Similar to full-weighting restriction, we can derive two- and three-dimensional versions of this operator as tensor products of the form
+%TODO check if necessary
+Similar to full-weighting restriction, we can derive two- and three-\\dimensional versions of this operator as tensor products of the form
 \begin{equation}
 	I_{2h_x, 2h_y}^{h_x, h_y} = \frac{1}{2} \begin{bmatrix}
 		1 \\ 2 \\ 1
