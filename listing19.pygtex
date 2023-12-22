@@ -1,0 +1,45 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{deap} \PYG{k+kn}{import} \PYG{n}{gp}
+\PYG{k+kn}{import} \PYG{n+nn}{operator}
+
+\PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}grammar}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{u}\PYG{p}{,} \PYG{n}{v}\PYG{p}{):}
+    \PYG{n}{E} \PYG{o}{=} \PYG{n+nb}{type}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}E\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{n+nb}{object}\PYG{p}{,),} \PYG{p}{\PYGZob{}\PYGZcb{})}
+    \PYG{n}{A} \PYG{o}{=} \PYG{n+nb}{type}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{n+nb}{object}\PYG{p}{,),} \PYG{p}{\PYGZob{}\PYGZcb{})}
+    \PYG{n}{B} \PYG{o}{=} \PYG{n+nb}{type}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}B\PYGZdq{}}\PYG{p}{,} \PYG{p}{(}\PYG{n+nb}{object}\PYG{p}{,),} \PYG{p}{\PYGZob{}\PYGZcb{})}
+    \PYG{n}{pset} \PYG{o}{=} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{PrimitiveSetTyped}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}main\PYGZdq{}}\PYG{p}{,} \PYG{p}{[],} \PYG{n}{ret\PYGZus{}type}\PYG{o}{=}\PYG{n}{E}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} \PYGZlt{}E\PYGZgt{} := if \PYGZlt{}B\PYGZgt{} then \PYGZlt{}E\PYGZgt{} else \PYGZlt{}E\PYGZgt{} | \PYGZlt{}A\PYGZgt{}}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{b}\PYG{p}{,} \PYG{n}{e1}\PYG{p}{,} \PYG{n}{e2}\PYG{p}{:} \PYG{n}{e1} \PYG{k}{if} \PYG{n}{b} \PYG{k}{else} \PYG{n}{e2}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{,} \PYG{n}{E}\PYG{p}{,} \PYG{n}{E}\PYG{p}{],} \PYG{n}{E}\PYG{p}{,} \PYG{n}{name}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}if\PYGZus{}then\PYGZus{}else\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{\PYGZus{}}\PYG{p}{:} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{],} \PYG{n}{E}\PYG{p}{,} \PYG{n}{name}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}id\PYGZdq{}}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{} :=}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{neg}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}         \PYG{c+c1}{\PYGZsh{} \PYGZhy{}\PYGZlt{}A\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{add}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{,} \PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{} + \PYGZlt{}A\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{sub}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{,} \PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{} \PYGZhy{} \PYGZlt{}A\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{mul}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{,} \PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{} * \PYGZlt{}A\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{truediv}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{,} \PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{} / \PYGZlt{}A\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{pow}\PYG{p}{,} \PYG{p}{[}\PYG{n}{A}\PYG{p}{,} \PYG{n}{A}\PYG{p}{],} \PYG{n}{A}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} \PYGZlt{}A\PYGZgt{}\PYGZca{}\PYGZlt{}A\PYGZgt{}}
+    \PYG{c+c1}{\PYGZsh{} \PYGZlt{}B\PYGZgt{} :=}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{not\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{],} \PYG{n}{B}\PYG{p}{)}        \PYG{c+c1}{\PYGZsh{} not \PYGZlt{}B\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{and\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{,} \PYG{n}{B}\PYG{p}{],} \PYG{n}{B}\PYG{p}{)}     \PYG{c+c1}{\PYGZsh{} \PYGZlt{}B\PYGZgt{} and \PYGZlt{}B\PYGZgt{} |}
+    \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addPrimitive}\PYG{p}{(}\PYG{n}{operator}\PYG{o}{.}\PYG{n}{or\PYGZus{}}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{,} \PYG{n}{B}\PYG{p}{],} \PYG{n}{B}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} \PYGZlt{}B\PYGZgt{} or \PYGZlt{}B\PYGZgt{}}
+
+    \PYG{k}{def} \PYG{n+nf}{add\PYGZus{}argument}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{arg}\PYG{p}{,} \PYG{n}{type\PYGZus{}list}\PYG{p}{):}
+        \PYG{n}{symbolic} \PYG{o}{=} \PYG{k+kc}{True}
+        \PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n}{type\PYGZus{}list}\PYG{p}{:}
+            \PYG{n}{pset}\PYG{o}{.}\PYG{n}{\PYGZus{}add}\PYG{p}{(}\PYG{n}{gp}\PYG{o}{.}\PYG{n}{Terminal}\PYG{p}{(}\PYG{n}{arg}\PYG{p}{,} \PYG{n}{symbolic}\PYG{p}{,} \PYG{n}{t}\PYG{p}{))}
+            \PYG{n}{pset}\PYG{o}{.}\PYG{n}{terms\PYGZus{}count} \PYG{o}{+=} \PYG{l+m+mi}{1}
+        \PYG{n}{pset}\PYG{o}{.}\PYG{n}{arguments}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{arg}\PYG{p}{)}
+
+    \PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{p}{[}\PYG{n}{E}\PYG{p}{,} \PYG{n}{A}\PYG{p}{])}
+    \PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{p}{[}\PYG{n}{E}\PYG{p}{,} \PYG{n}{A}\PYG{p}{])}
+    \PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{u}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{])}
+    \PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{p}{[}\PYG{n}{B}\PYG{p}{])}
+    \PYG{k}{return} \PYG{n}{pset}
+
+\PYG{n}{pset} \PYG{o}{=} \PYG{n}{generate\PYGZus{}grammar}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}y\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}u\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}v\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{expr} \PYG{o}{=} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{genGrow}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}
+\PYG{n}{tree} \PYG{o}{=} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{PrimitiveTree}\PYG{p}{(}\PYG{n}{expr}\PYG{p}{)}
+\PYG{n}{f} \PYG{o}{=} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{compile}\PYG{p}{(}\PYG{n}{tree}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{tree}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{f}\PYG{p}{(}\PYG{l+m+mi}{42}\PYG{p}{,} \PYG{l+m+mi}{7}\PYG{p}{,} \PYG{k+kc}{False}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{))}
+\end{Verbatim}

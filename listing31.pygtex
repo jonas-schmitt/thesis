@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nc}{Function}\PYG{+w}{ }\PYG{n+nc}{VCycle}\PYG{n+nd}{@finest}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{b}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nc}{A}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{x}
+\PYG{+w}{  }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}
+\PYG{+w}{  }\PYG{c+c1}{// Restriction and coarsening}
+\PYG{+w}{  }\PYG{n}{b}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nc}{R}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{r}
+\PYG{+w}{  }\PYG{n}{r}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{b}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nc}{A}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}
+\PYG{+w}{  }\PYG{n}{b}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nc}{R}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{r}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}
+\PYG{+w}{  }\PYG{c+c1}{// Apply the coarse\PYGZhy{}grid solver}
+\PYG{+w}{  }\PYG{n+nc}{VCycle}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n+nc}{P}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{+w}{  }\PYG{c+c1}{// Smoothing with damped Jacobi}
+\PYG{+w}{  }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mf}{0.6}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{diag\PYGZus{}inv}\PYG{p}{(}\PYG{n+nc}{A}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{b}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nc}{A}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{))}
+\PYG{+w}{  }\PYG{c+c1}{// Prolongation and coarse\PYGZhy{}grid correction}
+\PYG{+w}{  }\PYG{n}{x}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n+nc}{P}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{x}\PYG{o}{@}\PYG{p}{(}\PYG{n}{coarser}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

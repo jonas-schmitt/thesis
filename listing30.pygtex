@@ -1,0 +1,16 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{random}
+
+\PYG{k}{def} \PYG{n+nf}{mutateSubtree}\PYG{p}{(}\PYG{n}{individual}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{):}
+    \PYG{n}{index} \PYG{o}{=} \PYG{n}{random}\PYG{o}{.}\PYG{n}{randrange}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{individual}\PYG{p}{))}
+    \PYG{n}{node} \PYG{o}{=} \PYG{n}{individual}\PYG{p}{[}\PYG{n}{index}\PYG{p}{]}
+    \PYG{n}{slice\PYGZus{}} \PYG{o}{=} \PYG{n}{individual}\PYG{o}{.}\PYG{n}{searchSubtree}\PYG{p}{(}\PYG{n}{index}\PYG{p}{)}
+    \PYG{k}{def} \PYG{n+nf}{condition}\PYG{p}{(}\PYG{n}{height}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{depth} \PYG{o}{\PYGZlt{}} \PYG{n}{height}
+    \PYG{n}{subtree} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{k}{if} \PYG{n}{random}\PYG{o}{.}\PYG{n}{random}\PYG{p}{()} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{0.5}\PYG{p}{:}
+        \PYG{n}{subtree} \PYG{o}{=} \PYG{n}{individual}\PYG{p}{[}\PYG{n}{slice\PYGZus{}}\PYG{p}{]}
+    \PYG{n}{new\PYGZus{}subtree} \PYG{o}{=} \PYG{n}{generate}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{condition}\PYG{p}{,} \PYG{n}{node}\PYG{o}{.}\PYG{n}{ret}\PYG{p}{,} \PYG{n}{subtree}\PYG{p}{)}
+    \PYG{n}{individual}\PYG{p}{[}\PYG{n}{slice\PYGZus{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{new\PYGZus{}subtree}
+    \PYG{k}{return} \PYG{n}{individual}\PYG{p}{,}
+\end{Verbatim}

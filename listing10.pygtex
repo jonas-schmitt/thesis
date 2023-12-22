@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Cycle}\PYG{p}{(}\PYG{n}{Expression}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{approximation}\PYG{p}{,} \PYG{n}{rhs}\PYG{p}{,} \PYG{n}{correction}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{relaxation\PYGZus{}factor}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{n}{partitioning}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{predecessor}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{approximation} \PYG{o}{=} \PYG{n}{approximation}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{rhs} \PYG{o}{=} \PYG{n}{rhs}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{correction} \PYG{o}{=} \PYG{n}{correction}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor} \PYG{o}{=} \PYG{n}{relaxation\PYGZus{}factor}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{partitioning} \PYG{o}{=} \PYG{n}{partitioning}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{predecessor} \PYG{o}{=} \PYG{n}{predecessor}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{shape}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{approximation}\PYG{o}{.}\PYG{n}{shape}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{approximation}\PYG{o}{.}\PYG{n}{grid}
+\end{Verbatim}

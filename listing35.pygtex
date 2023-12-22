@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{random}
+
+\PYG{k}{def} \PYG{n+nf}{evaluate\PYGZus{}individuals}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{invalid\PYGZus{}ind}\PYG{p}{):}
+    \PYG{n}{fitnesses} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{map}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{,} \PYG{n}{invalid\PYGZus{}ind}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{ind}\PYG{p}{,} \PYG{n}{fit} \PYG{o+ow}{in} \PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{invalid\PYGZus{}ind}\PYG{p}{,} \PYG{n}{fitnesses}\PYG{p}{):}
+        \PYG{n}{ind}\PYG{o}{.}\PYG{n}{fitness}\PYG{o}{.}\PYG{n}{values} \PYG{o}{=} \PYG{n}{fit}
+
+\PYG{k}{def} \PYG{n+nf}{create\PYGZus{}offspring}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{parents}\PYG{p}{,} \PYG{n}{crossover\PYGZus{}probability}\PYG{p}{):}
+    \PYG{n}{offspring} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{k}{for} \PYG{n}{ind1}\PYG{p}{,} \PYG{n}{ind2} \PYG{o+ow}{in} \PYG{n+nb}{zip}\PYG{p}{(}\PYG{n}{parents}\PYG{p}{[::}\PYG{l+m+mi}{2}\PYG{p}{],} \PYG{n}{parents}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{::}\PYG{l+m+mi}{2}\PYG{p}{]):}
+        \PYG{n}{child1}\PYG{p}{,} \PYG{n}{child2} \PYG{o}{=} \PYG{n}{ind1}\PYG{p}{,} \PYG{n}{ind2}
+        \PYG{n}{key1}\PYG{p}{,} \PYG{n}{key2} \PYG{o}{=} \PYG{k+kc}{None}\PYG{p}{,} \PYG{k+kc}{None}
+        \PYG{n}{count} \PYG{o}{=} \PYG{l+m+mi}{0}
+        \PYG{n}{operator\PYGZus{}choice} \PYG{o}{=} \PYG{n}{random}\PYG{o}{.}\PYG{n}{random}\PYG{p}{()}
+        \PYG{k}{while} \PYG{n}{key1} \PYG{o+ow}{or} \PYG{n}{key2} \PYG{o+ow}{in} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache} \PYG{o+ow}{and} \PYG{n}{count} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{10}\PYG{p}{:}
+            \PYG{k}{if} \PYG{n}{operator\PYGZus{}choice} \PYG{o}{\PYGZlt{}} \PYG{n}{crossover\PYGZus{}probability}\PYG{p}{:}
+                \PYG{n}{child1}\PYG{p}{,} \PYG{n}{child2} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{mate}\PYG{p}{(}\PYG{n}{ind1}\PYG{p}{,} \PYG{n}{ind2}\PYG{p}{)}
+            \PYG{k}{else}\PYG{p}{:}
+                \PYG{n}{child1}\PYG{p}{,} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{mutate}\PYG{p}{(}\PYG{n}{ind1}\PYG{p}{)}
+                \PYG{n}{child2}\PYG{p}{,} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{mutate}\PYG{p}{(}\PYG{n}{ind2}\PYG{p}{)}
+            \PYG{n}{key1}\PYG{p}{,} \PYG{n}{key2} \PYG{o}{=} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{child1}\PYG{p}{),} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{child2}\PYG{p}{)}
+            \PYG{n}{count} \PYG{o}{+=} \PYG{l+m+mi}{1}
+        \PYG{k}{del} \PYG{n}{child1}\PYG{o}{.}\PYG{n}{fitness}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,} \PYG{n}{child2}\PYG{o}{.}\PYG{n}{fitness}\PYG{o}{.}\PYG{n}{values}
+        \PYG{n}{offspring}\PYG{o}{.}\PYG{n}{extend}\PYG{p}{([}\PYG{n}{child1}\PYG{p}{,} \PYG{n}{child2}\PYG{p}{])}
+    \PYG{k}{return} \PYG{n}{offspring}
+\end{Verbatim}

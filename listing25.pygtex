@@ -1,0 +1,29 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+
+\PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}grammar}\PYG{p}{(}\PYG{n}{generator}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{,} \PYG{n}{samples}\PYG{o}{=}\PYG{l+m+mi}{37}\PYG{p}{):}
+    \PYG{n}{coarsest} \PYG{o}{=} \PYG{k+kc}{False}
+    \PYG{k}{if} \PYG{n}{depth} \PYG{o}{==} \PYG{l+m+mi}{1}\PYG{p}{:}
+        \PYG{n}{coarsest} \PYG{o}{=} \PYG{k+kc}{True}
+    \PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{generator}\PYG{o}{.}\PYG{n}{get\PYGZus{}approximation}\PYG{p}{(}\PYG{n}{max\PYGZus{}level}\PYG{p}{)}
+    \PYG{n}{b\PYGZus{}h} \PYG{o}{=} \PYG{n}{generator}\PYG{o}{.}\PYG{n}{get\PYGZus{}rhs}\PYG{p}{(}\PYG{n}{max\PYGZus{}level}\PYG{p}{)}
+    \PYG{n}{pset}\PYG{p}{,} \PYG{n}{terminals}\PYG{p}{,} \PYG{n}{types} \PYG{o}{=} \PYG{n}{init\PYGZus{}grammar}\PYG{p}{(}\PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{samples}\PYG{p}{,} \PYG{n}{coarsest}\PYG{o}{=}\PYG{n}{coarsest}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Iteratively add productions per level}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{):}
+        \PYG{n}{level} \PYG{o}{=} \PYG{n}{max\PYGZus{}level} \PYG{o}{\PYGZhy{}} \PYG{n}{i}
+        \PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{generator}\PYG{o}{.}\PYG{n}{get\PYGZus{}approximation}\PYG{p}{(}\PYG{n}{level}\PYG{p}{)}
+        \PYG{n}{A\PYGZus{}h} \PYG{o}{=} \PYG{n}{terminals}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h}
+        \PYG{k}{if} \PYG{n}{i} \PYG{o}{==} \PYG{n}{depth} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{:}
+            \PYG{n}{coarsest} \PYG{o}{=} \PYG{k+kc}{True}
+        \PYG{n}{A\PYGZus{}2h} \PYG{o}{=} \PYG{n}{generator}\PYG{o}{.}\PYG{n}{get\PYGZus{}operator}\PYG{p}{(}\PYG{n}{level} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{restriction\PYGZus{}operators}\PYG{p}{,} \PYG{n}{prolongation\PYGZus{}operators} \PYG{o}{=} \PYG{n}{generator}\PYG{o}{.}\PYG{n}{get\PYGZus{}inter\PYGZus{}grid\PYGZus{}operators}\PYG{p}{(}\PYG{n}{level}\PYG{p}{,} \PYG{n}{level} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{CGS\PYGZus{}2h} \PYG{o}{=} \PYG{n}{CoarseGridSolver}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}CGS\PYGZdq{}}\PYG{p}{,} \PYG{n}{A\PYGZus{}2h}\PYG{p}{)}
+        \PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mf}{0.1}\PYG{p}{,} \PYG{l+m+mf}{1.9}\PYG{p}{,} \PYG{n}{samples}\PYG{p}{)}
+        \PYG{n}{terminals} \PYG{o}{=} \PYG{n}{Terminals}\PYG{p}{(}\PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{restriction\PYGZus{}operators}\PYG{p}{,} \PYG{n}{prolongation\PYGZus{}operators}\PYG{p}{,} \PYG{n}{CGS\PYGZus{}2h}\PYG{p}{,} \PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval}\PYG{p}{,} \PYG{n}{partitionings}\PYG{p}{)}
+        \PYG{n}{previous\PYGZus{}types} \PYG{o}{=} \PYG{n}{types}
+        \PYG{n}{types} \PYG{o}{=} \PYG{n}{Types}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,} \PYG{n}{previous\PYGZus{}types}\PYG{p}{)}
+        \PYG{n}{add\PYGZus{}level}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{terminals}\PYG{p}{,} \PYG{n}{types}\PYG{p}{,} \PYG{n}{i}\PYG{p}{,} \PYG{n}{samples}\PYG{p}{,} \PYG{n}{coarsest}\PYG{o}{=}\PYG{n}{coarsest}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{pset}
+\end{Verbatim}

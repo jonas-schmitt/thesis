@@ -862,7 +862,7 @@
   \def\bibasterisk{The 2nd (3rd) author names the supervisor; the last author
     is head of the institute.}%
 }
-\RequirePackage{minted}
+\RequirePackage[frozencache,cachedir=.]{minted}
 % The csquotes package allows to set quotation marks depending on the currently
 % selected language. Usage is recommended by BibLaTeX when using babel or
 % polyglossia. Further package options can be passed to it in the usual way by
@@ -959,8 +959,8 @@
   % installed using the tool getnonfreefonts.
 
   \RequirePackage{textcomp} % 2020/02/02 v2.0n
-  \RequirePackage{ebgaramond} % 2020/04/12
-  \RequirePackage[ebgaramond]{newtxmath} % 2020/05/02 v1.626
+  %\RequirePackage{ebgaramond} % 2020/04/12
+  %\RequirePackage[ebgaramond]{newtxmath} % 2020/05/02 v1.626
 
 \fi
 

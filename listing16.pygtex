@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}jacobi\PYGZus{}operator}\PYG{p}{(}\PYG{n}{operator}\PYG{p}{:} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Operator}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Diagonal}\PYG{p}{(}\PYG{n}{operator}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{jacobi}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{partitioning}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{smoothing}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{partitioning}\PYG{p}{,} \PYG{n}{generate\PYGZus{}jacobi\PYGZus{}operator}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+\end{Verbatim}

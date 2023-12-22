@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{deap} \PYG{k+kn}{import} \PYG{n}{gp}
+
+\PYG{c+c1}{\PYGZsh{} Implemented as a method of the Optimizer class}
+\PYG{k}{def} \PYG{n+nf}{evaluate}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{individual}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}level}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{evaluation\PYGZus{}samples}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{pde\PYGZus{}parameter\PYGZus{}values}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{pde\PYGZus{}parameter\PYGZus{}values} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{pde\PYGZus{}parameter\PYGZus{}values} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+
+    \PYG{n}{key} \PYG{o}{=} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{individual}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{key} \PYG{o+ow}{in} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache}\PYG{p}{[}\PYG{n}{key}\PYG{p}{]}
+    \PYG{n}{expression}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{compile}\PYG{p}{(}\PYG{n}{individual}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{)}
+    \PYG{n}{solving\PYGZus{}time}\PYG{p}{,} \PYG{n}{convergence\PYGZus{}factor}\PYG{p}{,} \PYG{n}{number\PYGZus{}of\PYGZus{}iterations} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator}\PYG{o}{.}\PYG{n}{generate\PYGZus{}and\PYGZus{}evaluate}\PYG{p}{(}\PYG{n}{expression}\PYG{p}{,} \PYG{n}{min\PYGZus{}level}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{evaluation\PYGZus{}samples}\PYG{p}{,} \PYG{n}{pde\PYGZus{}parameter\PYGZus{}values}\PYG{p}{)}
+
+    \PYG{n}{fitness} \PYG{o}{=} \PYG{n}{convergence\PYGZus{}factor}\PYG{p}{,} \PYG{n}{solving\PYGZus{}time} \PYG{o}{/} \PYG{n}{number\PYGZus{}of\PYGZus{}iterations}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache}\PYG{p}{[}\PYG{n}{key}\PYG{p}{]} \PYG{o}{=} \PYG{n}{fitness}
+    \PYG{k}{return} \PYG{n}{fitness}
+\end{Verbatim}

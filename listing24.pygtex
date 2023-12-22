@@ -1,0 +1,11 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{add\PYGZus{}terminals}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{terminals}\PYG{p}{,} \PYG{n}{types}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{,} \PYG{n}{coarsest}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{):}
+    \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{coarsest}\PYG{p}{:}
+        \PYG{n}{x\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Approximation}\PYG{p}{(}\PYG{n}{terminals}\PYG{o}{.}\PYG{n}{coarse\PYGZus{}grid}\PYG{p}{)}
+        \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addTerminal}\PYG{p}{(}\PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{types}\PYG{o}{.}\PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}zero\PYGZus{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{depth}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addTerminal}\PYG{p}{(}\PYG{n}{terminals}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{types}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}A\PYGZus{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{depth}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{P\PYGZus{}2h} \PYG{o+ow}{in} \PYG{n}{terminals}\PYG{o}{.}\PYG{n}{prolongation\PYGZus{}operators}\PYG{p}{:}
+        \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addTerminal}\PYG{p}{(}\PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{types}\PYG{o}{.}\PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{P\PYGZus{}2h}\PYG{o}{.}\PYG{n}{name}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{R\PYGZus{}h} \PYG{o+ow}{in} \PYG{n}{terminals}\PYG{o}{.}\PYG{n}{restriction\PYGZus{}operators}\PYG{p}{:}
+        \PYG{n}{pset}\PYG{o}{.}\PYG{n}{addTerminal}\PYG{p}{(}\PYG{n}{R\PYGZus{}h}\PYG{p}{,} \PYG{n}{types}\PYG{o}{.}\PYG{n}{R\PYGZus{}h}\PYG{p}{,} \PYG{n}{R\PYGZus{}h}\PYG{o}{.}\PYG{n}{name}\PYG{p}{)}
+\end{Verbatim}

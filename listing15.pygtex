@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{smoothing}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{partitioning}\PYG{p}{,} \PYG{n}{generate\PYGZus{}smoother}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{k}{assert} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction}\PYG{p}{,} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Residual}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}Invalid production: expected residual\PYGZsq{}}
+    \PYG{n}{smoothing\PYGZus{}operator} \PYG{o}{=} \PYG{n}{generate\PYGZus{}smoother}\PYG{p}{(}\PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction}\PYG{o}{.}\PYG{n}{A\PYGZus{}h}\PYG{p}{)}
+    \PYG{n}{cycle} \PYG{o}{=} \PYG{n}{apply}\PYG{p}{(}\PYG{n}{base}\PYG{o}{.}\PYG{n}{Inverse}\PYG{p}{(}\PYG{n}{smoothing\PYGZus{}operator}\PYG{p}{),} \PYG{n}{cycle}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{update}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{partitioning}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+\end{Verbatim}

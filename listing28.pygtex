@@ -1,0 +1,11 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{genGrow}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{size\PYGZus{}limit}\PYG{o}{=}\PYG{l+m+mi}{150}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf}{condition}\PYG{p}{(}\PYG{n}{height}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{depth} \PYG{o}{\PYGZlt{}} \PYG{n}{height}
+    \PYG{n}{result} \PYG{o}{=} \PYG{n}{generate}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{condition}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{p}{)}
+    \PYG{k}{while} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{result}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{n}{size\PYGZus{}limit}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Repeat the process until the generated individual }
+        \PYG{c+c1}{\PYGZsh{} does fulfill the specified limits}
+        \PYG{n}{result} \PYG{o}{=} \PYG{n}{generate}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{condition}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{result}
+\end{Verbatim}

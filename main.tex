@@ -77,11 +77,11 @@
 \usepackage{amssymb}
 \usepackage{blindtext}
 \usepackage{physics}
-%\usepackage{bm}
+\usepackage{bm}
 %TODO Best solution so far
-\def\bm{\symbf}
 %\def\bm{}
 \usepackage{relsize}
+\let\openbox\relax
 \usepackage{amsthm}
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}
@@ -97,7 +97,6 @@
 \usepackage{backnaur}
 \usepackage{hyperref}
 \usepackage[titles]{tocloft}
-\usepackage{minted}
 
 % Defs and adaptions
 \newcommand{\ps}[1]{\langle #1 \rangle}

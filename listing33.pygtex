@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{deap} \PYG{k+kn}{import} \PYG{n}{tools}
+
+\PYG{k}{def} \PYG{n+nf}{init\PYGZus{}multi\PYGZus{}objective\PYGZus{}selection}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{,} \PYG{n}{evaluation\PYGZus{}function}\PYG{p}{):}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}evaluate\PYGZsq{}}\PYG{p}{,} \PYG{n}{evaluation\PYGZus{}function}\PYG{p}{,} \PYG{n}{pset}\PYG{o}{=}\PYG{n}{pset}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}select\PYGZdq{}}\PYG{p}{,} \PYG{n}{tools}\PYG{o}{.}\PYG{n}{selTournamentDCD}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}elitism\PYGZdq{}}\PYG{p}{,} \PYG{n}{tools}\PYG{o}{.}\PYG{n}{selNSGA2}\PYG{p}{)}
+\end{Verbatim}

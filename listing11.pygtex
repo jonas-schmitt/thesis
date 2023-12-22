@@ -1,0 +1,32 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{l} \PYG{o}{=} \PYG{l+m+mi}{10} \PYG{c+c1}{\PYGZsh{} level}
+\PYG{n}{h} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{o}{**}\PYG{n}{l} \PYG{c+c1}{\PYGZsh{} fine\PYGZhy{}grid spacing}
+\PYG{n}{n\PYGZus{}h} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{h} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}
+\PYG{n}{H} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{h} \PYG{c+c1}{\PYGZsh{} coarse\PYGZhy{}grid spacing}
+\PYG{n}{n\PYGZus{}H} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{H} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}
+
+\PYG{c+c1}{\PYGZsh{} Generate the fine and coarse grid}
+\PYG{n}{grid} \PYG{o}{=} \PYG{n}{Grid}\PYG{p}{((}\PYG{n}{n\PYGZus{}h}\PYG{p}{,} \PYG{n}{n\PYGZus{}h}\PYG{p}{),} \PYG{p}{(}\PYG{n}{h}\PYG{p}{,} \PYG{n}{h}\PYG{p}{),} \PYG{n}{l}\PYG{p}{)}
+\PYG{n}{coarse\PYGZus{}grid} \PYG{o}{=} \PYG{n}{Grid}\PYG{p}{((}\PYG{n}{n\PYGZus{}H}\PYG{p}{,} \PYG{n}{n\PYGZus{}H}\PYG{p}{),} \PYG{p}{(}\PYG{n}{H}\PYG{p}{,} \PYG{n}{H}\PYG{p}{),} \PYG{n}{l}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Define entities on the fine grid}
+\PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{Approximation}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZus{}h\PYGZdq{}}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{)}
+\PYG{n}{b\PYGZus{}h} \PYG{o}{=} \PYG{n}{RightHandSide}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}b\PYGZus{}h\PYGZdq{}}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{)}
+\PYG{n}{A\PYGZus{}h} \PYG{o}{=} \PYG{n}{Operator}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZus{}h\PYGZdq{}}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}h} \PYG{o}{=} \PYG{n}{Residual}\PYG{p}{(}\PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} Create a temporary Cycle object without a correction term}
+\PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{Cycle}\PYG{p}{(}\PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Define the entities on coarse\PYGZhy{}grid}
+\PYG{n}{A\PYGZus{}H} \PYG{o}{=} \PYG{n}{Operator}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZus{}H\PYGZdq{}}\PYG{p}{,} \PYG{n}{coarse\PYGZus{}grid}\PYG{p}{)}
+\PYG{n}{x\PYGZus{}H} \PYG{o}{=} \PYG{n}{Approximation}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZus{}H\PYGZdq{}}\PYG{p}{,} \PYG{n}{coarse\PYGZus{}grid}\PYG{p}{)}
+\PYG{n}{b\PYGZus{}H} \PYG{o}{=} \PYG{n}{Multiplication}\PYG{p}{(}\PYG{n}{Restriction}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}I\PYGZus{}hH\PYGZdq{}}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{coarse\PYGZus{}grid}\PYG{p}{),} \PYG{n}{r\PYGZus{}h}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}H} \PYG{o}{=} \PYG{n}{Residual}\PYG{p}{(}\PYG{n}{A\PYGZus{}H}\PYG{p}{,} \PYG{n}{x\PYGZus{}H}\PYG{p}{,} \PYG{n}{b\PYGZus{}H}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Define a complete Cycle on the coarse level}
+\PYG{n}{x\PYGZus{}H} \PYG{o}{=} \PYG{n}{Cycle}\PYG{p}{(}\PYG{n}{x\PYGZus{}H}\PYG{p}{,} \PYG{n}{b\PYGZus{}H}\PYG{p}{,} \PYG{n}{r\PYGZus{}H}\PYG{p}{,} \PYG{n}{predecessor}\PYG{o}{=}\PYG{n}{x\PYGZus{}h}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} Restore the state on the fine level}
+\PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{x\PYGZus{}H}\PYG{o}{.}\PYG{n}{predecessor}
+\PYG{c+c1}{\PYGZsh{} Replace the old correction term with the computed coarse\PYGZhy{}grid correction}
+\PYG{n}{x\PYGZus{}h}\PYG{o}{.}\PYG{n}{correction} \PYG{o}{=} \PYG{n}{Multiplication}\PYG{p}{(}\PYG{n}{Prolongation}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}I\PYGZus{}Hh\PYGZdq{}}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{coarse\PYGZus{}grid}\PYG{p}{),} \PYG{n}{x\PYGZus{}H}\PYG{p}{)}
+\end{Verbatim}

@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{restrict\PYGZus{}and\PYGZus{}coarsen}\PYG{p}{(}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{R\PYGZus{}h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{n}{cycle} \PYG{o}{=} \PYG{n}{apply}\PYG{p}{(}\PYG{n}{R\PYGZus{}h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{coarsening}\PYG{p}{(}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{update\PYGZus{}with\PYGZus{}coarse\PYGZus{}grid\PYGZus{}correction}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{state}\PYG{p}{):}
+    \PYG{n}{cycle} \PYG{o}{=} \PYG{n}{coarse\PYGZus{}grid\PYGZus{}correction}\PYG{p}{(}\PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{state}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{update}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{terminals}\PYG{o}{.}\PYG{n}{no\PYGZus{}partitioning}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+\end{Verbatim}

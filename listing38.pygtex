@@ -1,0 +1,24 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{merge\PYGZus{}lists}\PYG{p}{(}\PYG{n}{lst}\PYG{p}{):}
+    \PYG{k}{return} \PYG{p}{[}\PYG{n}{item} \PYG{k}{for} \PYG{n}{sublist} \PYG{o+ow}{in} \PYG{n}{lst} \PYG{k}{for} \PYG{n}{item} \PYG{o+ow}{in} \PYG{n}{sublist}\PYG{p}{]}
+
+\PYG{k}{class} \PYG{n+nc}{Optimizer}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{program\PYGZus{}generator}\PYG{p}{,} \PYG{n}{mpi\PYGZus{}comm}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{nprocs}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{rank}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator} \PYG{o}{=} \PYG{n}{program\PYGZus{}generator}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{params} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mpi\PYGZus{}comm} \PYG{o}{=} \PYG{n}{mpi\PYGZus{}comm}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{nprocs} \PYG{o}{=} \PYG{n}{nprocs}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{rank} \PYG{o}{=} \PYG{n}{rank}
+
+    \PYG{k}{def} \PYG{n+nf}{is\PYGZus{}root}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{rank} \PYG{o}{==} \PYG{l+m+mi}{0}
+
+    \PYG{k}{def} \PYG{n+nf}{allgather}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{data}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mpi\PYGZus{}comm} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n}{data}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n}{merge\PYGZus{}lists}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mpi\PYGZus{}comm}\PYG{o}{.}\PYG{n}{allgather}\PYG{p}{(}\PYG{n}{data}\PYG{p}{))}
+\end{Verbatim}

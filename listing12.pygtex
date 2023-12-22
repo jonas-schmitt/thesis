@@ -1,0 +1,23 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{evostencils.ir} \PYG{k+kn}{import} \PYG{n}{partitioning}
+
+\PYG{k}{class} \PYG{n+nc}{Terminals}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{restriction\PYGZus{}operators}\PYG{p}{,} \PYG{n}{prolongation\PYGZus{}operators}\PYG{p}{,} \PYG{n}{CGS\PYGZus{}2h}\PYG{p}{,} \PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval}\PYG{p}{,} \PYG{n}{partitionings}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}h} \PYG{o}{=} \PYG{n}{A\PYGZus{}h}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h} \PYG{o}{=} \PYG{n}{A\PYGZus{}2h}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n}{x\PYGZus{}h}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{prolongation\PYGZus{}operators} \PYG{o}{=} \PYG{n}{prolongation\PYGZus{}operators}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{restriction\PYGZus{}operators} \PYG{o}{=} \PYG{n}{restriction\PYGZus{}operators}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{CGS\PYGZus{}2h} \PYG{o}{=} \PYG{n}{CGS\PYGZus{}2h}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval} \PYG{o}{=} \PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{no\PYGZus{}partitioning} \PYG{o}{=} \PYG{n}{partitioning}\PYG{o}{.}\PYG{n}{Single}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{partitionings} \PYG{o}{=} \PYG{n}{partitionings}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}h}\PYG{o}{.}\PYG{n}{grid}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{coarse\PYGZus{}grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h}\PYG{o}{.}\PYG{n}{grid}
+\end{Verbatim}

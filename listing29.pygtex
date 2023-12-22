@@ -1,0 +1,22 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{deap} \PYG{k+kn}{import} \PYG{n}{base}\PYG{p}{,} \PYG{n}{gp}\PYG{p}{,} \PYG{n}{creator}
+\PYG{k+kn}{from} \PYG{n+nn}{evostencils.gp} \PYG{k+kn}{import} \PYG{n}{genGrow}\PYG{p}{,} \PYG{n}{mutInsert}
+
+\PYG{k}{def} \PYG{n+nf}{init\PYGZus{}toolbox}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{multi\PYGZus{}objective}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} Define an Individual together with its Fitness}
+    \PYG{k}{if} \PYG{n}{multi\PYGZus{}objective}\PYG{p}{:}
+        \PYG{n}{creator}\PYG{o}{.}\PYG{n}{create}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Fitness\PYGZdq{}}\PYG{p}{,} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Fitness}\PYG{p}{,} \PYG{n}{weights}\PYG{o}{=}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{p}{))}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n}{creator}\PYG{o}{.}\PYG{n}{create}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Fitness\PYGZdq{}}\PYG{p}{,} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Fitness}\PYG{p}{,} \PYG{n}{weights}\PYG{o}{=}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{p}{,))}
+    \PYG{n}{creator}\PYG{o}{.}\PYG{n}{create}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Individual\PYGZdq{}}\PYG{p}{,} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{PrimitiveTree}\PYG{p}{,} \PYG{n}{fitness}\PYG{o}{=}\PYG{n}{creator}\PYG{o}{.}\PYG{n}{Fitness}\PYG{p}{)}
+
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox} \PYG{o}{=} \PYG{n}{deap}\PYG{o}{.}\PYG{n}{base}\PYG{o}{.}\PYG{n}{Toolbox}\PYG{p}{()}
+    \PYG{c+c1}{\PYGZsh{} Population initialization}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}generate\PYGZus{}tree\PYGZdq{}}\PYG{p}{,} \PYG{n}{genGrow}\PYG{p}{,} \PYG{n}{pset}\PYG{o}{=}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{o}{=}\PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{o}{=}\PYG{n}{max\PYGZus{}height}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}generate\PYGZus{}individual\PYGZdq{}}\PYG{p}{,} \PYG{n}{tools}\PYG{o}{.}\PYG{n}{initIterate}\PYG{p}{,} \PYG{n}{creator}\PYG{o}{.}\PYG{n}{Individual}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{generate\PYGZus{}tree}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}population\PYGZdq{}}\PYG{p}{,} \PYG{n}{tools}\PYG{o}{.}\PYG{n}{initRepeat}\PYG{p}{,} \PYG{n+nb}{list}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{generate\PYGZus{}individual}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} Crossover and mutation}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}mate\PYGZdq{}}\PYG{p}{,} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{cxOnePoint}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{register}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}mutate\PYGZdq{}}\PYG{p}{,} \PYG{n}{mutateSubtree}\PYG{p}{,} \PYG{n}{pset\PYGZus{}}\PYG{o}{=}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{o}{=}\PYG{n}{max\PYGZus{}height} \PYG{o}{/} \PYG{l+m+mi}{2}\PYG{p}{)}
+\end{Verbatim}

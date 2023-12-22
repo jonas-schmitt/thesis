@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{adapt\PYGZus{}problem\PYGZus{}size}\PYG{p}{(}\PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{params}\PYG{p}{,} \PYG{n}{multi\PYGZus{}objective}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{):}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset} \PYG{o}{=} \PYG{n}{generate\PYGZus{}grammar}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{depth}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}samples}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Initialize the code generator}
+    \PYG{c+c1}{\PYGZsh{} according to the specified maximum level}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator}\PYG{o}{.}\PYG{n}{initialize\PYGZus{}code\PYGZus{}generation}\PYG{p}{(}\PYG{n}{max\PYGZus{}level} \PYG{o}{\PYGZhy{}} \PYG{n}{params}\PYG{o}{.}\PYG{n}{depth}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{)}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}toolbox}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{tree\PYGZus{}min\PYGZus{}height}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{tree\PYGZus{}max\PYGZus{}height}\PYG{p}{,} \PYG{n}{multi\PYGZus{}objective}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{multi\PYGZus{}objective}\PYG{p}{:}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}multi\PYGZus{}objective\PYGZus{}selection}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}single\PYGZus{}objective\PYGZus{}selection}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{)}
+\end{Verbatim}

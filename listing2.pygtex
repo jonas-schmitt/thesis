@@ -1,0 +1,15 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{abc}
+
+\PYG{k}{class} \PYG{n+nc}{Expression}\PYG{p}{(}\PYG{n}{abc}\PYG{o}{.}\PYG{n}{ABC}\PYG{p}{):}
+
+    \PYG{n+nd}{@property}
+    \PYG{n+nd}{@abc}\PYG{o}{.}\PYG{n}{abstractmethod}
+    \PYG{k}{def} \PYG{n+nf}{shape}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{pass}
+
+    \PYG{n+nd}{@property}
+    \PYG{n+nd}{@abc}\PYG{o}{.}\PYG{n}{abstractmethod}
+    \PYG{k}{def} \PYG{n+nf}{grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{pass}
+\end{Verbatim}

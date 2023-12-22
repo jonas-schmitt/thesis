@@ -1,0 +1,26 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+
+\PYG{k}{class} \PYG{n+nc}{Grid}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{size}\PYG{p}{,} \PYG{n}{spacing}\PYG{p}{,} \PYG{n}{level}\PYG{p}{):}
+        \PYG{k}{assert} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{size}\PYG{p}{)} \PYG{o}{==} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{spacing}\PYG{p}{),} 
+        \PYG{l+s+s2}{\PYGZdq{}Dimensions of the size and step size must match\PYGZdq{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}size} \PYG{o}{=} \PYG{n}{size}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}spacing} \PYG{o}{=} \PYG{n}{spacing}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}level} \PYG{o}{=} \PYG{n}{level}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{size}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}size}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{spacing}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}spacing}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{level}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}level}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{dimension}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{size}\PYG{p}{)}
+\end{Verbatim}

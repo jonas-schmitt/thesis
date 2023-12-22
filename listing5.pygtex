@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{operator} \PYG{k+kn}{import} \PYG{n}{mul}
+
+\PYG{k}{class} \PYG{n+nc}{Operator}\PYG{p}{(}\PYG{n}{Entity}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{name}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{stencil\PYGZus{}generator}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n}{reduce}\PYG{p}{(}\PYG{n}{mul}\PYG{p}{,} \PYG{n}{grid}\PYG{o}{.}\PYG{n}{size}\PYG{p}{)}
+        \PYG{n}{shape} \PYG{o}{=} \PYG{p}{(}\PYG{n}{n}\PYG{p}{,} \PYG{n}{n}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}stencil\PYGZus{}generator} \PYG{o}{=} \PYG{n}{stencil\PYGZus{}generator}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{shape}\PYG{p}{)}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{stencil\PYGZus{}generator}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}stencil\PYGZus{}generator}
+
+    \PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}stencil}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}stencil\PYGZus{}generator} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{k}{return} \PYG{k+kc}{None}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}stencil\PYGZus{}generator}\PYG{o}{.}\PYG{n}{generate\PYGZus{}stencil}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}grid}\PYG{p}{)}
+\end{Verbatim}

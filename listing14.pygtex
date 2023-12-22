@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{residual}\PYG{p}{(}\PYG{n}{state}\PYG{p}{):}
+    \PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h} \PYG{o}{=} \PYG{n}{state}
+    \PYG{k}{return} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Cycle}\PYG{p}{(}\PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h}\PYG{p}{,} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Residual}\PYG{p}{(}\PYG{n}{terminals}\PYG{o}{.}\PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{approximation}\PYG{p}{,} \PYG{n}{rhs}\PYG{p}{),} \PYG{n}{predecessor}\PYG{o}{=}\PYG{n}{approximation}\PYG{o}{.}\PYG{n}{predecessor}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction} \PYG{o}{=} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Multiplication}\PYG{p}{(}\PYG{n}{A\PYGZus{}h}\PYG{p}{,} \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{cycle}
+
+\PYG{k}{def} \PYG{n+nf}{update}\PYG{p}{(}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{,} \PYG{n}{partitioning}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{n}{relaxation\PYGZus{}factor} \PYG{o}{=} \PYG{n}{terminals}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}interval}\PYG{p}{[}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}index}\PYG{p}{]}
+    \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor} \PYG{o}{=} \PYG{n}{relaxation\PYGZus{}factor}
+    \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{partitioning} \PYG{o}{=} \PYG{n}{partitioning}
+    \PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h} \PYG{o}{=} \PYG{n}{cycle}\PYG{p}{,} \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{rhs}
+    \PYG{k}{return} \PYG{n}{x\PYGZus{}h}\PYG{p}{,} \PYG{n}{b\PYGZus{}h}
+
+\PYG{k}{def} \PYG{n+nf}{coarsening}\PYG{p}{(}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{):}
+    \PYG{n}{r\PYGZus{}2h} \PYG{o}{=} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Residual}\PYG{p}{(}\PYG{n}{A\PYGZus{}2h}\PYG{p}{,} \PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction}\PYG{p}{)}
+    \PYG{n}{new\PYGZus{}cycle} \PYG{o}{=} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Cycle}\PYG{p}{(}\PYG{n}{x\PYGZus{}2h}\PYG{p}{,} \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{correction}\PYG{p}{,} \PYG{n}{r\PYGZus{}2h}\PYG{p}{)}
+    \PYG{n}{new\PYGZus{}cycle}\PYG{o}{.}\PYG{n}{predecessor} \PYG{o}{=} \PYG{n}{cycle}
+    \PYG{k}{return} \PYG{n}{new\PYGZus{}cycle}
+
+\PYG{k}{def} \PYG{n+nf}{coarse\PYGZus{}grid\PYGZus{}correction}\PYG{p}{(}\PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{state}\PYG{p}{):}
+    \PYG{n}{cycle} \PYG{o}{=} \PYG{n}{state}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{correction} \PYG{o}{=} \PYG{n}{base}\PYG{o}{.}\PYG{n}{Multiplication}\PYG{p}{(}\PYG{n}{P\PYGZus{}2h}\PYG{p}{,} \PYG{n}{cycle}\PYG{p}{)}
+    \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{predecessor}\PYG{o}{.}\PYG{n}{correction} \PYG{o}{=} \PYG{n}{correction}
+    \PYG{k}{return} \PYG{n}{cycle}\PYG{o}{.}\PYG{n}{predecessor}
+\end{Verbatim}

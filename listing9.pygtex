@@ -1,0 +1,28 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Residual}\PYG{p}{(}\PYG{n}{Expression}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{operator}\PYG{p}{,} \PYG{n}{approximation}\PYG{p}{,} \PYG{n}{rhs}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}operator} \PYG{o}{=} \PYG{n}{operator}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}approximation} \PYG{o}{=} \PYG{n}{approximation}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}rhs} \PYG{o}{=} \PYG{n}{rhs}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{()}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{shape}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{rhs}\PYG{o}{.}\PYG{n}{shape}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{rhs}\PYG{o}{.}\PYG{n}{grid}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{operator}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}operator}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{approximation}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}approximation}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{rhs}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}rhs}
+\end{Verbatim}

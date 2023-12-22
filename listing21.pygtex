@@ -1,0 +1,39 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Types}\PYG{p}{:}
+    \PYG{n+nd}{@staticmethod}
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{identifier}\PYG{p}{,} \PYG{n}{types}\PYG{p}{,} \PYG{n}{type\PYGZus{}attribute}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{guard}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n}{type\PYGZus{}attribute} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{n}{type\PYGZus{}attribute} \PYG{o}{=} \PYG{n}{identifier}
+        \PYG{k}{if} \PYG{n}{types} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{identifier}\PYG{p}{,} \PYG{n}{guard}\PYG{p}{)}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n+nb}{getattr}\PYG{p}{(}\PYG{n}{types}\PYG{p}{,} \PYG{n}{type\PYGZus{}attribute}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{,} \PYG{n}{previous\PYGZus{}types}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Fine\PYGZhy{}grid types}
+        \PYG{n}{gen\PYGZus{}id} \PYG{o}{=} \PYG{k}{lambda} \PYG{n}{base}\PYG{p}{:} \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{base}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{depth}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{S\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}S\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}S\PYGZus{}2h\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{S\PYGZus{}guard\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}S\PYGZus{}guard\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}S\PYGZus{}guard\PYGZus{}2h\PYGZdq{}}\PYG{p}{,} \PYG{n}{guard}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{C\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}C\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}C\PYGZus{}2h\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{C\PYGZus{}guard\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}C\PYGZus{}guard\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}C\PYGZus{}guard\PYGZus{}2h\PYGZdq{}}\PYG{p}{,} \PYG{n}{guard}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{x\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}x\PYGZus{}2h\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}A\PYGZus{}2h\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{B\PYGZus{}h} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZdq{}}\PYG{p}{),} \PYG{n}{previous\PYGZus{}types}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}B\PYGZus{}2h\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{R\PYGZus{}h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}R\PYGZus{}}\PYG{l+s+si}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{+w}{ }\PYG{o}{**}\PYG{+w}{ }\PYG{n}{depth}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{h\PYGZdq{}}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Coarse\PYGZhy{}grid types}
+        \PYG{n}{gen\PYGZus{}id} \PYG{o}{=} \PYG{k}{lambda} \PYG{n}{base}\PYG{p}{:} \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{base}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{depth}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{h\PYGZdq{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{S\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}S\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{S\PYGZus{}guard\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}S\PYGZus{}guard\PYGZdq{}}\PYG{p}{),} \PYG{n}{guard}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{C\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}C\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{C\PYGZus{}guard\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}C\PYGZus{}guard\PYGZdq{}}\PYG{p}{),} \PYG{n}{guard}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{x\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{A\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}A\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{B\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}B\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{P\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}P\PYGZdq{}}\PYG{p}{))}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{CGS\PYGZus{}2h} \PYG{o}{=} \PYG{n}{Type}\PYG{p}{(}\PYG{n}{gen\PYGZus{}id}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}CGC\PYGZdq{}}\PYG{p}{))}
+
+        \PYG{c+c1}{\PYGZsh{} General types}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{Partitioning} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Partitioning\PYGZdq{}}\PYG{p}{,} \PYG{n}{previous\PYGZus{}types}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{RelaxationFactorIndex} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}init\PYGZus{}type}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}RelaxationFactorIndex\PYGZdq{}}\PYG{p}{,} \PYG{n}{previous\PYGZus{}types}\PYG{p}{)}
+\end{Verbatim}

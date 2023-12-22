@@ -1,0 +1,42 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{random}
+
+\PYG{k}{def} \PYG{n+nf}{evolutionary\PYGZus{}search}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{params}\PYG{p}{,} \PYG{n}{use\PYGZus{}random\PYGZus{}search}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{,} \PYG{n}{generalization\PYGZus{}interval}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{generalization\PYGZus{}interval} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{generalization\PYGZus{}interval} \PYG{o}{=} \PYG{n}{params}\PYG{o}{.}\PYG{n}{generations}
+    \PYG{c+c1}{\PYGZsh{} Generate and evaluate the initial population}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n}{params}\PYG{o}{.}\PYG{n}{initial\PYGZus{}population\PYGZus{}size} \PYG{o}{/} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{nprocs}
+    \PYG{n}{population} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{population}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}
+    \PYG{n}{invalid\PYGZus{}ind} \PYG{o}{=} \PYG{p}{[}\PYG{n}{ind} \PYG{k}{for} \PYG{n}{ind} \PYG{o+ow}{in} \PYG{n}{population}\PYG{p}{]}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate\PYGZus{}individuals}\PYG{p}{(}\PYG{n}{invalid\PYGZus{}ind}\PYG{p}{)}
+    \PYG{n}{population} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{allgather}\PYG{p}{(}\PYG{n}{population}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Select mu individuals from the initial population}
+    \PYG{n}{population} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{population}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{mu\PYGZus{}}\PYG{p}{)}
+    \PYG{n}{max\PYGZus{}level} \PYG{o}{=} \PYG{n}{params}\PYG{o}{.}\PYG{n}{max\PYGZus{}level}
+    \PYG{k}{for} \PYG{n}{gen} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{generations} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n}{gen} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{1} \PYG{o+ow}{and} \PYG{n}{gen} \PYG{o}{\PYGZpc{}} \PYG{n}{generalization\PYGZus{}interval} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Increase the problem size}
+            \PYG{n}{max\PYGZus{}level} \PYG{o}{+=} \PYG{l+m+mi}{1}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{adapt\PYGZus{}problem\PYGZus{}size}\PYG{p}{(}\PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{params}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{multi\PYGZus{}objective}\PYG{p}{)}
+            \PYG{c+c1}{\PYGZsh{} Reevaluate individuals}
+            \PYG{n}{invalid\PYGZus{}ind} \PYG{o}{=} \PYG{p}{[}\PYG{n}{ind} \PYG{k}{for} \PYG{n}{ind} \PYG{o+ow}{in} \PYG{n}{population}\PYG{p}{]}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate\PYGZus{}individuals}\PYG{p}{(}\PYG{n}{invalid\PYGZus{}ind}\PYG{p}{)}
+        \PYG{n}{lambda\PYGZus{}} \PYG{o}{=} \PYG{n}{params}\PYG{o}{.}\PYG{n}{lambda\PYGZus{}} \PYG{o}{/} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{nprocs}
+        \PYG{k}{if} \PYG{n}{use\PYGZus{}random\PYGZus{}search}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} For random search simply generate individuals randomly}
+            \PYG{n}{offspring} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{population}\PYG{p}{(}\PYG{n}{n}\PYG{o}{=}\PYG{n}{lambda\PYGZus{}}\PYG{p}{)}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Select lambda parents for mutation and crossover}
+            \PYG{n}{selected} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{population}\PYG{p}{,} \PYG{n}{lambda\PYGZus{}}\PYG{p}{)}
+            \PYG{n}{parents} \PYG{o}{=} \PYG{p}{[}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{clone}\PYG{p}{(}\PYG{n}{ind}\PYG{p}{)} \PYG{k}{for} \PYG{n}{ind} \PYG{o+ow}{in} \PYG{n}{selected}\PYG{p}{]}
+            \PYG{n}{offspring} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{create\PYGZus{}offspring}\PYG{p}{(}\PYG{n}{parents}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{crossover\PYGZus{}probability}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} Evaluate new individuals}
+        \PYG{n}{invalid\PYGZus{}ind} \PYG{o}{=} \PYG{p}{[}\PYG{n}{ind} \PYG{k}{for} \PYG{n}{ind} \PYG{o+ow}{in} \PYG{n}{offspring} \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{ind}\PYG{o}{.}\PYG{n}{fitness}\PYG{o}{.}\PYG{n}{valid}\PYG{p}{]}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate\PYGZus{}individuals}\PYG{p}{(}\PYG{n}{invalid\PYGZus{}ind}\PYG{p}{)}
+        \PYG{n}{offspring} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{allgather}\PYG{p}{(}\PYG{n}{offspring}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} Select new population from the combined set of parents}
+        \PYG{c+c1}{\PYGZsh{} and offspring (elitism)}
+        \PYG{n}{population} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox}\PYG{o}{.}\PYG{n}{elitism}\PYG{p}{(}\PYG{n}{population} \PYG{o}{+} \PYG{n}{offspring}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{mu\PYGZus{}}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{population}
+\end{Verbatim}

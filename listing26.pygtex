@@ -1,0 +1,22 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Optimizer}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{program\PYGZus{}generator}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator} \PYG{o}{=} \PYG{n}{program\PYGZus{}generator}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{toolbox} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{params} \PYG{o}{=} \PYG{k+kc}{None}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{individual\PYGZus{}cache} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+
+    \PYG{k}{def} \PYG{n+nf}{run}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{params}\PYG{p}{,} \PYG{n}{use\PYGZus{}random\PYGZus{}search}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{params} \PYG{o}{=} \PYG{n}{params}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset} \PYG{o}{=} \PYG{n}{generate\PYGZus{}grammar}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{depth}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}samples}\PYG{p}{)}
+        \PYG{n}{min\PYGZus{}level} \PYG{o}{=} \PYG{n}{params}\PYG{o}{.}\PYG{n}{max\PYGZus{}level} \PYG{o}{\PYGZhy{}} \PYG{n}{params}\PYG{o}{.}\PYG{n}{depth}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{program\PYGZus{}generator}\PYG{o}{.}\PYG{n}{initialize\PYGZus{}code\PYGZus{}generation}\PYG{p}{(}\PYG{n}{min\PYGZus{}level}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{max\PYGZus{}level}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}toolbox}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{tree\PYGZus{}min\PYGZus{}height}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{tree\PYGZus{}max\PYGZus{}height}\PYG{p}{,} \PYG{n}{params}\PYG{o}{.}\PYG{n}{multi\PYGZus{}objective}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{params}\PYG{o}{.}\PYG{n}{multi\PYGZus{}objective}\PYG{p}{:}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}multi\PYGZus{}objective\PYGZus{}selection}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{)}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{init\PYGZus{}single\PYGZus{}objective\PYGZus{}selection}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{pset}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{)}
+        \PYG{n}{final\PYGZus{}population} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{evolutionary\PYGZus{}search}\PYG{p}{(}\PYG{n}{params}\PYG{p}{,} \PYG{n}{use\PYGZus{}random\PYGZus{}search}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{final\PYGZus{}population}
+\end{Verbatim}

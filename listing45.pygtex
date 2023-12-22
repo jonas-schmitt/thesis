@@ -1,0 +1,33 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{deap} \PYG{k+kn}{import} \PYG{n}{gp}
+
+\PYG{k}{class} \PYG{n+nc}{PrimitiveSetTyped}\PYG{p}{(}\PYG{n}{gp}\PYG{o}{.}\PYG{n}{PrimitiveSetTyped}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}add}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{prim}\PYG{p}{):}
+        \PYG{k}{def} \PYG{n+nf}{addType}\PYG{p}{(}\PYG{n}{dict\PYGZus{}}\PYG{p}{,} \PYG{n}{ret\PYGZus{}type}\PYG{p}{):}
+            \PYG{k}{if} \PYG{n}{ret\PYGZus{}type} \PYG{o+ow}{not} \PYG{o+ow}{in} \PYG{n}{dict\PYGZus{}}\PYG{p}{:}
+                \PYG{n}{new\PYGZus{}list} \PYG{o}{=} \PYG{p}{[]}
+                \PYG{k}{for} \PYG{n}{type\PYGZus{}}\PYG{p}{,} \PYG{n}{list\PYGZus{}} \PYG{o+ow}{in} \PYG{n}{dict\PYGZus{}}\PYG{o}{.}\PYG{n}{items}\PYG{p}{():}
+                    \PYG{c+c1}{\PYGZsh{} Use \PYGZus{}\PYGZus{}equal\PYGZus{}\PYGZus{} instead of issubclass}
+                    \PYG{k}{if} \PYG{n}{ret\PYGZus{}type} \PYG{o}{==} \PYG{n}{type\PYGZus{}}\PYG{p}{:}
+                        \PYG{k}{for} \PYG{n}{item} \PYG{o+ow}{in} \PYG{n}{list\PYGZus{}}\PYG{p}{:}
+                            \PYG{k}{if} \PYG{n}{item} \PYG{o+ow}{not} \PYG{o+ow}{in} \PYG{n}{new\PYGZus{}list}\PYG{p}{:}
+                                \PYG{n}{new\PYGZus{}list}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{item}\PYG{p}{)}
+                \PYG{n}{dict\PYGZus{}}\PYG{p}{[}\PYG{n}{ret\PYGZus{}type}\PYG{p}{]} \PYG{o}{=} \PYG{n}{new\PYGZus{}list}
+
+        \PYG{n}{addType}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{primitives}\PYG{p}{,} \PYG{n}{prim}\PYG{o}{.}\PYG{n}{ret}\PYG{p}{)}
+        \PYG{n}{addType}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{terminals}\PYG{p}{,} \PYG{n}{prim}\PYG{o}{.}\PYG{n}{ret}\PYG{p}{)}
+
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mapping}\PYG{p}{[}\PYG{n}{prim}\PYG{o}{.}\PYG{n}{name}\PYG{p}{]} \PYG{o}{=} \PYG{n}{prim}
+        \PYG{k}{if} \PYG{n+nb}{isinstance}\PYG{p}{(}\PYG{n}{prim}\PYG{p}{,} \PYG{n}{gp}\PYG{o}{.}\PYG{n}{Primitive}\PYG{p}{):}
+            \PYG{k}{for} \PYG{n}{type\PYGZus{}} \PYG{o+ow}{in} \PYG{n}{prim}\PYG{o}{.}\PYG{n}{args}\PYG{p}{:}
+                \PYG{n}{addType}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{primitives}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{p}{)}
+                \PYG{n}{addType}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{terminals}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{p}{)}
+            \PYG{n}{dict\PYGZus{}} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{primitives}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{n}{dict\PYGZus{}} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{terminals}
+
+        \PYG{k}{for} \PYG{n}{type\PYGZus{}} \PYG{o+ow}{in} \PYG{n}{dict\PYGZus{}}\PYG{p}{:}
+            \PYG{k}{if} \PYG{n}{type\PYGZus{}} \PYG{o}{==} \PYG{n}{prim}\PYG{o}{.}\PYG{n}{ret}\PYG{p}{:}
+                \PYG{n}{dict\PYGZus{}}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{prim}\PYG{p}{)}
+
+\end{Verbatim}

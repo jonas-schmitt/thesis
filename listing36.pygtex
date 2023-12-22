@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Primitive}\PYG{p}{(}\PYG{n+nb}{object}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{name}\PYG{p}{,} \PYG{n}{args}\PYG{p}{,} \PYG{n}{ret}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{name} \PYG{o}{=} \PYG{n}{name} \PYG{c+c1}{\PYGZsh{} name as a string}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{arity} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{args}\PYG{p}{)}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{args} \PYG{o}{=} \PYG{n}{args} \PYG{c+c1}{\PYGZsh{} list of argument types}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{ret} \PYG{o}{=} \PYG{n}{ret} \PYG{c+c1}{\PYGZsh{} return type}
+
+\PYG{k}{class} \PYG{n+nc}{Terminal}\PYG{p}{(}\PYG{n+nb}{object}\PYG{p}{):}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{terminal}\PYG{p}{,} \PYG{n}{symbolic}\PYG{p}{,} \PYG{n}{ret}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{ret} \PYG{o}{=} \PYG{n}{ret} \PYG{c+c1}{\PYGZsh{} return type}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{value} \PYG{o}{=} \PYG{n}{terminal}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{name} \PYG{o}{=} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{terminal}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{} name as a string}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{conv\PYGZus{}fct} \PYG{o}{=} \PYG{n+nb}{str} \PYG{k}{if} \PYG{n}{symbolic} \PYG{k}{else} \PYG{n+nb}{repr}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{arity}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{l+m+mi}{0}
+\end{Verbatim}

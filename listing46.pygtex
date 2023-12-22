@@ -1,0 +1,42 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{random}
+\PYG{k+kn}{from} \PYG{n+nn}{inspect} \PYG{k+kn}{import} \PYG{n}{isclass}
+
+\PYG{k}{def} \PYG{n+nf}{generate}\PYG{p}{(}\PYG{n}{pset}\PYG{p}{,} \PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{,} \PYG{n}{condition}\PYG{p}{,} \PYG{n}{return\PYGZus{}type}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{,} \PYG{n}{subtree}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{):}
+    \PYG{n}{type\PYGZus{}} \PYG{o}{=} \PYG{n}{return\PYGZus{}type}
+    \PYG{k}{if} \PYG{n}{type\PYGZus{}} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{type\PYGZus{}} \PYG{o}{=} \PYG{n}{pset}\PYG{o}{.}\PYG{n}{ret}
+    \PYG{n}{expression} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{n}{height} \PYG{o}{=} \PYG{n}{random}\PYG{o}{.}\PYG{n}{randint}\PYG{p}{(}\PYG{n}{min\PYGZus{}height}\PYG{p}{,} \PYG{n}{max\PYGZus{}height}\PYG{p}{)}
+    \PYG{n}{stack} \PYG{o}{=} \PYG{p}{[(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{type\PYGZus{}}\PYG{p}{)]}
+    \PYG{n}{max\PYGZus{}depth} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{subtree\PYGZus{}inserted} \PYG{o}{=} \PYG{k+kc}{False}
+    \PYG{k}{if} \PYG{n}{subtree} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{subtree\PYGZus{}inserted} \PYG{o}{=} \PYG{k+kc}{True}
+    \PYG{k}{while} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{stack}\PYG{p}{)} \PYG{o}{!=} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{n}{depth}\PYG{p}{,} \PYG{n}{type\PYGZus{}} \PYG{o}{=} \PYG{n}{stack}\PYG{o}{.}\PYG{n}{pop}\PYG{p}{()}
+        \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{subtree\PYGZus{}inserted} \PYG{o+ow}{and} \PYG{n}{type\PYGZus{}} \PYG{o}{==} \PYG{n}{return\PYGZus{}type} \PYG{o+ow}{and} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{expression}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{n}{expression}\PYG{o}{.}\PYG{n}{extend}\PYG{p}{(}\PYG{n}{subtree}\PYG{p}{)}
+            \PYG{n}{subtree\PYGZus{}inserted} \PYG{o}{=} \PYG{k+kc}{True}
+            \PYG{k}{continue}
+        \PYG{n}{max\PYGZus{}depth} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{max\PYGZus{}depth}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{)}
+        \PYG{n}{terminals\PYGZus{}available} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{pset}\PYG{o}{.}\PYG{n}{terminals}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{])} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}
+        \PYG{k}{if} \PYG{n}{condition}\PYG{p}{(}\PYG{n}{height}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{):}
+            \PYG{n}{nodes} \PYG{o}{=} \PYG{n}{pset}\PYG{o}{.}\PYG{n}{terminals}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{]} \PYG{o}{+} \PYG{n}{pset}\PYG{o}{.}\PYG{n}{primitives}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{]}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{k}{if} \PYG{n}{terminals\PYGZus{}available}\PYG{p}{:}
+                \PYG{n}{nodes} \PYG{o}{=} \PYG{n}{pset}\PYG{o}{.}\PYG{n}{terminals}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{]}
+            \PYG{k}{else}\PYG{p}{:}
+                \PYG{n}{nodes} \PYG{o}{=} \PYG{n}{pset}\PYG{o}{.}\PYG{n}{primitives}\PYG{p}{[}\PYG{n}{type\PYGZus{}}\PYG{p}{]}
+        \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{nodes}\PYG{p}{)} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{k}{raise} \PYG{n+ne}{RuntimeError}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Neither terminal nor primitive available for }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{type\PYGZus{}}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{choice} \PYG{o}{=} \PYG{n}{random}\PYG{o}{.}\PYG{n}{choice}\PYG{p}{(}\PYG{n}{nodes}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{choice}\PYG{o}{.}\PYG{n}{arity} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{k}{for} \PYG{n}{arg} \PYG{o+ow}{in} \PYG{n+nb}{reversed}\PYG{p}{(}\PYG{n}{choice}\PYG{o}{.}\PYG{n}{args}\PYG{p}{):}
+                \PYG{n}{stack}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n}{depth} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{arg}\PYG{p}{))}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{k}{if} \PYG{n}{isclass}\PYG{p}{(}\PYG{n}{choice}\PYG{p}{):}
+                \PYG{n}{choice} \PYG{o}{=} \PYG{n}{choice}\PYG{p}{()}
+        \PYG{n}{expression}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{choice}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{expression}
+\end{Verbatim}

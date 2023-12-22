@@ -1,0 +1,15 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{Parameters}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{max\PYGZus{}level}\PYG{p}{,} \PYG{n}{depth}\PYG{p}{,} \PYG{n}{generations}\PYG{p}{,} \PYG{n}{mu\PYGZus{}}\PYG{p}{,} \PYG{n}{lambda\PYGZus{}}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{max\PYGZus{}level} \PYG{o}{=} \PYG{n}{max\PYGZus{}level}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{depth} \PYG{o}{=} \PYG{n}{depth}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{generations} \PYG{o}{=} \PYG{n}{generations}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{mu\PYGZus{}} \PYG{o}{=} \PYG{n}{mu\PYGZus{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{lambda\PYGZus{}} \PYG{o}{=} \PYG{n}{lambda\PYGZus{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{initial\PYGZus{}population\PYGZus{}size} \PYG{o}{=} \PYG{l+m+mi}{4} \PYG{o}{*} \PYG{n}{mu\PYGZus{}}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{crossover\PYGZus{}probability} \PYG{o}{=} \PYG{l+m+mf}{0.7}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{relaxation\PYGZus{}factor\PYGZus{}samples} \PYG{o}{=} \PYG{l+m+mi}{37}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{tree\PYGZus{}min\PYGZus{}height} \PYG{o}{=} \PYG{l+m+mi}{10}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{tree\PYGZus{}max\PYGZus{}height} \PYG{o}{=} \PYG{l+m+mi}{50}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{multi\PYGZus{}objective} \PYG{o}{=} \PYG{k+kc}{True}
+\end{Verbatim}

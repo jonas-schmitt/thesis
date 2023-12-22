@@ -1,0 +1,16 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{InterGridOperator}\PYG{p}{(}\PYG{n}{Operator}\PYG{p}{):}
+
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{name}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{fine\PYGZus{}grid}\PYG{p}{,} \PYG{n}{coarse\PYGZus{}grid}\PYG{p}{,} \PYG{n}{stencil\PYGZus{}generator}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}fine\PYGZus{}grid} \PYG{o}{=} \PYG{n}{fine\PYGZus{}grid}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}coarse\PYGZus{}grid} \PYG{o}{=} \PYG{n}{coarse\PYGZus{}grid}
+        \PYG{n+nb}{super}\PYG{p}{()}\PYG{o}{.}\PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{,} \PYG{n}{stencil\PYGZus{}generator}\PYG{p}{)}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{fine\PYGZus{}grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}fine\PYGZus{}grid}
+
+    \PYG{n+nd}{@property}
+    \PYG{k}{def} \PYG{n+nf}{coarse\PYGZus{}grid}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{\PYGZus{}coarse\PYGZus{}grid}
+\end{Verbatim}
