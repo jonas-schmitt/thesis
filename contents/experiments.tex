@@ -315,19 +315,19 @@ In summary, we can conclude that our evolutionary program synthesis method consi
 To further analyze the behavior of our multi-objective evolutionary algorithm, we consider the distribution of non-dominated individuals at the end of all experiments, which is shown in Figure~\ref{fig:pareto-front-2D-poisson},~\ref{fig:pareto-front-3D-poisson} and~\ref{fig:pareto-front-2D-linear-elasticity}.
 \begin{figure}
 \centering
-	\includegraphics[scale=0.725]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
+	\includegraphics[scale=0.655]{figures/pareto_front_2D_FD_Poisson_fromL2.pdf}
 	\caption[2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments]{2D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-poisson}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[scale=0.725]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
+\includegraphics[scale=0.655]{figures/pareto_front_3D_FD_Poisson_fromL2.pdf}
 	\caption[3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments]{3D Poisson -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-3D-poisson}
 \end{figure}
 \begin{figure}
 \centering
-\includegraphics[scale=0.725]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
+\includegraphics[scale=0.655]{figures/pareto_front_2D_FD_LinearElasticity_fromL2.pdf}
 	\caption[2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments]{2D Linear Elasticity -- Distribution of non-dominated individuals at the end of all ten experiments. The red line denotes the combined Pareto front.}
 	\label{fig:pareto-front-2D-linear-elasticity}
 \end{figure}
@@ -566,7 +566,7 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	%2D Poisson
  \captionsetup[subfigure]{justification=centering}
 		\begin{subfigure}[b]{\columnwidth}
-			\scalebox{0.725}{%
+			\scalebox{0.645}{%
 			\begin{tikzpicture}
 				\node   (h) at (-0.75, 4){$h$};
 				\node   (2h) at (-0.75, 3){$2h$};
@@ -627,7 +627,7 @@ To conclude our experimental analysis, Figure~\ref{fig:evolved-methods-graphical
 	\end{subfigure}
   \par\bigskip
 	\begin{subfigure}[b]{\columnwidth}
-	\scalebox{0.725}{%
+	\scalebox{0.645}{%
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -709,7 +709,7 @@ The main difficulty in solving this equation is that the system of linear equati
 For instance, a discretization with ten grid points per wavelength\footnote{Usually the relation of the wavelength $\lambda$ to the wavenumber $k$ is defined as $k = 2 \pi/\lambda$.}, as it is common in geophysical applications~\cite{erlangga2006multigrid}, requires us to fulfill a second-order accuracy requirement of $kh = 0.625$.
 Figure~\ref{fig:condition-number-helmholtz} shows the condition number of the system matrix $A$ that results from a discretization of Equation~\eqref{eq:helmholtz} for different values of the wavenumber $k$.
 \begin{figure}
-		\includegraphics[scale=0.725]{figures/cond.pdf}
+		\includegraphics[scale=0.655]{figures/cond.pdf}
 		\caption[Condition number resulting from a finite-difference discretization of the two-dimensional Helmholtz equation]{Condition number of the system matrix resulting from a finite-difference discretization of the two-dimensional Helmholtz equation with $kh = 0.625$.}
 		\label{fig:condition-number-helmholtz}
 \end{figure}
@@ -1014,7 +1014,7 @@ Furthermore, even though the largest wavenumber considered within our evolutiona
 Figure~\ref{fig:helmholtz-solving-time-comparison} shows a direct comparison of the preconditioners from both categories that lead to the fastest solving time for large wavenumbers.
 \begin{figure}
 \centering
-	\includegraphics[scale=0.725]{figures/solving-time.pdf}
+	\includegraphics[scale=0.655]{figures/solving-time.pdf}
 	\caption[2D Helmholtz -- Solving time comparison of the best preconditioners]{Solving time comparison of the best preconditioners according to the product of both objectives for different wavenumbers ($k$).}
 	\label{fig:helmholtz-solving-time-comparison}
 \end{figure} 
@@ -1027,7 +1027,7 @@ As a second evaluation step, we address the question of why our evolutionary alg
 Similar to Section~\ref{sec:experiments1-algorithm-behavior-analysis}, we consider the space of non-dominated individuals at the end of each experiment, which is shown in Figure~\ref{fig:pareto-front-helmholtz}.
 \begin{figure}
 \centering
-	\includegraphics[scale=0.725]{figures/pareto-front.pdf}
+	\includegraphics[scale=0.655]{figures/pareto-front.pdf}
 	\caption[2D Helmholtz -- Distribution of non-dominated individuals at the end of all ten experiments]{Distribution of non-dominated individuals at the end of all ten experiments for $k = 320$. The red line denotes the combined front.}
 	\label{fig:pareto-front-helmholtz}
 \end{figure}
@@ -1049,7 +1049,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 \begin{subfigure}[b]{\columnwidth}
-		\scalebox{0.725}{%
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1109,8 +1109,8 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\label{fig:ep-2}
 	\end{subfigure}
   \par\bigskip
-	\begin{subfigure}[b]{0.465\columnwidth}
-		\scalebox{0.725}{%
+	\begin{subfigure}[b]{0.455\columnwidth}
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1150,8 +1150,8 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 		\caption{EP-3}
 		\label{fig:ep-3}
 	\end{subfigure}
-     \begin{subfigure}[b]{0.5\columnwidth}
-		\scalebox{0.725}{%
+     \begin{subfigure}[b]{0.53\columnwidth}
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
 			\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
@@ -1195,7 +1195,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 	\end{subfigure}
     \par\bigskip
   	\begin{subfigure}[b]{\columnwidth}
-			\scalebox{0.725}{%
+			\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1274,7 +1274,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 	\begin{subfigure}[b]{\columnwidth}
-		\scalebox{0.725}{%
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -1335,7 +1335,7 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 	\end{subfigure}
   \par\bigskip
  	\begin{subfigure}[b]{\columnwidth}
-			\scalebox{0.725}{%
+			\scalebox{0.645}{%
 			\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
