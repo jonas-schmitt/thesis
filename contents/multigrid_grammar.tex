@@ -6,6 +6,7 @@ Furthermore, each classical multigrid cycle employs a fixed number of smoothing 
 While the representation of a multigrid method as a recursive cycle yields a formally simple and easily parameterizable algorithmic formulation, it also enforces unnecessary restrictions on its structure.
 Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-traditional-multigrid-cycle}.
 \begin{figure}
+	\scalebox{0.85}{
 		\begin{tikzpicture}
             \node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -55,6 +56,7 @@ Consider, for instance, the multigrid method shown in Figure~\ref{fig:non-tradit
 			(t) edge[->] (u)
 			;
 		\end{tikzpicture}
+	}
 	\caption{Example for a non-classical multigrid method.}
 	\label{fig:non-traditional-multigrid-cycle}
 \end{figure}

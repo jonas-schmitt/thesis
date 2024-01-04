@@ -83,19 +83,14 @@ $\forall i, j \in \{1, 2, \dots, n\}$ with $u_{i,j} = u(ih, jh)$, $f_{i,j} = f(i
 By defining a unique ordering of the grid points $u_{i, j}$, Equation~\eqref{eq:2D-poisson-model-discrete} can be formulated as a system of linear equation of type $A \bm{u} = \bm{f}$. 
 For instance, setting $h = 0.25$, results in $n = 3$ and a total number of nine grid points.
 %TODO draw grid
-A natural ordering of the grid points then yields the system of linear equations
-\begin{equation}
-	A \bm{u} = \bm{f}
-\end{equation}
-with
+By incorporating the given Dirichlet BCs, which assume a constant value of zero at all boundary points, into the right-hand side $\bm{f}$ and by applying a natural ordering of the grid points we obtain the system of linear equations $A \bm{u} = \bm{f}$ with
 \begin{equation}
 A = \frac{1}{h^2} \begin{pmatrix}
 \begin{array}{ccc|ccc|ccc}~4&-1&~0&-1&~0&~0&~0&~0&~0\\-1&~4&-1&~0&-1&~0&~0&~0&~0\\~0&-1&~4&~0&~0&-1&~0&~0&~0\\\hline -1&~0&~0&~4&-1&~0&-1&~0&~0\\~0&-1&~0&-1&~4&-1&~0&-1&~0\\~0&~0&-1&~0&-1&~4&~0&~0&-1\\\hline ~0&~0&~0&-1&~0&~0&~4&-1&~0\\~0&~0&~0&~0&-1&~0&-1&~4&-1\\~0&~0&~0&~0&~0&-1&~0&-1&~4\end{array}
-	\end{pmatrix}.
+	\end{pmatrix},
 \label{eq:2D-poisson-assembled-matrix}
 \end{equation}
-By incorporating the given Dirichlet BCs, which assume a constant value of zero at all boundary points, into the right-hand side $\bm{f}$, we obtain
-\begin{equation}
+\begin{equation*}
 	\bm u = \begin{pmatrix}
 	u_{11} \\ u_{12} \\ u_{13} \\ u_{21} \\ u_{22} \\ u_{23} \\ u_{31} \\ u_{32} \\ u_{33}
 \end{pmatrix}, \quad
@@ -113,8 +108,7 @@ f_{33}
 \begin{pmatrix}
 	f_{11} + \frac{1}{h^2} (u_{10} + u_{01}) \\f_{12} + \frac{1}{h^2} u_{02} \\ f_{13} + \frac{1}{h^2} (u_{03} + u_{14})  \\ f_{21} + \frac{1}{h^2} u_{20} \\ f_{22} \\ f_{23} + \frac{1}{h^2} u_{24} \\ f_{31} + \frac{1}{h^2} (u_{30} + u_{41}) \\ f_{32} + \frac{1}{h^2} u_{42} \\ f_{33} + \frac{1}{h^2} (u_{34} + u_{43})
 \end{pmatrix}.
-\label{eq:2D-poisson-assembled-rhs}
-\end{equation}
+\end{equation*}
 Note that $A$ represents a sparse matrix, which means that only a minority of its entries are nonzero.
 Moreover, since we already represent the solution of Equation~\eqref{eq:2D-poisson-model-discrete} on a regular grid, storing the resulting linear system in a matrix-vector format is inefficient.
 If we assume that each operation required for solving a system of linear equations can be formulated as a matrix-vector or vector-vector operation, it is unnecessary to store the corresponding matrix explicitly.

@@ -646,14 +646,17 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 \begin{figure}
 	\captionsetup{justification=centering}
    \begin{subfigure}[t!]{0.075\textwidth}
+   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 		\end{tikzpicture}
+		}
 		\subcaption*{\phantom{$\gamma = 1$}}
 	\end{subfigure}
 	\begin{subfigure}[t!]{0.21\textwidth}
+		   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -667,9 +670,11 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 			(d) edge[->] (e)   
 			;
 		\end{tikzpicture}
+	}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
 	\begin{subfigure}[t!]{0.29\textwidth}
+		   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -688,9 +693,11 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 			(f) edge[->] (g)
 			;
 		\end{tikzpicture}
+	}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
 	\begin{subfigure}[t!]{0.35\textwidth}
+		   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -712,6 +719,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 			(h) edge[->] (i)
 			;
 		\end{tikzpicture}
+	}
 		\subcaption*{$\gamma = 3$}
 	\end{subfigure}
 	\caption{Three-grid cycles ($k = 3$).}
@@ -720,15 +728,18 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 \begin{figure}
 	\captionsetup{justification=centering}
 	\begin{subfigure}[t!]{0.075\textwidth}
+		   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
 			\node   (4h) at (-0.75, 2){$4h$};
 			\node   (8h) at (-0.75, 1){$8h$};
 		\end{tikzpicture}
+	}
 		\subcaption*{\phantom{$\gamma = 1$}}
 	\end{subfigure}
 	\begin{subfigure}[t!]{0.295\textwidth}
+		   		\scalebox{0.85}{
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -747,9 +758,11 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 			
 			;
 		\end{tikzpicture}
+	}
 		\subcaption*{$\gamma = 1$}
 	\end{subfigure}
 	\begin{subfigure}[t!]{0.59\textwidth}
+		   \scalebox{0.85}{
 		\begin{tikzpicture}
 			\node	(a) at (0,4) [draw, circle,scale=1] {};
 			\node	(b) at (0.5,3) [draw, circle,scale=1] {};
@@ -784,6 +797,7 @@ Each white node corresponds to one or multiple steps of smoothing on the respect
 			(n) edge[->] (o)
 			;
 		\end{tikzpicture}
+	}
 		\subcaption*{$\gamma = 2$}
 	\end{subfigure}
 	\caption{Four-grid cycles ($k = 4$).}
@@ -800,6 +814,7 @@ One way to overcome this limitation is to combine different cycle types in a sin
 For instance, combining W- and V-cycles on each level results in a so-called F-cycle, whose algorithmic structure is illustrated in Figure~\ref{fig:f-cycle}.
 \begin{figure}
 	\begin{subfigure}[t]{0.4\textwidth}
+				   \scalebox{0.85}{
 		\begin{tikzpicture}
 			\node   (h) at (-0.75, 4){$h$};
 			\node   (2h) at (-0.75, 3){$2h$};
@@ -822,9 +837,11 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 			(f) edge[->] (g)
 			;
 		\end{tikzpicture}
+		}
   		\subcaption*{}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.59\textwidth}
+		\scalebox{0.85}{
 		\begin{tikzpicture}
 				\node   (h) at (-0.75, 4){$h$};
 				\node   (2h) at (-0.75, 3){$2h$};
@@ -859,6 +876,7 @@ For instance, combining W- and V-cycles on each level results in a so-called F-c
 			(l) edge[->] (m)
 			;
 		\end{tikzpicture}
+	}
     		\subcaption*{}
 	\end{subfigure}
 	\caption{Computational pattern of the F-cycle with a different number of coarsening steps.}
