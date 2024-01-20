@@ -636,16 +636,11 @@
     paperwidth   =    170mm,
     paperheight  =    240mm,
     top          =     25mm,
-    % Adapted
-    %bottom       =     25mm,
     bottom       =     20mm,
     inner        =     25mm,
     outer        =     20mm,
     headheight   =   13.6pt, % originally 1em -> warning and automatically changed
-    %headheight   =   24.0pt,
     headsep      = 15mm-1em,
-    % Adapted
-    %footskip     =    12.5mm,
     footskip     =    7.5mm,
     %showframe,  
   }
@@ -782,7 +777,6 @@
 
 \addto\captionsenglish{%
   \def\prefacename{Preface}            % unchanged, original: Preface
-  \def\abstractname{Abstract}
   \def\refname{References}             % unchanged, original: References
   \def\abstractname{Abstract}          % unchanged, original: Abstract
   \def\bibname{Bibliography}           % unchanged, original: Bibliography
@@ -862,7 +856,7 @@
   \def\bibasterisk{The 2nd (3rd) author names the supervisor; the last author
     is head of the institute.}%
 }
-\RequirePackage{minted}
+
 % The csquotes package allows to set quotation marks depending on the currently
 % selected language. Usage is recommended by BibLaTeX when using babel or
 % polyglossia. Further package options can be passed to it in the usual way by
@@ -1398,10 +1392,7 @@
   % (the unfinished successor of LaTeX2e). Thus first the expl3 syntax is
   % turned on, the boolean is defined and then the expl3 syntax is again turned
   % off to continue with "normal" LaTeX2e syntax.
-
-  \ExplSyntaxOn \bool_new:N\g__acro_rerun_bool \ExplSyntaxOff
-
-
+\ExplSyntaxOn \bool_new:N\g__acro_rerun_bool \ExplSyntaxOff
   % In publications of the FAU University Press the acronyms can be split in
   % two parts, namely the abbreviations and symbols. They shall have tabular
   % layouts that slightly differ from the pre-defined templates.
@@ -1770,8 +1761,7 @@
 %%% DEFINE FONTS TO BE USED FOR META INFO %%%
 
 \newkomafont{supervisor}{\sffamily\normalsize}
-\newkomafont{facultytitle}{\LARGE\bfseries}
-\newkomafont{facultysubtitle}{\Large\bfseries}
+\newkomafont{facultytitle}{\Large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
 
@@ -1884,50 +1874,6 @@
   \end{titlepage}%
 }
 % Titlepage of the faculty %%% BIS JETZT NUR FUER TECHFAK
-% \newcommand{\makefacultytitle}{
-%   \begin{titlepage}
-%     \setlength{\parindent}{\z@}
-%     \setlength{\parskip}{\z@}
-%     \onehalfspacing
-%     \typeout{Typesetting the faculty titlepage!}
-%     \centering
-%     \vspace*{4.8mm}
-%     {\usekomafont{facultytitle} \@title\par}
-%     \vfill
-%     {\usekomafont{facultysubtitle} \@subtitle\par}
-%     \vfill
-%     {\usekomafont{faculty}
-%       Der Technischen Fakultät \\
-%       der Friedrich-Alexander-Universität\\
-%       Erlangen-Nürnberg \par}
-%     \vspace{6mm}
-%     {\usekomafont{faculty}
-%       zur \\
-%       Erlangung des Doktorgrades Dr.-Ing.\par}
-%     \vspace{34mm}
-%     {\usekomafont{faculty} vorgelegt von \par}
-%       \vspace{6.2mm}
-%     {\usekomafont{faculty} \@firstname\ \@lastname \par}
-%       \vspace{6.2mm}
-%     {\usekomafont{faculty} aus \@origin \par}
-%     \vskip38mm
-%     \next@tpage
-%     \raggedright
-%     \normalfont\normalsize
-%     \phantom{M}\vfill
-%     { Als Dissertation genehmigt \\
-%       von der Technischen Fakultät \\
-%       der Friedrich-Alexander-Universität Erlangen-Nürnberg\par}
-%     \vspace{16mm}
-%     \begin{tabular}{@{}l l}
-%       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
-%       %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
-%       Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
-%     \end{tabular}
-%     \vskip18mm
-%   \end{titlepage}
-% }
-
 \newcommand{\makefacultytitle}{
   \begin{titlepage}
     \setlength{\parindent}{\z@}
@@ -1936,23 +1882,21 @@
     \typeout{Typesetting the faculty titlepage!}
     \centering
     \vspace*{4.8mm}
-    {\usekomafont{facultytitle} \@title \par}
-    \vspace{7.5mm}
-    {\usekomafont{facultysubtitle} \@subtitle\par}
-    %\vspace{35mm}
+    {\usekomafont{facultytitle} \@title\par}
     \vfill
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\
       Erlangen-Nürnberg \par}
-    \vspace{10mm}
+    \vspace{6mm}
     {\usekomafont{faculty}
-      zur Erlangung des \\ Doktorgrades Dr.-Ing.\par}
-    \vspace{10mm}
+      zur \\
+      Erlangung des Doktorgrades Dr.-Ing.\par}
+    \vspace{34mm}
     {\usekomafont{faculty} vorgelegt von \par}
-    \vspace{2.5mm}
+      \vspace{6.2mm}
     {\usekomafont{faculty} \@firstname\ \@lastname \par}
-    \vspace{2.5mm}
+      \vspace{6.2mm}
     {\usekomafont{faculty} aus \@origin \par}
     \vskip38mm
     \next@tpage
@@ -1965,12 +1909,13 @@
     \vspace{16mm}
     \begin{tabular}{@{}l l}
       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
-      %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
+      \parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
       Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
     \end{tabular}
     \vskip18mm
   \end{titlepage}
 }
+
 
 \AtEndPreamble{
   \iffaupress@acronym

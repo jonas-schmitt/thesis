@@ -176,7 +176,7 @@ Prof. Dr. Dietmar Fey}
 \begin{document}
 
 % typeset the titlepage of the publisher
-%\maketitle
+\maketitle
 
 % start the frontmatter (roman page numbering,
 % lowercase roman sectioning numbering, no header)
@@ -184,7 +184,6 @@ Prof. Dr. Dietmar Fey}
   
   % typesets the titlepage of the faculty
   \makefacultytitle
-
   % insert preface heading (has \label{ch:preface},
   % reference via \nameref{ch:preface})
   \begin{abstract}
@@ -194,21 +193,22 @@ Prof. Dr. Dietmar Fey}
     \input{contents/zusammenfassung.tex}
   \end{zusammenfassung}
 
-  % typeset the table of contents
-  \tableofcontents
+\chapter*{Acknowledgments}
+\input{contents/acknowledgments.tex}
 
+\tableofcontents
 % start the mainmatter (arabic page numbering [reset],
 % arabic sectioning numbering, header)
 \mainmatter
 
   % inserts introduction heading (hat \label{ch:intro},
   % reference via \autoref{ch:intro} or \ref{ch:intro})
-\chapter{Introduction}
+\begin{introduction}
 \input{contents/introduction.tex}
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR INTRODUCTION %%%
     %\input{contents/my_introduction.tex}
-
+\end{introduction}
 \chapter{Multigrid Methods for Solving Partial Differential Equations}
   %%% WRITE YOUR THESIS DIRECTLY HERE OR %%%%%%
   %%% INPUT EXTERNAL FILES WITH YOUR THESIS %%%
