@@ -62,7 +62,7 @@ In Section~\ref{sec:discretization}, we have already made the assumption of disc
 To identify a grid within this hierarchy, certain information is required, which we store in a \emph{Grid} data structure whose implementation is shown in Listing~\ref{code:ir:grid}.
 In general, a structured grid is defined by its \emph{spacing} ($h$) in each dimension and its \emph{size}, i.e., the number of grid points.
 In addition, we also include the grid's \emph{level} to identify it within the discretization hierarchy.
-Note that in case the grid is uniform, we only need to store a single value for its spacing in each dimension, while otherwise, a value would need to be stored for each pair of grid points.
+Note that in case the grid is uniform and consists of $n$ points, we only need to store a single value for its spacing in each dimension, while otherwise, $n-1$ values need to be stored.
 As the problems considered in this work are all solved on a hierarchy of uniform grids, we focus on this particular case.
 \begin{listing}
 	\inputminted{python}{evostencils/ir/grid.py}
