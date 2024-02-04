@@ -98,6 +98,7 @@
 \usepackage{hyperref}
 \usepackage[titles]{tocloft}
 \usepackage{minted}
+\usepackage{epigraph}
 
 % Defs and adaptions
 \newcommand{\ps}[1]{\langle #1 \rangle}
@@ -194,10 +195,8 @@ Prof. Dr. Dietmar Fey}
   \begin{zusammenfassung}
     \input{contents/zusammenfassung.tex}
   \end{zusammenfassung}
-
 \chapter*{Acknowledgments}
 \input{contents/acknowledgments.tex}
-
 \tableofcontents
 % start the mainmatter (arabic page numbering [reset],
 % arabic sectioning numbering, header)
@@ -206,6 +205,7 @@ Prof. Dr. Dietmar Fey}
   % inserts introduction heading (hat \label{ch:intro},
   % reference via \autoref{ch:intro} or \ref{ch:intro})
 \begin{introduction}
+\epigraph{The highest activity a human being can attain is learning for understanding, because to understand is to be free.}{Baruch Spinoza}
 \input{contents/introduction.tex}
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR INTRODUCTION %%%
