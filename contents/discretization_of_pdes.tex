@@ -16,7 +16,7 @@ These so-called \emph{boundary conditions} (BCs) can usually be classified into 
 	\item[Robin] $a u(\bm{x}) + b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = g(\bm{x})$
 	\item[Cauchy] $a u(\bm{x}) = g(\bm{x}), \; b \frac{\partial}{\partial \vec{n}} u(\bm{x}) = h(\bm{x})$.
 \end{description}
-Here $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
+Note that $\frac{\partial}{\partial \vec{n}} u(\bm{x})$ denotes the partial derivative of $u$ with respect to the outwards-directed normal vector of the boundary.
 The difference between Robin and Cauchy BCs is that in the former case, one condition is formulated as a weighted average of $u$ and its derivative in the normal direction, while in the latter, two conditions must be met individually.
 While depending on the boundary conditions, an analytical solution for Equation~\eqref{eq:heat-equation} might exist, for many PDEs, such a solution has not been discovered, or its computation is infeasible.
 A remedy is the application of so-called numerical methods that are based on approximating the solution of a given PDE on a discrete set of points. 

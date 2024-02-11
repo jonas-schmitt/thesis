@@ -117,9 +117,9 @@
 {\end{bnf}}
 
 \usemintedstyle{tango}
-\setminted[python]{fontsize=\footnotesize, breaklines, frame=lines
+\setminted[python]{fontsize=\footnotesize, breaklines, frame=none
 , numbersep=7.5pt, numberblanklines=False}
-\setminted[scala]{fontsize=\footnotesize, breaklines, frame=lines, numbersep=7.5pt, numberblanklines=False}
+\setminted[scala]{fontsize=\footnotesize, breaklines, frame=none, numbersep=7.5pt, numberblanklines=False}
 %\AtBeginDocument{\RenewCommandCopy\qty\SI}
 \usepackage{etoolbox}
 \usepackage{microtype}
@@ -197,15 +197,16 @@ Prof. Dr. Dietmar Fey}
   \end{zusammenfassung}
 \chapter*{Acknowledgments}
 \input{contents/acknowledgments.tex}
+
+\input{contents/epigraph.tex}
+
 \tableofcontents
 % start the mainmatter (arabic page numbering [reset],
 % arabic sectioning numbering, header)
+
 \mainmatter
 
-  % inserts introduction heading (hat \label{ch:intro},
-  % reference via \autoref{ch:intro} or \ref{ch:intro})
 \begin{introduction}
-\epigraph{The highest activity a human being can attain is learning for understanding, because to understand is to be free.}{Baruch Spinoza}
 \input{contents/introduction.tex}
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
     %%% INPUT AN EXTERNAL FILE WITH YOUR INTRODUCTION %%%
