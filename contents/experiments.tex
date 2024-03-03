@@ -242,7 +242,14 @@ To reduce statistical variations between individual evaluation runs, we execute 
 As a first step towards a quantitative evaluation of our evolutionary program synthesis method, we assess whether our algorithm is able to effectively find good solutions with respect to our two optimization objectives.
 For this purpose, we measure the minimum of each of the two objectives within the population throughout each of the ten experiments for all three test problems.
 As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D-minimum-objectives} and~\ref{fig:linear-elasticity-2D-minimum-objectives} shows the mean and standard deviation of the current optimum of both objectives over all experiments.
-\begin{figure}[h]
+First of all, we can conclude that in all three cases, our algorithm is able to quickly reduce the minimum value of both objectives within the population.
+If we compare the slope of the two objectives for the three different problems, we can see that in the case of the first objective $\rho$, significantly more generations are required to achieve the same degree of reduction as for the second objective $t$.
+However, the algorithm still significantly improves upon the current minimum of $\rho$ beyond the first 50 generations, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor},~\ref{fig:poisson-3D-minimum-convergence-factor} and~\ref{fig:linear-elasticity-2D-minimum-convergence-factor}.
+For the second objective $t$, the majority of improvement happens within the first 50--70 generations, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}.
+Note that while the convergence factor is constant for each execution of the same solver, $t$ is obtained by measuring its execution time on the respective compute node.
+Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive runs.
+Consequently, even though the algorithm is able to reduce the second objective faster, this effect induces a larger deviation between the individual experiments and thus an overall higher standard deviation.
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
@@ -296,13 +303,6 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 	\caption[2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values]{2D Linear Elasticity -- Mean and standard deviation of the minimum objective function values of all evolutionary algorithm runs.}
 	\label{fig:linear-elasticity-2D-minimum-objectives}
 \end{figure}
-First of all, we can conclude that in all three cases, our algorithm is able to quickly reduce the minimum value of both objectives within the population.
-If we compare the slope of the two objectives for the three different problems, we can see that in the case of the first objective $\rho$, significantly more generations are required to achieve the same degree of reduction as for the second objective $t$.
-However, the algorithm still significantly improves upon the current minimum of $\rho$ beyond the first 50 generations, which can be seen in Figure~\ref{fig:poisson-2D-minimum-convergence-factor},~\ref{fig:poisson-3D-minimum-convergence-factor} and~\ref{fig:linear-elasticity-2D-minimum-convergence-factor}.
-For the second objective $t$, the majority of improvement happens within the first 50--70 generations, as it can be seen in Figure~\ref{fig:poisson-2D-minimum-execution-time},~\ref{fig:poisson-3D-minimum-execution-time} and~\ref{fig:linear-elasticity-2D-minimum-execution-time}.
-Note that while the convergence factor is constant for each execution of the same solver, $t$ is obtained by measuring its execution time on the respective compute node.
-Therefore, due to manufacturing and temperature-based variations, we can expect a certain degree of fluctuations when measuring the execution time of the same solver on different compute nodes during consecutive runs.
-Consequently, even though the algorithm is able to reduce the second objective faster, this effect induces a larger deviation between the individual experiments and thus an overall higher standard deviation.
 
 As a next step, we can assess the difficulty of the underlying problem by considering the absolute value of the minimum convergence factor attained in each of the three different cases.
 While the execution time per iteration $t$ is solely determined by the computational complexity of each solver and the properties of the given computer architecture, a smaller convergence factor indicates that the underlying problem is easier to solve.
@@ -1046,223 +1046,226 @@ While the results shown in Table~\ref{table:evolved-solvers} indicate that our a
 For this purpose, we first need to gain an understanding of the algorithmic features of these methods and how they compare to those of classical multigrid cycles.
 Figure~\ref{fig:structure-evolved-preconditioners1} and~\ref{fig:structure-evolved-preconditioners2} contain the graphical representations of those automatically-designed preconditioners that yield a converging solver for a wavenumber of $k = 640$.
 Note that we are particularly interested in this case since all V-, F-, and W-cycles fail to achieve convergence when applied to this problem instance.
+As illustrated by their graphical representations, the employed sequence of multigrid operations varies significantly between the individual methods, and none of them can easily be characterized as one of the classical multigrid cycles.
+However, we can still identify a number of common characteristics.
+While the search space also includes different block Jacobi smoothers, all methods employ exclusively pointwise Jacobi and RB-GS smoothing, whereby, with the exception of EP-3, the latter is used predominantly.
 \begin{figure}
-\captionsetup[subfigure]{justification=centering}
-\begin{subfigure}[b]{\columnwidth}
+	\captionsetup[subfigure]{justification=centering}
+	\begin{subfigure}[b]{\columnwidth}
 		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
-			\node   (2h) at (-0.75, 3){$2h$};
-			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(c) at (1,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.00};
-			\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(g) at (3,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.90};
-			\node	(i) at (4.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.20};
-			\node	(j) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
-			\node	(k) at (5.5,1) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.00};
-			\node	(l) at (6,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(m) at (6.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
-			\node	(n) at (7,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
-			\node	(o) at (7.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
-			\node	(p) at (8,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(q) at (8.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
-			\node	(r) at (9,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-			\node	(s) at (9.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
-			\node	(t) at (10,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(u) at (10.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
-			\node	(v) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.80};
-			%\node	(w) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] node[near end,left] {\tiny 1.00} (f)
-			(f) edge[->] node[near end,left] {\tiny 1.60} (g)
-			(g) edge[->] node[near end,left] {\tiny 0.85} (h)
-			(h) edge[->] (i)
-			(i) edge[->] (j) 
-			(j) edge[->] (k)
-			(k) edge[->] node[near end,left] {\tiny 0.30} (l)
-			(l) edge[->] node[near end,left] {\tiny 0.85} (m)   
-			(m) edge[->] (n)
-			(n) edge[->] (o)
-			(o) edge[->] node[near end,left] {\tiny 0.30} (p)
-			(p) edge[->] node[near end,left] {\tiny 0.85} (q)
-			(q) edge[->] (r)
-			(r) edge[->] (s)
-			(s) edge[->] node[near end,left] {\tiny 0.30} (t)
-			(t) edge[->] node[near end,left] {\tiny 0.85} (u)
-			(u) edge[->] node[near end,left] {\tiny 1.35} (v)
-			%(v) edge[->] (w)
-			;
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(c) at (1,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.00};
+				\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(g) at (3,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.90};
+				\node	(i) at (4.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.20};
+				\node	(j) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+				\node	(k) at (5.5,1) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.00};
+				\node	(l) at (6,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(m) at (6.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
+				\node	(n) at (7,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+				\node	(o) at (7.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
+				\node	(p) at (8,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(q) at (8.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
+				\node	(r) at (9,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(s) at (9.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
+				\node	(t) at (10,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(u) at (10.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+				\node	(v) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.80};
+				%\node	(w) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\tiny 1.00} (f)
+				(f) edge[->] node[near end,left] {\tiny 1.60} (g)
+				(g) edge[->] node[near end,left] {\tiny 0.85} (h)
+				(h) edge[->] (i)
+				(i) edge[->] (j) 
+				(j) edge[->] (k)
+				(k) edge[->] node[near end,left] {\tiny 0.30} (l)
+				(l) edge[->] node[near end,left] {\tiny 0.85} (m)   
+				(m) edge[->] (n)
+				(n) edge[->] (o)
+				(o) edge[->] node[near end,left] {\tiny 0.30} (p)
+				(p) edge[->] node[near end,left] {\tiny 0.85} (q)
+				(q) edge[->] (r)
+				(r) edge[->] (s)
+				(s) edge[->] node[near end,left] {\tiny 0.30} (t)
+				(t) edge[->] node[near end,left] {\tiny 0.85} (u)
+				(u) edge[->] node[near end,left] {\tiny 1.35} (v)
+				%(v) edge[->] (w)
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-2}
 		\label{fig:ep-2}
 	\end{subfigure}
-  \par\bigskip
+	\par\bigskip
 	\begin{subfigure}[b]{0.455\columnwidth}
 		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
-			\node   (2h) at (-0.75, 3){$2h$};
-			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(c) at (1,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-			\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(f) at (2.5,1) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\node	(g) at (3,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-			\node	(i) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
-			\node	(j) at (4.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-			\node	(k) at (5,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.10};
-			\node	(l) at (5.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-			\node	(m) at (6,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.75};
-			%\node	(w) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] node[near end,left] {\tiny 1.00} (f)
-			(f) edge[->] node[near end,left] {\tiny 1.25} (g)
-			(g) edge[->] node[near end,left] {\tiny 1.05} (h)
-			(h) edge[->] (i)
-			(i) edge[->] node[near end,left] {\tiny 0.90} (j) 
-			(j) edge[->] (k)
-			(k) edge[->] node[near end,left] {\tiny 0.90} (l)
-			(l) edge[->] node[near end,left] {\tiny 1.40} (m)   
-			;
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(c) at (1,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(f) at (2.5,1) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\node	(g) at (3,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(i) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
+				\node	(j) at (4.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(k) at (5,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+				\node	(l) at (5.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(m) at (6,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.75};
+				%\node	(w) at (11,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\tiny 1.00} (f)
+				(f) edge[->] node[near end,left] {\tiny 1.25} (g)
+				(g) edge[->] node[near end,left] {\tiny 1.05} (h)
+				(h) edge[->] (i)
+				(i) edge[->] node[near end,left] {\tiny 0.90} (j) 
+				(j) edge[->] (k)
+				(k) edge[->] node[near end,left] {\tiny 0.90} (l)
+				(l) edge[->] node[near end,left] {\tiny 1.40} (m)   
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-3}
 		\label{fig:ep-3}
 	\end{subfigure}
-     \begin{subfigure}[b]{0.53\columnwidth}
+	\begin{subfigure}[b]{0.53\columnwidth}
 		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
-			\node	(c) at (1,2) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.55};
-			\node	(d) at (1.5,1) [draw,circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(f) at (2.5,1) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(g) at (3,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(h) at (3.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
-			\node	(i) at (4,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.95};
-			\node	(j) at (4.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(k) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.70};
-			\node	(l) at (5.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(m) at (6,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
-			\node	(n) at (6.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(o) at (7,2) [draw, circle, fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.70};
-			\node	(p) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(q) at (8,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] node[near end,left] {\tiny 1.00}  (f)
-			(f) edge[->] node[near end,left] {\tiny 0.95} (g)
-			(g) edge[->] node[near end,left] {\tiny 1.45} (h)
-			(h) edge[->] (i)
-			(i) edge[->] node[near end,left] {\tiny 1.30} (j) 
-			(j) edge[->] (k)
-			(k) edge[->] node[near end,left] {\tiny 1.10} (l)
-			(l) edge[->] node[near end,left] {\tiny 1.65} (m)   
-			(m) edge[->] (n)
-			(n) edge[->] (o)
-			(o) edge[->] node[near end,left] {\tiny 1.10} (p)
-			(p) edge[->] node[near end,left] {\tiny 1.20} (q)
-			;
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
+				\node	(c) at (1,2) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.55};
+				\node	(d) at (1.5,1) [draw,circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(f) at (2.5,1) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(g) at (3,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(h) at (3.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
+				\node	(i) at (4,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.95};
+				\node	(j) at (4.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(k) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.70};
+				\node	(l) at (5.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(m) at (6,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
+				\node	(n) at (6.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(o) at (7,2) [draw, circle, fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.70};
+				\node	(p) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(q) at (8,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\tiny 1.00}  (f)
+				(f) edge[->] node[near end,left] {\tiny 0.95} (g)
+				(g) edge[->] node[near end,left] {\tiny 1.45} (h)
+				(h) edge[->] (i)
+				(i) edge[->] node[near end,left] {\tiny 1.30} (j) 
+				(j) edge[->] (k)
+				(k) edge[->] node[near end,left] {\tiny 1.10} (l)
+				(l) edge[->] node[near end,left] {\tiny 1.65} (m)   
+				(m) edge[->] (n)
+				(n) edge[->] (o)
+				(o) edge[->] node[near end,left] {\tiny 1.10} (p)
+				(p) edge[->] node[near end,left] {\tiny 1.20} (q)
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-8}
 		\label{fig:ep-8}
 	\end{subfigure}
-    \par\bigskip
-  	\begin{subfigure}[b]{\columnwidth}
-			\scalebox{0.645}{%
+	\par\bigskip
+	\begin{subfigure}[b]{\columnwidth}
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
-			\node   (2h) at (-0.75, 3){$2h$};
-			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.10};
-			\node	(c) at (1.5,3) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 0.95};
-			\node	(d) at (2,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(e) at (2.5,1) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\node	(f) at (3,0) [draw, fill=black,circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(g) at (3.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(h) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.70};
-			\node	(i) at (4.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(j) at (5,0) [draw, circle,fill=black,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(k) at (5.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(l) at (6,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 0.30};
-			\node	(m) at (6.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(n) at (7,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.45};
-			\node	(o) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(p) at (8,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(q) at (8.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(r) at (9,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.70};
-			\node	(s) at (9.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(t) at (10,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(u) at (10.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(v) at (11,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\node	(w) at (11.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-   			\node	(x) at (12,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-      		\node	(y) at (12.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(z) at (13,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.30};
-			\node	(aa) at (13.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-   			\node	(bb) at (14,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-            \node	(cc) at (14.5,3) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-   			\node	(dd) at (15,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] (f)
-			(f) edge[->] node[near end,left] {\tiny 1.00} (g)
-			(g) edge[->] node[near end,left] {\tiny 0.80} (h)
-			(h) edge[->] (i)
-			(i) edge[->] (j) 
-			(j) edge[->] node[near end,left] {\tiny 1.00} (k)
-			(k) edge[->] node[near end,left] {\tiny 0.55} (l)
-			(l) edge[->] node[near end,left] {\tiny 1.70} (m)   
-			(m) edge[->] (n)
-			(n) edge[->] node[near end,left] {\tiny 1.80} (o)
-			(o) edge[->] node[near end,left] {\tiny 1.70} (p)
-			(p) edge[->] (q)
-			(q) edge[->] (r)
-			(r) edge[->] node[near end,left] {\tiny 0.95} (s)
-			(s) edge[->] node[near end,left] {\tiny 1.10} (t)
-			(t) edge[->] (u)
-			(u) edge[->] (v)
-			(v) edge[->] node[near end,left] {\tiny 0.55} (w)
-   			(w) edge[->] node[near end,left] {\tiny 0.95} (x)
-      		(x) edge[->] (y)
-			(y) edge[->] (z)
-			(z) edge[->] node[near end,left] {\tiny 0.95} (aa)
-   			(aa) edge[->] node[near end,left] {\tiny 1.10} (bb)
-      		(bb) edge[->] (cc)
-   			(cc) edge[->] node[near end,left] {\tiny 0.90} (dd)
-			;
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+				\node	(c) at (1.5,3) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 0.95};
+				\node	(d) at (2,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(e) at (2.5,1) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\node	(f) at (3,0) [draw, fill=black,circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(g) at (3.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(h) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.70};
+				\node	(i) at (4.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(j) at (5,0) [draw, circle,fill=black,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(k) at (5.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(l) at (6,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 0.30};
+				\node	(m) at (6.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(n) at (7,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.45};
+				\node	(o) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(p) at (8,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(q) at (8.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(r) at (9,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.70};
+				\node	(s) at (9.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(t) at (10,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(u) at (10.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(v) at (11,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\node	(w) at (11.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(x) at (12,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(y) at (12.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(z) at (13,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.30};
+				\node	(aa) at (13.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(bb) at (14,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(cc) at (14.5,3) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(dd) at (15,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] (f)
+				(f) edge[->] node[near end,left] {\tiny 1.00} (g)
+				(g) edge[->] node[near end,left] {\tiny 0.80} (h)
+				(h) edge[->] (i)
+				(i) edge[->] (j) 
+				(j) edge[->] node[near end,left] {\tiny 1.00} (k)
+				(k) edge[->] node[near end,left] {\tiny 0.55} (l)
+				(l) edge[->] node[near end,left] {\tiny 1.70} (m)   
+				(m) edge[->] (n)
+				(n) edge[->] node[near end,left] {\tiny 1.80} (o)
+				(o) edge[->] node[near end,left] {\tiny 1.70} (p)
+				(p) edge[->] (q)
+				(q) edge[->] (r)
+				(r) edge[->] node[near end,left] {\tiny 0.95} (s)
+				(s) edge[->] node[near end,left] {\tiny 1.10} (t)
+				(t) edge[->] (u)
+				(u) edge[->] (v)
+				(v) edge[->] node[near end,left] {\tiny 0.55} (w)
+				(w) edge[->] node[near end,left] {\tiny 0.95} (x)
+				(x) edge[->] (y)
+				(y) edge[->] (z)
+				(z) edge[->] node[near end,left] {\tiny 0.95} (aa)
+				(aa) edge[->] node[near end,left] {\tiny 1.10} (bb)
+				(bb) edge[->] (cc)
+				(cc) edge[->] node[near end,left] {\tiny 0.90} (dd)
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-4}
@@ -1272,137 +1275,134 @@ Note that we are particularly interested in this case since all V-, F-, and W-cy
 	\label{fig:structure-evolved-preconditioners1}
 \end{figure}
 \begin{figure}
-\captionsetup[subfigure]{justification=centering}
+	\captionsetup[subfigure]{justification=centering}
 	\begin{subfigure}[b]{\columnwidth}
 		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
-			\node   (2h) at (-0.75, 3){$2h$};
-			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.30};
-			\node	(c) at (1,2) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
-			\node	(d) at (1.5,1) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.35};
-			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(f) at (2.5,1) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(g) at (3,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(h) at (3.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(i) at (4,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
-			\node	(j) at (4.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(k) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.30};
-			\node	(l) at (5.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(m) at (6,2) [draw, circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.80};
-			\node	(n) at (7,2) [draw, circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.55};
-			\node	(o) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(p) at (8,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.80};
-			\node	(q) at (8.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
-			\node	(r) at (9,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(s) at (9.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(t) at (10,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.95};
-			\node	(u) at (11,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.70};
-			\node	(v) at (11.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
-			\node	(w) at (12,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.90};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] node[near end,left] {\tiny 1.00}  (f)
-			(f) edge[->] node[near end,left] {\tiny 1.00} (g)
-			(g) edge[->] node[near end,left] {\tiny 0.80} (h)
-			(h) edge[->] node[near end,left] {\tiny 1.60} (i)
-			(i) edge[->] (j) 
-			(j) edge[->] (k)
-			(k) edge[->] node[near end,left] {\tiny 0.85} (l)
-			(l) edge[->] (m)   
-			(m) edge[->] (n)
-			(n) edge[->] node[near end,left] {\tiny 0.85} (o)
-			(o) edge[->] (p)
-			(p) edge[->] (q)
-			(q) edge[->] node[near end,left] {\tiny 1.05} (r)
-			(r) edge[->] node[near end,left] {\tiny 1.10} (s)
-			(s) edge[->] (t)
-			(t) edge[->] (u)
-			(u) edge[->] node[near end,left] {\tiny 1.05} (v)
-			(v) edge[->] node[near end,left] {\tiny 1.80} (w)
-			;
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.30};
+				\node	(c) at (1,2) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
+				\node	(d) at (1.5,1) [draw,circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.35};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(f) at (2.5,1) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(g) at (3,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(h) at (3.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(i) at (4,4) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.20};
+				\node	(j) at (4.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(k) at (5,2) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.30};
+				\node	(l) at (5.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(m) at (6,2) [draw, circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 1.80};
+				\node	(n) at (7,2) [draw, circle,fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.55};
+				\node	(o) at (7.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(p) at (8,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.80};
+				\node	(q) at (8.5,1) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.45};
+				\node	(r) at (9,2) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(s) at (9.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(t) at (10,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.95};
+				\node	(u) at (11,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.70};
+				\node	(v) at (11.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.00};
+				\node	(w) at (12,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.90};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\tiny 1.00}  (f)
+				(f) edge[->] node[near end,left] {\tiny 1.00} (g)
+				(g) edge[->] node[near end,left] {\tiny 0.80} (h)
+				(h) edge[->] node[near end,left] {\tiny 1.60} (i)
+				(i) edge[->] (j) 
+				(j) edge[->] (k)
+				(k) edge[->] node[near end,left] {\tiny 0.85} (l)
+				(l) edge[->] (m)   
+				(m) edge[->] (n)
+				(n) edge[->] node[near end,left] {\tiny 0.85} (o)
+				(o) edge[->] (p)
+				(p) edge[->] (q)
+				(q) edge[->] node[near end,left] {\tiny 1.05} (r)
+				(r) edge[->] node[near end,left] {\tiny 1.10} (s)
+				(s) edge[->] (t)
+				(t) edge[->] (u)
+				(u) edge[->] node[near end,left] {\tiny 1.05} (v)
+				(v) edge[->] node[near end,left] {\tiny 1.80} (w)
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-5}
 		\label{fig:ep-5}
 	\end{subfigure}
-  \par\bigskip
- 	\begin{subfigure}[b]{\columnwidth}
-			\scalebox{0.645}{%
+	\par\bigskip
+	\begin{subfigure}[b]{\columnwidth}
+		\scalebox{0.645}{%
 			\begin{tikzpicture}
-			\node   (h) at (-0.75, 4){$h$};
-			\node   (2h) at (-0.75, 3){$2h$};
-			\node   (4h) at (-0.75, 2){$4h$};
-			\node   (8h) at (-0.75, 1){$8h$};
-			\node   (16h) at (-0.75, 0){$16h$};
-			\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(c) at (1,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(g) at (3,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.55};
-			\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.40};
-			\node	(i) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
-			\node	(j) at (4.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
-			\node	(k) at (5,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.50};
-			\node	(l) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.20};
-			\node	(m) at (7,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.55};
-			\node	(n) at (7.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
-			\node	(o) at (8,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
-			\node	(p) at (8.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
-			\node	(q) at (9,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.25};
-			\node	(r) at (10,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
-			\node	(s) at (10.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(t) at (11,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(u) at (11.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
-			\node	(v) at (12,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
-			\node	(w) at (12.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
-   			\node	(x) at (13,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.80};
-			\draw 
-			(a) edge[->] (b) 
-			(b) edge[->] (c)
-			(c) edge[->] (d)
-			(d) edge[->] (e)   
-			(e) edge[->] node[near end,left] {\tiny 1.00} (f)
-			(f) edge[->] node[near end,left] {\tiny 0.70} (g)
-			(g) edge[->] node[near end,left] {\tiny 1.10} (h)
-			(h) edge[->] (i)
-			(i) edge[->] node[near end,left] {\tiny 0.85} (j) 
-			(j) edge[->] (k)
-			(k) edge[->] (l)
-			(l) edge[->] (m)   
-			(m) edge[->] node[near end,left] {\tiny 1.00} (n)
-			(n) edge[->] (o)
-			(o) edge[->] node[near end,left] {\tiny 1.40} (p)
-			(p) edge[->] (q)
-			(q) edge[->] (r)
-			(r) edge[->] node[near end,left] {\tiny 1.70} (s)
-			(s) edge[->] node[near end,left] {\tiny 1.65} (t)
-			(t) edge[->] (u)
-			(u) edge[->] (v)
-			(v) edge[->] node[near end,left] {\tiny 1.40} (w)
-   			(w) edge[->] node[near end,left] {\tiny 0.80} (x)
-			;
+				\node   (h) at (-0.75, 4){$h$};
+				\node   (2h) at (-0.75, 3){$2h$};
+				\node   (4h) at (-0.75, 2){$4h$};
+				\node   (8h) at (-0.75, 1){$8h$};
+				\node   (16h) at (-0.75, 0){$16h$};
+				\node	(a) at (0,4) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(b) at (0.5,3) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(c) at (1,2) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(d) at (1.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(e) at (2,0) [draw, circle,fill=black, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(f) at (2.5,1) [draw, circle,inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(g) at (3,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.55};
+				\node	(h) at (3.5,3) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+				\node	(i) at (4,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 1.15};
+				\node	(j) at (4.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+				\node	(k) at (5,2) [draw, circle,fill=lightblue,inner sep=0pt,minimum size=5mm] {\tiny 1.50};
+				\node	(l) at (6,2) [draw, circle,fill=lightred,inner sep=0pt,minimum size=5mm] {\tiny 0.20};
+				\node	(m) at (7,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.55};
+				\node	(n) at (7.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.40};
+				\node	(o) at (8,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
+				\node	(p) at (8.5,3) [draw, circle,fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.10};
+				\node	(q) at (9,2) [draw, circle, fill=lightblue, inner sep=0pt,minimum size=5mm] {\tiny 0.25};
+				\node	(r) at (10,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.05};
+				\node	(s) at (10.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(t) at (11,4) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(u) at (11.5,3) [draw, circle, inner sep=0pt,minimum size=5mm] {\phantom{\tiny 1.00}};
+				\node	(v) at (12,2) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.65};
+				\node	(w) at (12.5,3) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 1.25};
+				\node	(x) at (13,4) [draw, circle, fill=lightred, inner sep=0pt,minimum size=5mm] {\tiny 0.80};
+				\draw 
+				(a) edge[->] (b) 
+				(b) edge[->] (c)
+				(c) edge[->] (d)
+				(d) edge[->] (e)   
+				(e) edge[->] node[near end,left] {\tiny 1.00} (f)
+				(f) edge[->] node[near end,left] {\tiny 0.70} (g)
+				(g) edge[->] node[near end,left] {\tiny 1.10} (h)
+				(h) edge[->] (i)
+				(i) edge[->] node[near end,left] {\tiny 0.85} (j) 
+				(j) edge[->] (k)
+				(k) edge[->] (l)
+				(l) edge[->] (m)   
+				(m) edge[->] node[near end,left] {\tiny 1.00} (n)
+				(n) edge[->] (o)
+				(o) edge[->] node[near end,left] {\tiny 1.40} (p)
+				(p) edge[->] (q)
+				(q) edge[->] (r)
+				(r) edge[->] node[near end,left] {\tiny 1.70} (s)
+				(s) edge[->] node[near end,left] {\tiny 1.65} (t)
+				(t) edge[->] (u)
+				(u) edge[->] (v)
+				(v) edge[->] node[near end,left] {\tiny 1.40} (w)
+				(w) edge[->] node[near end,left] {\tiny 0.80} (x)
+				;
 			\end{tikzpicture}
 		}
 		\caption{EP-10}
 		\label{fig:ep-10}
 	\end{subfigure}
 	\caption[2D Helmholtz -- Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10]{Algorithmic structure of the discovered multigrid preconditioners EP-5 and EP-10. %The color of the node denotes the type of operation. Black: Coarse-grid solver, Blue: Pointwise Jacobi smoothing, Red: Red-black Gauss-Seidel smoothing, White: No operation. The relaxation factor of each smoothing step is included in each node, while for coarse-grid correction, it is attached to the respective edge.
- }
+	}
 	\label{fig:structure-evolved-preconditioners2}
 \end{figure}
-As illustrated by their graphical representations, the employed sequence of multigrid operations varies significantly between the individual methods, and none of them can easily be characterized as one of the classical multigrid cycles.
-However, we can still identify a number of common characteristics.
-While the search space also includes different block Jacobi smoothers, all methods employ exclusively pointwise Jacobi and RB-GS smoothing, whereby, with the exception of EP-3, the latter is used predominantly.
 If we consider the total amount of smoothing within each method, on average, the Jacobi method is used in $1/3$ of the smoothing steps.
 However, in contrast to classical multigrid cycles, which usually utilize the same smoother with a fixed number of steps on each level, our evolutionary algorithm can alter each operation independently, yielding varying smoothers and relaxation factors in each individual step.
 If we examine the computational structure of each of the six multigrid-based preconditioners more closely, we can see that many coarse-grid correction steps originate from one or multiple smoothing operations on intermediate levels, often using a different combination of relaxation factors.
@@ -1445,13 +1445,13 @@ Figure~\ref{fig:histograms} shows the distribution of relaxation factors over al
 \begin{figure}
 \captionsetup[subfigure]{justification=centering}
 	\centering
-\begin{subfigure}[b]{0.495\columnwidth}
+\begin{subfigure}[b]{0.575\textwidth}
     \includegraphics[width=\columnwidth]{figures/histogram_rbgs.pdf}
 	\caption{Red-black Gauss-Seidel}
 	\label{fig:histogram-rbgs}
 \end{subfigure}
 	\centering
-\begin{subfigure}[b]{0.495\columnwidth}
+\begin{subfigure}[b]{0.575\textwidth}
 	\centering
     \includegraphics[width=\columnwidth]{figures/histogram_jacobi.pdf}
 	\caption{Jacobi}
@@ -1459,7 +1459,7 @@ Figure~\ref{fig:histograms} shows the distribution of relaxation factors over al
 \end{subfigure}
 \par\bigskip
 	\centering
-\begin{subfigure}[b]{0.495\columnwidth}
+\begin{subfigure}[b]{0.575\textwidth}
     \includegraphics[width=\columnwidth]{figures/histogram_cgc.pdf}
 	\caption{Coarse-grid correction}
 	\label{fig:histogram-cgc}
