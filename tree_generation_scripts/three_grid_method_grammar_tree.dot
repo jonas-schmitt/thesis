@@ -1,4 +1,5 @@
 digraph G {  
+  rankdir=LR ;
   ratio=0.7;
   ordering=in ;
   start [texlbl="$\langle S \rangle$"];
