@@ -1,6 +1,9 @@
 digraph G {  
   rankdir=LR ;
   ordering=in ;
+  nodesep=0.25;
+  ranksep=0.25;
+  splines=line;
   A[texlbl="AI-Based PDE Solvers"];
   A -> B
   A -> C

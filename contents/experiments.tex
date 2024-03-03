@@ -695,7 +695,7 @@ However, if we consider the method ES-2, which leads to the fastest solving time
 In particular, ES-2 applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, it employs exclusively RB-GS smoothing.
 
-\section{Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
+\section[Multigrid-Based Preconditioners for the Indefinite \\ Helmholtz Equation]{Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
 While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated design of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in the case of a problem that is difficult to solve numerically, we consider the indefinite Helmholtz equation.
 At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.

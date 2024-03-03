@@ -621,8 +621,9 @@ We can express this method as a sequence of the productions defined in Algorithm
 	\caption{Grammar derivation tree for the three-grid method formulated in Algorithm~\ref{alg:example-three-grid-method}.}
 	\label{fig:example-three-grid-method-derivation-tree}
 \end{figure}
-Note that each inner tree node corresponds to a symbol contained in the set of variables $V$ of our grammar, as shown in Equation~\eqref{eq:multigrid-grammar-variables}, while all leaf nodes refer to terminals.
-Since in the context of Algorithm~\ref{table:multigrid-grammar}, the application order of each function is well-defined, we have omitted all parentheses in the tree for the sake of simplicity.
+Each inner tree node corresponds to a symbol contained in the set of variables $V$ of our grammar, as shown in Equation~\eqref{eq:multigrid-grammar-variables}, while all leaf nodes refer to terminals.
+To save space, the initial mandatory production that involves the start variable $\ps{S}$ is excluded.
+Furthermore, since in the context of Algorithm~\ref{table:multigrid-grammar}, the application order of each function is well-defined, we have omitted all parentheses in the tree for the sake of simplicity.
 %TODO evtl darauf eingehen, dass der CGS auf dem entsprechenden level spezifiziert sein muss
 
 Until now, we have been exclusively concerned with the problem of developing a formal representation for multigrid methods that is based on their algorithmic formulation.

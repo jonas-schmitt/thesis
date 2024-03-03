@@ -1,9 +1,12 @@
 digraph G {  
   rankdir=LR ;
-  ratio=0.7;
+  //ratio=1;
   ordering=in ;
-  start [texlbl="$\langle S \rangle$"];
-  start -> sh_1
+  nodesep=0.15;
+  ranksep=0.15;
+  splines=line;
+  //start [texlbl="$\langle S \rangle$"];
+  //start -> sh_1
   sh_1 [texlbl="$\langle s_h\rangle$"];
   sh_1 -> update_1
   sh_1 -> omega_1
