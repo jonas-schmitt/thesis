@@ -126,7 +126,7 @@
 \usepackage{microtype}
 % TODO outcomment to check for overfull hboxes
 %\overfullrule=1mm
-\hyphenation{cross-over, Parallelisierungs-schema, Evo-Stencils, Helm-holtz}
+\hyphenation{cross-over, Parallelisierungs-schema, Evo-Stencils, Helm-holtz, Multi-grid}
 
 \AtBeginEnvironment{tabular}{\small}
 
@@ -205,8 +205,15 @@ Prof. Dr. Dietmar Fey}
 % start the mainmatter (arabic page numbering [reset],
 % arabic sectioning numbering, header)
 
-\mainmatter
+\faupressprintacronyms
+\begingroup
+\listofalgorithms
+\let\clearpage\relax
+\listoflistings
+\endgroup
 
+
+\mainmatter
 \begin{introduction}
 \input{contents/introduction.tex}
     %%% WRITE YOUR INTRODUCTION DIRECTLY HERE OR %%%%%%%%
@@ -248,11 +255,4 @@ Prof. Dr. Dietmar Fey}
 % no sectioning numbering, header)
 \backmatter
   \faupressprintbibliography
-   \faupressprintacronyms
-  \begingroup
-  \listofalgorithms
-  \let\clearpage\relax
-  \listoflistings
-  \endgroup
-
 \end{document}
