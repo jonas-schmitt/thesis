@@ -99,6 +99,7 @@
 \usepackage[titles]{tocloft}
 \usepackage{minted}
 \usepackage{epigraph}
+\usepackage{rotating}
 
 % Defs and adaptions
 \newcommand{\ps}[1]{\langle #1 \rangle}
@@ -125,7 +126,7 @@
 \usepackage{microtype}
 % TODO outcomment to check for overfull hboxes
 %\overfullrule=1mm
-\hyphenation{cross-over, Parallelisierungs-schema}
+\hyphenation{cross-over, Parallelisierungs-schema, Evo-Stencils, Helm-holtz}
 
 \AtBeginEnvironment{tabular}{\small}
 
@@ -225,10 +226,10 @@ Prof. Dr. Dietmar Fey}
 \chapter{A Formal Language for Expressing Multigrid Methods}
 \label{chapter:multigrid-formal-language}
   \input{contents/multigrid_grammar.tex}
-\chapter{Automated Multigrid Solver Design with EvoStencils -- Part 1: Core Implementation}
+\chapter{Automated Multigrid Solver Design -- Part 1: Core Implementation}
 \label{chapter:evostencils-1}
   \input{contents/evostencils_part1.tex}
-\chapter{Automated Multigrid Solver Design with EvoStencils -- Part 2: Generalization and Parallelization}
+\chapter{Automated Multigrid Solver Design -- Part 2: Generalization and Parallelization}
   \label{chapter:evostencils-2}
   \input{contents/evostencils_part2.tex}
 \chapter{Experiments and Discussion}

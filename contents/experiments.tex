@@ -244,14 +244,14 @@ For this purpose, we measure the minimum of each of the two objectives within th
 As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D-minimum-objectives} and~\ref{fig:linear-elasticity-2D-minimum-objectives} shows the mean and standard deviation of the current optimum of both objectives over all experiments.
 \begin{figure}[h]
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_convergence_factor_2D_FD_Poisson_fromL2.pdf}
 		\caption{Minimum Convergence Factor}
 		\label{fig:poisson-2D-minimum-convergence-factor}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_execution_time_2D_FD_Poisson_fromL2.pdf}
 		\caption{Minimum Execution Time per Iteration}
@@ -262,14 +262,14 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 \end{figure}
 \begin{figure}
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_convergence_factor_3D_FD_Poisson_fromL2.pdf}
 		\caption{Minimum Convergence Factor}
 		\label{fig:poisson-3D-minimum-convergence-factor}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_execution_time_3D_FD_Poisson_fromL2.pdf}
 		\caption{Minimum Execution Time per Iteration}
@@ -280,14 +280,14 @@ As a result, Figure~\ref{fig:poisson-2D-minimum-objectives},~\ref{fig:poisson-3D
 \end{figure}
 \begin{figure}
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_convergence_factor_2D_FD_LinearElasticity_fromL2.pdf}
 		\caption{Minimum Convergence Factor}
 		\label{fig:linear-elasticity-2D-minimum-convergence-factor}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.675\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/minimum_execution_time_2D_FD_LinearElasticity_fromL2.pdf}
 		\caption{Minimum Execution Time per Iteration}
@@ -695,7 +695,7 @@ However, if we consider the method ES-2, which leads to the fastest solving time
 In particular, ES-2 applies the coarse-grid solver only once within its computations and, therefore, resembles a V-cycle but also includes additional smoothing-based coarse-grid correction steps with a varying amount of smoothing on each level.
 Furthermore, with the exception of a single Jacobi step on the second-coarsest level, it employs exclusively RB-GS smoothing.
 
-\section[Multigrid-Based Preconditioners for the Indefinite \\ Helmholtz Equation]{Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
+\section{Multigrid-Based Preconditioners for the Indefinite Helmholtz Equation}
 While within the last section, we could already demonstrate that our evolutionary program synthesis approach leads to the automated design of multigrid methods with competitive performance compared to common multigrid cycles, none of the PDEs considered there is particularly challenging to solve.   
 Therefore, in order to evaluate whether our approach can achieve any advantages compared to state-of-the-art methods in the case of a problem that is difficult to solve numerically, we consider the indefinite Helmholtz equation.
 At this point, we would like to point out that all results presented in this section have been originally published in~\cite{schmitt2022evolving}.

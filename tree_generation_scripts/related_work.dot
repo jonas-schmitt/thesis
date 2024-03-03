@@ -1,4 +1,5 @@
 digraph G {  
+  rankdir=LR ;
   ordering=in ;
   A[texlbl="AI-Based PDE Solvers"];
   A -> B
