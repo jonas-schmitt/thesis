@@ -423,7 +423,7 @@ or equivalently using the matrix notation
 \end{equation} 
 Since the application of this stencil yields a grid function of different dimensionality than the one to which it is applied, we additionally include the respective step sizes as a sub- and superscript.
 %TODO check if necessary
-If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two- and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
+If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we can define the two-dimensional and three-dimensional full-weighting restriction operator as a tensor product with the corresponding column vector, such that
 \begin{equation}
 	I^{2h_x, 2h_y}_{h_x, h_y} = \frac{1}{4} \begin{bmatrix}
 		1 \\ 2 \\ 1
@@ -466,7 +466,7 @@ If we treat Equation~\eqref{eq:full-weighting-restriction} as a row vector, we c
 \end{bmatrix}^{2h_x, 2h_y, 2h_z}_{h_x, h_y, h_z}
 \end{split}
 \end{equation}
-A second restriction operator based on the idea of averaging neighboring fine grid points is the half-weighting restriction operator, whose two- and three-dimensional versions can be defined as
+A second restriction operator based on the idea of averaging neighboring fine grid points is the half-weighting restriction operator, whose two-dimensional and three-dimensional versions can be defined as
 \begin{equation}
 	I^{2h_x,2h_y}_{h_x, h_y} = \frac{1}{8}
 	\begin{bmatrix}
@@ -560,7 +560,7 @@ A common choice for one-dimensional prolongation is the linear interpolation ope
 	\label{eq:linear-interpolation}
 \end{equation}
 %TODO check if necessary
-Similar to full-weighting restriction, we can derive two- and three-dimensional versions of this operator as tensor products of the form
+Similar to full-weighting restriction, we can derive two-dimensional and three-dimensional versions of this operator as tensor products of the form
 \begin{equation}
 	I_{2h_x, 2h_y}^{h_x, h_y} = \frac{1}{2} \begin{bmatrix}
 		1 \\ 2 \\ 1

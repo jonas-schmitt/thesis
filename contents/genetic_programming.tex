@@ -343,7 +343,7 @@ However, to be valid, the newly inserted production needs to generate a sequence
 As a consequence, point mutation can only be applied to the subset of productions that fulfills this condition, which limits its applicability within G3P.
 
 \paragraph{Recombination}
-While the goal of mutation is to introduce new genetic information into the population, recombination, often also called crossover, aims to combine the genotypes of existing individuals in novel ways to construct individuals with improved fitness compared to their predecessors.
+While the goal of mutation is to introduce new genetic information into the population, recombination, also called crossover, aims to combine the genotypes of existing individuals in novel ways to construct individuals with improved fitness compared to their predecessors.
 In general, recombination operators can be classified into \emph{homologous} and \emph{non-homologous} ones, whereby those from the former category preserve the position of the individual elements of the genome.
 A straightforward way to perform recombination in tree-based GP is to exchange subtrees between two individuals at a certain crossover point, which is called \emph{subtree crossover}.
 Again, to apply this operator within G3P, the crossover point must be chosen in a way that the root nodes of the exchanged branches correspond to the same variable.
