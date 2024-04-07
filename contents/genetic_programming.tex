@@ -75,9 +75,9 @@ This is especially true for languages from the Lisp family, which were originall
 His work can be considered the first implementation of GP~\cite{koza1994genetic}.
 In tree-based GP, all operations are performed on program expression trees, and thus both mutation and crossover must be designed with respect to this representation.
 %TODO: Probably OK to leave out
-%Expression trees can be created in a straightforward way after rewriting each expression in postfix notation.
-%To obtain the corresponding tree, the expression is traversed sequentially by putting each encountered symbol, either in the form of a terminal or an operator that has already been processed, on a stack.
-%For each new operator encountered we then first retrieve the required operands from the stack based on which the tree is created in a bottom-up manner.
+Expression trees can be straightforwardly created by first converting each expression into postfix notation.
+This process involves sequentially traversing the expression and placing each encountered symbol, whether a terminal or a previously processed operator, onto a stack.
+Upon encountering a new operator, we initially retrieve the necessary operands from the stack, based on which the tree is constructed in a bottom-up approach.
 Figure~\ref{fig:gp-expression-tree-examples} shows the corresponding expression trees for $f_1$ and $f_2$.
 \begin{figure}
 	\begin{subfigure}{0.58\textwidth}
