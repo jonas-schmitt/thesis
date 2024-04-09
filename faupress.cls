@@ -1762,6 +1762,7 @@
 
 \newkomafont{supervisor}{\sffamily\normalsize}
 \newkomafont{facultytitle}{\Large\bfseries}
+\newkomafont{facultysubtitle}{\Large\bfseries}
 \newkomafont{faculty}{\Large\normalfont}
 \newkomafont{institute}{\sffamily\normalsize}
 
@@ -1883,7 +1884,9 @@
     \centering
     \vspace*{4.8mm}
     {\usekomafont{facultytitle} \@title\par}
-    \vfill
+     \vspace{6mm}
+    {\usekomafont{facultysubtitle} Automatisierung des Entwurfs von Mehrgitterverfahren mit Evolutionärer Programmsynthese \par}
+    \vspace{6mm}
     {\usekomafont{faculty}
       Der Technischen Fakultät \\
       der Friedrich-Alexander-Universität\\
@@ -1896,8 +1899,8 @@
     {\usekomafont{faculty} vorgelegt von \par}
       \vspace{6.2mm}
     {\usekomafont{faculty} \@firstname\ \@lastname \par}
-      \vspace{6.2mm}
-    {\usekomafont{faculty} aus \@origin \par}
+      %\vspace{6.2mm}
+    %{\usekomafont{faculty} aus \@origin \par}
     \vskip38mm
     \next@tpage
     \raggedright
@@ -1909,7 +1912,7 @@
     \vspace{16mm}
     \begin{tabular}{@{}l l}
       \parbox[b]{20ex}{Tag der mündlichen \newline Prüfung:} & \@oralexam\\[1.25em]
-      \parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
+      %\parbox[b]{20ex}{Vorsitzender des \newline Promotionsorgans:} & \parbox[t]{0.6\textwidth}{\raggedright\@dean}\\[0.5em]
       Gutachter: & \parbox[t]{0.6\textwidth}{\raggedright\@reviewer} 
     \end{tabular}
     \vskip18mm
